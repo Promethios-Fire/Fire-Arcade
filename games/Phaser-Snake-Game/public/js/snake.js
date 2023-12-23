@@ -1,12 +1,16 @@
+
 export default class Snake {
-    constructor(scene) {
+    constructor(scene){
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
         this.moveInterval = 120;
-        this.tileSize = 16;
+        this.tileSize = 8;
         this.spawnZone = this.tileSize*4
         this.direction = Phaser.Math.Vector2.DOWN;
         this.body = []; // body will be a set of boxes
+        this.moveCount = 0;
+        this.q = 3;
+        this.newQuadrant(this.q, 240);
 
         //head of the snake
         this.body.push(this.scene.add.rectangle(
@@ -15,12 +19,10 @@ export default class Snake {
             this.tileSize, 
             this.tileSize, 
             0xff0000
-        ).setOrigin(0));
+            ).setOrigin(0));
         // setOrigin will show the full square at 0,0
 
         this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
-        this.wall = []; // define walls
-        this.wall2 = [];
         this.portal = []; // define a array for portals
 
         // colors
@@ -40,22 +42,18 @@ export default class Snake {
         while (JSON.stringify(this.map1) === JSON.stringify(this.map2)) {
             this.map2 = mapArray();
         }
-        // combine two random quadrant arrays for mapping
+        // combine two random quadrant arrays for mappinng
         this.combinedMapping = this.map1.concat(this.map2);
 
         // call methods
         this.positionApple(); // drop first apple
-        this.positionPortal(); // position portals
-        this.positionWall(); // position walls
+        // this.positionPortal(); // position portals
+        // this.positionWall(); // position walls
         
         // define keys
         scene.input.keyboard.on('keydown', e => {
             this.keydown(e);
         })
-    }
-
-    createMap() {
-
     }
 
     positionApple() {
@@ -68,7 +66,30 @@ export default class Snake {
         if (this.apple.x == this.scene.game.config.width/2 || this.apple.y == this.scene.game.config.width/2) {
             this.apple.x += this.tileSize;
         }
+        this.moveCount++;
+        if (this.moveCount % 3 == 0) {
+            this.positionPortal();
+        }
     }
+
+    newQuadrant(q, qSize) {
+        if (this.tileSize % qSize ==  0) {
+            throw console.error("bad board size");
+        }
+        let walls = q-1;
+
+        this.scene.game.config.width = (q * qSize);
+        this.scene.game.config.height = (q * qSize);
+        for (let j = 1; j < q; j++) {
+            this.positionWall(q, j);
+        }
+        console.log(this.scene.game.config.width);
+
+    }
+
+
+
+
     positionPortal(){
         console.log("*********************************");
         let c = 0;
@@ -80,18 +101,18 @@ export default class Snake {
 
             } else if (this.combinedMapping[i] == 1) { // quadrant 1
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - this.scene.game.config.width/2+this.spawnZone) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - this.scene.game.config.height/2+this.spawnZone) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
+                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - (this.scene.game.config.width/2+this.spawnZone)) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - (this.scene.game.config.height/2+this.spawnZone)) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
 
             } else if (this.combinedMapping[i] == 2) { // quadrant 2
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
                 this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * (this.scene.game.config.height/2 - this.spawnZone*2) + this.spawnZone)/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
 
             } else if (this.combinedMapping[i] == 3) { // quadrant 3
                 this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - this.scene.game.config.width/2+this.spawnZone) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
+                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - (this.scene.game.config.width/2+this.spawnZone)) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
+                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
 
             }
             
@@ -107,14 +128,16 @@ export default class Snake {
         // }
     }
   
-    positionWall() {
+    positionWall(walls, factor) {
        for (let i = 0; i < this.scene.game.config.height; i++) {
-            this.wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-            this.wall[i].x = this.scene.game.config.height/2;
-            this.wall[i].y = i;
-            this.wall2[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
-            this.wall2[i].x = i;
-            this.wall2[i].y = this.scene.game.config.height/2;
+            let wall = [];
+            let wallY = [];
+            wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
+            wall[i].x = (this.scene.game.config.height/walls)*factor;
+            wall[i].y = i;
+            wallY[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
+            wallY[i].x = i;
+            wallY[i].y = (this.scene.game.config.height/walls)*factor;
         
         }
     }
@@ -167,32 +190,7 @@ export default class Snake {
 
         return mapping;
     }
-
-    createMapQuadrant(rows, cols, leftWall = false, rightWall = false, topWall = false, bottomWall = false) {
-        let map = new Array(cols).fill(new Array(rows).fill(0))
-      
-        if (leftWall) {
-            for (let i = 0; i < rows; i++) {
-                map[i][0] = 1;
-            }
-        }
-        if (rightWall) {
-            for (let i = 0; i < rows; i++) {
-                map[i][cols - 1] = 1;
-            }
-        }
-        if (topWall) {
-            for (let i = 0; i < cols; i++) {
-                map[0][i] = 1;
-            }
-        }
-        if (bottomWall) {
-            for (let i = 0; i < cols; i++) {
-                map[rows - 1][i] = 1;
-            }
-        }
-        return map;
-      }
+    
     
     // Game Loop
     update(time){
@@ -219,29 +217,29 @@ export default class Snake {
         }
 
         let j; // check even/odds
-        for (let i = 0; i < 8; i++) {
-            if (this.portal[i].x == x && this.portal[i].y == y) {
-                let check = i % 2; // if portal # even = 0 | if portal # odd = 1
-                if (check < 1) { // if even spawn to portal after it
-                    j = i+1;
-                } else {        // if odd spawn in portal behind it
-                    j = i-1;
-                }
-                if (this.direction.x == 1 && this.direction.y == 0) {
-                    x = this.portal[j].x+this.tileSize;
-                    y = this.portal[j].y;
-                } else if (this.direction.x == -1 && this.direction.y == 0) {
-                    x = this.portal[j].x-this.tileSize;
-                    y = this.portal[j].y;
-                } else if (this.direction.x == 0 && this.direction.y == -1) {
-                    x = this.portal[j].x;
-                    y = this.portal[j].y-this.tileSize;
-                } else if (this.direction.x == 0 && this.direction.y == 1) {
-                    x = this.portal[j].x;
-                    y = this.portal[j].y+this.tileSize;
-                }
-            }
-        }
+        // for (let i = 0; i < 8; i++) {
+        //     if (this.portal[i].x == x && this.portal[i].y == y) {
+        //         let check = i % 2; // if portal # even = 0 | if portal # odd = 1
+        //         if (check < 1) { // if even spawn to portal after it
+        //             j = i+1;
+        //         } else {        // if odd spawn in portal behind it
+        //             j = i-1;
+        //         }
+        //         if (this.direction.x == 1 && this.direction.y == 0) {
+        //             x = this.portal[j].x+this.tileSize;
+        //             y = this.portal[j].y;
+        //         } else if (this.direction.x == -1 && this.direction.y == 0) {
+        //             x = this.portal[j].x-this.tileSize;
+        //             y = this.portal[j].y;
+        //         } else if (this.direction.x == 0 && this.direction.y == -1) {
+        //             x = this.portal[j].x;
+        //             y = this.portal[j].y-this.tileSize;
+        //         } else if (this.direction.x == 0 && this.direction.y == 1) {
+        //             x = this.portal[j].x;
+        //             y = this.portal[j].y+this.tileSize;
+        //         }
+        //     }
+        // }
 
         for (let index = this.body.length-1; index>0; index--){
             this.body[index].x = this.body[index-1].x;
@@ -256,11 +254,17 @@ export default class Snake {
             this.body[0].x < 0 || 
             this.body[0].x >= this.scene.game.config.width ||
             this.body[0].y < 0 || 
-            this.body[0].y >= this.scene.game.config.height ||
-            this.body[0].x == this.scene.game.config.width/2 ||
-            this.body[0].y == this.scene.game.config.height/2 
+            this.body[0].y >= this.scene.game.config.height
         ){
             this.scene.scene.restart();
+        }
+        for (let j = 1; j < this.q; j++ ) {
+            if(
+                this.body[0].x == (this.scene.game.config.height/this.q)*j ||
+                this.body[0].y == (this.scene.game.config.height/this.q)*j
+            ){
+                this.scene.scene.restart();
+            }
         }
 
         // Death by eating itself
