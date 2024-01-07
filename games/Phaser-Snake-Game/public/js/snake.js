@@ -1,5 +1,5 @@
-
 export default class Snake {
+
     constructor(scene){
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
@@ -10,11 +10,12 @@ export default class Snake {
         this.body = []; // body will be a set of boxes
         this.moveCount = 0;
         this.q = 3;
-        this.newQuadrant(this.q, 240);
+        this.qSize = 240;
+        this.newQuadrant(this.q, this.qSize);
 
         //head of the snake
         this.body.push(this.scene.add.rectangle(
-            this.scene.game.config.width -this.tileSize*4, 
+            this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
             this.tileSize, 
             this.tileSize, 
@@ -40,14 +41,14 @@ export default class Snake {
 
         // redo second sequence until it is nothing like the first one
         while (JSON.stringify(this.map1) === JSON.stringify(this.map2)) {
-            this.map2 = mapArray();
+            this.map2 = this.mapArray();
         }
         // combine two random quadrant arrays for mappinng
         this.combinedMapping = this.map1.concat(this.map2);
 
         // call methods
         this.positionApple(); // drop first apple
-        // this.positionPortal(); // position portals
+        this.positionPortal(); // position portals
         // this.positionWall(); // position walls
         
         // define keys
@@ -76,7 +77,6 @@ export default class Snake {
         if (this.tileSize % qSize ==  0) {
             throw console.error("bad board size");
         }
-        let walls = q-1;
 
         this.scene.game.config.width = (q * qSize);
         this.scene.game.config.height = (q * qSize);
@@ -90,42 +90,87 @@ export default class Snake {
 
 
 
-    positionPortal(){
+    positionPortal() {
         console.log("*********************************");
         let c = 0;
-        for (let i = 0; i < 8; i++) {
-            if (this.combinedMapping[i] == 0) { // quadrant 0
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - (this.scene.game.config.height/2+this.spawnZone)) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
+        let z = 0;
+        let index = (this.q * this.q)*2
 
-            } else if (this.combinedMapping[i] == 1) { // quadrant 1
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - (this.scene.game.config.width/2+this.spawnZone)) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height - this.spawnZone) - (this.scene.game.config.height/2+this.spawnZone)) + (this.scene.game.config.height/2+this.spawnZone))/this.tileSize) * this.tileSize;
+        let evenMin = 32;
+        let evenMax = this.qSize/2;
 
-            } else if (this.combinedMapping[i] == 2) { // quadrant 2
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
+        let oddMin = this.qSize/2;
+        let oddMax = this.qSize-32;
 
-            } else if (this.combinedMapping[i] == 3) { // quadrant 3
-                this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
-                this.portal[i].x = Math.floor((Math.random() * ((this.scene.game.config.width - this.spawnZone) - (this.scene.game.config.width/2+this.spawnZone)) + (this.scene.game.config.width/2+this.spawnZone))/this.tileSize) * this.tileSize;
-                this.portal[i].y = Math.floor((Math.random() * ((this.scene.game.config.height/2 - this.spawnZone) - this.spawnZone) + this.spawnZone)/this.tileSize) * this.tileSize;
+        let yMin = 32;
+        let yMax = this.qSize-32;
 
+        for (let i = 0; i < index+1; i++) {
+            this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
+            if (i < (this.q*2)) {
+                if (i % 2 == 0) {
+                    this.portal[i].x = Math.floor((Math.random() * (evenMin - evenMax) + evenMax)/this.tileSize) * this.tileSize;
+                    this.portal[i].y = Math.floor((Math.random() * (yMin - yMax) + yMax)/this.tileSize) * this.tileSize;
+                    evenMin += this.qSize;
+                    evenMax += this.qSize;
+                } else {
+                    this.portal[i].x = Math.floor((Math.random() * (oddMin - oddMax) + oddMax)/this.tileSize) * this.tileSize;
+                    this.portal[i].y = Math.floor((Math.random() * (yMin - yMax) + yMax)/this.tileSize) * this.tileSize;
+                    oddMin += this.qSize;
+                    oddMax += this.qSize;
+                }
+            } else if (i >= this.q*2 && z < this.q*2) {
+                if (i == this.q*2) {
+                    yMin += this.qSize;
+                    yMax += this.qSize;
+                    evenMin = 32;
+                    evenMax = this.qSize/2;
+                    oddMin = this.qSize/2;
+                    oddMax = this.qSize-32;
+                    console.log("check1");
+                }
+                if (i % 2 == 0) {
+                    this.portal[i].x = Math.floor((Math.random() * (evenMin - evenMax) + evenMax)/this.tileSize) * this.tileSize;
+                    this.portal[i].y = Math.floor((Math.random() * (yMin - yMax) + yMax)/this.tileSize) * this.tileSize;
+                    evenMin += this.qSize;
+                    evenMax += this.qSize;
+                } else {
+                    this.portal[i].x = Math.floor((Math.random() * (oddMin - oddMax) + oddMax)/this.tileSize) * this.tileSize;
+                    this.portal[i].y = Math.floor((Math.random() * (yMin - yMax) + yMax)/this.tileSize) * this.tileSize;
+                    oddMin += this.qSize;
+                    oddMax += this.qSize;
+                }
+                z++;
+            } else if (i > this.q*2 && z >= this.q*2) {
+                if (z == this.q*2) {
+                    yMin += this.qSize;
+                    yMax += this.qSize;
+                    evenMin = 32;
+                    evenMax = this.qSize/2;
+                    oddMin = this.qSize/2;
+                    oddMax = this.qSize-32;
+                    z++;
+                    console.log("check2");
+                }
+                if (i % 2 == 0) {
+                    this.portal[i].x = Math.floor((Math.random() * (evenMin - evenMax) + evenMax)/this.tileSize) * this.tileSize;
+                    this.portal[i].y = Math.floor((Math.random() * (yMin - yMax) + yMax)/this.tileSize) * this.tileSize;
+                    evenMin += this.qSize;
+                    evenMax += this.qSize;
+                } else {
+                    this.portal[i].x = Math.floor((Math.random() * (oddMin - oddMax) + oddMax)/this.tileSize) * this.tileSize;
+                    this.portal[i].y = Math.floor((Math.random() * (yMin - yMax) + yMax)/this.tileSize) * this.tileSize;
+                    oddMin += this.qSize;
+                    oddMax += this.qSize;
+                }
             }
-            
-            if (i % 2 > 0) {
-                c++; // change color every even number
-            }
+            // if (i % 2 < 0.5) {
+            //     c++; // change color every even number
+            //     console.log("color");
+            // }
             console.log(this.portal[i].x, this.portal[i].y);
         }
         console.log("*********************************");
-        // let j = 0;
-        // while ( j < this.portal.length) {
-
-        // }
     }
   
     positionWall(walls, factor) {
