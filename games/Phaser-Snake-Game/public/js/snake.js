@@ -11,6 +11,7 @@ export default class Snake {
         this.moveCount = 0;
         this.q = 3;
         this.qSize = 240;
+        this.portalCount = 0;
         this.newQuadrant(this.q, this.qSize);
 
         //head of the snake
@@ -206,7 +207,21 @@ export default class Snake {
                 if(this.direction !== Phaser.Math.Vector2.UP)
                     this.direction = Phaser.Math.Vector2.DOWN;
                 break;
+            case 32:    //space
+            if (this.moveInterval>60) {
+                this.moveInterval = 60;
+            } else {
+                this.moveInterval = 120;
+            }
+                break;
         }
+    }
+        // need to call at the start of every loop 
+    counter() {
+        if (portalCount = 4) {
+            this.positionPortal()
+        }
+        
     }
 
     // Randomly generates a sequence of 0-3 for choosing a portals quadrant
@@ -260,8 +275,15 @@ export default class Snake {
             this.positionApple();
 
         }
+        /** TODO
+         * Neeed to create a solution for portal travel
+         * conditions:
+         * - Needs to not get stuck in previous loop
+         * - Requires to have a way to reset where travel goes.
+         * - Counters? How is it going to factor in.
+         */
 
-        let j; // check even/odds
+        let j;// check even/odds
         // for (let i = 0; i < 8; i++) {
         //     if (this.portal[i].x == x && this.portal[i].y == y) {
         //         let check = i % 2; // if portal # even = 0 | if portal # odd = 1
