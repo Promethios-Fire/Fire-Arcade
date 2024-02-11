@@ -4,24 +4,24 @@ export default class Snake {
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
         this.moveInterval = 120;
-        this.tileSize = 8;
+        this.tileSize = 16;
         this.spawnZone = this.tileSize*4
         this.direction = Phaser.Math.Vector2.DOWN;
         this.body = []; // body will be a set of boxes
         this.moveCount = 0;
         this.q = 3;
-        this.qSize = 240;
+        this.qSize = 256;
         this.portalCount = 0;
         this.newQuadrant(this.q, this.qSize);
 
         //head of the snake
-        this.body.push(this.scene.add.rectangle(
+        this.body.push(this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
+            "snakeHead",
             this.tileSize, 
-            this.tileSize, 
-            0xff0000
-            ).setOrigin(0));
+            this.tileSize,
+            ).setOrigin(0,0));
         // setOrigin will show the full square at 0,0
 
         this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
@@ -81,6 +81,7 @@ export default class Snake {
 
         this.scene.game.config.width = (q * qSize);
         this.scene.game.config.height = (q * qSize);
+        //q is quadrant and we need to omit center one in below function
         for (let j = 1; j < q; j++) {
             this.positionWall(q, j);
         }
@@ -269,8 +270,8 @@ export default class Snake {
         if(this.apple.x === x && this.apple.y === y){
             this.body.push(
                 this.scene.add.
-                rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff)
-                .setOrigin(0)
+                sprite(0,0,"snakeBody")
+                .setOrigin(0,0)
             );
             this.positionApple();
 
