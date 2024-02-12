@@ -18,9 +18,7 @@ export default class Snake {
         this.body.push(this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
-            "snakeHead",
-            this.tileSize, 
-            this.tileSize,
+            "snakeHead"
             ).setOrigin(0,0));
         // setOrigin will show the full square at 0,0
 
@@ -84,6 +82,7 @@ export default class Snake {
         //q is quadrant and we need to omit center one in below function
         for (let j = 1; j < q; j++) {
             this.positionWall(q, j);
+            console.log("J =",j)
         }
         console.log(this.scene.game.config.width);
 
@@ -170,22 +169,23 @@ export default class Snake {
             //     c++; // change color every even number
             //     console.log("color");
             // }
-            console.log(this.portal[i].x, this.portal[i].y);
+            //console.log(this.portal[i].x, this.portal[i].y);
         }
         console.log("*********************************");
     }
   
     positionWall(walls, factor) {
-       for (let i = 0; i < this.scene.game.config.height; i++) {
+       for (let i = -15; i < this.scene.game.config.height; i++) {
+            i += 15 // use 15 here because counting in steps of 15 from 0 means it's only printing a tile every 16 pixels
             let wall = [];
             let wallY = [];
-            wall[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
+            wall[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
             wall[i].x = (this.scene.game.config.height/walls)*factor;
             wall[i].y = i;
-            wallY[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0xffffff).setOrigin(0);
+            wallY[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
             wallY[i].x = i;
             wallY[i].y = (this.scene.game.config.height/walls)*factor;
-        
+
         }
     }
 
