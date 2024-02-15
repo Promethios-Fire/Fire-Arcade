@@ -23,7 +23,11 @@ export default class Snake {
 
         // setOrigin will show the full square at 0,0
 
-        this.apple = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
+        this.apples = []
+        this.apples[0] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
+        this.apples[1] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
+        this.apples[2] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
+        
         this.portal = []; // define a array for portals
         //this.wall = [];
 
@@ -49,7 +53,9 @@ export default class Snake {
         this.combinedMapping = this.map1.concat(this.map2);
 
         // call methods
-        this.positionApple(); // drop first apple
+        this.positionApple(0); // drop first apple
+        this.positionApple(1); // drop first apple
+        this.positionApple(2); // drop first apple
         this.positionPortal(); // position portals
         // this.positionWall(); // position walls
         
@@ -60,16 +66,16 @@ export default class Snake {
         this.spaceBar = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }
 
+    positionApple(i) {
+        this.apples[i].x = Math.floor(
 
-    positionApple() {
-        this.apple.x = Math.floor(
             (Math.random() * this.scene.game.config.width)/this.tileSize
             ) * this.tileSize;
-        this.apple.y = Math.floor(
+        this.apples[i].y = Math.floor(
             (Math.random() * this.scene.game.config.height)/this.tileSize
             ) * this.tileSize;
-        if (this.apple.x == this.scene.game.config.width/2 || this.apple.y == this.scene.game.config.width/2) {
-            this.apple.x += this.tileSize;
+        if (this.apples[i].x == this.scene.game.config.width/2 || this.apples[i].y == this.scene.game.config.width/2) {
+            this.apples[i].x += this.tileSize;
         }
         this.moveCount++;
         if (this.moveCount % 3 == 0) {
@@ -281,13 +287,31 @@ export default class Snake {
     
 
         // if snakes eat the apple
-        if(this.apple.x === x && this.apple.y === y){
+        if(this.apples[0].x === x && this.apples[0].y === y){
             this.body.push(
                 this.scene.add.
                 sprite(0,0,"snakeBody")
                 .setOrigin(0,0)
             );
-            this.positionApple();
+            this.positionApple(0);
+
+        }
+        if(this.apples[1].x === x && this.apples[1].y === y){
+            this.body.push(
+                this.scene.add.
+                sprite(0,0,"snakeBody")
+                .setOrigin(0,0)
+            );
+            this.positionApple(1);
+
+        }
+        if(this.apples[2].x === x && this.apples[2].y === y){
+            this.body.push(
+                this.scene.add.
+                sprite(0,0,"snakeBody")
+                .setOrigin(0,0)
+            );
+            this.positionApple(2);
 
         }
         /** TODO
