@@ -10,6 +10,7 @@ export default class MainScene extends Phaser.Scene{
     preload(){
         this.load.image("snakeHead","/assets/snakeHead.png")
         this.load.image("snakeBody","/assets/snakeBody.png")
+        this.load.image("apple","/assets/apple.png")
         this.load.image("wallSing01","/assets/wallSingle01.png")
     }
     create(){

@@ -22,11 +22,23 @@ export default class Snake {
             ).setOrigin(0,0));
 
         // setOrigin will show the full square at 0,0
-
+        // setOrigin with .0625 moves it over one pixel which is needed because apple is over 16x16 pixels
         this.apples = []
-        this.apples[0] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
-        this.apples[1] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
-        this.apples[2] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
+        this.apples[0] = this.scene.add.sprite(
+            this.scene.game.config.width -this.tileSize*4,
+            this.scene.game.config.height/2, 
+            "apple"
+            ).setOrigin(.0625,.0625);
+        this.apples[1] = this.scene.add.sprite(
+            this.scene.game.config.width -this.tileSize*4,
+            this.scene.game.config.height/2, 
+            "apple"
+            ).setOrigin(.0625,.0625);
+        this.apples[2] = this.scene.add.sprite(
+            this.scene.game.config.width -this.tileSize*4,
+            this.scene.game.config.height/2, 
+            "apple"
+            ).setOrigin(.0625,.0625);
         
         this.portal = []; // define a array for portals
         //this.wall = [];
