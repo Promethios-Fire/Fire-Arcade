@@ -4,7 +4,7 @@ import Snake from './snake.js'
 export default class MainScene extends Phaser.Scene{
     constructor() {
         super('MainScene')
-
+        
         this.player
     }
     preload(){
