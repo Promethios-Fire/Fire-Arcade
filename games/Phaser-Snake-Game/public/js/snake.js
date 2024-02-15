@@ -20,6 +20,7 @@ export default class Snake {
             this.scene.game.config.height/2, 
             "snakeHead"
             ).setOrigin(0,0));
+
         // setOrigin will show the full square at 0,0
 
         this.apples = []
@@ -28,6 +29,8 @@ export default class Snake {
         this.apples[2] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, 0x00ff00).setOrigin(0) // apple asset
         
         this.portal = []; // define a array for portals
+        //this.wall = [];
+
 
         // colors
         this.color = [];
@@ -60,10 +63,12 @@ export default class Snake {
         scene.input.keyboard.on('keydown', e => {
             this.keydown(e);
         })
+        this.spaceBar = scene.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
     }
 
     positionApple(i) {
         this.apples[i].x = Math.floor(
+
             (Math.random() * this.scene.game.config.width)/this.tileSize
             ) * this.tileSize;
         this.apples[i].y = Math.floor(
@@ -85,7 +90,7 @@ export default class Snake {
 
         this.scene.game.config.width = (q * qSize);
         this.scene.game.config.height = (q * qSize);
-        //q is quadrant and we need to omit center one in below function
+        //q is quadrant
         for (let j = 1; j < q; j++) {
             this.positionWall(q, j);
             console.log("J =",j)
@@ -182,16 +187,19 @@ export default class Snake {
   
     positionWall(walls, factor) {
        for (let i = -15; i < this.scene.game.config.height; i++) {
-            i += 15 // use 15 here because counting in steps of 15 from 0 means it's only printing a tile every 16 pixels
-            let wall = [];
-            let wallY = [];
-            wall[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
-            wall[i].x = (this.scene.game.config.height/walls)*factor;
-            wall[i].y = i;
-            wallY[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
-            wallY[i].x = i;
-            wallY[i].y = (this.scene.game.config.height/walls)*factor;
+            if (i <256 || i > 496){
+                i += 15 // use 15 here because counting in steps of 16 means it's only printing a tile every 16 pixels
+                let wall = [];
+                let wallY = [];
+                wall[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
+                wall[i].x = (this.scene.game.config.height/walls)*factor;
+                wall[i].y = i;
 
+
+                wallY[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
+                wallY[i].x = i;
+                wallY[i].y = (this.scene.game.config.height/walls)*factor;
+            }
         }
     }
 
@@ -214,13 +222,13 @@ export default class Snake {
                 if(this.direction !== Phaser.Math.Vector2.UP)
                     this.direction = Phaser.Math.Vector2.DOWN;
                 break;
-            case 32:    //space
+            /*case 32:    //space
             if (this.moveInterval>60) {
                 this.moveInterval = 60;
             } else {
                 this.moveInterval = 120;
             }
-                break;
+                break;*/
         }
     }
         // need to call at the start of every loop 
@@ -264,13 +272,19 @@ export default class Snake {
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
             this.move();
+            console.log(this.spaceBar.isDown);
+        }
+        if (!this.spaceBar.isDown){
+            this.moveInterval = 120;}
+        else{
+            this.moveInterval = 60;
         }
     }
 
     move(){
         let x = this.body[0].x + this.direction.x * this.tileSize;
         let y = this.body[0].y + this.direction.y * this.tileSize;
-       
+    
 
         // if snakes eat the apple
         if(this.apples[0].x === x && this.apples[0].y === y){
@@ -342,12 +356,14 @@ export default class Snake {
         this.body[0].y = y;
 
         // Death by hitting the wall
-        if(
+        //if (this.wallSpawnX == x && this.wallSpawnY == y) {
+        /*if(
             this.body[0].x < 0 || 
             this.body[0].x >= this.scene.game.config.width ||
             this.body[0].y < 0 || 
             this.body[0].y >= this.scene.game.config.height
         ){
+            
             this.scene.scene.restart();
         }
         for (let j = 1; j < this.q; j++ ) {
@@ -357,7 +373,7 @@ export default class Snake {
             ){
                 this.scene.scene.restart();
             }
-        }
+        }*/
 
         // Death by eating itself
         let tail = this.body.slice(1);  // tail - headpos === any of tail positions
