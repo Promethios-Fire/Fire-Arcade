@@ -3,7 +3,7 @@ export default class Snake {
     constructor(scene){
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
-        this.moveInterval = 120;
+        // this.moveInterval = 80;
         this.tileSize = 32;
         this.spawnZone = this.tileSize*4
         this.direction = Phaser.Math.Vector2.DOWN;
@@ -199,9 +199,9 @@ export default class Snake {
     }
 
     positionWall(walls, factor) {
-       for (let i = -15; i < this.scene.game.config.height; i++) {
+       for (let i = -31; i < this.scene.game.config.height; i++) {
             if (i <256 || i > 496){
-                i += 15 // use 15 here because counting in steps of 16 means it's only printing a tile every 16 pixels
+                i += 31 // use 15 here because counting in steps of 32 means it's only printing a tile every 32 pixels
                 let wall = [];
                 let wallY = [];
                 wall[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01x32").setOrigin(0);
@@ -292,9 +292,9 @@ export default class Snake {
             console.log(this.previousDirection)
         }
         if (!this.spaceBar.isDown){
-            this.moveInterval = 120;}
+            this.moveInterval = 64;} // Less is Faster
         else{
-            this.moveInterval = 60;
+            this.moveInterval = 32;
         }
         
     }
