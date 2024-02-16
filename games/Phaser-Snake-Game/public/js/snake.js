@@ -4,7 +4,7 @@ export default class Snake {
         this.scene = scene;
         this.lastMoveTime = 0; // The last time we called move()
         this.moveInterval = 120;
-        this.tileSize = 16;
+        this.tileSize = 32;
         this.spawnZone = this.tileSize*4
         this.direction = Phaser.Math.Vector2.DOWN;
         this.previousDirection = Phaser.Math.Vector2.DOWN;
@@ -19,7 +19,7 @@ export default class Snake {
         this.body.push(this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
-            "snakeHead"
+            "snakeHead32"
             ).setOrigin(0,0));
 
         // setOrigin will show the full square at 0,0
@@ -204,12 +204,12 @@ export default class Snake {
                 i += 15 // use 15 here because counting in steps of 16 means it's only printing a tile every 16 pixels
                 let wall = [];
                 let wallY = [];
-                wall[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
+                wall[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01x32").setOrigin(0);
                 wall[i].x = (this.scene.game.config.height/walls)*factor;
                 wall[i].y = i;
 
 
-                wallY[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01").setOrigin(0);
+                wallY[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "wallSing01x32").setOrigin(0);
                 wallY[i].x = i;
                 wallY[i].y = (this.scene.game.config.height/walls)*factor;
             }
@@ -309,7 +309,7 @@ export default class Snake {
         if(this.apples[0].x === x && this.apples[0].y === y){
             this.body.push(
                 this.scene.add.
-                sprite(0,0,"snakeBody")
+                sprite(0,0,"snakeBody32")
                 .setOrigin(0,0)
             );
             this.positionApple(0);
@@ -318,7 +318,7 @@ export default class Snake {
         if(this.apples[1].x === x && this.apples[1].y === y){
             this.body.push(
                 this.scene.add.
-                sprite(0,0,"snakeBody")
+                sprite(0,0,"snakeBody32")
                 .setOrigin(0,0)
             );
             this.positionApple(1);
@@ -327,7 +327,7 @@ export default class Snake {
         if(this.apples[2].x === x && this.apples[2].y === y){
             this.body.push(
                 this.scene.add.
-                sprite(0,0,"snakeBody")
+                sprite(0,0,"snakeBody32")
                 .setOrigin(0,0)
             );
             this.positionApple(2);
