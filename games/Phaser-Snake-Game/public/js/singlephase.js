@@ -5,6 +5,15 @@ const config = {
     height: 768,
     type: Phaser.AUTO,
     parent: 'phaser-game',
+    physics: {
+        default: 'matter',
+        matter: {
+            gravity: {
+                x: 0,
+                y: 0
+            }
+        }
+    },
     scene: [MainScene]
 };
 

@@ -13,6 +13,7 @@ export default class MainScene extends Phaser.Scene{
         this.load.image("snakeBody","/assets/snakeBody.png")
         this.load.image("snakeBody32","/assets/snakeBody32.png")
         this.load.image("apple","/assets/apple.png")
+        this.load.image("applex32","/assets/applex32.png")
         this.load.image("portalBlue","/assets/portalBlue.png")
         this.load.image("wallSing01","/assets/wallSingle01.png")
         this.load.image("wallSing01x32","/assets/wallSingle01x32.png")

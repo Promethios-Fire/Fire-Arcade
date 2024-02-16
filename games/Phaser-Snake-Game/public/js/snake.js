@@ -17,8 +17,8 @@ export default class Snake {
 
         //head of the snake
         this.body.push(this.scene.add.sprite(
-            this.scene.game.config.width/2, // In the middle
-            this.scene.game.config.height/300, 
+            this.scene.game.config.width -this.tileSize*4,
+            this.scene.game.config.height/2, 
             "snakeHead32"
             ).setOrigin(0,0));
 
@@ -28,17 +28,17 @@ export default class Snake {
         this.apples[0] = this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
-            "apple"
+            "applex32"
             ).setOrigin(.0625,.0625);
         this.apples[1] = this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
-            "apple"
+            "applex32"
             ).setOrigin(.0625,.0625);
         this.apples[2] = this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
             this.scene.game.config.height/2, 
-            "apple"
+            "applex32"
             ).setOrigin(.0625,.0625);
         
         this.portal = []; // define a array for portals
