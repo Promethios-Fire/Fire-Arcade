@@ -7,6 +7,7 @@ export default class Snake {
         this.tileSize = 16;
         this.spawnZone = this.tileSize*4
         this.direction = Phaser.Math.Vector2.DOWN;
+        this.previousDirection = Phaser.Math.Vector2.DOWN;
         this.body = []; // body will be a set of boxes
         this.moveCount = 0;
         this.q = 3;
@@ -22,7 +23,7 @@ export default class Snake {
             ).setOrigin(0,0));
 
         // setOrigin will show the full square at 0,0
-        // setOrigin with .0625 moves it over one pixel which is needed because apple is over 16x16 pixels
+        // setOrigin with .0625 moves it over one pixel which is needed because apple is over 16x16 pixels(1 tile)
         this.apples = []
         this.apples[0] = this.scene.add.sprite(
             this.scene.game.config.width -this.tileSize*4,
@@ -130,7 +131,7 @@ export default class Snake {
         let yMax = this.qSize-32;
 
         for (let i = 0; i < index+1; i++) {
-            this.portal[i] = this.scene.add.rectangle(0, 0, this.tileSize, this.tileSize, this.color[c]).setOrigin(0)
+            this.portal[i] = this.scene.add.sprite(this.tileSize, this.tileSize, "portalBlue").setOrigin(.0625,.0625);
             if (i < (this.q*2)) {
                 if (i % 2 == 0) {
                     this.portal[i].x = Math.floor((Math.random() * (evenMin - evenMax) + evenMax)/this.tileSize) * this.tileSize;
@@ -196,7 +197,7 @@ export default class Snake {
         }
         console.log("*********************************");
     }
-  
+
     positionWall(walls, factor) {
        for (let i = -15; i < this.scene.game.config.height; i++) {
             if (i <256 || i > 496){
@@ -219,20 +220,24 @@ export default class Snake {
         // console.log(event);
         switch(event.keyCode){
             case 37:    //left
-                if(this.direction !== Phaser.Math.Vector2.RIGHT)    
+                if(this.direction !== Phaser.Math.Vector2.RIGHT && this.direction == this.previousDirection)    
                     this.direction = Phaser.Math.Vector2.LEFT;
+                    this.moveCount = 0;
                 break;
             case 38:    //up
-                if(this.direction !== Phaser.Math.Vector2.DOWN)
+                if(this.direction !== Phaser.Math.Vector2.DOWN && this.direction == this.previousDirection)
                     this.direction = Phaser.Math.Vector2.UP;
+                    this.moveCount = 0;
                 break;
             case 39:    //right
-                if(this.direction !== Phaser.Math.Vector2.LEFT)
+                if(this.direction !== Phaser.Math.Vector2.LEFT && this.direction == this.previousDirection)
                     this.direction = Phaser.Math.Vector2.RIGHT;
+                    this.moveCount = 0;
                 break;
             case 40:    //down
-                if(this.direction !== Phaser.Math.Vector2.UP)
+                if(this.direction !== Phaser.Math.Vector2.UP && this.direction == this.previousDirection)
                     this.direction = Phaser.Math.Vector2.DOWN;
+                    this.moveCount = 0;
                 break;
             /*case 32:    //space
             if (this.moveInterval>60) {
@@ -284,19 +289,21 @@ export default class Snake {
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
             this.move();
-            console.log(this.spaceBar.isDown);
+            console.log(this.previousDirection)
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = 120;}
         else{
             this.moveInterval = 60;
         }
+        
     }
 
     move(){
         let x = this.body[0].x + this.direction.x * this.tileSize;
         let y = this.body[0].y + this.direction.y * this.tileSize;
-    
+        
+        this.previousDirection = this.direction;
 
         // if snakes eat the apple
         if(this.apples[0].x === x && this.apples[0].y === y){
@@ -368,7 +375,6 @@ export default class Snake {
         this.body[0].y = y;
 
         // Death by hitting the wall
-        //if (this.wallSpawnX == x && this.wallSpawnY == y) {
         /*if(
             this.body[0].x < 0 || 
             this.body[0].x >= this.scene.game.config.width ||
