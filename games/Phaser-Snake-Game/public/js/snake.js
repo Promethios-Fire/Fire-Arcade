@@ -292,7 +292,7 @@ export default class Snake {
             console.log(this.previousDirection)
         }
         if (!this.spaceBar.isDown){
-            this.moveInterval = 64;} // Less is Faster
+            this.moveInterval = 96;} // Less is Faster
         else{
             this.moveInterval = 32;
         }
