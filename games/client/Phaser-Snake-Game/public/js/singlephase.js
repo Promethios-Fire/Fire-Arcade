@@ -6,7 +6,7 @@ const config = {
     type: Phaser.AUTO,
     parent: 'phaser-game',
     physics: {
-        default: 'matter',
+        default: 'arcade',
         matter: {
             gravity: {
                 x: 0,

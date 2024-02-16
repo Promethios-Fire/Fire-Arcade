@@ -55,16 +55,7 @@ export default class Snake {
         // map out portal spawns
         this.map1 = [];
         this.map2 = [];
-        this.map1 = this.mapArray();
-        this.map2 = this.mapArray();
-
-        // redo second sequence until it is nothing like the first one
-        while (JSON.stringify(this.map1) === JSON.stringify(this.map2)) {
-            this.map2 = this.mapArray();
-        }
-        // combine two random quadrant arrays for mappinng
-        this.combinedMapping = this.map1.concat(this.map2);
-
+        
         // call methods
         this.positionApple(0); // drop first apple
         this.positionApple(1); // drop first apple
@@ -256,34 +247,6 @@ export default class Snake {
         
     }
 
-    // Randomly generates a sequence of 0-3 for choosing a portals quadrant
-    // 0 | 1
-    // __|__
-    //   | 
-    // 2 | 3
-    mapArray() {
-        let numbers = [0, 1, 2, 3, 0, 1, 2, 3];
-        let mapping = [];
-
-        while (numbers.length > 0) {
-            // Exclude numbers that are the same as the last number added
-            let options = numbers.filter(n => n !== mapping[mapping.length - 1]);
-
-            // Select a random number from the options
-            let randomIndex = Math.floor(Math.random() * options.length);
-            let number = options[randomIndex];
-
-            // Add the number to the mapping
-            mapping.push(number);
-
-            // Remove the number from the numbers array
-            numbers = numbers.filter(n => n !== number);
-        }
-
-        return mapping;
-    }
-    
-    
     // Game Loop
     update(time){
         if(time >= this.lastMoveTime + this.moveInterval){
