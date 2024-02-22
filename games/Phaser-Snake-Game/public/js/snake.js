@@ -312,12 +312,12 @@ function create ()
         let tail = this.body.slice(1);  // tail - headpos === any of tail positions
 
         // if any tailpos == headpos
-        if(
-            tail.some(
-                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-        ){
-            this.alive = false;
-        }
+        //if(
+        //   tail.some(
+        //        pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
+        //){
+        //    this.alive = false;
+        //}
 
         
         scene.portals.forEach(portal => { 
@@ -356,17 +356,6 @@ function create ()
     
     // width 25 grid
     // width 19
-
-    for (let i = 0; i <= END_X; i++) {
-        wall = new Wall(this, i, 0);
-        wall = new Wall(this, i, 19);
-      }
-    
-    var wall = new Wall(this, 10, 10);
-    var wall = new Wall(this, 10, 11);
-    var wall = new Wall(this, 10, 12);
-    var wall = new Wall(this, 10, 13);
-    var wall = new Wall(this, 10, 14);
 
     for (let index = 0; index < 3; index++) {
         var food = new Food(this);
