@@ -1,7 +1,7 @@
 var config = {
     type: Phaser.WEBGL,
-    width: 768, // If you change these remember 
-    height: 640,// to update below as well
+    width: 480,  
+    height: 416,
     parent: 'phaser-example',
     scene: {
         preload: preload,
@@ -35,7 +35,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 // DEBUG OPTIONS
 
 var DEBUG = true;
-var DEBUG_AREA_ALPHA = 0.2;   // Between 0,1 to make portal areas appear
+var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 const game = new Phaser.Game(config);
 
@@ -363,28 +363,24 @@ function create ()
     }
 
     // Todo Portal Spawning Algorithm
-    var spawnAreaA = new SpawnArea(this, 1,1,7,5, 0x6666ff);
-    var spawnAreaB = new SpawnArea(this, 9,1,6,5, 0x6666ff);
-    var spawnAreaC = new SpawnArea(this, 16,1,7,5, 0x6666ff);
-    var spawnAreaD = new SpawnArea(this, 1,7,6,6, 0x6666ff);
-    var spawnAreaE = new SpawnArea(this, 17,7,6,6, 0x6666ff);
-    var spawnAreaF = new SpawnArea(this, 1,14,7,5, 0x6666ff);
-    var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
-    var spawnAreaH = new SpawnArea(this, 16,14,7,5, 0x6666ff);
+    var spawnAreaA = new SpawnArea(this, 1,1,6,5, 0x6666ff);
+    var spawnAreaB = new SpawnArea(this, 8,1,6,5, 0x6666ff);
+    var spawnAreaC = new SpawnArea(this, 1,7,6,5, 0x6666ff);
+    var spawnAreaD = new SpawnArea(this, 8,7,6,5, 0x6666ff);
+    //var spawnAreaE = new SpawnArea(this, 17,7,6,5, 0x6666ff);
+    //var spawnAreaF = new SpawnArea(this, 1,14,6,5, 0x6666ff);
+    //var spawnAreaG = new SpawnArea(this, 9,14,6,5, 0x6666ff);
+    //var spawnAreaH = new SpawnArea(this, 16,14,6,5, 0x6666ff);
 
 
     var A1 = spawnAreaA.genPortalChords(this);
-    var H1 = spawnAreaH.genPortalChords(this);
-
-    var G1 = spawnAreaG.genPortalChords(this);
-    var A2 = spawnAreaA.genPortalChords(this);
+    var B1 = spawnAreaB.genPortalChords(this);
 
     var C1 = spawnAreaC.genPortalChords(this);
-    var F1 = spawnAreaF.genPortalChords(this);
+    var D1 = spawnAreaD.genPortalChords(this);
 
-    makePair(this, A1, H1);
-    makePair(this, C1, F1);
-    makePair(this, G1, A2);
+    makePair(this, A1, D1);
+    makePair(this, B1, C1);
 
 }
 
@@ -504,12 +500,20 @@ function updateDirection(game, event)
         }
     });
 
+    
     this.walls.forEach(wall => {
         if(snake.head.x === wall.x && snake.head.y === wall.y){
             snake.alive = false;
             return 'valid';
         }
     });
+
+    // Win function
+    if (this.fruitCount >= 99) {
+        console.log("YOU WIN");
+        console.log("SCORE = ", this.score);
+        game.destroy();
+    }
 }
 
 
