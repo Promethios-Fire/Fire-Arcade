@@ -78,15 +78,27 @@ function create ()
     this.walls = [];
     this.portals = [];
 
+
     // Start Fruit Score Timer
     this.score = 0;
     if (DEBUG) { console.log("STARTING SCORE TIMER"); }
+
+    this.scoreText = this.add.text(1*GRID, 1*GRID , this.score, { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: "32px" });
+    // this.scoreText.setOrigin(0,0);
     
     this.scoreTimer = this.time.addEvent({
         delay: 10000,
         paused: false
         });
     this.fruitCount = 0;
+
+    this.timerText = this.add.text(SCREEN_WIDTH/2, 1*GRID , 
+                                    this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                                    { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+                                      fontSize: "32px"});
+    this.timerText.setAlign("center");
+    this.timerText.setOrigin(0,0);
+
 
     
     this.lastMoveTime = 0; // The last time we called move()
@@ -509,6 +521,8 @@ function updateDirection(game, event)
     else{
         this.moveInterval = 32;
     }
+
+    this.timerText.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
     //console.log(this.apples[0]);
    
     // Check collision for all Fruits
@@ -519,6 +533,7 @@ function updateDirection(game, event)
             fruit.move(this);
             var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             this.score = this.score + pointsToAdd;
+            this.scoreText.setText(this.score);
             this.fruitCount++;
             
             if (DEBUG) {console.log(                         
