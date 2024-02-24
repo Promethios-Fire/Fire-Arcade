@@ -105,7 +105,7 @@ function create ()
 
     
     this.lastMoveTime = 0; // The last time we called move()
-    this.moveInterval = 96;
+    //this.moveInterval = 128;
 
     // define keys       
     this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
@@ -164,10 +164,18 @@ function create ()
                 }
             }
         
+            
+            console.log(scene.walls);
             // Make all the unsafe places unsafe
-            /*scene.walls.forEach(wall => {
-                testGrid[wall.x/GRID][wall.y/GRID] = false;
-            });*/
+            scene.walls.forEach(wall => {
+                // Hack to sanitize index undefined value
+                // Current Tiled input script adds additional X values.
+                if (wall.x < SCREEN_WIDTH) {
+                    console.log(wall.x/GRID, wall.y/GRID);
+                    testGrid[wall.x/GRID][wall.y/GRID] = false; //
+                    console.log(testGrid[wall.x/GRID][wall.y/GRID]) 
+                }
+            });
 
             scene.apples.forEach(fruit => {
                 testGrid[fruit.x/GRID][fruit.y/GRID] = false;
@@ -520,7 +528,7 @@ function updateDirection(game, event)
         snake.move(this);
     }
     if (!this.spaceBar.isDown){
-        this.moveInterval = 96;} // Less is Faster
+        this.moveInterval = 112;} // Less is Faster
     else{
         this.moveInterval = 32;
     }
