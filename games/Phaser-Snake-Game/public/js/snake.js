@@ -69,7 +69,6 @@ function create ()
     this.tileset = this.map.addTilesetImage('tileSheet');
     this.layer = this.map.createLayer('Wall', this.tileset);
     
-
     // add background
     this.add.image(286, 286, 'bg01').setDepth(-1);
 
@@ -82,9 +81,6 @@ function create ()
     // Start Fruit Score Timer
     this.score = 0;
     if (DEBUG) { console.log("STARTING SCORE TIMER"); }
-
-    this.scoreText = this.add.text(1*GRID, 1*GRID , this.score, { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: "32px" });
-    // this.scoreText.setOrigin(0,0);
     
     this.scoreTimer = this.time.addEvent({
         delay: 10000,
@@ -92,12 +88,19 @@ function create ()
         });
     this.fruitCount = 0;
 
+    // Initalize Screen Text Objects
+    this.scoreText = this.add.text(1*GRID, 1*GRID , this.score, { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', fontSize: "32px" });
+    // this.scoreText.setOrigin(0,0);
     this.timerText = this.add.text(SCREEN_WIDTH/2, 1*GRID , 
-                                    this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-                                    { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
-                                      fontSize: "32px"});
-    this.timerText.setAlign("center");
-    this.timerText.setOrigin(0,0);
+                                this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+                                { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+                                    fontSize: "32px"});
+    this.fruitCountText = this.add.text(SCREEN_WIDTH - GRID*2, 1*GRID,
+                                        this.fruitCount,
+                                        { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+                                        fontSize: "32px"});
+
+
 
 
     
@@ -533,8 +536,11 @@ function updateDirection(game, event)
             fruit.move(this);
             var pointsToAdd = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
             this.score = this.score + pointsToAdd;
-            this.scoreText.setText(this.score);
             this.fruitCount++;
+            
+            // Text Update
+            this.scoreText.setText(this.score);
+            this.fruitCountText.setText(this.fruitCount);
             
             if (DEBUG) {console.log(                         
                 "SCORE=", this.score, 
