@@ -659,6 +659,14 @@ function updateDirection(game, event)
         console.log("YOU WIN");
         console.log("SCORE = ", this.score);
         this.children.bringToTop(this.scoreText);
+
+        this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
+        ["YOU WIN YAY!", this.score],
+        { fontFamily: 'Georgia, "Goudy Bookletter 1911", Times, serif', 
+            fontSize: "32px",
+            align: "center",
+        });
+
         game.destroy();
     }
 }
