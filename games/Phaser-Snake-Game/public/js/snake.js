@@ -29,6 +29,10 @@ var layer;
 var tileset;
 var map;
 
+
+
+/// I"M CODING YA? AND THE ISSUE IS FIXED
+
 //  Direction consts
 var LEFT = 0;
 var RIGHT = 1;
