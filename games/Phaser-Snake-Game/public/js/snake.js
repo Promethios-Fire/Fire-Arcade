@@ -22,28 +22,7 @@ var config = {
     }
 };
 
-var snake;
 
-// Tilemap variables
-var layer;
-var tileset;
-var map;
-
-
-
-/// I"M CODING YA? AND THE ISSUE IS FIXED
-/// Finished feature
-
-//  Direction consts
-var LEFT = 0;
-var RIGHT = 1;
-var UP = 2;
-var DOWN = 3;
-
-// Screen Globals
-var GRID = 24; // Size of Sprites and GRID. TileSheet specified separately 
-var SCREEN_WIDTH = config.width;
-var SCREEN_HEIGHT = config.height; 
 
 // Edge locations for X and Y
 var END_X = SCREEN_WIDTH/GRID -1;
