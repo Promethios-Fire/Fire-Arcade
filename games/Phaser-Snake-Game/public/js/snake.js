@@ -32,6 +32,7 @@ var map;
 
 
 /// I"M CODING YA? AND THE ISSUE IS FIXED
+/// Finished feature
 
 //  Direction consts
 var LEFT = 0;
