@@ -51,8 +51,6 @@ class GameScene extends Phaser.Scene
 
     create ()
     {
-        
-
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -82,10 +80,11 @@ class GameScene extends Phaser.Scene
         // define keys       
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
+        var ourGame = this.scene.get('GameScene');
+
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
         var ourGame = this.scene.get('GameScene');
         this.input.keyboard.on('keydown', e => {
-
             ourGame.updateDirection(this, e);
         })
 
@@ -115,7 +114,7 @@ class GameScene extends Phaser.Scene
                 });
                 this.fruitTimerText.setOrigin(0,0);
 
-                this.setTexture('blocks', 2);
+                this.setTexture('blocks', 2).setDepth(10);
                 this.move(scene);
                 this.setOrigin(0);
 
@@ -324,7 +323,7 @@ class GameScene extends Phaser.Scene
                 this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
                 
                 this.moveTime = 0;
-                this.heading = 0; // 5 is no direction. Effectively waits for a player input
+                this.heading = LEFT;
             },
             
             grow: function (scene)
@@ -362,6 +361,8 @@ class GameScene extends Phaser.Scene
             ){
                 this.alive = false;
             }
+            
+            this.direction = this.heading;
 
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
