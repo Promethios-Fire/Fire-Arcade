@@ -392,8 +392,33 @@ class GameScene extends Phaser.Scene
             }
             Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
 
-            },
-        });
+            // Check if dead by map
+            if (scene.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
+                snake.alive = false;
+            }
+
+            // Check collision for all Fruits
+            scene.apples.forEach(fruit => { 
+                if(snake.head.x === fruit.x && snake.head.y === fruit.y){
+                    //console.log("HIT");
+                    snake.grow(scene);
+                    fruit.move(scene);
+
+                    //  Dispatch a Scene event
+                    scene.events.emit('addScore'); // Sends to UI Listener
+                    scene.fruitCount++;
+                    
+                    scene.fruitCountText.setText(FRUITGOAL - scene.fruitCount);
+                    
+                    if (DEBUG) {console.log(                         
+                        "FRUITCOUNT=", scene.fruitCount,
+                        );
+                    }
+                    return 'valid';
+                }
+            });
+        },
+    });
 
         snake = new Snake(this, 11, 6);
         
@@ -482,7 +507,7 @@ class GameScene extends Phaser.Scene
         switch (event.keyCode) {
             case 87: // w
             //console.log(event.code, game.time.now);
-            if (snake.heading === LEFT || snake.heading  === RIGHT) { 
+            if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = UP; // Prevents backtracking to death
                 snake.move(game);
                 game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
@@ -491,7 +516,7 @@ class GameScene extends Phaser.Scene
 
             case 65: // a
             //console.log(event.code, game.time.now);
-            if (snake.heading  === UP || snake.heading  === DOWN) {
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
                 snake.heading = LEFT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -500,7 +525,7 @@ class GameScene extends Phaser.Scene
 
             case 83: // s
             //console.log(event.code, game.time.now);
-            if (snake.heading  === LEFT || snake.heading  === RIGHT) { 
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -509,7 +534,7 @@ class GameScene extends Phaser.Scene
 
             case 68: // d
             //console.log(event.code, game.time.now);
-            if (snake.heading  === UP || snake.heading  === DOWN) { 
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -583,26 +608,6 @@ class GameScene extends Phaser.Scene
 
             //Snake head is moved, check collisions
 
-            // Check collision for all Fruits
-            this.apples.forEach(fruit => { 
-                if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-                    //console.log("HIT");
-                    snake.grow(this);
-                    fruit.move(this);
-
-                    //  Dispatch a Scene event
-                    this.events.emit('addScore'); // Sends to UI Listener
-                    this.fruitCount++;
-                    
-                    this.fruitCountText.setText(FRUITGOAL - this.fruitCount);
-                    
-                    if (DEBUG) {console.log(                         
-                        "FRUITCOUNT=", this.fruitCount,
-                        );
-                    }
-                    return 'valid';
-                }
-            });
 
             // Different ways to look for collisions (keep both for documentation)
             
@@ -661,7 +666,7 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
-            if (this.fruitCount >= FRUITGOAL) {
+            if (this.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 this.winText = this.add.text(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 , 
@@ -687,11 +692,6 @@ class GameScene extends Phaser.Scene
             
             // Move at last second
             snake.move(this);
-
-            // Check if dead by map
-            if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-                snake.alive = false;
-            }
         }
         if (!this.spaceBar.isDown){
             this.moveInterval = SPEEDWALK;} // Less is Faster
