@@ -83,8 +83,9 @@ class GameScene extends Phaser.Scene
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
+        var ourGame = this.scene.get('GameScene');
         this.input.keyboard.on('keydown', e => {
-            var ourGame = this.scene.get('GameScene');
+
             ourGame.updateDirection(this, e);
         })
 
@@ -375,19 +376,19 @@ class GameScene extends Phaser.Scene
                 }
             });
 
-            if (this.direction === LEFT)
+            if (this.heading === LEFT)
             {
                 x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
             }
-            else if (this.direction === RIGHT)
+            else if (this.heading === RIGHT)
             {
                 x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
             }
-            else if (this.direction === UP)
+            else if (this.heading === UP)
             {
                 y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
             }
-            else if (this.direction === DOWN)
+            else if (this.heading === DOWN)
             {
                 y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
             }
