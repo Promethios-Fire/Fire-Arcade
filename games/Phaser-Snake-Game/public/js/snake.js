@@ -324,8 +324,7 @@ class GameScene extends Phaser.Scene
                 this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
                 
                 this.moveTime = 0;
-                this.direction = LEFT;
-                this.previousDirection = LEFT;
+                this.heading = 0; // 5 is no direction. Effectively waits for a player input
             },
             
             grow: function (scene)
@@ -349,7 +348,6 @@ class GameScene extends Phaser.Scene
             
             move: function (scene)
             {
-            snake.previousDirection = snake.direction; //this prevents snake from being able to 180
             // start with current head position
             let x = this.head.x;
             let y = this.head.y;
@@ -484,17 +482,16 @@ class GameScene extends Phaser.Scene
         switch (event.keyCode) {
             case 87: // w
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) { 
+            if (snake.heading === LEFT || snake.heading  === RIGHT) { 
                 snake.heading = UP; // Prevents backtracking to death
                 snake.move(game);
-                console.log(game.time.now - game.lastMoveTime);
                 game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
 
             case 65: // a
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) {
+            if (snake.heading  === UP || snake.heading  === DOWN) {
                 snake.heading = LEFT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -503,7 +500,7 @@ class GameScene extends Phaser.Scene
 
             case 83: // s
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT|| snake.body.length <= 2) { 
+            if (snake.heading  === LEFT || snake.heading  === RIGHT) { 
                 snake.heading = DOWN;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -512,7 +509,7 @@ class GameScene extends Phaser.Scene
 
             case 68: // d
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+            if (snake.heading  === UP || snake.heading  === DOWN) { 
                 snake.heading = RIGHT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -521,7 +518,7 @@ class GameScene extends Phaser.Scene
 
             case 38: // UP
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) {
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
                 snake.heading = UP;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -530,7 +527,7 @@ class GameScene extends Phaser.Scene
 
             case 37: // LEFT
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = LEFT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -539,7 +536,7 @@ class GameScene extends Phaser.Scene
 
             case 40: // DOWN
             //console.log(event.code, game.time.now);
-            if (snake.direction === LEFT || snake.direction === RIGHT || snake.body.length <= 2) { 
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -548,7 +545,7 @@ class GameScene extends Phaser.Scene
 
             case 39: // RIGHT
             //console.log(event.code, game.time.now);
-            if (snake.direction === UP || snake.direction === DOWN || snake.body.length <= 2) { 
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
