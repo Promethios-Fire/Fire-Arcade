@@ -6,7 +6,7 @@ var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 var FRUITGOAL = 24;      //............................. Win Condition
 
-var SPEEDWALK = 256; // 96 In milliseconds 
+var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDSPRINT = 24; // 24
 
 // DEBUG OPTIONS
@@ -28,6 +28,19 @@ var RIGHT = 1;
 var UP = 2;
 var DOWN = 3;
 
+var PORTAL_COLORS = [
+    // This color order will be respected. TODO add Slice
+    '#fc0303',
+    '#06f202',
+    '#e2f202',
+    '#fc03f8',
+    //'#AABBCC'
+];
+
+// TODOL: Need to truncate this list based on number of portals.
+// DO this dynamically later based on the number of portal areas.
+
+PORTAL_COLORS.shuf
 
 class GameScene extends Phaser.Scene
 {
@@ -224,7 +237,7 @@ class GameScene extends Phaser.Scene
 
                 scene.portals.push(this);
                 
-                this.tint = color.color;
+                this.tint = color.color; // Color is a Phaser Color Object
                 scene.children.add(this);
 
                 // Add Glow
@@ -249,17 +262,13 @@ class GameScene extends Phaser.Scene
             
         });
 
-        var makePair = function (scene, to, from,i){
-            var color = [Phaser.Display.Color.ValueToColor('#fc0303'),
-            Phaser.Display.Color.ValueToColor('#06f202'),
-            Phaser.Display.Color.ValueToColor('#e2f202'),
-            Phaser.Display.Color.ValueToColor('#fc03f8')
-        ];
-            var p1 = []
-            var p2 = []
+        var makePair = function (scene, to, from){
             
-            p1[i] = new Portal(scene, color[i], to, from);
-            p2[i]= new Portal(scene, color[i], from, to);
+            var colorHex = Phaser.Utils.Array.RemoveRandomElement(PORTAL_COLORS); // May Error if more portals than colors.
+            var color = new Phaser.Display.Color.HexStringToColor(colorHex);
+            
+            var p1 = new Portal(scene, color, to, from);
+            var p2 = new Portal(scene, color, from, to);
         }
 
         var SpawnArea = new Phaser.Class({
@@ -364,8 +373,8 @@ class GameScene extends Phaser.Scene
             ){
                 this.alive = false;
             }
-            
 
+            
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
                     console.log("PORTAL");
@@ -420,8 +429,8 @@ class GameScene extends Phaser.Scene
                     return 'valid';
                 }
             });
-        },
-    });
+            },
+        });
 
         snake = new Snake(this, 11, 6);
         
@@ -494,10 +503,10 @@ class GameScene extends Phaser.Scene
         var J1 = spawnAreaJ.genPortalChords(this);
         var I1 = spawnAreaI.genPortalChords(this);
 
-        makePair(this, A1, H1,0);
-        makePair(this, B1, G1,1);
-        makePair(this, C1, F1,2);
-        makePair(this, J1, I1,3);
+        makePair(this, A1, H1);
+        makePair(this, B1, G1);
+        makePair(this, C1, F1);
+        makePair(this, J1, I1);
 
     }
 
@@ -505,7 +514,7 @@ class GameScene extends Phaser.Scene
     updateDirection(game, event) 
     {
         // console.log(event.keyCode, this.time.now); // all keys
-        //console.profile("UpdateDirection");
+//console.profile("UpdateDirection");
         //console.time("UpdateDirection");
         switch (event.keyCode) {
             case 87: // w
