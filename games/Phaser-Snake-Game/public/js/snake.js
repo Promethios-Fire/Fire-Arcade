@@ -266,7 +266,6 @@ class GameScene extends Phaser.Scene
 
         var makePair = function (scene, to, from){
             
-            console.log(scene.portalColors);
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
