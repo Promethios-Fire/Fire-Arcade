@@ -622,27 +622,7 @@ class GameScene extends Phaser.Scene
         if(time >= this.lastMoveTime + this.moveInterval){
             //console.log(time, this.lastMoveTime, this.moveInterval);
             this.lastMoveTime = time;
-
-            //Snake head is moved, check collisions
-
-
-            // Different ways to look for collisions (keep both for documentation)
-            
-            // Direct lookup method
-            //if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-            //    console.log(this.map.getTileAtWorldXY(snake.head.x, snake.head.y ));
-            //}
-
-            // ForEach method
-            /*this.walls.forEach(wall => {
-                if(snake.head.x === wall.x && snake.head.y === wall.y){
-                    snake.alive = false;
-                    return 'valid';
-                }
-            });
-            */
-
-            
+ 
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
             closestPortal.fx.setActive(false);
@@ -714,8 +694,17 @@ class GameScene extends Phaser.Scene
             this.moveInterval = SPEEDWALK;} // Less is Faster
         else{
             this.moveInterval = SPEEDSPRINT; // Sprinting now
-            var ourUI = this.scene.get('UIScene');
-            ourUI.scoreMulti ++;
+
+            var ourUI = this.scene.get('UIScene'); 
+            var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
+            if (timeLeft > 10) { 
+                // STOPS ADDING IF UNDER 10
+                ourUI.scoreMulti += 0.1;
+            } else {
+                
+            }
+
+
         }
     }
 }
