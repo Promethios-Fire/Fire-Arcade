@@ -10,6 +10,10 @@ var SPEEDWALK = 96; // 96 In milliseconds
 var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDSPRINT = 24; // 24
 
+
+var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
+var SCORE_MULTI_GROWTH = 0.01;
+
 // DEBUG OPTIONS
 
 var DEBUG = false;
@@ -107,7 +111,6 @@ class GameScene extends Phaser.Scene
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             var ourUI = this.scene.get('UIScene');
-            console.log(ourUI.score, ourUI.scoreMulti.toFixed(2), Math.sqrt(ourUI.scoreMulti).toFixed(2));
         }) 
 
         var Food = new Phaser.Class({
@@ -598,9 +601,6 @@ class GameScene extends Phaser.Scene
             if (DEBUG) { console.log(event.code, game.time.now); }
 
         }
-        //console.timeEnd("UpdateDirection");
-        //console.profileEnd();
-
     }
 
     update (time, delta) 
@@ -626,8 +626,6 @@ class GameScene extends Phaser.Scene
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
             closestPortal.fx.setActive(false);
-
-            //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
             
             // Distance on an x y grid
 
@@ -679,7 +677,7 @@ class GameScene extends Phaser.Scene
        
             const ourUI = this.scene.get('UIScene');
             var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            if (timeTick < 10) {
+            if (timeTick < SCORE_FLOOR ) {
                 
             } else {
                 this.apples.forEach( fruit => {
@@ -697,12 +695,14 @@ class GameScene extends Phaser.Scene
 
             var ourUI = this.scene.get('UIScene'); 
             var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
-            if (timeLeft > 10) { 
+            if (timeLeft > SCORE_FLOOR ) { 
                 // STOPS ADDING IF UNDER 10
-                ourUI.scoreMulti += 0.1;
+                ourUI.scoreMulti += SCORE_MULTI_GROWTH;
+                //console.log(Math.sqrt(ourUI.scoreMulti));
             } else {
                 
             }
+ 
 
 
         }
@@ -764,6 +764,15 @@ class UIScene extends Phaser.Scene
             delay: 10000,
             paused: false
             });
+
+            var multiScore = Math.sqrt(this.scoreMulti);
+            
+            console.log(
+                ourGame.fruitCount + 1,
+                this.score, 
+                multiScore.toFixed(2), 
+                (this.score * multiScore).toFixed(2));
+            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
         }, this);
 
         //  Event: saveScore
