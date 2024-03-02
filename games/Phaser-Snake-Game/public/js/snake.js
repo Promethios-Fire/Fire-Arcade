@@ -12,7 +12,7 @@ var SPEEDSPRINT = 24; // 24
 
 // DEBUG OPTIONS
 
-var DEBUG = true;
+var DEBUG = false;
 var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
@@ -105,9 +105,9 @@ class GameScene extends Phaser.Scene
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-            console.log(e.code+" unPress", this.time.now);
+            if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             var ourUI = this.scene.get('UIScene');
-            console.log(ourUI.scoreMulti, Math.sqrt(ourUI.scoreMulti));
+            console.log(ourUI.score, ourUI.scoreMulti.toFixed(2), Math.sqrt(ourUI.scoreMulti).toFixed(2));
         }) 
 
         var Food = new Phaser.Class({
@@ -382,7 +382,7 @@ class GameScene extends Phaser.Scene
             
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
-                    console.log("PORTAL");
+                    if (DEBUG) { console.log("PORTAL"); }
 
                     x = portal.target.x*GRID;
                     y = portal.target.y*GRID;
@@ -595,7 +595,7 @@ class GameScene extends Phaser.Scene
             break;
 
             case 32: // SPACE
-            console.log(event.code, game.time.now);
+            if (DEBUG) { console.log(event.code, game.time.now); }
 
         }
         //console.timeEnd("UpdateDirection");
