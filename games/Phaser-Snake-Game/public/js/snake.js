@@ -40,7 +40,6 @@ var PORTAL_COLORS = [
 // TODOL: Need to truncate this list based on number of portals.
 // DO this dynamically later based on the number of portal areas.
 
-PORTAL_COLORS.shuf
 
 class GameScene extends Phaser.Scene
 {
