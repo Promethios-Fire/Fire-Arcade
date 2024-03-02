@@ -91,6 +91,7 @@ class GameScene extends Phaser.Scene
         this.anims.create(idle)
 
         this.portal = this.add.sprite(32,32, 'portals');
+        this.portal.tint = Math.random() * 0xffffff;
 
         this.portal.play('idle',true)
 
