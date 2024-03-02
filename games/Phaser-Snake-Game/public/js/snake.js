@@ -79,6 +79,21 @@ class GameScene extends Phaser.Scene
 
         this.fruitCount = 0;
 
+        // Animations
+
+        const idle = {
+            key:'idle',
+            frames: this.anims.generateFrameNumbers('portals',{frames:[0,1,2,3,4,5,6,7]}),
+            frameRate:8,
+            repeat: -1
+        }
+
+        this.anims.create(idle)
+
+        this.portal = this.add.sprite(32,32, 'portals');
+
+        this.portal.play('idle',true)
+
         // Make a copy of Portal Colors.
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice(); 
