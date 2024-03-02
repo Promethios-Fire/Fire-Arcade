@@ -733,6 +733,8 @@ class GameScene extends Phaser.Scene
             var ourUI = this.scene.get('UIScene');
             ourUI.scoreMulti ++;
         }
+
+        this.portal.rotation += 0.005; // Rotate test portal
     }
 }
 
