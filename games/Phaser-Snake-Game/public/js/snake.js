@@ -21,7 +21,6 @@ var snake;
 var map;  // Phaser.Tilemaps.Tilemap 
 var tileset;
 
-
 //  Direction consts
 var LEFT = 0;
 var RIGHT = 1;
@@ -37,7 +36,7 @@ var PORTAL_COLORS = [
     //'#AABBCC'
 ];
 
-// TODOL: Need to truncate this list based on number of portals.
+// TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
 
 
@@ -78,6 +77,10 @@ class GameScene extends Phaser.Scene
         this.portals = [];
 
         this.fruitCount = 0;
+
+        // Make a copy of Portal Colors.
+        // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
+        this.portalColors = PORTAL_COLORS.slice(); 
 
         // Initalize Screen Text Objects
         
@@ -263,11 +266,12 @@ class GameScene extends Phaser.Scene
 
         var makePair = function (scene, to, from){
             
-            var colorHex = Phaser.Utils.Array.RemoveRandomElement(PORTAL_COLORS); // May Error if more portals than colors.
+            console.log(scene.portalColors);
+            var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
             var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
+            var p2 = new Portal(scene, color, from, to)
         }
 
         var SpawnArea = new Phaser.Class({
