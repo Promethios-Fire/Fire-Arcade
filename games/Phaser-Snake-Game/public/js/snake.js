@@ -59,6 +59,11 @@ class GameScene extends Phaser.Scene
         this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
+        // Audio
+
+        this.load.setPath('assets/audio');
+        this.load.audio('crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]);
+
     }
 
     create ()
@@ -71,6 +76,10 @@ class GameScene extends Phaser.Scene
         
         // add background
         this.add.image(286, 286, 'bg01').setDepth(-1);
+
+        // Audio
+
+        this.crunch01 = this.sound.add('crunch01');
 
         // arrays for collision detection
         this.apples = [];
@@ -420,6 +429,7 @@ class GameScene extends Phaser.Scene
                     //console.log("HIT");
                     snake.grow(scene);
                     fruit.move(scene);
+                    scene.crunch01.play(); //change to function that plays from random selection
 
                     //  Dispatch a Scene event
                     scene.events.emit('addScore'); // Sends to UI Listener
