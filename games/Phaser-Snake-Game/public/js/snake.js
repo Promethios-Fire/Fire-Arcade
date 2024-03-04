@@ -473,7 +473,7 @@ class GameScene extends Phaser.Scene
                     
                     // Play crunch sound
                     var index = Math.round(Math.random() * scene.crunchSounds.length); 
-                    if (index == 8){ //this is an ugly solution to ensure index isn't called outside of array length -Holden
+                    if (index == 8){ //this is to ensure index isn't called outside of array length
                         index = 7;
                     }
                     console.log(index);
