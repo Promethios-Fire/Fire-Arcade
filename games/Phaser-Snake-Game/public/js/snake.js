@@ -4,7 +4,7 @@
 
 var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-var FRUITGOAL = 24;      //............................. Win Condition
+var FRUITGOAL = 256; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDWALK = 96; // 96 In milliseconds 
@@ -12,6 +12,7 @@ var SPEEDSPRINT = 24; // 24
 
 
 var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
+var BOOST_FLOOR = 80;
 var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
@@ -695,7 +696,7 @@ class GameScene extends Phaser.Scene
 
             var ourUI = this.scene.get('UIScene'); 
             var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
-            if (timeLeft > SCORE_FLOOR ) { 
+            if (timeLeft >= BOOST_FLOOR ) { 
                 // STOPS ADDING IF UNDER 10
                 ourUI.scoreMulti += SCORE_MULTI_GROWTH;
                 //console.log(Math.sqrt(ourUI.scoreMulti));
@@ -769,6 +770,7 @@ class UIScene extends Phaser.Scene
             
             console.log(
                 ourGame.fruitCount + 1,
+                timeLeft,
                 this.score, 
                 multiScore.toFixed(2), 
                 (this.score * multiScore).toFixed(2));
@@ -787,6 +789,11 @@ class UIScene extends Phaser.Scene
             this.score = 0;
             this.scoreMulti = 0;
             currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+
+            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                delay: 10000,
+                paused: false
+             });
 
         }, this);
         
