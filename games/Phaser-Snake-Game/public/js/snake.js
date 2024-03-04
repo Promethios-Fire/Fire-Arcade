@@ -92,6 +92,10 @@ class GameScene extends Phaser.Scene
 
     create ()
     {
+        //RESET
+        this.crunchSounds = [];
+        crunchSounds = this.crunchSounds;
+
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -104,7 +108,7 @@ class GameScene extends Phaser.Scene
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
             {
-                crunchSounds.push(this.sound.add(soundID[0]));
+                this.crunchSounds.push(this.sound.add(soundID[0]));
             });
         //sounds.push(this.sound.add('crunch01'));
         //sounds.push(this.sound.add('crunch02'));
@@ -472,10 +476,10 @@ class GameScene extends Phaser.Scene
                     if (index == 8){ //this is an ugly solution to ensure index isn't called outside of array length -Holden
                         index = 7;
                     }
-                    console.log(index) 
+                    console.log(index);
                     var soundRandom = scene.crunchSounds[index];
                     
-                    soundRandom.play()
+                    soundRandom.play();
 
                     //  Scene.crunch01.play();
                     //  Dispatch a Scene event
