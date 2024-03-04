@@ -4,19 +4,25 @@
 
 var GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-var FRUITGOAL = 24;      //............................. Win Condition
+var FRUITGOAL = 256; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDWALK = 96; // 96 In milliseconds 
 var SPEEDSPRINT = 24; // 24
 
+
+var SCORE_FLOOR = 10; // Floor of Fruit score as it counts down.
+var BOOST_FLOOR = 80;
+var SCORE_MULTI_GROWTH = 0.01;
+
 // DEBUG OPTIONS
 
-var DEBUG = true;
+var DEBUG = false;
 var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 var snake;
+var crunchSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -35,6 +41,17 @@ var PORTAL_COLORS = [
     '#e2f202',
     '#fc03f8',
     //'#AABBCC'
+];
+
+var SOUND_CRUNCH = [
+    ['crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]],
+    ['crunch02', [ 'crunch02.ogg', 'crunch02.mp3' ]],
+    ['crunch03', [ 'crunch03.ogg', 'crunch03.mp3' ]],
+    ['crunch04', [ 'crunch04.ogg', 'crunch04.mp3' ]],
+    ['crunch05', [ 'crunch05.ogg', 'crunch05.mp3' ]],
+    ['crunch06', [ 'crunch06.ogg', 'crunch06.mp3' ]],
+    ['crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]],
+    ['crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]]
 ];
 
 // TODOL: Need to truncate this list based on number of portals areas.
@@ -59,10 +76,31 @@ class GameScene extends Phaser.Scene
         this.load.image('tileSheetx24', 'assets/Tiled/snakeMap.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
+        // Audio
+        this.load.setPath('assets/audio');
+
+        SOUND_CRUNCH.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
+        //this.load.audio('crunch01', [ 'crunch01.ogg', 'crunch01.mp3' ]);
+        //this.load.audio('crunch02', [ 'crunch02.ogg', 'crunch02.mp3' ]);
+        //this.load.audio('crunch03', [ 'crunch03.ogg', 'crunch03.mp3' ]);
+        //this.load.audio('crunch04', [ 'crunch04.ogg', 'crunch04.mp3' ]);
+        //this.load.audio('crunch05', [ 'crunch05.ogg', 'crunch05.mp3' ]);
+        //this.load.audio('crunch06', [ 'crunch06.ogg', 'crunch06.mp3' ]);
+        //this.load.audio('crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]);
+        //this.load.audio('crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]);
     }
+
+    
 
     create ()
     {
+        //RESET
+        this.crunchSounds = [];
+        crunchSounds = this.crunchSounds;
+
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -71,6 +109,23 @@ class GameScene extends Phaser.Scene
         
         // add background
         this.add.image(286, 286, 'bg01').setDepth(-1);
+
+        // Audio
+        SOUND_CRUNCH.forEach(soundID =>
+            {
+                this.crunchSounds.push(this.sound.add(soundID[0]));
+            });
+        //sounds.push(this.sound.add('crunch01'));
+        //sounds.push(this.sound.add('crunch02'));
+        //sounds.push(this.sound.add('crunch03'));
+        //sounds.push(this.sound.add('crunch04'));
+        //sounds.push(this.sound.add('crunch05'));
+        //sounds.push(this.sound.add('crunch06'));
+        //sounds.push(this.sound.add('crunch07'));
+        //sounds.push(this.sound.add('crunch08'));
+
+        this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
+        //console.log(this.sound.length)
 
         // arrays for collision detection
         this.apples = [];
@@ -121,9 +176,8 @@ class GameScene extends Phaser.Scene
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
-            console.log(e.code+" unPress", this.time.now);
+            if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             var ourUI = this.scene.get('UIScene');
-            console.log(ourUI.scoreMulti, Math.sqrt(ourUI.scoreMulti));
         }) 
 
         var Food = new Phaser.Class({
@@ -398,7 +452,7 @@ class GameScene extends Phaser.Scene
             
             scene.portals.forEach(portal => { 
                 if(snake.head.x === portal.x && snake.head.y === portal.y){
-                    console.log("PORTAL");
+                    if (DEBUG) { console.log("PORTAL"); }
 
                     x = portal.target.x*GRID;
                     y = portal.target.y*GRID;
@@ -436,7 +490,18 @@ class GameScene extends Phaser.Scene
                     //console.log("HIT");
                     snake.grow(scene);
                     fruit.move(scene);
+                    
+                    // Play crunch sound
+                    var index = Math.round(Math.random() * scene.crunchSounds.length); 
+                    if (index == 8){ //this is to ensure index isn't called outside of array length
+                        index = 7;
+                    }
+                    console.log(index);
+                    var soundRandom = scene.crunchSounds[index];
+                    
+                    soundRandom.play();
 
+                    //  Scene.crunch01.play();
                     //  Dispatch a Scene event
                     scene.events.emit('addScore'); // Sends to UI Listener
                     scene.fruitCount++;
@@ -611,12 +676,9 @@ class GameScene extends Phaser.Scene
             break;
 
             case 32: // SPACE
-            console.log(event.code, game.time.now);
+            if (DEBUG) { console.log(event.code, game.time.now); }
 
         }
-        //console.timeEnd("UpdateDirection");
-        //console.profileEnd();
-
     }
 
     update (time, delta) 
@@ -638,32 +700,10 @@ class GameScene extends Phaser.Scene
         if(time >= this.lastMoveTime + this.moveInterval){
             //console.log(time, this.lastMoveTime, this.moveInterval);
             this.lastMoveTime = time;
-
-            //Snake head is moved, check collisions
-
-
-            // Different ways to look for collisions (keep both for documentation)
-            
-            // Direct lookup method
-            //if (this.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-            //    console.log(this.map.getTileAtWorldXY(snake.head.x, snake.head.y ));
-            //}
-
-            // ForEach method
-            /*this.walls.forEach(wall => {
-                if(snake.head.x === wall.x && snake.head.y === wall.y){
-                    snake.alive = false;
-                    return 'valid';
-                }
-            });
-            */
-
-            
+ 
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
             closestPortal.fx.setActive(false);
-
-            //var fxPortalGlow = closestPortal.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 10);
             
             // Distance on an x y grid
 
@@ -715,7 +755,7 @@ class GameScene extends Phaser.Scene
        
             const ourUI = this.scene.get('UIScene');
             var timeTick = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            if (timeTick < 10) {
+            if (timeTick < SCORE_FLOOR ) {
                 
             } else {
                 this.apples.forEach( fruit => {
@@ -730,8 +770,19 @@ class GameScene extends Phaser.Scene
             this.moveInterval = SPEEDWALK;} // Less is Faster
         else{
             this.moveInterval = SPEEDSPRINT; // Sprinting now
-            var ourUI = this.scene.get('UIScene');
-            ourUI.scoreMulti ++;
+
+            var ourUI = this.scene.get('UIScene'); 
+            var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10 // VERY INEFFICIENT WAY TO DO THIS
+            if (timeLeft >= BOOST_FLOOR ) { 
+                // STOPS ADDING IF UNDER 10
+                ourUI.scoreMulti += SCORE_MULTI_GROWTH;
+                //console.log(Math.sqrt(ourUI.scoreMulti));
+            } else {
+                
+            }
+ 
+
+
         }
 
         this.portal.rotation += 0.005; // Rotate test portal
@@ -793,6 +844,16 @@ class UIScene extends Phaser.Scene
             delay: 10000,
             paused: false
             });
+
+            var multiScore = Math.sqrt(this.scoreMulti);
+            
+            console.log(
+                ourGame.fruitCount + 1,
+                timeLeft,
+                this.score, 
+                multiScore.toFixed(2), 
+                (this.score * multiScore).toFixed(2));
+            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
         }, this);
 
         //  Event: saveScore
@@ -807,6 +868,11 @@ class UIScene extends Phaser.Scene
             this.score = 0;
             this.scoreMulti = 0;
             currentScore.setText(`Score: ${this.score}`); // Update Text on Screen
+
+            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                delay: 10000,
+                paused: false
+             });
 
         }, this);
         
