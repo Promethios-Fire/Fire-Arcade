@@ -1,4 +1,4 @@
-import {END_X, END_Y, SCREEN_WIDTH, GRID} from "../snake.js";
+import {END_X, END_Y, SCREEN_WIDTH, GRID} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 

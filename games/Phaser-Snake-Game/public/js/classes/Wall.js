@@ -1,4 +1,4 @@
-import {GRID} from "../snake.js";
+import {GRID} from "../SnakeHole.js";
 
 var Wall = new Phaser.Class({
     Extends: Phaser.GameObjects.Image,
