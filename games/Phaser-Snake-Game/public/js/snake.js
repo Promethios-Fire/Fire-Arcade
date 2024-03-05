@@ -1,5 +1,6 @@
 import {Food} from './classes/Food.js';
 import {Wall} from './classes/Wall.js';
+import {Portal} from './classes/Portal.js';
 
 //******************************************************************** */
 // GameSettings           SnakeHole
@@ -146,7 +147,7 @@ class GameScene extends Phaser.Scene
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             var ourUI = this.scene.get('UIScene');
         }) 
-        
+
         var Portal = new Phaser.Class({
             Extends: Phaser.GameObjects.Image,
 
