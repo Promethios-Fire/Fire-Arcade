@@ -1,3 +1,5 @@
+import Food from './classes/Food.js';
+
 //******************************************************************** */
 // GameSettings           SnakeHole
 //******************************************************************** */
@@ -147,6 +149,7 @@ class GameScene extends Phaser.Scene
             var ourUI = this.scene.get('UIScene');
         }) 
 
+        /*
         var Food = new Phaser.Class({
 
             Extends: Phaser.GameObjects.Image,
@@ -243,6 +246,7 @@ class GameScene extends Phaser.Scene
             },    
 
         });
+        */
 
         var Wall = new Phaser.Class({
             Extends: Phaser.GameObjects.Image,
