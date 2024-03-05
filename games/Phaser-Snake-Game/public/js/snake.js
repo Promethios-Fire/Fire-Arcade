@@ -1,4 +1,4 @@
-import Food from './classes/Food.js';
+import {Food} from './classes/Food.js';
 
 //******************************************************************** */
 // GameSettings           SnakeHole
@@ -875,17 +875,19 @@ var config = {
 };
 
 // Screen Settings
-var SCREEN_WIDTH = config.width;
+export const SCREEN_WIDTH = config.width;
 var SCREEN_HEIGHT = config.height; 
 
 // Edge locations for X and Y
-var END_X = SCREEN_WIDTH/GRID -1;
-var END_Y = SCREEN_HEIGHT/GRID -1;
+export const END_X = SCREEN_WIDTH/GRID -1;
+export const END_Y = SCREEN_HEIGHT/GRID -1;
 
 // Collision only works if GRID is whole divisor of HEIGHT and WIDTH
 if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
+
+export { SCREEN_HEIGHT, GRID}
 
 const game = new Phaser.Game(config);
 

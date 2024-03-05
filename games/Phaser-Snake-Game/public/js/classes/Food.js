@@ -1,6 +1,4 @@
-
-
-
+import {END_X,END_Y, SCREEN_WIDTH, GRID } from "../snake.js";
 
 var Food = new Phaser.Class({
 
@@ -98,3 +96,6 @@ var Food = new Phaser.Class({
     },    
 
 });
+
+
+export { Food };
