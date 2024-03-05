@@ -97,5 +97,4 @@ var Food = new Phaser.Class({
 
 });
 
-
 export { Food };

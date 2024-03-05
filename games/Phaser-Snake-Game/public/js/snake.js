@@ -5,7 +5,7 @@ import {Wall} from './classes/Wall.js';
 // GameSettings           SnakeHole
 //******************************************************************** */
 
-export const GRID = 24;           //.................. Size of Sprites and GRID
+export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 var FRUITGOAL = 24; //24 //............................. Win Condition
 
@@ -87,13 +87,11 @@ class GameScene extends Phaser.Scene
             });
     }
 
-    
-
     create ()
     {
         //RESET
         this.crunchSounds = [];
-        crunchSounds = this.crunchSounds;
+        crunchSounds = this.crunchSounds; // Still don't know why this works, but still do it.
 
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
