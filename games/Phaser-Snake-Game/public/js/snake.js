@@ -1,4 +1,5 @@
 import {Food} from './classes/Food.js';
+import {Wall} from './classes/Wall.js';
 
 //******************************************************************** */
 // GameSettings           SnakeHole
@@ -247,7 +248,7 @@ class GameScene extends Phaser.Scene
         });
         */
 
-        var Wall = new Phaser.Class({
+        /*var Wall = new Phaser.Class({
             Extends: Phaser.GameObjects.Image,
 
             initialize:
@@ -264,7 +265,7 @@ class GameScene extends Phaser.Scene
 
                 // scene.children.add(this);   // walls are added through tilemaps now
             },
-        });
+        });*/
     
         var Portal = new Phaser.Class({
             Extends: Phaser.GameObjects.Image,
