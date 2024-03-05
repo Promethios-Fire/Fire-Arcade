@@ -6,13 +6,13 @@ import {Food} from './classes/Food.js';
 
 export const GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-var FRUITGOAL = 256; //24 //............................. Win Condition
+var FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
 
 
-var SCORE_FLOOR = 25; // Floor of Fruit score as it counts down.
+var SCORE_FLOOR = 24; // Floor of Fruit score as it counts down.
 var BOOST_FLOOR = 80;
 var SCORE_MULTI_GROWTH = 0.01;
 
@@ -136,12 +136,11 @@ class GameScene extends Phaser.Scene
         // define keys       
         this.input.keyboard.addCapture('W,A,S,D,UP,LEFT,RIGHT,DOWN,SPACE');
 
-        var ourGame = this.scene.get('GameScene');
-
         this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
-        var ourGame = this.scene.get('GameScene');
+        
+        var ourInputScene = this.scene.get('InputScene');
         this.input.keyboard.on('keydown', e => {
-            ourGame.updateDirection(this, e);
+            ourInputScene.updateDirection(this, e);
         })
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
@@ -559,7 +558,7 @@ class GameScene extends Phaser.Scene
 
     }
 
-
+/*
     updateDirection(game, event) 
     {
         // console.log(event.keyCode, this.time.now); // all keys
@@ -643,7 +642,7 @@ class GameScene extends Phaser.Scene
 
         }
     }
-
+*/
     update (time, delta) 
     {
     // console.log("update -- time=" + time + " delta=" + delta);
@@ -752,6 +751,110 @@ class GameScene extends Phaser.Scene
         }
     }
 }
+
+
+class InputScene extends Phaser.Scene
+{
+    constructor ()
+    {
+        super({key: 'InputScene', active: true});
+    }
+
+    preload()
+    {
+
+    }
+    create()
+    {
+    }
+    update()
+    {
+    }
+    updateDirection(game, event) 
+    {
+        // console.log(event.keyCode, this.time.now); // all keys
+        //console.profile("UpdateDirection");
+        //console.time("UpdateDirection");
+        switch (event.keyCode) {
+            case 87: // w
+            //console.log(event.code, game.time.now);
+            if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.heading = UP; // Prevents backtracking to death
+                snake.move(game);
+                game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            }
+            break;
+
+            case 65: // a
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
+                snake.heading = LEFT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 83: // s
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.heading = DOWN;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 68: // d
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.heading = RIGHT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 38: // UP
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
+                snake.heading = UP;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 37: // LEFT
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.heading = LEFT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 40: // DOWN
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.heading = DOWN;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 39: // RIGHT
+            //console.log(event.code, game.time.now);
+            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.heading = RIGHT;
+                snake.move(game);
+                game.lastMoveTime = game.time.now;
+            }
+            break;
+
+            case 32: // SPACE
+            if (DEBUG) { console.log(event.code, game.time.now); }
+
+        }
+    }
+}
+
 
 class UIScene extends Phaser.Scene
 {
@@ -871,7 +974,7 @@ var config = {
             quality: 0.1
         }
     },
-    scene: [GameScene, UIScene]
+    scene: [GameScene, UIScene, InputScene]
 };
 
 // Screen Settings
