@@ -68,7 +68,7 @@ class GameScene extends Phaser.Scene
     preload ()
     {
         this.load.image('bg01', 'assets/sprites/background01.png');
-        this.load.spritesheet('blocks', 'assets/Tiled/tileSheet.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
         // Tilemap
@@ -384,7 +384,7 @@ class GameScene extends Phaser.Scene
             {
                 this.alive = true;
                 this.body = []
-                this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
+                this.head = scene.add.sprite(x * GRID, y * GRID, 'blocks', 0);
                 this.head.setOrigin(0);
                 
                 this.body.push(this.head);
@@ -401,8 +401,9 @@ class GameScene extends Phaser.Scene
                 // Add a new part at the current tail position
                 // The head moves away from the snake 
                 // The Tail position stays where it is and then every thing moves in series
-                var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
+                var newPart = scene.add.sprite(this.tail.x, this.tail.y, 'blocks', 1);
                 this.body.push(newPart);
+                //console.log(this.body.slice())
 
                 newPart.setOrigin(0);
             },
@@ -424,6 +425,11 @@ class GameScene extends Phaser.Scene
 
             // Death by eating itself
             let tail = this.body.slice(1);
+            //console.log(tail)
+            //tail.setTexture('blocks', 8);
+            /*if (snake.body.length > 2){
+                    //snake.newPart.setTexture('blocks', 8);
+            }*/
 
             // if any tailpos == headpos
             if(
@@ -590,6 +596,7 @@ class GameScene extends Phaser.Scene
             case 87: // w
             //console.log(event.code, game.time.now);
             if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 6);
                 snake.heading = UP; // Prevents backtracking to death
                 snake.move(game);
                 game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
@@ -599,6 +606,7 @@ class GameScene extends Phaser.Scene
             case 65: // a
             //console.log(event.code, game.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
+                snake.head.setTexture('blocks', 4);
                 snake.heading = LEFT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -608,6 +616,7 @@ class GameScene extends Phaser.Scene
             case 83: // s
             //console.log(event.code, game.time.now);
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 7);
                 snake.heading = DOWN;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -617,6 +626,7 @@ class GameScene extends Phaser.Scene
             case 68: // d
             //console.log(event.code, game.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 5);
                 snake.heading = RIGHT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -626,6 +636,7 @@ class GameScene extends Phaser.Scene
             case 38: // UP
             //console.log(event.code, game.time.now);
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
+                snake.head.setTexture('blocks', 6);
                 snake.heading = UP;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -635,6 +646,7 @@ class GameScene extends Phaser.Scene
             case 37: // LEFT
             //console.log(event.code, game.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 4);
                 snake.heading = LEFT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -644,6 +656,7 @@ class GameScene extends Phaser.Scene
             case 40: // DOWN
             //console.log(event.code, game.time.now);
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 7);
                 snake.heading = DOWN;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
@@ -653,6 +666,7 @@ class GameScene extends Phaser.Scene
             case 39: // RIGHT
             //console.log(event.code, game.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
+                snake.head.setTexture('blocks', 5);
                 snake.heading = RIGHT;
                 snake.move(game);
                 game.lastMoveTime = game.time.now;
