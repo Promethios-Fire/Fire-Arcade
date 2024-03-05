@@ -4,7 +4,7 @@ import {Food} from './classes/Food.js';
 // GameSettings           SnakeHole
 //******************************************************************** */
 
-var GRID = 24;           //.................. Size of Sprites and GRID
+export const GRID = 24;           //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 var FRUITGOAL = 256; //24 //............................. Win Condition
 
@@ -876,7 +876,7 @@ var config = {
 
 // Screen Settings
 export const SCREEN_WIDTH = config.width;
-var SCREEN_HEIGHT = config.height; 
+export const SCREEN_HEIGHT = config.height; 
 
 // Edge locations for X and Y
 export const END_X = SCREEN_WIDTH/GRID -1;
@@ -886,8 +886,6 @@ export const END_Y = SCREEN_HEIGHT/GRID -1;
 if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
-
-export { SCREEN_HEIGHT, GRID}
 
 const game = new Phaser.Game(config);
 
