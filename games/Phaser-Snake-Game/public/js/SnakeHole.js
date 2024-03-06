@@ -91,8 +91,8 @@ class StartScene extends Phaser.Scene
         this.input.keyboard.on('keydown', e => {
             this.scene.start('GameScene');
             this.scene.start('UIScene');
-            console.log(e)
-            //ourInputScene.updateDirection(this, e);
+            //console.log(e)
+            this.scene.stop()
         })
     }
 
