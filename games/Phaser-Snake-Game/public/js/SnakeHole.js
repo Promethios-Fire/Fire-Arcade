@@ -290,7 +290,12 @@ class GameScene extends Phaser.Scene
                 if (DEBUG) { console.log("DEAD"); }
                 
                 this.events.emit('saveScore');
+                
+                var ourInputScene = this.scene.get('InputScene');
+                console.log(ourInputScene.inputSet[0]);
+                ourInputScene.scene.restart();
                 //game.destroy();
+                
                 this.scene.restart();
                 return;
             }
@@ -412,10 +417,8 @@ class InputScene extends Phaser.Scene
     }
     updateDirection(gameScene, event) 
     {
-        // console.log(event.keyCode, this.time.now); // all keys
-        //console.profile("UpdateDirection");
-        //console.time("UpdateDirection");
-        console.log(this.turns);
+        //console.log(event.keyCode, this.time.now); // all keys
+        //console.log(this.turns);
         switch (event.keyCode) {
             case 87: // w
 
