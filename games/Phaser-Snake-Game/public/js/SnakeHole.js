@@ -63,12 +63,54 @@ var SOUND_CRUNCH = [
 // DO this dynamically later based on the number of portal areas.
 
 
+class StartScene extends Phaser.Scene
+{
+    constructor ()
+    {
+        super({key: 'StartScene', active: true});
+    }
+
+    preload()
+    {
+        this.load.image('howToCard', 'assets/howToCard.webp');
+    }
+
+    create()
+    {
+        
+        this.add.text(SCREEN_WIDTH/2 - GRID*6, GRID*2, 'SNAKEHOLE',{"fontSize":'48px'});
+        
+        var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
+        card.setOrigin(0,0);
+
+        card.setScale(0.7);
+        console.log(this.card);
+
+        this.add.text(SCREEN_WIDTH/2 - GRID*10, GRID*24, 'PRESS TO CONTINUE',{"fontSize":'48px'});
+
+        this.input.keyboard.on('keydown', e => {
+            this.scene.start('GameScene');
+            this.scene.start('UIScene');
+            console.log(e)
+            //ourInputScene.updateDirection(this, e);
+        })
+    }
+
+    end()
+    {
+
+    }
+
+
+}
+
+
 class GameScene extends Phaser.Scene
 {
 
     constructor ()
     {
-        super({key: 'GameScene'});
+        super({key: 'GameScene', active: false});
     }
     
     preload ()
@@ -454,7 +496,7 @@ class UIScene extends Phaser.Scene
 {
     constructor ()
     {
-        super({ key: 'UIScene', active: true });
+        super({ key: 'UIScene', active: false });
 
         this.score = 0;
         this.bestScore = 0;
@@ -568,7 +610,8 @@ var config = {
             quality: 0.1
         }
     },
-    scene: [GameScene, UIScene, InputScene]
+    //scene: [ StartScene, InputScene]
+    scene: [ StartScene, GameScene, UIScene, InputScene]
 };
 
 // Screen Settings

@@ -29,7 +29,7 @@ var Snake = new Phaser.Class({
         var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
         this.body.push(newPart);
 
-        newPart.setOrigin(0);
+        newPart.setOrigin(0,0);
     },
     
     
