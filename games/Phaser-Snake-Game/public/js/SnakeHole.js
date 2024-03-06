@@ -1,6 +1,8 @@
-import {Food} from './classes/Food.js';
-import {Wall} from './classes/Wall.js';
-import {Portal} from './classes/Portal.js';
+import { Food } from './classes/Food.js';
+import { Wall } from './classes/Wall.js';
+import { Portal } from './classes/Portal.js';
+import { SpawnArea } from './classes/SpawnArea.js';
+import { Snake } from './classes/Snake.js';
 
 //******************************************************************** */
 // GameSettings           SnakeHole
@@ -8,7 +10,7 @@ import {Portal} from './classes/Portal.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-var FRUITGOAL = 24; //24 //............................. Win Condition
+export const FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -20,8 +22,8 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-var DEBUG = false;
-var DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+export const DEBUG = false;
+export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 var snake;
@@ -32,10 +34,10 @@ var map;  // Phaser.Tilemaps.Tilemap
 var tileset;
 
 //  Direction consts
-var LEFT = 0;
-var RIGHT = 1;
-var UP = 2;
-var DOWN = 3;
+export const LEFT = 0;
+export const RIGHT = 1;
+export const UP = 2;
+export const DOWN = 3;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -112,7 +114,7 @@ class GameScene extends Phaser.Scene
 
         this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
 
-        // arrays for collision detection
+        // Arrays for collision detection
         this.apples = [];
         this.walls = [];
         this.portals = [];
@@ -148,47 +150,6 @@ class GameScene extends Phaser.Scene
             var ourUI = this.scene.get('UIScene');
         }) 
 
-        var Portal = new Phaser.Class({
-            Extends: Phaser.GameObjects.Image,
-
-            initialize:
-
-            function Portal(scene, color, from, to)
-            {
-                Phaser.GameObjects.Image.call(this, scene);
-                this.setTexture('portals', 0);
-                this.setPosition(from[0] * GRID, from[1] * GRID);
-                this.setOrigin(.125,.125);
-
-                this.target = { x: to[0], y: to[1]};
-
-                scene.portals.push(this);
-                
-                this.tint = color.color; // Color is a Phaser Color Object
-                scene.children.add(this);
-
-                // Add Glow
-                this.preFX.setPadding(32);
-
-                this.fx = this.preFX.addGlow();
-
-                //  For PreFX Glow the quality and distance are set in the Game Configuration
-
-                /*
-                scene.tweens.add({
-                    targets: this.fx,
-                    outerStrength: 10,
-                    yoyo: true,
-                    loop: -1,
-                    ease: 'sine.inout'
-                });*/
-
-                this.fx.setActive(false);
-
-            },
-            
-        });
-
         var makePair = function (scene, to, from){
             
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
@@ -197,170 +158,6 @@ class GameScene extends Phaser.Scene
             var p1 = new Portal(scene, color, to, from);
             var p2 = new Portal(scene, color, from, to)
         }
-
-        var SpawnArea = new Phaser.Class({
-            Extends: Phaser.GameObjects.Rectangle,
-
-            initialize:
-
-            function SpawnArea (scene, x, y, width , height , fillColor)
-            {
-                Phaser.GameObjects.Rectangle.call(this, scene, x, y, width, height, fillColor);
-                
-                this.setPosition(x * GRID, y * GRID); 
-                this.width = width*GRID;
-                this.height = height*GRID;
-                this.fillColor = 0x6666ff;
-                this.fillAlpha = DEBUG_AREA_ALPHA;
-                
-                this.setOrigin(0,0);
-
-                scene.children.add(this);
-            },
-
-            genPortalChords: function (scene)
-            {
-                
-                var xMin = this.x/GRID;
-                var xMax = this.x/GRID + this.width/GRID - 1;
-
-                var yMin = this.y/GRID;
-                var yMax = this.y/GRID + this.height/GRID - 1;
-                
-                var x = (Phaser.Math.RND.between(xMin, xMax));
-                var y = (Phaser.Math.RND.between(yMin, yMax));
-
-            
-                // Recursively if there is a portal in the same spot as this point try again until there isn't one.
-                scene.portals.forEach( portal => {
-                    console.print("HELL YEAH REROLL THAT PORTAL");
-                    if(portal.x === x && portal.y === y){
-                        this.genPortalChords();
-                    }
-                }
-
-                )
-                
-                var cords = [x,y];
-                return cords;
-            },
-        });
-
-        var Snake = new Phaser.Class({
-            initialize:
-
-            function Snake (scene, x, y)
-            {
-                this.alive = true;
-                this.body = []
-                this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-                this.head.setOrigin(0);
-                
-                this.body.push(this.head);
-
-
-                this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
-                
-                this.heading = LEFT;
-            },
-            
-            grow: function (scene)
-            {
-                // Add a new part at the current tail position
-                // The head moves away from the snake 
-                // The Tail position stays where it is and then every thing moves in series
-                var newPart = scene.add.image(this.tail.x, this.tail.y, 'blocks', 1);
-                this.body.push(newPart);
-
-                newPart.setOrigin(0);
-            },
-            
-            
-            move: function (scene)
-            {
-            // start with current head position
-            let x = this.head.x;
-            let y = this.head.y;
-
-            // Death by eating itself
-            let tail = this.body.slice(1);
-
-            // if any tailpos == headpos
-            if(
-                tail.some(
-                    pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-            ){
-                this.alive = false;
-            }
-
-            
-            scene.portals.forEach(portal => { 
-                if(snake.head.x === portal.x && snake.head.y === portal.y){
-                    if (DEBUG) { console.log("PORTAL"); }
-
-                    x = portal.target.x*GRID;
-                    y = portal.target.y*GRID;
-                    
-                    return 'valid';  //Don't know why this is here but I left it -James
-                }
-            });
-
-            if (this.heading === LEFT)
-            {
-                x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
-            }
-            else if (this.heading === RIGHT)
-            {
-                x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
-            }
-            else if (this.heading === UP)
-            {
-                y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
-            }
-            else if (this.heading === DOWN)
-            {
-                y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
-            }
-            Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
-
-            // Check if dead by map
-            if (scene.map.getTileAtWorldXY(snake.head.x, snake.head.y )) {
-                snake.alive = false;
-            }
-
-            // Check collision for all Fruits
-            scene.apples.forEach(fruit => { 
-                if(snake.head.x === fruit.x && snake.head.y === fruit.y){
-                    //console.log("HIT");
-                    snake.grow(scene);
-                    fruit.move(scene);
-                    
-                    // Play crunch sound
-                    var index = Math.round(Math.random() * scene.crunchSounds.length); 
-                    if (index == 8){ //this is to ensure index isn't called outside of array length
-                        index = 7;
-                    }
-                    //console.log(index);
-                    var soundRandom = scene.crunchSounds[index];
-                    
-                    soundRandom.play();
-
-                    //  Scene.crunch01.play();
-                    //  Dispatch a Scene event
-                    scene.events.emit('addScore'); // Sends to UI Listener
-                    scene.fruitCount++;
-                    
-                    scene.fruitCountText.setText(FRUITGOAL - scene.fruitCount);
-                    
-                    if (DEBUG) {console.log(                         
-                        "FRUITCOUNT=", scene.fruitCount,
-                        );
-                    }
-                    return 'valid';
-                }
-            });
-            },
-        });
 
         snake = new Snake(this, 11, 6);
         
@@ -440,91 +237,6 @@ class GameScene extends Phaser.Scene
 
     }
 
-/*
-    updateDirection(game, event) 
-    {
-        // console.log(event.keyCode, this.time.now); // all keys
-//console.profile("UpdateDirection");
-        //console.time("UpdateDirection");
-        switch (event.keyCode) {
-            case 87: // w
-            //console.log(event.code, game.time.now);
-            if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.heading = UP; // Prevents backtracking to death
-                snake.move(game);
-                game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-            }
-            break;
-
-            case 65: // a
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
-                snake.heading = LEFT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 83: // s
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.heading = DOWN;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 68: // d
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.heading = RIGHT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 38: // UP
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
-                snake.heading = UP;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 37: // LEFT
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.heading = LEFT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 40: // DOWN
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
-                snake.heading = DOWN;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 39: // RIGHT
-            //console.log(event.code, game.time.now);
-            if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
-                snake.heading = RIGHT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
-            }
-            break;
-
-            case 32: // SPACE
-            if (DEBUG) { console.log(event.code, game.time.now); }
-
-        }
-    }
-*/
     update (time, delta) 
     {
     // console.log("update -- time=" + time + " delta=" + delta);

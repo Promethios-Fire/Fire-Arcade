@@ -1,4 +1,4 @@
-import { } from "../SnakeHole.js";
+import {GRID } from "../SnakeHole.js";
 
 
 var Portal = new Phaser.Class({
