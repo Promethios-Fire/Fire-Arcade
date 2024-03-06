@@ -22,7 +22,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-export const DEBUG = false;
+export const DEBUG = true;
 export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
@@ -38,6 +38,8 @@ export const LEFT = 0;
 export const RIGHT = 1;
 export const UP = 2;
 export const DOWN = 3;
+const START_SPRINT = 4;
+const STOP_SPRINT = 5;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -189,7 +191,7 @@ class GameScene extends Phaser.Scene
 
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
-            var ourUI = this.scene.get('UIScene');
+            ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
         }) 
 
         var makePair = function (scene, to, from){
@@ -402,90 +404,110 @@ class InputScene extends Phaser.Scene
     }
     create()
     {
+        this.inputSet = [];
+        this.turns = 0;
     }
     update()
     {
     }
-    updateDirection(game, event) 
+    updateDirection(gameScene, event) 
     {
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
+        console.log(this.turns);
         switch (event.keyCode) {
             case 87: // w
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = UP; // Prevents backtracking to death
-                snake.move(game);
-                game.lastMoveTime = game.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
 
             case 65: // a
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
                 snake.heading = LEFT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 83: // s
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 68: // d
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 38: // UP
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
                 snake.heading = UP;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 37: // LEFT
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = LEFT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 40: // DOWN
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 39: // RIGHT
-            //console.log(event.code, game.time.now);
+            //console.log(event.code, gameScene.time.now);
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
-                snake.move(game);
-                game.lastMoveTime = game.time.now;
+                snake.move(gameScene);
+                this.turns += 1;
+                this.inputSet.push([snake.heading, gameScene.time.now]);
+                gameScene.lastMoveTime = gameScene.time.now;
             }
             break;
 
             case 32: // SPACE
-            if (DEBUG) { console.log(event.code, game.time.now); }
+            if (DEBUG) { console.log(event.code, gameScene.time.now); }
+            this.inputSet.push([START_SPRINT, gameScene.time.now]);
 
         }
     }
