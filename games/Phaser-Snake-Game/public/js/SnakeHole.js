@@ -418,7 +418,7 @@ class InputScene extends Phaser.Scene
         console.log(this.turns);
         switch (event.keyCode) {
             case 87: // w
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = UP; // Prevents backtracking to death
                 snake.move(gameScene);
@@ -429,7 +429,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 65: // a
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) {
                 snake.heading = LEFT;
                 snake.move(gameScene);
@@ -440,7 +440,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 83: // s
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
                 snake.move(gameScene);
@@ -451,7 +451,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 68: // d
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
                 snake.move(gameScene);
@@ -462,7 +462,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 38: // UP
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) {
                 snake.heading = UP;
                 snake.move(gameScene);
@@ -473,7 +473,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 37: // LEFT
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = LEFT;
                 snake.move(gameScene);
@@ -484,7 +484,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 40: // DOWN
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === LEFT || snake.heading  === RIGHT || snake.body.length <= 2) { 
                 snake.heading = DOWN;
                 snake.move(gameScene);
@@ -495,7 +495,7 @@ class InputScene extends Phaser.Scene
             break;
 
             case 39: // RIGHT
-            //console.log(event.code, gameScene.time.now);
+
             if (snake.heading  === UP || snake.heading  === DOWN || snake.body.length <= 2) { 
                 snake.heading = RIGHT;
                 snake.move(gameScene);
