@@ -513,7 +513,7 @@ class UIScene extends Phaser.Scene
     {
         const ourGame = this.scene.get('GameScene');
 
-        const style = {
+        const UIStyle = {
             //width: '220px',
             //height: '22px',
             color: 'lightyellow',
@@ -527,15 +527,15 @@ class UIScene extends Phaser.Scene
             'text-align': 'right',
         };
    
-        const currentScore = this.add.dom(GRID * 1, GRID * 1, 'div', style);
+        const currentScore = this.add.dom(GRID * 1, GRID * 1, 'div', UIStyle);
         currentScore.setOrigin(0,0);
         currentScore.setText(`Score: ${this.score}`);
         
-        const bestScore = this.add.dom(GRID * 7, GRID * 1, 'div', style);
+        const bestScore = this.add.dom(GRID * 7, GRID * 1, 'div', UIStyle);
         bestScore.setOrigin(0,0);
         //currentScore.setText(`Best: ${this.score}`)
 
-        const fruitCount = this.add.dom(GRID * 28, GRID * 1, 'div', style);
+        const fruitCount = this.add.dom(GRID * 28, GRID * 1, 'div', UIStyle);
         fruitCount.setOrigin(0,0);
         fruitCount.setText(`${this.fruitCount} / ${FRUITGOAL}`);
 
@@ -557,14 +557,49 @@ class UIScene extends Phaser.Scene
         }
         
         //  Event: addScore
-        ourGame.events.on('addScore', function ()
+        ourGame.events.on('addScore', function (fruit)
         {
 
+            const scoreStyle = {
+                //width: '220px',
+                //height: '22px',
+                color: 'lightyellow',
+                'font-size': '13px',
+                'font-family': ["Sono", 'sans-serif'],
+                'font-weight': '400',
+                'padding': '2px 9px 2px 9px',
+                'font-weight': 'bold',
+                //'border-radius': '24px',
+                //outline: 'solid',
+                'text-align': 'right',
+            };
+
+            var scoreText = this.add.dom(fruit.x -10, fruit.y - GRID, 'div', scoreStyle);
+            scoreText.setOrigin(0,0);
+            
+            // Remove score text after a time period.
+            this.time.delayedCall(1000, event => {
+                scoreText.removeElement();
+            }, [], this);
+
+            this.tweens.add({
+                targets: scoreText,
+                alpha: { from: 1, to: 0.1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+            //debugger
+            
+            
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
-            if (timeLeft > 10) {
+            if (timeLeft > SCORE_FLOOR) {
                 this.score += timeLeft;
+                scoreText.setText(`+${timeLeft}`);
             } else {
-                this.score += 10;
+                this.score += SCORE_FLOOR;
+                scoreText.setText(`+${SCORE_FLOOR}`);
             }
 
             //this.score += this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;

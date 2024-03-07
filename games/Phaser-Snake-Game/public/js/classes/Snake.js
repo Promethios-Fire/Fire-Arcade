@@ -87,7 +87,9 @@ var Snake = new Phaser.Class({
 
     scene.apples.forEach(fruit => {  // Check collision for all Fruits
         if(this.head.x === fruit.x && this.head.y === fruit.y){
-            //console.log("HIT");
+            console.log(fruit.x, fruit.y);
+            scene.events.emit('addScore', fruit); // Sends to UI Listener 
+            
             this.grow(scene);
             fruit.move(scene);
             
@@ -103,8 +105,9 @@ var Snake = new Phaser.Class({
 
             //  Scene.crunch01.play();
             //  Dispatch a Scene event
-            scene.events.emit('addScore'); // Sends to UI Listener    
+               
 
+            //debugger
             scene.apples.forEach(fruit => {
                 fruit.startDecay(scene);
             });
