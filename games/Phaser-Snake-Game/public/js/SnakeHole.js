@@ -9,7 +9,7 @@ import { Snake } from './classes/Snake.js';
 
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
-export const FRUITGOAL = 4; //24 //............................. Win Condition
+export const FRUITGOAL = 24; //24 //............................. Win Condition
 
 var SPEEDWALK = 96; // 96 In milliseconds  
 var SPEEDSPRINT = 24; // 24
@@ -27,6 +27,7 @@ export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appea
 // Game Objects
 var snake;
 var crunchSounds = [];
+var portalSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -59,6 +60,10 @@ var SOUND_CRUNCH = [
     ['crunch07', [ 'crunch07.ogg', 'crunch07.mp3' ]],
     ['crunch08', [ 'crunch08.ogg', 'crunch08.mp3' ]]
 ];
+
+var SOUND_PORTAL = [
+    ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
+]
 
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
@@ -147,6 +152,10 @@ class GameScene extends Phaser.Scene
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
+        SOUND_PORTAL.forEach(soundID =>
+            {
+                this.load.audio(soundID[0], soundID[1]);
+            });
     }
 
     create ()
@@ -154,6 +163,8 @@ class GameScene extends Phaser.Scene
         //RESET
         this.crunchSounds = [];
         crunchSounds = this.crunchSounds; // Still don't know why this works, but still do it.
+        this.portalSounds = [];
+        portalSounds = this.portalSounds;
 
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
@@ -170,9 +181,12 @@ class GameScene extends Phaser.Scene
             {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
             });
+        SOUND_PORTAL.forEach(soundID =>{
+                this.portalSounds.push(this.sound.add(soundID[0]));
+            });
 
 
-        this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
+        //this.crunchSounds = crunchSounds.slice(); // This copies. Does it need to copy here?
 
         // Arrays for collision detection
         this.apples = [];

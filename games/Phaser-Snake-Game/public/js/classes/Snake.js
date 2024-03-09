@@ -54,6 +54,8 @@ var Snake = new Phaser.Class({
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y){
             if (DEBUG) { console.log("PORTAL"); }
+            var portalSound = scene.portalSounds[0]
+            portalSound.play();
 
             x = portal.target.x*GRID;
             y = portal.target.y*GRID;

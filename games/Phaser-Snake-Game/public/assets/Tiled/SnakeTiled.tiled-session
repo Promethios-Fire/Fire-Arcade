@@ -74,8 +74,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 247.3333333333333,
-                "y": 463.33333333333326
+                "x": 382.66666666666663,
+                "y": 461.99999999999994
             }
         },
         "snakeMap.tmx#tileSheet": {
@@ -96,9 +96,9 @@
     ],
     "project": "SnakeTiled.tiled-project",
     "recentFiles": [
+        "snakeMap.tmx",
         "snakeMap.tmj",
         "snakeMap.json",
-        "snakeMap.tmx",
         "snakeMap..tmx",
         "SnakeTiledProject.json"
     ],
