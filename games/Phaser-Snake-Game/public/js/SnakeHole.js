@@ -329,7 +329,7 @@ class GameScene extends Phaser.Scene
                         portal.fx.outerStrength = 6 - closestPortalDist;
 
                         closestPortal.fx.setActive(true);
-                        closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                        //closestPortal.fx.innerStrength = 3 - closestPortalDist;
                         closestPortal.fx.outerStrength = 0;
 
                     }
