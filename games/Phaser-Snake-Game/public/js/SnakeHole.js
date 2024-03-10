@@ -7,7 +7,7 @@ import { Snake } from './classes/Snake.js';
 // GameSettings           SnakeHole
 //******************************************************************** */
 
-const GAME_VERSION = 'v0.1.03.08.003';
+const GAME_VERSION = 'v0.1.03.08.004';
 export const GRID = 24;  //.................. Size of Sprites and GRID
 var FRUIT = 4;           //.................. Number of fruit to spawn
 export const FRUITGOAL = 24; //24 //............................. Win Condition
@@ -234,16 +234,16 @@ class GameScene extends Phaser.Scene
         }
 
 
-        var spawnAreaA = new SpawnArea(this, 2,3,6,5, 0x6666ff);
-        var spawnAreaB = new SpawnArea(this, 10,3,6,5, 0x6666ff);
-        var spawnAreaC = new SpawnArea(this, 24,3,6,5, 0x6666ff);
-        var spawnAreaF = new SpawnArea(this, 2,23,6,5, 0x6666ff);
+        var spawnAreaA = new SpawnArea(this, 2,5,6,4, 0x6666ff);
+        var spawnAreaB = new SpawnArea(this, 10,5,6,4, 0x6666ff);
+        var spawnAreaC = new SpawnArea(this, 24,5,6,4, 0x6666ff);
+        var spawnAreaF = new SpawnArea(this, 2,23,6,4, 0x6666ff);
 
-        var spawnAreaG = new SpawnArea(this, 10,13,6,5, 0x6666ff);
-        var spawnAreaH = new SpawnArea(this, 24,23,6,5, 0x6666ff);
+        var spawnAreaG = new SpawnArea(this, 10,14,6,4, 0x6666ff);
+        var spawnAreaH = new SpawnArea(this, 24,23,6,4, 0x6666ff);
 
-        var spawnAreaJ = new SpawnArea(this, 16,13,6,5, 0x6666ff);
-        var spawnAreaI = new SpawnArea(this, 16,23,6,5, 0x6666ff);
+        var spawnAreaJ = new SpawnArea(this, 16,14,6,4, 0x6666ff);
+        var spawnAreaI = new SpawnArea(this, 16,23,6,4, 0x6666ff);
 
 
 
