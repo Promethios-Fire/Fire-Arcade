@@ -164,6 +164,7 @@ class GameScene extends Phaser.Scene
 
         // GameUI
         this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         
         // Audio
         this.load.setPath('assets/audio');
@@ -196,7 +197,11 @@ class GameScene extends Phaser.Scene
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
 
         //Boost Meter -- will probably move to a separate UI class - Holden
-        this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(10);
+        const shape = this.add.rectangle(200, 0, 300, 200, 0xff0000);
+        var boostMeter = this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(10);
+        this.add.image(GRID * 16,GRID*1,'boostMeterFrame').setDepth(10);
+        this.mask = shape.createBitmapMask();
+        boostMeter.setMask(this.mask); // image.mask = mask;
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
