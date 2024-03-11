@@ -81,21 +81,44 @@ class StartScene extends Phaser.Scene
 
     preload()
     {
-        this.load.image('howToCard', 'assets/howToCard.webp');
+        this.load.image('portalToFruit', 'assets/cards/portalToFruit.webp');
+        this.load.image('scoretimer', 'assets/cards/scoretimer.webp');
+        this.load.image('boost', 'assets/cards/boost.webp');
+        this.load.image('movement', 'assets/cards/movement.webp');
     }
 
     create()
     {
         
-        this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
+        this.add.text(SCREEN_WIDTH/2, GRID*2, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
-        var card = this.add.image(SCREEN_WIDTH/2, 5.5*GRID, 'howToCard').setDepth(10).setOrigin(0.5,0);
+        var card01 = this.add.image(SCREEN_WIDTH/2, 5*GRID, 'portalToFruit').setDepth(10).setOrigin(0.5,0);
+        var card02 = this.add.image(SCREEN_WIDTH/2, 9*GRID, 'scoretimer').setDepth(10).setOrigin(0.5,0).setScale(0.4);
+        var card03 = this.add.image(SCREEN_WIDTH/2, 13*GRID, 'boost').setDepth(10).setOrigin(0.5,0).setScale(0.4);
+        var card04 = this.add.image(SCREEN_WIDTH/2, 17*GRID, 'movement').setDepth(10).setOrigin(0.5,0).setScale(0.4);
+        var card05 = this.add.image(SCREEN_WIDTH/2, 21*GRID, 'movement').setDepth(10).setOrigin(0.5,0).setScale(0.4);
+
+
+        card01.displayHeight = 96; // GRID * 4
+        card01.displayWidth = 410;
+
+        card02.displayHeight = 96; // GRID * 4
+        card02.displayWidth = 410;
+
+        card03.displayHeight = 96; // GRID * 4
+        card03.displayWidth = 410;
+
+        card04.displayHeight = 96; // GRID * 4
+        card04.displayWidth = 410;
+
+        card05.displayHeight = 96; // GRID * 4
+        card05.displayWidth = 410;
         //card.setOrigin(0,0);
 
-        card.setScale(0.55);
+        //card.setScale(0.5);
 
         
-        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*25, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
+        var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26.5, '[PRESS TO CONTINUE]',{"fontSize":'48px'}).setOrigin(0.5,0);
         
         this.tweens.add({
             targets: continueText,
