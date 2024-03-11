@@ -162,6 +162,9 @@ class GameScene extends Phaser.Scene
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
+        // GameUI
+        this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        
         // Audio
         this.load.setPath('assets/audio');
 
@@ -182,7 +185,7 @@ class GameScene extends Phaser.Scene
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
         this.snake.heading = STOP;
-
+        
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -191,6 +194,9 @@ class GameScene extends Phaser.Scene
     
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
+
+        //Boost Meter -- will probably move to a separate UI class - Holden
+        this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(10);
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
