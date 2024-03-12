@@ -29,7 +29,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0.3;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
@@ -74,18 +74,15 @@ var SOUND_CRUNCH = [
 
 class StartScene extends Phaser.Scene
 {
-    constructor ()
-    {
+    constructor () {
         super({key: 'StartScene', active: true});
     }
 
-    preload()
-    {
+    preload() {
         this.load.image('howToCard', 'assets/howToCard.webp');
     }
 
-    create()
-    {
+    create() {
         
         this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
         
@@ -115,8 +112,7 @@ class StartScene extends Phaser.Scene
         })
     }
 
-    end()
-    {
+    end() {
 
     }
 
@@ -133,8 +129,7 @@ class GameScene extends Phaser.Scene
     }
     
     
-    init()
-    {
+    init() {
         
         // Arrays for collision detection
         this.apples = [];
@@ -153,8 +148,7 @@ class GameScene extends Phaser.Scene
     }
     
     
-    preload ()
-    {
+    preload () {
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
@@ -172,8 +166,7 @@ class GameScene extends Phaser.Scene
             });
     }
 
-    create ()
-    {
+    create () {
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
 
@@ -181,7 +174,7 @@ class GameScene extends Phaser.Scene
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
-        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 6);
+        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 4);
         this.snake.heading = STOP;
 
         // Tilemap
@@ -236,43 +229,92 @@ class GameScene extends Phaser.Scene
 
         });
 
-        // Make Fruit
-        for (let index = 0; index < FRUIT; index++) {
-            var food = new Food(this);
-        }
-
-
-        var spawnAreaA = new SpawnArea(this, 2,5,6,4, 0x6666ff);
-        var spawnAreaB = new SpawnArea(this, 10,5,6,4, 0x6666ff);
-        var spawnAreaC = new SpawnArea(this, 24,5,6,4, 0x6666ff);
-        var spawnAreaF = new SpawnArea(this, 2,23,6,4, 0x6666ff);
-
-        var spawnAreaG = new SpawnArea(this, 10,14,6,4, 0x6666ff);
-        var spawnAreaH = new SpawnArea(this, 24,23,6,4, 0x6666ff);
-
-        var spawnAreaJ = new SpawnArea(this, 16,14,6,4, 0x6666ff);
-        var spawnAreaI = new SpawnArea(this, 16,23,6,4, 0x6666ff);
+        
 
 
 
+        // Define Spawn Areas
+        
+        var areaAA = new SpawnArea(this, 1,5,6,4, 0x6666ff);
+        var areaAB = new SpawnArea(this, 9,5,6,4, 0x6666ff);
+        var areaAC = new SpawnArea(this, 17,5,6,4, 0x6666ff);
+        var areaAD = new SpawnArea(this, 25,5,6,4, 0x6666ff);
+
+        var areaBA = new SpawnArea(this, 1,14,6,4, 0x6666ff);
+        var areaBB = new SpawnArea(this, 9,14,6,4, 0x6666ff);
+        var areaBC = new SpawnArea(this, 17,14,6,4, 0x6666ff);
+        var areaBD = new SpawnArea(this, 25,14,6,4, 0x6666ff);
+
+        var areaCA = new SpawnArea(this, 1,23,6,4, 0x6666ff);
+        var areaCB = new SpawnArea(this, 9,23,6,4, 0x6666ff);
+        var areaCC = new SpawnArea(this, 17,23,6,4, 0x6666ff);
+        var areaCD = new SpawnArea(this, 25,23,6,4, 0x6666ff);
+
+        var areas = [
+            [areaAA, areaAB, areaAC, areaAD],
+            [areaBA, areaBB, areaBC, areaBD],
+            [areaCA, areaCB, areaCC, areaCD]
+        ]
 
 
-        var A1 = spawnAreaA.genPortalChords(this);
-        var H1 = spawnAreaH.genPortalChords(this);
+        var cordsP1 = areaAA.genChords(this);
+        areaAA.portalCords = cordsP1;
+        
+        var cordsP2 = areaAD.genChords(this);
+        areaAD.portalCords = cordsP2;
 
-        var B1 = spawnAreaB.genPortalChords(this);
-        var G1 = spawnAreaG.genPortalChords(this);
+        var nextArea = [
+            [areaBA, areaBB, areaBC, areaBD],
+            [areaCA, areaCB, areaCC, areaCD],
+        ];
 
-        var C1 = spawnAreaC.genPortalChords(this);
-        var F1 = spawnAreaF.genPortalChords(this);
+        // Choose a Random Lane
+        var lane3 = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        
+        var areaP3 = Phaser.Math.RND.pick(lane3);
+        var cordsP3 = areaP3.genChords(this);
+        areaP3.portalCords = cordsP3;
 
-        var J1 = spawnAreaJ.genPortalChords(this);
-        var I1 = spawnAreaI.genPortalChords(this);
+        // Other Portal goes to the other Lane
+        var areaP4 = Phaser.Math.RND.pick(nextArea[0]);
+        var cordsP4 = areaP4.genChords(this);
+        areaP4.portalCords = cordsP4
 
-        makePair(this, A1, H1);
-        makePair(this, B1, G1);
-        makePair(this, C1, F1);
-        makePair(this, J1, I1);
+
+        var B1 = areaAB.genChords(this);
+        var G1 = areaBB.genChords(this);
+
+        var C1 = areaAD.genChords(this);
+        var F1 = areaCA.genChords(this);
+
+        var J1 = areaBC.genChords(this);
+        var I1 = areaCC.genChords(this);
+
+        makePair(this, cordsP1, cordsP3);
+        makePair(this, cordsP2, cordsP4);
+        //makePair(this, C1, F1);
+        //makePair(this, J1, I1);
+
+        // Fair Fruit Spawn (5x)
+        this.setFruit(this, [areaAB, areaAC]);
+        // Middle Row
+        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
+        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
+        // Bottom Row
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+        this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+    }
+    setFruit (scene, areas) {
+
+        
+        var area = Phaser.Math.RND.pick(areas);
+
+        var pos = area.genChords(scene);
+
+        var food = new Food(scene);
+        food.setPosition(pos[0]*GRID, pos[1]*GRID);
+        //console.log(scene.portals);
 
     }
 
@@ -463,8 +505,8 @@ class WinScene extends Phaser.Scene
         TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
         
-        BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
-        BOOST TIME: ${ourInputScene.boostTime} FRAMES
+        FRESH BOOST TIME: ${ourInputScene.boostBonusTime} FRAMES
+        TOTAL BOOST TIME: ${ourInputScene.boostTime} FRAMES
         
         BETA: ${GAME_VERSION}
         ................RUN STATS.................

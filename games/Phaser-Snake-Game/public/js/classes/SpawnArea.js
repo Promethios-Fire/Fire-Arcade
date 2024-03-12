@@ -19,9 +19,11 @@ var SpawnArea = new Phaser.Class({
         this.setOrigin(0,0);
 
         scene.children.add(this);
+
+        this.portalCords = []; // Used as Null
     },
 
-    genPortalChords: function (scene)
+    genChords: function (scene)
     {
         
         var xMin = this.x/GRID;
@@ -30,19 +32,22 @@ var SpawnArea = new Phaser.Class({
         var yMin = this.y/GRID;
         var yMax = this.y/GRID + this.height/GRID - 1;
         
-        var x = (Phaser.Math.RND.between(xMin, xMax));
-        var y = (Phaser.Math.RND.between(yMin, yMax));
-
+        var x1 = (Phaser.Math.RND.between(xMin, xMax));
+        var y1 = (Phaser.Math.RND.between(yMin, yMax));
     
         // Recursively if there is a portal in the same spot as this point try again until there isn't one.
+        //console.log(scene.portals);
         scene.portals.forEach( portal => {
-            console.print("HELL YEAH REROLL THAT PORTAL");
-            if(portal.x === x && portal.y === y){
-                this.genPortalChords();
+            //console.log(portal.x === x1*GRID && portal.y === y1*GRID);
+            if(portal.x === x1*GRID && portal.y === y1*GRID) {
+                var newCords = this.genChords(scene);
+                x1 = newCords[0];
+                y1 = newCords[1];
             }
         });
+
         
-        var cords = [x,y];
+        var cords = [x1,y1];
         return cords;
     },
 });
