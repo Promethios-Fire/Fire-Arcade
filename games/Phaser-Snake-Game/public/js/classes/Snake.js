@@ -1,6 +1,7 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, DEBUG,
-    FRUITGOAL
+    LEFT, RIGHT, UP, DOWN, DEBUG, STOP,
+    FRUITGOAL,
+    REVERSE_ON, 
 } from "../SnakeHole.js";
 
 var Snake = new Phaser.Class({
@@ -21,8 +22,7 @@ var Snake = new Phaser.Class({
         
     },
     
-    grow: function (scene)
-    {
+    grow: function (scene) {
         
         // Current Tail of the snake
         this.tail = this.body.slice(-1);
@@ -31,10 +31,13 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'blocks', 1);
+        newPart.setOrigin(0,0);
 
         this.body.push(newPart);
+    },
+    
+    reverse: function(target, direction) {
 
-        newPart.setOrigin(0,0);
     },
     
     
@@ -89,7 +92,55 @@ var Snake = new Phaser.Class({
 
     // Check if dead by map
     if (scene.map.getTileAtWorldXY(this.head.x, this.head.y )) {
+        if (!REVERSE_ON) {
+            this.alive = false;
+        }
+        else {
+            
+            // Reverse the Snake
+            this.body.reverse();
+            
+            // Get the Tail
+            var end = Phaser.Utils.Array.GetFirst(this.body);
+
+            let restOfSnake = this.body.slice(1);
+
+            let reverseDir = STOP
+            
+            restOfSnake.every(part => {
+                if (part.y === end.y) { // Checks every one. May be good to escape loop the first time this is true.
+                    
+                    let dif = part.x - end.x;
+                    if (dif > 0) {
+                        reverseDir = LEFT;
+                    }
+                    else {
+                        reverseDir = RIGHT;
+                    }
+                    return false;
+                }
+                
+                reverseDir = STOP; // reset to default
+                console.log("No collision")
+                return true;
+            });
+
+            // No collisions with body.
+            if (reverseDir === STOP) {
+                
+                // Check if to the left or right of the Head location and go opposite.
+                if ((end.x/GRID - this.head.x/GRID) > 0) {
+                    reverseDir = RIGHT;
+                } else {
+                    reverseDir = LEFT;
+                }
+            }
+            console.log(reverseDir);
+
+        }
+        
         this.alive = false;
+        
     }
 
     // Check collision for all Fruits

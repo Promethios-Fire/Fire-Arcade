@@ -29,7 +29,12 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0.2;   // Between 0,1 to make portal areas appear
+
+
+// Default User Settings
+
+export const REVERSE_ON = true;
 
 // Game Objects
 
@@ -44,9 +49,10 @@ export const LEFT = 0;
 export const RIGHT = 1;
 export const UP = 2;
 export const DOWN = 3;
+
 const START_SPRINT = 4;
 const STOP_SPRINT = 5;
-const STOP = 10;
+export const STOP = 10;
 
 var PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -174,7 +180,7 @@ class GameScene extends Phaser.Scene
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
-        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 4);
+        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 15);
         this.snake.heading = STOP;
 
         // Tilemap
@@ -235,16 +241,19 @@ class GameScene extends Phaser.Scene
 
         // Define Spawn Areas
         
+        // Row A
         var areaAA = new SpawnArea(this, 1,5,6,4, 0x6666ff);
         var areaAB = new SpawnArea(this, 9,5,6,4, 0x6666ff);
         var areaAC = new SpawnArea(this, 17,5,6,4, 0x6666ff);
         var areaAD = new SpawnArea(this, 25,5,6,4, 0x6666ff);
 
+        // Row B
         var areaBA = new SpawnArea(this, 1,14,6,4, 0x6666ff);
         var areaBB = new SpawnArea(this, 9,14,6,4, 0x6666ff);
         var areaBC = new SpawnArea(this, 17,14,6,4, 0x6666ff);
         var areaBD = new SpawnArea(this, 25,14,6,4, 0x6666ff);
 
+        // Row C
         var areaCA = new SpawnArea(this, 1,23,6,4, 0x6666ff);
         var areaCB = new SpawnArea(this, 9,23,6,4, 0x6666ff);
         var areaCC = new SpawnArea(this, 17,23,6,4, 0x6666ff);
@@ -257,14 +266,14 @@ class GameScene extends Phaser.Scene
         ]
 
 
-        var cordsP1 = areaAA.genChords(this);
+        var cordsP1 = areaBA.genChords(this);
         areaAA.portalCords = cordsP1;
         
-        var cordsP2 = areaAD.genChords(this);
+        var cordsP2 = areaBD.genChords(this);
         areaAD.portalCords = cordsP2;
 
         var nextArea = [
-            [areaBA, areaBB, areaBC, areaBD],
+            [areaAA, areaAB, areaAC, areaAD],
             [areaCA, areaCB, areaCC, areaCD],
         ];
 
@@ -296,10 +305,28 @@ class GameScene extends Phaser.Scene
         //makePair(this, J1, I1);
 
         // Fair Fruit Spawn (5x)
-        this.setFruit(this, [areaAB, areaAC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
         // Middle Row
-        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
-        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
@@ -327,6 +354,8 @@ class GameScene extends Phaser.Scene
 
         if (!this.snake.alive)
             {
+                
+                game.destroy();
                 
                 // game.scene.scene.restart(); // This doesn't work correctly
                 if (DEBUG) { console.log("DEAD"); }
@@ -375,7 +404,7 @@ class GameScene extends Phaser.Scene
 
             // This is a bit eccessive because I only store the target portal coordinates
             // and I need to get the portal object to turn on the effect. Probably can be optimized.
-            // Good enough for testing.
+            // Good enough for now.
             if (closestPortalDist < 6) {
                 this.portals.forEach(portal => {
                     if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
@@ -391,6 +420,7 @@ class GameScene extends Phaser.Scene
                     }
                 });
             };
+            
             const ourUI = this.scene.get('UIScene');
             if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
                 console.log("YOU WIN");
