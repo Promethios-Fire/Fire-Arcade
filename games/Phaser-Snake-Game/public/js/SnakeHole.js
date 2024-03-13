@@ -163,7 +163,8 @@ class GameScene extends Phaser.Scene
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
         // GameUI
-        this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
         
@@ -199,20 +200,36 @@ class GameScene extends Phaser.Scene
 
         //Boost Meter -- will probably move to a separate UI class - Holden
         //const shape = this.add.rectangle(200, 0, 300, 200,'#ffffff');
-        var boostMeter = this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(10);
+        this.energyAmount = 0;
+
+        //var boostMeter = this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(9);
         this.add.image(GRID * 16,GRID*1,'boostMeterFrame').setDepth(10);
 
-        const mask = this.make.image({
+        this.mask = this.make.image({
             x: GRID * 16,
             y: GRID*1,
             key: 'mask',
             add: false
         });
-        boostMeter.mask = new Phaser.Display.Masks.BitmapMask(this, mask);
+        
+
+        // Animation set
+        this.anims.create({
+            key: 'increasing',
+            frames: this.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        const keys = [ 'increasing' ];
+        const energyBar = this.add.sprite(16 * GRID,1 * GRID)
+        energyBar.play('increasing');
+
+        energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
         //this.mask = shape.createBitmapMask();
         //boostMeter.setMask(this.mask); // image.mask = mask;
-        //mask.invertAlpha = true;
+        //boostMeter.mask.invertAlpha = true;
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
@@ -402,15 +419,20 @@ class GameScene extends Phaser.Scene
             this.snake.move(this);
         }
         
-        // Boost and Boot Multi Code
-
+        // Boost and Boost Multi Code
 
         var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
         if (!this.spaceBar.isDown){
-            this.moveInterval = SPEEDWALK;} // Less is Faster
+            this.moveInterval = SPEEDWALK; // Less is Faster
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount += .25;
+        }
+            //setDisplaySize}
         else{
             this.moveInterval = SPEEDSPRINT; // Sprinting now 
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount -= 1;
             if (timeLeft >= BOOST_BONUS_FLOOR ) { 
                 // Don't add boost multi after 20 seconds
                 ourInputScene.boostBonusTime += 1;
@@ -426,6 +448,12 @@ class GameScene extends Phaser.Scene
             //ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
             //console.log(ourUI.scoreMulti);
         }
+        if (this.energyAmount >= 100){
+            this.energyAmount = 100;}
+        else if(this.energyAmount <= 0){
+            this.energyAmount = 0;
+        }
+        //console.log(this.energyAmount)
     }
 }
 
