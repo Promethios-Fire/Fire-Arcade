@@ -36,7 +36,12 @@ var Snake = new Phaser.Class({
         this.body.push(newPart);
     },
     
-    reverse: function(target, direction) {
+    reverseMove: function(direction, endPart) {
+        // this.body is is reversed before this is called.
+        console.log("REVERSING NOW", this.body);
+        //Phaser.Actions.ShiftPosition(this.body, endPart.x - GRID*2, endPart.y, 1, endPart.y);
+        //Phaser.Actions.ShiftPosition(this.body, endPart.x - GRID*2, endPart.y, 1, endPart.y);
+        //Phaser.Actions.ShiftPosition(this.body, endPart.x - GRID*3, endPart.y, 1, endPart.y);
 
     },
     
@@ -97,15 +102,15 @@ var Snake = new Phaser.Class({
         }
         else {
             
-            // Reverse the Snake
-            this.body.reverse();
+            // Reverse a Copy of the Snake
+            var reverseBody = this.body.slice().reverse();
             
             // Get the Tail
-            var end = Phaser.Utils.Array.GetFirst(this.body);
+            var end = Phaser.Utils.Array.GetFirst(reverseBody);
 
-            let restOfSnake = this.body.slice(1);
+            let restOfSnake = reverseBody.slice(1);
 
-            let reverseDir = STOP
+            let reverseDir = STOP;
             
             restOfSnake.every(part => {
                 if (part.y === end.y) { // Checks every one. May be good to escape loop the first time this is true.
@@ -136,6 +141,7 @@ var Snake = new Phaser.Class({
                 }
             }
             console.log(reverseDir);
+            this.reverseMove(reverseDir, end);
 
         }
         
