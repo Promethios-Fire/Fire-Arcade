@@ -36,9 +36,10 @@ var Snake = new Phaser.Class({
         this.body.push(newPart);
     },
     
-    reverseMove: function(direction, endPart) {
-        // this.body is is reversed before this is called.
+    reverseMove: function(scene, direction, endPart) {
         console.log("REVERSING NOW", this.body);
+        this.body.reverse();
+        this.move();
         //Phaser.Actions.ShiftPosition(this.body, endPart.x - GRID*2, endPart.y, 1, endPart.y);
         //Phaser.Actions.ShiftPosition(this.body, endPart.x - GRID*2, endPart.y, 1, endPart.y);
         //Phaser.Actions.ShiftPosition(this.body, endPart.x - GRID*3, endPart.y, 1, endPart.y);
@@ -57,11 +58,10 @@ var Snake = new Phaser.Class({
 
     // if any tailpos == headpos
     if(
-        tail.some(
-            pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
+        tail.some(pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
     ){
         this.alive = false;
-    }
+    };
 
     
     scene.portals.forEach(portal => { 
@@ -113,13 +113,14 @@ var Snake = new Phaser.Class({
             let reverseDir = STOP;
             
             restOfSnake.every(part => {
-                if (part.y === end.y) { // Checks every one. May be good to escape loop the first time this is true.
-                    
+                if (part.y === end.y) {
                     let dif = part.x - end.x;
                     if (dif > 0) {
+                        console.log("LEFT-body");
                         reverseDir = LEFT;
                     }
                     else {
+                        console.log("RIGHT-body");
                         reverseDir = RIGHT;
                     }
                     return false;
@@ -135,13 +136,44 @@ var Snake = new Phaser.Class({
                 
                 // Check if to the left or right of the Head location and go opposite.
                 if ((end.x/GRID - this.head.x/GRID) > 0) {
+                    console.log("RIGHT-head");
                     reverseDir = RIGHT;
                 } else {
+                    console.log("LEFT-head");
                     reverseDir = LEFT;
                 }
             }
             console.log(reverseDir);
-            this.reverseMove(reverseDir, end);
+            
+            
+            
+            
+            
+            //Phaser.Actions.ShiftPosition(this.body, this.head.x, this.head.y - GRID, this.tail);
+            console.log(this.body);
+            this.head.x -= 32;
+            this.head.y += GRID;
+            //console.log(this.body[0].x);
+            //debugger
+            //console.log(this.body.reverse());
+
+            
+
+            
+            //if (reverseDir === LEFT) {
+            //    this.body[0].x - GRID;
+
+            //} else  if (reverseDir === RIGHT) {
+            //    Phaser.Actions.ShiftPosition(this.body, end.x + GRID, end.y, 1, this.head);
+                
+            //} else {
+
+            //}
+            //debugger
+
+            // Phaser.Actions.ShiftPosition(this.body, end.x - GRID*2, end.y, this.tail);
+
+            //this.reverseMove(scene, reverseDir, end);
 
         }
         
