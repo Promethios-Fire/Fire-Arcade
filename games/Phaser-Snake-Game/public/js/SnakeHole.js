@@ -346,26 +346,9 @@ class GameScene extends Phaser.Scene
         //makePair(this, C1, F1);
         //makePair(this, J1, I1);
 
-        // Fair Fruit Spawn (5x)
+        // Fair Fruit Spawn
         this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
-        this.setFruit(this, [areaBB, areaBC]);
+
         // Middle Row
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
         this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
@@ -377,6 +360,8 @@ class GameScene extends Phaser.Scene
     setFruit (scene, areas) {
 
         
+        var ourUIScene = this.scene.get('UIScene');
+        
         var area = Phaser.Math.RND.pick(areas);
 
         var pos = area.genChords(scene);
@@ -385,8 +370,8 @@ class GameScene extends Phaser.Scene
         food.setPosition(pos[0]*GRID, pos[1]*GRID);
         //console.log(scene.portals);
 
-        ourUIScene.fruitCount = 20;
-        ourUIScene.fruitCountUI.setText(ourUIScene.fruitCount);
+        //ourUIScene.fruitCount = 20;
+        //ourUIScene.fruitCountUI.setText(ourUIScene.fruitCount);
 
     }
 
@@ -394,14 +379,11 @@ class GameScene extends Phaser.Scene
     {
         var ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         var ourInputScene = this.scene.get('InputScene');
+        
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
-        if (!this.snake.alive)
-            {
-                
-                game.destroy();
-                
+        if (!this.snake.alive) {          
                 // game.scene.scene.restart(); // This doesn't work correctly
                 if (DEBUG) { console.log("DEAD"); }
                 
@@ -411,13 +393,14 @@ class GameScene extends Phaser.Scene
                 ourUI.lives += 1;
                 ourUI.livesUI.setText(ourUI.lives);
 
-                ourUI.fruitCount = 0;
+                // ourUI.fruitCount = 0;
                 ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${LENGTHGOAL}`);
 
                 //game.destroy();
                 this.scene.restart();
                 return;
             }
+
 
         
         // Only Calculate things when snake is moved.
@@ -497,7 +480,7 @@ class GameScene extends Phaser.Scene
             
             
             var ourUIScene = this.scene.get('UIScene');
-            if (this.snake.body.length < ourUIScene.fruitCount && this.started){
+            if (this.snake.body.length <= ourUIScene.fruitCount && this.started){
                 this.snake.grow(this);
             };
 
@@ -840,7 +823,7 @@ class UIScene extends Phaser.Scene
             // Reset Score for new game
             this.score = 0;
             this.scoreMulti = 0;
-            this.fruitCount = 0;
+            //this.fruitCount = 0;
             this.scoreHistory = [];
 
             this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.

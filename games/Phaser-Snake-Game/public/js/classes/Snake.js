@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, DEBUG,
-    LENGTHGOAL
+    LEFT, RIGHT, UP, DOWN, STOP, DEBUG,
+    LENGTHGOAL, REVERSE_ON,
 } from "../SnakeHole.js";
 
 var Snake = new Phaser.Class({
@@ -101,6 +101,7 @@ var Snake = new Phaser.Class({
         }
         else {
             
+            /*
             // Reverse a Copy of the Snake
             var reverseBody = this.body.slice().reverse();
             
@@ -143,36 +144,7 @@ var Snake = new Phaser.Class({
                 }
             }
             console.log(reverseDir);
-            
-            
-            
-            
-            
-            //Phaser.Actions.ShiftPosition(this.body, this.head.x, this.head.y - GRID, this.tail);
-            console.log(this.body);
-            this.head.x -= 32;
-            this.head.y += GRID;
-            //console.log(this.body[0].x);
-            //debugger
-            //console.log(this.body.reverse());
-
-            
-
-            
-            //if (reverseDir === LEFT) {
-            //    this.body[0].x - GRID;
-
-            //} else  if (reverseDir === RIGHT) {
-            //    Phaser.Actions.ShiftPosition(this.body, end.x + GRID, end.y, 1, this.head);
-                
-            //} else {
-
-            //}
-            //debugger
-
-            // Phaser.Actions.ShiftPosition(this.body, end.x - GRID*2, end.y, this.tail);
-
-            //this.reverseMove(scene, reverseDir, end);
+            */     
 
         }
         
