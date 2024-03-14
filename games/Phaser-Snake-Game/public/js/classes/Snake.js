@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
     LEFT, RIGHT, UP, DOWN, DEBUG,
-    FRUITGOAL
+    LENGTH_GOAL
 } from "../SnakeHole.js";
 
 var Snake = new Phaser.Class({

@@ -11,7 +11,7 @@ import { Snake } from './classes/Snake.js';
 const GAME_VERSION = 'v0.2.03.15.005';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const FRUITGOAL = 32; //24 //32?................... Win Condition
+export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
 
 
 // 1 frame is 16.666 
@@ -376,10 +376,10 @@ class GameScene extends Phaser.Scene
                 
                 ourUI = this.scene.get('UIScene');
                 ourUI.lives += 1;
-                ourUI.livesUI.setText(`Lives:${ourUI.lives}`);
+                ourUI.livesUI.setText(`x ${ourUI.lives}`);
 
                 ourUI.fruitCount = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${FRUITGOAL}`);
+                ourUI.fruitCountUI.setText(`${ourUI.fruitCount}/${LENGTH_GOAL}`);
 
                 //game.destroy();
                 this.scene.restart();
@@ -433,11 +433,11 @@ class GameScene extends Phaser.Scene
                 });
             };
             const ourUI = this.scene.get('UIScene');
-            if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
+            if (ourUI.fruitCount >= LENGTH_GOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
-                ourUI.bestScoreUI.setText(`Best: ${ourUI.score}`);
+                ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
 
 
                 this.scene.pause();
@@ -547,7 +547,7 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        var scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
 
         scoreScreen.setOrigin(0.5,0);
 
@@ -557,7 +557,7 @@ class WinScene extends Phaser.Scene
         ` 
         /************ WINNING SCORE *************/
         SCORE: ${ourUI.score}
-        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / FRUITGOAL)}
+        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
         
         TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
@@ -581,7 +581,7 @@ class WinScene extends Phaser.Scene
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '200',
             'padding': '2px 12px 2px 12px',
-            'font-weight': 'bold',
+            //'font-weight': 'bold',
             'word-wrap': 'break-word',
             //'border-radius': '24px',
             //outline: 'solid',
@@ -646,7 +646,7 @@ class UIScene extends Phaser.Scene
     {
         this.score = 0;
         this.bestScore = 0;
-        this.fruitCount = 0;
+        this.lengthGoal = 0;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
@@ -655,8 +655,11 @@ class UIScene extends Phaser.Scene
         this.scoreHistory = [];
     }
 
-    create()
-    {
+    preload () {
+        this.load.spritesheet('ui', 'assets/Tiled/tileSheetx24.png', { frameWidth: GRID, frameHeight: GRID });
+    }
+    
+    create() {
         const ourGame = this.scene.get('GameScene');
 
         const UIStyle = {
@@ -666,8 +669,8 @@ class UIScene extends Phaser.Scene
             'font-size': '16px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
-            'padding': '0px 0px 0px 0px',
-            'font-weight': 'bold',
+            'padding': '0px 0px 0px 12px',
+            //'font-weight': 'bold',
             //'border-radius': '24px',
             //outline: 'solid',
             'text-align': 'right',
@@ -681,18 +684,26 @@ class UIScene extends Phaser.Scene
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
         
-        this.scoreUI = this.add.dom(GRID*.5 , GRID*1.25, 'div', UIStyle);
-        this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
+        // Score Text
+        this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UIStyle);
+        this.scoreUI.setText(`Score: 0000`).setOrigin(0,1);
+        //this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
         
-        this.bestScoreUI = this.add.dom(GRID * 21, GRID*1.25 , 'div', UIStyle);
+        // Best Score
+        this.bestScoreUI = this.add.dom(0, 12 - 2 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
-        this.bestScoreUI.setText("Best: 0000");
+        this.bestScoreUI.setText("Best : 0000");
         
-        this.livesUI = this.add.dom(GRID*8, GRID*1.25, 'div', UIStyle);
-        this.livesUI.setText(`Lives:${this.lives}`).setOrigin(1,0);
+        // Lives
+        this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
+        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UIStyle);
+        this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
 
-        this.fruitCountUI = this.add.dom(GRID * 28, GRID*1.25, 'div', UIStyle);
-        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`).setOrigin(0,0);
+        // Goal UI
+        this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
+        this.fruitCountUI = this.add.dom(GRID * 27.5, GRID * 2 + 2, 'div', UIStyle);
+        this.fruitCountUI.setText(`${this.lengthGoal}/${LENGTH_GOAL}`).setOrigin(0,1);
+        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -767,10 +778,10 @@ class UIScene extends Phaser.Scene
 
             this.scoreUI.setText(`Score: ${this.score}`);
             
-            this.fruitCount += 1;
+            this.lengthGoal += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            this.fruitCountUI.setText(`${this.lengthGoal}/${LENGTH_GOAL}`);
             
 
              // Restart Score Timer
@@ -797,7 +808,7 @@ class UIScene extends Phaser.Scene
         {
             if (this.score > this.bestScore) {
                 this.bestScore = this.score;
-                this.bestScoreUI.setText(`Best: ${this.bestScore}`);
+                this.bestScoreUI.setText(`Best : ${this.bestScore}`);
             }
             
             // Reset Score for new game
