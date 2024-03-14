@@ -378,8 +378,8 @@ class GameScene extends Phaser.Scene
                 ourUI.lives += 1;
                 ourUI.livesUI.setText(`x ${ourUI.lives}`);
 
-                ourUI.fruitCount = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.fruitCount}/${LENGTH_GOAL}`);
+                ourUI.length = 0;
+                ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
 
                 //game.destroy();
                 this.scene.restart();
@@ -433,7 +433,7 @@ class GameScene extends Phaser.Scene
                 });
             };
             const ourUI = this.scene.get('UIScene');
-            if (ourUI.fruitCount >= LENGTH_GOAL) { // not winning instantly
+            if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
@@ -646,7 +646,7 @@ class UIScene extends Phaser.Scene
     {
         this.score = 0;
         this.bestScore = 0;
-        this.lengthGoal = 0;
+        this.length = 0;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
@@ -702,7 +702,7 @@ class UIScene extends Phaser.Scene
         // Goal UI
         this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.fruitCountUI = this.add.dom(GRID * 27.5, GRID * 2 + 2, 'div', UIStyle);
-        this.fruitCountUI.setText(`${this.lengthGoal}/${LENGTH_GOAL}`).setOrigin(0,1);
+        this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`).setOrigin(0,1);
         this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
@@ -778,10 +778,10 @@ class UIScene extends Phaser.Scene
 
             this.scoreUI.setText(`Score: ${this.score}`);
             
-            this.lengthGoal += 1;
+            this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.fruitCountUI.setText(`${this.lengthGoal}/${LENGTH_GOAL}`);
+            this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`);
             
 
              // Restart Score Timer
