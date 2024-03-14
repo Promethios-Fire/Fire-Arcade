@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
     LEFT, RIGHT, UP, DOWN, DEBUG,
-    FRUITGOAL
+    LENGTHGOAL
 } from "../SnakeHole.js";
 
 var Snake = new Phaser.Class({
@@ -12,7 +12,7 @@ var Snake = new Phaser.Class({
         this.body = []
 
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-        this.head.setOrigin(0,0);
+        this.head.setOrigin(0,0).setDepth(99); // Head on Top
         
         this.body.push(this.head);
 
@@ -48,13 +48,17 @@ var Snake = new Phaser.Class({
     let tail = this.body.slice(1);
 
     // if any tailpos == headpos
-    if(
-        tail.some(
-            pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
-    ){
-        this.alive = false;
-    }
-
+    
+    var ourGameScene = scene.scene.get('GameScene');
+    //debugger
+    if (ourGameScene.started) {
+        console.log("STARTED");
+        if(tail.some(pos => pos.x === this.body[0].x && pos.y === this.body[0].y)) 
+        {
+            console.log("HIT TAIL AND DIED RIP BOZO");
+            this.alive = false;
+        }
+    };
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y){
