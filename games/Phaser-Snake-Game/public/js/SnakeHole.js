@@ -170,6 +170,8 @@ class GameScene extends Phaser.Scene
         this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
+
+        this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
         
         // Audio
         this.load.setPath('assets/audio');
@@ -230,6 +232,24 @@ class GameScene extends Phaser.Scene
 
         energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
+        this.anims.create({
+            key: 'idle',
+            frames: this.anims.generateFrameNumbers('startingArrowsAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7 ] }),
+            frameRate: 16,
+            repeat: -1
+        });
+
+        /*const startingArrowsAnimN = this.add.sprite(16.5 * GRID, 5.333 * GRID).setDepth(5)
+        const startingArrowsAnimS = this.add.sprite(16.5 * GRID, 7.666 * GRID).setDepth(5)
+        const startingArrowsAnimE = this.add.sprite(17.666 * GRID, 6.5 * GRID).setDepth(5)
+        const startingArrowsAnimW = this.add.sprite(15.333 * GRID, 6.5 * GRID).setDepth(5)
+        startingArrowsAnimS.flipY=true;
+        startingArrowsAnimE.angle = 90;
+        startingArrowsAnimW.angle = 270;
+        startingArrowsAnimN.play('idle');
+        startingArrowsAnimS.play('idle');
+        startingArrowsAnimE.play('idle');
+        startingArrowsAnimW.play('idle');*/
         //this.mask = shape.createBitmapMask();
         //boostMeter.setMask(this.mask); // image.mask = mask;
         //boostMeter.mask.invertAlpha = true;
