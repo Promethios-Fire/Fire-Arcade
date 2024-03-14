@@ -1,7 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
-    LEFT, RIGHT, UP, DOWN, DEBUG, STOP,
-    FRUITGOAL,
-    REVERSE_ON, 
+    LEFT, RIGHT, UP, DOWN, DEBUG,
+    LENGTHGOAL
 } from "../SnakeHole.js";
 
 var Snake = new Phaser.Class({
@@ -13,7 +12,7 @@ var Snake = new Phaser.Class({
         this.body = []
 
         this.head = scene.add.image(x * GRID, y * GRID, 'blocks', 0);
-        this.head.setOrigin(0,0);
+        this.head.setOrigin(0,0).setDepth(99); // Head on Top
         
         this.body.push(this.head);
 

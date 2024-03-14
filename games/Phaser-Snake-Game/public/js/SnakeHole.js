@@ -11,7 +11,7 @@ import { Snake } from './classes/Snake.js';
 const GAME_VERSION = 'snakehole.v0.2.03.15.001';
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
-export const FRUITGOAL = 32; //24 //32?................... Win Condition
+export const LENGTHGOAL = 32; //24 //32?................... Win Condition
 
 
 // 1 frame is 16.666 
@@ -151,6 +151,8 @@ class GameScene extends Phaser.Scene
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice(); 
 
+        this.started = false; // Exception that allows allows head to collide with body only at the start.
+
     }
     
     
@@ -163,6 +165,12 @@ class GameScene extends Phaser.Scene
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
 
+        // GameUI
+        //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
+        this.load.spritesheet('boostMeterAnim', 'assets/sprites/boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
+        this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
+        this.load.image("mask", "assets/sprites/boostMask.png");
+        
         // Audio
         this.load.setPath('assets/audio');
 
@@ -175,6 +183,7 @@ class GameScene extends Phaser.Scene
     create () {
         var ourInputScene = this.scene.get('InputScene');
         var ourGameScene = this.scene.get('GameScene');
+        var ourUIScene = this.scene.get('UIScene');
 
         /////////////////////////////////////////////////
         
@@ -182,7 +191,7 @@ class GameScene extends Phaser.Scene
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 15);
         this.snake.heading = STOP;
-
+        
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -191,6 +200,39 @@ class GameScene extends Phaser.Scene
     
         // add background
         this.add.image(0, GRID*3, 'bg01').setDepth(-1).setOrigin(0,0);
+
+        //Boost Meter -- will probably move to a separate UI class - Holden
+        //const shape = this.add.rectangle(200, 0, 300, 200,'#ffffff');
+        this.energyAmount = 0;
+
+        //var boostMeter = this.add.image(GRID * 16,GRID*1,'boostMeter').setDepth(9);
+        this.add.image(GRID * 16,GRID*1,'boostMeterFrame').setDepth(10);
+
+        this.mask = this.make.image({
+            x: GRID * 16,
+            y: GRID*1,
+            key: 'mask',
+            add: false
+        });
+        
+
+        // Animation set
+        this.anims.create({
+            key: 'increasing',
+            frames: this.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
+            frameRate: 8,
+            repeat: -1
+        });
+
+        const keys = [ 'increasing' ];
+        const energyBar = this.add.sprite(16 * GRID,1 * GRID)
+        energyBar.play('increasing');
+
+        energyBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+        //this.mask = shape.createBitmapMask();
+        //boostMeter.setMask(this.mask); // image.mask = mask;
+        //boostMeter.mask.invertAlpha = true;
 
         // Audio
         SOUND_CRUNCH.forEach(soundID =>
@@ -343,6 +385,9 @@ class GameScene extends Phaser.Scene
         food.setPosition(pos[0]*GRID, pos[1]*GRID);
         //console.log(scene.portals);
 
+        ourUIScene.fruitCount = 20;
+        ourUIScene.fruitCountUI.setText(ourUIScene.fruitCount);
+
     }
 
     update (time, delta) 
@@ -367,7 +412,7 @@ class GameScene extends Phaser.Scene
                 ourUI.livesUI.setText(ourUI.lives);
 
                 ourUI.fruitCount = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${FRUITGOAL}`);
+                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${LENGTHGOAL}`);
 
                 //game.destroy();
                 this.scene.restart();
@@ -378,7 +423,8 @@ class GameScene extends Phaser.Scene
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval){
             this.lastMoveTime = time;
-            
+
+            //debugger
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
  
@@ -422,7 +468,7 @@ class GameScene extends Phaser.Scene
             };
             
             const ourUI = this.scene.get('UIScene');
-            if (ourUI.fruitCount >= FRUITGOAL) { // not winning instantly
+            if (ourUI.fruitCount >= LENGTHGOAL) { // not winning instantly
                 console.log("YOU WIN");
     
                 ourUI.currentScore.setText(`Score: ${ourUI.score}`);
@@ -449,19 +495,30 @@ class GameScene extends Phaser.Scene
                 
             } 
             
+            
+            var ourUIScene = this.scene.get('UIScene');
+            if (this.snake.body.length < ourUIScene.fruitCount && this.started){
+                this.snake.grow(this);
+            };
+
             // Move at last second
             this.snake.move(this);
         }
         
-        // Boost and Boot Multi Code
-
+        // Boost and Boost Multi Code
 
         var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
         if (!this.spaceBar.isDown){
-            this.moveInterval = SPEEDWALK;} // Less is Faster
+            this.moveInterval = SPEEDWALK; // Less is Faster
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount += .25;
+        }
+            //setDisplaySize}
         else{
             this.moveInterval = SPEEDSPRINT; // Sprinting now 
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount -= 1;
             if (timeLeft >= BOOST_BONUS_FLOOR ) { 
                 // Don't add boost multi after 20 seconds
                 ourInputScene.boostBonusTime += 1;
@@ -477,6 +534,12 @@ class GameScene extends Phaser.Scene
             //ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
             //console.log(ourUI.scoreMulti);
         }
+        if (this.energyAmount >= 100){
+            this.energyAmount = 100;}
+        else if(this.energyAmount <= 0){
+            this.energyAmount = 0;
+        }
+        //console.log(this.energyAmount)
     }
 }
 
@@ -530,7 +593,7 @@ class WinScene extends Phaser.Scene
         ` 
         /************ WINNING SCORE *************/
         SCORE: ${ourUI.score}
-        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / FRUITGOAL)}
+        FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTHGOAL)}
         
         TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
@@ -666,7 +729,7 @@ class UIScene extends Phaser.Scene
         this.livesUI.setText(`${this.lives}`).setOrigin(0.5,0);
 
         this.fruitCountUI = this.add.dom(GRID * 28, GRID * .5, 'div', UIStyle);
-        this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`).setOrigin(0,0);
+        this.fruitCountUI.setText(`${this.fruitCount} / ${LENGTHGOAL}`).setOrigin(0,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -744,7 +807,7 @@ class UIScene extends Phaser.Scene
             this.fruitCount += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.fruitCountUI.setText(`${this.fruitCount} / ${FRUITGOAL}`);
+            this.fruitCountUI.setText(`${this.fruitCount} / ${LENGTHGOAL}`);
             
 
              // Restart Score Timer
@@ -843,6 +906,7 @@ class InputScene extends Phaser.Scene
         //console.time("UpdateDirection");
         //console.log(this.turns);
         
+        gameScene.started = true;
         switch (event.keyCode) {
             case 87: // w
 
