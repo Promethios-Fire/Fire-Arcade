@@ -28,7 +28,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-export const DEBUG = true;
+export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0.2;   // Between 0,1 to make portal areas appear
 
 
@@ -297,10 +297,6 @@ class GameScene extends Phaser.Scene
 
         });
 
-        
-
-
-
         // Define Spawn Areas
         
         // Row A
@@ -367,6 +363,23 @@ class GameScene extends Phaser.Scene
         //makePair(this, J1, I1);
 
         // Fair Fruit Spawn
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
+        this.setFruit(this, [areaBB, areaBC]);
         this.setFruit(this, [areaBB, areaBC]);
 
         // Middle Row
@@ -466,7 +479,7 @@ class GameScene extends Phaser.Scene
                 this.snake.regrouping = true;              //this.scene.restart();
                 
                 // not here
-                this.t = 0.5
+                this.t = 0.0
                 
                 return;
             }
@@ -479,17 +492,23 @@ class GameScene extends Phaser.Scene
             this.t = (this.t + 0.01) % 1;
             
             
-            Phaser.Geom.Point.Interpolate(this.snake.head, center, this.t, this.snake.head);
-            this.snake.head.setPosition = [
-                Phaser.Math.RoundTo(this.snake.head.x, 0), 
-                Phaser.Math.RoundTo(this.snake.head.y, 0)];
-            console.log(center.x, center.y, this.snake.head.x,this.snake.head.y);
+            this.snake.body.forEach(part => {
 
-            if (this.snake.head.x == center.x && this.snake.head.y == center.y) {
-                console.log("READY TO START");  
-                this.snake.regrouping = false;  
-                this.snake.move_pause = false;    
-            }
+           
+                Phaser.Geom.Point.Interpolate(part, center, this.t, part);
+                part.setPosition = [
+                    Phaser.Math.RoundTo(part.x, 0), 
+                    Phaser.Math.RoundTo(part.y, 0)];
+                console.log(center.x, center.y, part.x, part.y);
+
+                if (part.x == center.x && part.y == center.y) {
+                    console.log("READY TO START");  
+                    this.snake.regrouping = false;  
+                    this.move_pause = false;
+                    //this.snake.heading = STOP;    
+                }
+            });
+            console.log(this.snake.regrouping, this.move_pause);
         }
 
         
