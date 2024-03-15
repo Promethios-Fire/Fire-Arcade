@@ -28,7 +28,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-export const DEBUG = false;
+export const DEBUG = true;
 export const DEBUG_AREA_ALPHA = 0.2;   // Between 0,1 to make portal areas appear
 
 
@@ -152,7 +152,7 @@ class GameScene extends Phaser.Scene
         this.portalColors = PORTAL_COLORS.slice(); 
 
         this.started = false; // Exception that allows allows head to collide with body only at the start.
-
+        this.move_pause = false;
     }
     
     
@@ -417,14 +417,59 @@ class GameScene extends Phaser.Scene
                 ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${LENGTHGOAL}`);
 
                 //game.destroy();
-                this.scene.restart();
+
+                //var graphics = this.add.graphics({ lineStyle: { width: 3, color: 0x2266aa }, fillStyle: { color: 0x2266aa } });
+                //this.graphics.setDepth(100);
+
+                if (DEBUG) {
+                    const graphics = this.add.graphics();
+
+                    graphics.lineStyle(2, 0x00ff00, 1);
+            
+                    this.snake.body.forEach( part => {
+                    graphics.beginPath();
+                    graphics.moveTo(part.x, part.y);
+                    graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                    graphics.closePath();
+                    graphics.strokePath();
+                    });
+                }
+                
+
+                //graphics.beginPath();
+                //graphics.moveTo(this.snake.head.x, this.snake.head.y);
+                //graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                //graphics.lineTo(340, 430);
+                //graphics.lineTo(650, 300);
+                //graphics.lineTo(700, 180);
+                //graphics.lineTo(600, 80);
+        
+                //graphics.closePath();
+        
+                //graphics.strokePath();
+
+
+                //graphics.strokeRect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, GRID, GRID);
+
+                //graphics.fillPointShape([SCREEN_WIDTH/2, SCREEN_HEIGHT/2], 24);
+                
+                // Show Path For Body Reset
+                //this.snake.body.forEach( part => {
+                    
+
+                //});
+
+
+
+                this.move_pause = true;
+                //this.scene.restart();
                 return;
             }
 
 
         
         // Only Calculate things when snake is moved.
-        if(time >= this.lastMoveTime + this.moveInterval){
+        if(time >= this.lastMoveTime + this.moveInterval && !this.move_pause){
             this.lastMoveTime = time;
 
             //debugger
