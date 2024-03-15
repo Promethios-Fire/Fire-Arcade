@@ -18,6 +18,7 @@ var Snake = new Phaser.Class({
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
+        this.regrouping = false;
         
     },
     

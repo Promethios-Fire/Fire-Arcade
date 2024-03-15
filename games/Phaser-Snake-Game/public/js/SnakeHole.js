@@ -462,15 +462,44 @@ class GameScene extends Phaser.Scene
 
 
                 this.move_pause = true;
-                //this.scene.restart();
+                this.snake.alive = true;
+                this.snake.regrouping = true;              //this.scene.restart();
+                
+                // not here
+                this.t = 0.5
+                
                 return;
             }
+
+
+        if(this.snake.regrouping){ // This should be a uniform time period from any point.
+            console.log("respawn frame");
+            
+            var center = new Phaser.Geom.Point(SCREEN_WIDTH/2,SCREEN_HEIGHT/2);
+            this.t = (this.t + 0.01) % 1;
+            
+            
+            Phaser.Geom.Point.Interpolate(this.snake.head, center, this.t, this.snake.head);
+            this.snake.head.setPosition = [
+                Phaser.Math.RoundTo(this.snake.head.x, 0), 
+                Phaser.Math.RoundTo(this.snake.head.y, 0)];
+            console.log(center.x, center.y, this.snake.head.x,this.snake.head.y);
+
+            if (this.snake.head.x == center.x && this.snake.head.y == center.y) {
+                console.log("READY TO START");  
+                this.snake.regrouping = false;  
+                this.snake.move_pause = false;    
+            }
+        }
+
+        
 
 
         
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && !this.move_pause){
             this.lastMoveTime = time;
+            console.log("mOVe");
 
             //debugger
             // This code calibrates how many milliseconds per frame calculated.
@@ -1101,12 +1130,12 @@ var config = {
     height: 720,
     //seed: 1,
     parent: 'phaser-example',
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0}
-        }
-    },
+    //physics: {
+    //    default: 'arcade',
+    //    arcade: {
+    //        gravity: { y: 0}
+    //    }
+    //},
     fx: {
         glow: {
             distance: 32,
