@@ -535,7 +535,7 @@ class WinScene extends Phaser.Scene
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
             'padding': '2px 0px 2px 12px',
-            'font-weight': 'bold',
+            //'font-weight': 'bold',
             'word-wrap': 'break-word',
             //'border-radius': '24px',
             outline: 'solid',
@@ -587,8 +587,8 @@ class WinScene extends Phaser.Scene
             //outline: 'solid',
         }
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2, GRID * 20.5, 'div', logScreenStyle);
-        fruitLog.setText(`[${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,0);
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2, GRID * 22, 'div', logScreenStyle);
+        fruitLog.setText(`[${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);
 
         //card.setScale(0.7);
 
@@ -686,13 +686,13 @@ class UIScene extends Phaser.Scene
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UIStyle);
-        this.scoreUI.setText(`Score: 0000`).setOrigin(0,1);
+        this.scoreUI.setText(`Score: 0`).setOrigin(0,1);
         //this.scoreUI.setText(`Score: ${this.score}`).setOrigin(0,0);
         
         // Best Score
         this.bestScoreUI = this.add.dom(0, 12 - 2 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
-        this.bestScoreUI.setText("Best : 0000");
+        //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
         
         // Lives
         this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
