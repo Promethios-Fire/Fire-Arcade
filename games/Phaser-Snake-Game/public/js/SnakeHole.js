@@ -452,19 +452,26 @@ class GameScene extends Phaser.Scene
                 });
             }
 
-            this.tweens.add({
-                targets: this.snake.body.reverse(),
+            this.snake.regrouping = true;
+            this.move_pause = true;
+            
+            var tween = this.tweens.add({
+                targets: this.snake.body.reverse(), // Start removing the tail.
                 x: SCREEN_WIDTH/2,
                 y: SCREEN_HEIGHT/2,
                 yoyo: false,
-                duration: 2000,
-                ease: 'Sine.easeInOut',
+                duration: 250,
+                ease: 'Sine.easeOutIn',
                 repeat: 0,
-                //delay: this.tweens.stagger(150)
+                delay: this.tweens.stagger(75)
             });
 
-            this.move_pause = true;
-            this.snake.regrouping = true;              //this.scene.restart();
+            tween.on('complete', test => {
+                this.snake.body.reverse() // Head back at front
+                this.snake.regrouping = false;
+                this.scene.restart();
+                this.fruitCount = 0; // ON FOR TESTING
+            });
             
             // not here
             this.t = 0.0
