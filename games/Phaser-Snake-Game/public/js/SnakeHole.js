@@ -368,25 +368,26 @@ class GameScene extends Phaser.Scene
         ]
 
 
-        var cordsP1 = areaAA.genChords(this);
+        var cordsP1 = areaBA.genChords(this);
         areaAA.portalCords = cordsP1;
         
-        var cordsP2 = areaAD.genChords(this);
+        var cordsP2 = areaBD.genChords(this);
         areaAD.portalCords = cordsP2;
 
         var nextArea = [
-            [areaBA, areaBB, areaBC, areaBD],
+            [areaAA, areaAB, areaAC, areaAD],
             [areaCA, areaCB, areaCC, areaCD],
         ];
 
         // Choose a Random Lane
-        var lane3 = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        var nextLane = Phaser.Utils.Array.RemoveRandomElement(nextArea);
         
-        var areaP3 = Phaser.Math.RND.pick(lane3);
+        // Choose random area from that lane and get chords
+        var areaP3 = Phaser.Math.RND.pick(nextLane);
         var cordsP3 = areaP3.genChords(this);
         areaP3.portalCords = cordsP3;
 
-        // Other Portal goes to the other Lane
+        // Other Lane gets the second portal
         var areaP4 = Phaser.Math.RND.pick(nextArea[0]);
         var cordsP4 = areaP4.genChords(this);
         areaP4.portalCords = cordsP4
@@ -407,15 +408,30 @@ class GameScene extends Phaser.Scene
         //makePair(this, J1, I1);
 
         // Fair Fruit Spawn (5x)
-        this.setFruit(this, [areaAB, areaAC]);
-        // Middle Row
-        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
-        this.setFruit(this,[areaBA,areaBB,areaBC,areaBD]);
+        
+        // Top Row
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        this.setFruit(this,[areaAA,areaAB,areaAC,areaAD]);
+        
+        // Middle Row        
+        this.setFruit(this, [areaBB, areaBC]);
+
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
 
     }
+    chooseFreeArea (scene, areas, limit=3) {
+        var _areas = [
+            [areaAA, areaAB, areaAC, areaAD],
+            [areaBA, areaBB, areaBC, areaBD],
+            [areaCA, areaCB, areaCC, areaCD]
+        ]
+        
+        lane1 = Phaser.Utils.Array.RemoveRandomElement(_areas);
+
+    }
+    
     setFruit (scene, areas) {
 
         
@@ -431,71 +447,85 @@ class GameScene extends Phaser.Scene
 
     update (time, delta) 
     {
-        var ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
-        var ourInputScene = this.scene.get('InputScene');
+        const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
+        const ourInputScene = this.scene.get('InputScene');
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
-        if (!this.snake.alive && !this.snake.regrouping)
-            {
+        // Lose State
+        if (!this.snake.alive && !this.snake.regrouping) {
                 
-                // game.scene.scene.restart(); // This doesn't work correctly
-                if (DEBUG) { console.log("DEAD"); }
-                
-                this.events.emit('saveScore');
-                
-                ourUI = this.scene.get('UIScene');
-                ourUI.lives += 1;
-                ourUI.livesUI.setText(`x ${ourUI.lives}`);
-
-                ourUI.length = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
-
-                //game.destroy();
-                //this.scene.restart();
-                
-
-                if (DEBUG) {
-                    const graphics = this.add.graphics();
-    
-                    graphics.lineStyle(2, 0x00ff00, 1);
+            // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
             
-                    this.snake.body.forEach( part => {
-                    graphics.beginPath();
-                    graphics.moveTo(part.x, part.y);
-                    graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-                    graphics.closePath();
-                    graphics.strokePath();
-                    });
-                }
-    
-                this.snake.regrouping = true;
-                this.move_pause = true;
-                
-                var tween = this.tweens.add({
-                    targets: this.snake.body, // Start removing the tail.
-                    x: SCREEN_WIDTH/2,
-                    y: SCREEN_HEIGHT/2,
-                    yoyo: false,
-                    duration: 350,
-                    ease: 'Sine.easeOutIn',
-                    repeat: 0,
-                    delay: this.tweens.stagger(75)
-                });
-    
-                tween.on('complete', test => {
-                    //debugger
-                    //this.snake.body.reverse() // Head back at front
-                    this.snake.regrouping = false;
-                    this.snake.alive = true;
-                    this.started = false;
-                    this.snake.heading = 0;
-                    //this.scene.restart();
-                    //this.fruitCount = 0; // ON FOR TESTING
+            // DO THIS ON REAL RESET DEATH
+            //this.events.emit('saveScore');
+            
+            ourUI.lives += 1;
+            ourUI.livesUI.setText(`x ${ourUI.lives}`);
+
+            //ourUI.length = 0;
+            ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
+
+            //game.destroy();
+            //this.scene.restart();
+            
+
+            if (DEBUG) {
+                const graphics = this.add.graphics();
+
+                graphics.lineStyle(2, 0x00ff00, 1);
+        
+                this.snake.body.forEach( part => {
+                graphics.beginPath();
+                graphics.moveTo(part.x, part.y);
+                graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                graphics.closePath();
+                graphics.strokePath();
                 });
             }
+    
+            this.snake.regrouping = true;
+            this.move_pause = true;
+            
+            var tween = this.tweens.add({
+                targets: this.snake.body, // Start removing the tail.
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT/2,
+                yoyo: false,
+                duration: 350,
+                ease: 'Sine.easeOutIn',
+                repeat: 0,
+                delay: this.tweens.stagger(75)
+            });
 
+            tween.on('complete', test => {
+                //debugger
+                //this.snake.body.reverse() // Head back at front
+                this.snake.regrouping = false;
+                this.snake.alive = true;
+                this.started = false;
+                this.snake.heading = 0;
+                //this.scene.restart();
+                //this.fruitCount = 0; // ON FOR TESTING
+            });
+        }
         
+        // Win State
+        if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
+            console.log("YOU WIN");
+
+            ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
+            ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
+
+
+            this.scene.pause();
+
+
+            this.scene.start('WinScene');
+            //this.events.emit('saveScore');
+        }
+
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive){
             this.lastMoveTime = time;
@@ -542,19 +572,6 @@ class GameScene extends Phaser.Scene
                 });
             };
             const ourUI = this.scene.get('UIScene');
-            if (ourUI.length >= LENGTH_GOAL) { // not winning instantly
-                console.log("YOU WIN");
-    
-                ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
-                ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-
-
-                this.scene.pause();
-
-
-                this.scene.start('WinScene');
-                //this.events.emit('saveScore');
-            }
        
             if (DEBUG) {
                 const ourUI = this.scene.get('UIScene');
@@ -577,42 +594,41 @@ class GameScene extends Phaser.Scene
 
         var timeLeft = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10; // VERY INEFFICIENT WAY TO DO THIS
 
-        if (!this.spaceBar.isDown){
+        // Boost Logic
+        if (!this.spaceBar.isDown){ // Base Speed
             this.moveInterval = SPEEDWALK; // Less is Faster
             this.mask.setScale(this.energyAmount/100,1);
-            this.energyAmount += .25;
+            this.energyAmount += .25; // Recharge Boost Slowly
         }
-            //setDisplaySize}
         else{
+            // Has Boost Logic
             if(this.energyAmount > 1){
-                this.moveInterval = SPEEDSPRINT; // Sprinting now 
+                this.moveInterval = SPEEDSPRINT;
             }
             else{
                 this.moveInterval = SPEEDWALK;
             }
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount -= 1;
+            
+            // Boost Stats
             if (timeLeft >= BOOST_BONUS_FLOOR ) { 
-                // Don't add boost multi after 20 seconds
+                // Don't add boost time after 20 seconds
                 ourInputScene.boostBonusTime += 1;
                 ourInputScene.boostTime += 1;
-                //ourUI.scoreMulti += SCORE_MULTI_GROWTH;
-                //console.log(Math.sqrt(ourUI.scoreMulti));
             } else {
                 ourInputScene.boostTime += 1;
             }
         }
         if (timeLeft <= BOOST_BONUS_FLOOR && timeLeft >= SCORE_FLOOR) {
-            // Boost meter slowly drains after boost floor and before score floor
-            //ourUI.scoreMulti += SCORE_MULTI_GROWTH * -0.5;
-            //console.log(ourUI.scoreMulti);
         }
+        
+        // Reset Energy if out of bounds.
         if (this.energyAmount >= 100){
             this.energyAmount = 100;}
         else if(this.energyAmount <= 0){
             this.energyAmount = 0;
         }
-        //console.log(this.energyAmount)
     }
 }
 
@@ -898,18 +914,7 @@ class UIScene extends Phaser.Scene
             delay: 10000,
             paused: false
             });
-
-
             
-            var multiScore = Math.sqrt(this.scoreMulti);
-            
-            console.log(
-                //ourGame.fruitCount + 1,
-                timeLeft,
-                this.score, 
-                multiScore.toFixed(2), 
-                (this.score * multiScore).toFixed(2));
-            //console.log(this.score, Math.sqrt(this.scoreMulti), this.score * (Math.sqrt(this.scoreMulti)));
         }, this);
 
         //  Event: saveScore
@@ -921,10 +926,10 @@ class UIScene extends Phaser.Scene
             }
             
             // Reset Score for new game
-            this.score = 0;
-            this.scoreMulti = 0;
-            this.fruitCount = 0;
-            this.scoreHistory = [];
+            //this.score = 0;
+            //this.scoreMulti = 0;
+            //this.fruitCount = 0;
+            //this.scoreHistory = [];
 
             this.scoreUI.setText(`Score: ${this.score}`);
 
