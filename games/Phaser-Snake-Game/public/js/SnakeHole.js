@@ -406,6 +406,7 @@ class GameScene extends Phaser.Scene
         var areaCD = new SpawnArea(this, 25,23,6,4, "CD", 0x6666ff);
 
         var groups = [
+
             [areaAA, areaAB, areaAC, areaAD],
             [areaBA, areaBB, areaBC, areaBD],
             [areaCA, areaCB, areaCC, areaCD]
@@ -413,6 +414,7 @@ class GameScene extends Phaser.Scene
 
 
         var cordsP1 = areaBA.genChords(this);
+
         areaBA.portalCords = cordsP1;
         
         var cordsP2 = areaBD.genChords(this);
@@ -421,10 +423,12 @@ class GameScene extends Phaser.Scene
         console.log(areaBA.name, areaBA.hasPortal());
         console.log(areaBD.name, areaBD.hasPortal());
 
+
         var nextArea = [
             [areaAA, areaAB, areaAC, areaAD],
             [areaCA, areaCB, areaCC, areaCD],
         ];
+
 
         // Choose a Random Lane
         var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
@@ -441,6 +445,15 @@ class GameScene extends Phaser.Scene
         areaP4.portalCords = cordsP4
 
 
+        // Choose a Random Lane
+        var nextLane = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        
+        // Choose random area from that lane and get chords
+        var areaP3 = Phaser.Math.RND.pick(nextLane);
+        var cordsP3 = areaP3.genChords(this);
+        areaP3.portalCords = cordsP3;
+
+
         // Make first 2 portals
         makePair(this, cordsP1, cordsP3);
         makePair(this, cordsP2, cordsP4);
@@ -453,6 +466,9 @@ class GameScene extends Phaser.Scene
         var pair4 = this.chooseAreaPair(this, groups);
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
 
+
+        var J1 = areaBC.genChords(this);
+        var I1 = areaCC.genChords(this);
 
         // Fair Fruit Spawn (5x)
         
@@ -550,6 +566,7 @@ class GameScene extends Phaser.Scene
 
             //ourUI.length = 0;
             ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
+
 
             //game.destroy();
             //this.scene.restart();

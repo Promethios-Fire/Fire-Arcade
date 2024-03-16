@@ -27,6 +27,7 @@ const SpawnArea = new Phaser.Class({
     },
 
     genChords: function (scene) {
+
         
         var xMin = this.x/GRID;
         var xMax = this.x/GRID + this.width/GRID - 1;
@@ -41,6 +42,7 @@ const SpawnArea = new Phaser.Class({
 
     
         // Recursively if there is a portal in the same spot as this point try again until there isn't one.
+        //console.log(scene.portals);
         scene.portals.forEach( portal => {
             if(portal.x === x && portal.y === y){
                 console.log("HELP THIS SPACE IS OCUPADO",portal.x, portal.y);
@@ -52,11 +54,10 @@ const SpawnArea = new Phaser.Class({
         scene.apples.forEach( fruit => {
             if(fruit.x === x && fruit.y === y){
                 console.log("HELP THIS SPACE IS OCUPADO",fruit.x, fruit.y);
-                cords = this.genPortalChords();
+                cords = this.genPortalChords();b
             }
         });
-        
-        //var cords = [x,y];
+
         return cords;
     },
 
