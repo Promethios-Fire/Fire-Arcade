@@ -29,7 +29,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
@@ -342,26 +342,70 @@ class GameScene extends Phaser.Scene
         //for (let index = 0; index < FRUIT; index++) {
         //    var food = new Food(this);
         //}
+        /*
+        var SpawnGroup = new Phaser.Class({
+            Extends: Phaser.GameObjects.Rectangle,
         
+            initialize:
+        
+            function SpawnGroup(scene, areas, name)
+            {
+                this.name = name;
+                this.areas = [];
+
+                for (let index = 0; index < areas.length; index++) {
+                    var spawnArea = new SpawnArea(scene, 
+                        areas[index][0],  // x
+                        areas[index][1],  // y
+                        areas[index][2],  // width
+                        areas[index][3],  // height
+                        `${name}${index+1}`,
+                        0x6666ff
+                    );
+                    
+                    this.areas.push(spawnArea);
+                    
+                }
+            }
+        });
         
         // Define Spawn Areas
         
-        var areaAA = new SpawnArea(this, 1,5,6,4, 0x6666ff);
-        var areaAB = new SpawnArea(this, 9,5,6,4, 0x6666ff);
-        var areaAC = new SpawnArea(this, 17,5,6,4, 0x6666ff);
-        var areaAD = new SpawnArea(this, 25,5,6,4, 0x6666ff);
+        
+        var _group1 = [
+            [1,5,6,4],
+            [9,5,6,4],
+            [17,5,6,4],
+            [25,5,6,4]
+        ]
 
-        var areaBA = new SpawnArea(this, 1,14,6,4, 0x6666ff);
-        var areaBB = new SpawnArea(this, 9,14,6,4, 0x6666ff);
-        var areaBC = new SpawnArea(this, 17,14,6,4, 0x6666ff);
-        var areaBD = new SpawnArea(this, 25,14,6,4, 0x6666ff);
+        var groupA = new SpawnGroup(this, _group1, "A");
 
-        var areaCA = new SpawnArea(this, 1,23,6,4, 0x6666ff);
-        var areaCB = new SpawnArea(this, 9,23,6,4, 0x6666ff);
-        var areaCC = new SpawnArea(this, 17,23,6,4, 0x6666ff);
-        var areaCD = new SpawnArea(this, 25,23,6,4, 0x6666ff);
+        console.log(groupA.name);
+        groupA.areas.forEach( a => {
+            console.log(a.name);
+        });
 
-        var areas = [
+        */
+        
+        
+        // AREA NAME is [GROUP][ID]
+        var areaAA = new SpawnArea(this, 1,5,6,4, "AA", 0x6666ff);
+        var areaAB = new SpawnArea(this, 9,5,6,4, "AB", 0x6666ff);
+        var areaAC = new SpawnArea(this, 17,5,6,4, "AC", 0x6666ff);
+        var areaAD = new SpawnArea(this, 25,5,6,4, "AD", 0x6666ff);
+
+        var areaBA = new SpawnArea(this, 1,14,6,4, "BA", 0x6666ff);
+        var areaBB = new SpawnArea(this, 9,14,6,4, "BB", 0x6666ff);
+        var areaBC = new SpawnArea(this, 17,14,6,4, "BC", 0x6666ff);
+        var areaBD = new SpawnArea(this, 25,14,6,4, "BD", 0x6666ff);
+
+        var areaCA = new SpawnArea(this, 1,23,6,4, "CA", 0x6666ff);
+        var areaCB = new SpawnArea(this, 9,23,6,4, "CB", 0x6666ff);
+        var areaCC = new SpawnArea(this, 17,23,6,4, "CC", 0x6666ff);
+        var areaCD = new SpawnArea(this, 25,23,6,4, "CD", 0x6666ff);
+
+        var groups = [
             [areaAA, areaAB, areaAC, areaAD],
             [areaBA, areaBB, areaBC, areaBD],
             [areaCA, areaCB, areaCC, areaCD]
@@ -369,10 +413,13 @@ class GameScene extends Phaser.Scene
 
 
         var cordsP1 = areaBA.genChords(this);
-        areaAA.portalCords = cordsP1;
+        areaBA.portalCords = cordsP1;
         
         var cordsP2 = areaBD.genChords(this);
-        areaAD.portalCords = cordsP2;
+        areaBD.portalCords = cordsP2;
+
+        console.log(areaBA.name, areaBA.hasPortal());
+        console.log(areaBD.name, areaBD.hasPortal());
 
         var nextArea = [
             [areaAA, areaAB, areaAC, areaAD],
@@ -380,12 +427,13 @@ class GameScene extends Phaser.Scene
         ];
 
         // Choose a Random Lane
-        var nextLane = Phaser.Utils.Array.RemoveRandomElement(nextArea);
+        var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
         
         // Choose random area from that lane and get chords
-        var areaP3 = Phaser.Math.RND.pick(nextLane);
+        var areaP3 = Phaser.Math.RND.pick(nextGroup);
         var cordsP3 = areaP3.genChords(this);
         areaP3.portalCords = cordsP3;
+
 
         // Other Lane gets the second portal
         var areaP4 = Phaser.Math.RND.pick(nextArea[0]);
@@ -393,19 +441,18 @@ class GameScene extends Phaser.Scene
         areaP4.portalCords = cordsP4
 
 
-        var B1 = areaAB.genChords(this);
-        var G1 = areaBB.genChords(this);
-
-        var C1 = areaAD.genChords(this);
-        var F1 = areaCA.genChords(this);
-
-        var J1 = areaBC.genChords(this);
-        var I1 = areaCC.genChords(this);
-
+        // Make first 2 portals
         makePair(this, cordsP1, cordsP3);
         makePair(this, cordsP2, cordsP4);
-        //makePair(this, C1, F1);
-        //makePair(this, J1, I1);
+
+
+        // Generate next to portals
+        var pair3 = this.chooseAreaPair(this, groups);
+        makePair(this, pair3[0].genChords(this), pair3[1].genChords(this));
+
+        var pair4 = this.chooseAreaPair(this, groups);
+        makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
+
 
         // Fair Fruit Spawn (5x)
         
@@ -419,23 +466,60 @@ class GameScene extends Phaser.Scene
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
-
-    }
-    chooseFreeArea (scene, areas, limit=3) {
-        var _areas = [
-            [areaAA, areaAB, areaAC, areaAD],
-            [areaBA, areaBB, areaBC, areaBD],
-            [areaCA, areaCB, areaCC, areaCD]
-        ]
         
-        lane1 = Phaser.Utils.Array.RemoveRandomElement(_areas);
-
     }
     
-    setFruit (scene, areas) {
+    chooseAreaPair (scene, groups) {
+        // Random group where there is less than 3 portals already.
+        var groupPair = scene.chooseSpawnableLanes(scene, groups.slice(), 3)
 
+        var area1 = scene.chooseAreaFromLane(scene, groupPair[0]);
+        var area2 = scene.chooseAreaFromLane(scene, groupPair[1]);
         
-        var area = Phaser.Math.RND.pick(areas);
+        return [area1, area2]
+    }
+    
+    chooseAreaFromLane (scene, lane) {
+        
+        var area = Phaser.Utils.Array.RemoveRandomElement(lane);
+
+        if (area.hasPortal()) {
+            area = scene.chooseAreaFromLane(scene, lane);
+        }
+
+        return area;
+    }
+    
+    chooseSpawnableLanes (scene, _areas, limit=3) {
+        // Must have at least 2 free lanes to work.
+        let lanes = [];
+        
+        // Start with Random Lane
+        var lane1 = Phaser.Utils.Array.RemoveRandomElement(_areas);
+        //console.log(returnArea);
+        
+        // Verify there is enough space. If not choose another lane.
+        let _i = 0;
+        lane1.forEach(area => {
+            if (area.portalChords) {
+                _i += 1;
+            }
+            if (_i >= 3) { // Don't let any lane have more than 3 portals
+                console.log("ONE LAYER DEEPER");
+                lane1 = Phaser.Utils.Array.RemoveRandomElement(_areas);
+            }
+        });
+
+        var lane2 = Phaser.Utils.Array.RemoveRandomElement(_areas);
+
+        lanes = [lane1,lane2];
+
+        return lanes;
+    }
+    
+    setFruit (scene, groups) {
+
+        var area = Phaser.Math.RND.pick(groups);
 
         var pos = area.genChords(scene);
 

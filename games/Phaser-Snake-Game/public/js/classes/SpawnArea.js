@@ -1,24 +1,28 @@
 import {GRID, DEBUG_AREA_ALPHA} from "../SnakeHole.js";
 
 
-var SpawnArea = new Phaser.Class({
+const SpawnArea = new Phaser.Class({
     Extends: Phaser.GameObjects.Rectangle,
 
     initialize:
 
-    function SpawnArea (scene, x, y, width , height , fillColor) {
+    function SpawnArea (scene, x, y, width , height , name, fillColor) {
         
         Phaser.GameObjects.Rectangle.call(this, scene, x, y, width, height, fillColor);
         
         this.setPosition(x * GRID, y * GRID); 
         this.width = width*GRID;
         this.height = height*GRID;
+        this.name = name;
+        
+        //debug options
         this.fillColor = 0x6666ff;
         this.fillAlpha = DEBUG_AREA_ALPHA;
         
         this.setOrigin(0,0);
 
         scene.children.add(this);
+        
         this.portalCords = []; // Used as Null
     },
 
@@ -56,8 +60,11 @@ var SpawnArea = new Phaser.Class({
         return cords;
     },
 
-    hasPortal: function (scene) {
-
+    hasPortal: function() {
+        if (this.portalCords.length < 1 || this.portalCords == undefined) {
+            return false;
+        }
+        return true;
     }
 });
 
