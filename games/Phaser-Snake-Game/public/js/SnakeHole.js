@@ -193,6 +193,9 @@ class GameScene extends Phaser.Scene
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, 15);
         this.snake.heading = STOP;
+
+        //// Properties to not reset on restart.
+        this.portals = [];
         
         // Tilemap
         this.map = this.make.tilemap({ key: 'map', tileWidth: GRID, tileHeight: GRID });
@@ -268,6 +271,7 @@ class GameScene extends Phaser.Scene
         
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
+            this.started = true;
             ourInputScene.updateDirection(this, e);
         })
 
@@ -417,108 +421,90 @@ class GameScene extends Phaser.Scene
         // console.log("update -- time=" + time + " delta=" + delta);
 
         if (!this.snake.alive) {          
-                // game.scene.scene.restart(); // This doesn't work correctly
-                if (DEBUG) { console.log("DEAD"); }
-                
-                this.events.emit('saveScore');
-                
-                ourUI = this.scene.get('UIScene');
-                ourUI.lives += 1;
-                ourUI.livesUI.setText(ourUI.lives);
-
-                // ourUI.fruitCount = 0;
-                ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${LENGTHGOAL}`);
-
-                //game.destroy();
-
-                //var graphics = this.add.graphics({ lineStyle: { width: 3, color: 0x2266aa }, fillStyle: { color: 0x2266aa } });
-                //this.graphics.setDepth(100);
-
-                if (DEBUG) {
-                    const graphics = this.add.graphics();
-
-                    graphics.lineStyle(2, 0x00ff00, 1);
+            // game.scene.scene.restart(); // This doesn't work correctly
+            if (DEBUG) { console.log("DEAD"); }
             
-                    this.snake.body.forEach( part => {
-                    graphics.beginPath();
-                    graphics.moveTo(part.x, part.y);
-                    graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-                    graphics.closePath();
-                    graphics.strokePath();
-                    });
-                }
-                
+            this.events.emit('saveScore');
+            
+            ourUI = this.scene.get('UIScene');
+            ourUI.lives += 1;
+            ourUI.livesUI.setText(ourUI.lives);
 
-                //graphics.beginPath();
-                //graphics.moveTo(this.snake.head.x, this.snake.head.y);
-                //graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
-                //graphics.lineTo(340, 430);
-                //graphics.lineTo(650, 300);
-                //graphics.lineTo(700, 180);
-                //graphics.lineTo(600, 80);
+            // ourUI.fruitCount = 0;
+            ourUI.fruitCountUI.setText(`${ourUI.fruitCount} / ${LENGTHGOAL}`);
+
+            //game.destroy();
+
+            //var graphics = this.add.graphics({ lineStyle: { width: 3, color: 0x2266aa }, fillStyle: { color: 0x2266aa } });
+            //this.graphics.setDepth(100);
+
+            if (DEBUG) {
+                const graphics = this.add.graphics();
+
+                graphics.lineStyle(2, 0x00ff00, 1);
         
-                //graphics.closePath();
-        
-                //graphics.strokePath();
-
-
-                //graphics.strokeRect(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, GRID, GRID);
-
-                //graphics.fillPointShape([SCREEN_WIDTH/2, SCREEN_HEIGHT/2], 24);
-                
-                // Show Path For Body Reset
-                //this.snake.body.forEach( part => {
-                    
-
-                //});
-
-
-
-                this.move_pause = true;
-                this.snake.alive = true;
-                this.snake.regrouping = true;              //this.scene.restart();
-                
-                // not here
-                this.t = 0.0
-                
-                return;
+                this.snake.body.forEach( part => {
+                graphics.beginPath();
+                graphics.moveTo(part.x, part.y);
+                graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                graphics.closePath();
+                graphics.strokePath();
+                });
             }
+
+            this.move_pause = true;
+            this.snake.alive = true;
+            this.snake.regrouping = true;              //this.scene.restart();
+            
+            // not here
+            this.t = 0.0
+            
+            return;
+        }
 
 
         if(this.snake.regrouping){ // This should be a uniform time period from any point.
-            console.log("respawn frame");
+            //console.log("respawn frame");
             
             var center = new Phaser.Geom.Point(SCREEN_WIDTH/2,SCREEN_HEIGHT/2);
             this.t = (this.t + 0.01) % 1;
             
             
-            this.snake.body.forEach(part => {
-
-           
+            // Move each part closer to the center.
+            this.snake.body.forEach(part => {     
                 Phaser.Geom.Point.Interpolate(part, center, this.t, part);
-                part.setPosition = [
-                    Phaser.Math.RoundTo(part.x, 0), 
-                    Phaser.Math.RoundTo(part.y, 0)];
-                console.log(center.x, center.y, part.x, part.y);
-
-                if (part.x == center.x && part.y == center.y) {
-                    console.log("READY TO START");  
-                    this.snake.regrouping = false;  
-                    this.move_pause = false;
-                    //this.snake.heading = STOP;    
-                }
             });
-            console.log(this.snake.regrouping, this.move_pause);
-        }
 
+            // Keep moving until all parts are at the center
+            if (this.snake.body.some(pos => pos.x != center.x && pos.y != center.y)) {
+                this.snake.regrouping = true;
+            }
+            else {
+                // All at center now
+                this.snake.regrouping = false;
+                
+                this.snake.heading = STOP;
+                this.started = false;
+                this.move_pause = false;
+
+                // Fit all body parts to grid space
+                this.snake.body.forEach( part => {
+                    part.x = SCREEN_WIDTH/2;
+                    part.y = SCREEN_HEIGHT/2;
+                });
+
+                this.snake.alive = true; // Reset Snake to Alive.
+                //this.scene.pause();
+                    //console.log(part.x,part.y);
+            }
+        };
         
+        console.log("REGROUPING=",this.snake.regrouping,", MOVE_PAUSE=", this.move_pause, this.snake.heading, "STARTED=", this.started, "ALIVE=");
 
-
-        
         // Only Calculate things when snake is moved.
-        if(time >= this.lastMoveTime + this.moveInterval && !this.move_pause){
+        if(time >= this.lastMoveTime + this.moveInterval && !this.move_pause && this.started){
             this.lastMoveTime = time;
-            console.log("mOVe");
+            
 
             //debugger
             // This code calibrates how many milliseconds per frame calculated.
@@ -587,8 +573,7 @@ class GameScene extends Phaser.Scene
                     this.apples.forEach( fruit => {
                         fruit.fruitTimerText.setText(timeTick);
                     });
-                }
-                
+                } 
             } 
             
             
