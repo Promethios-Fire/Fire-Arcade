@@ -452,6 +452,17 @@ class GameScene extends Phaser.Scene
                 });
             }
 
+            this.tweens.add({
+                targets: this.snake.body.reverse(),
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT/2,
+                yoyo: false,
+                duration: 2000,
+                ease: 'Sine.easeInOut',
+                repeat: 0,
+                //delay: this.tweens.stagger(150)
+            });
+
             this.move_pause = true;
             this.snake.regrouping = true;              //this.scene.restart();
             
@@ -462,6 +473,7 @@ class GameScene extends Phaser.Scene
         }
 
 
+        /*
         if(this.snake.regrouping){ // This should be a uniform time period from any point.
             //console.log("respawn frame");
             
@@ -498,6 +510,7 @@ class GameScene extends Phaser.Scene
                     //console.log(part.x,part.y);
             }
         };
+        */
         
         console.log("REGROUPING=",this.snake.regrouping,", MOVE_PAUSE=", this.move_pause, this.snake.heading, "STARTED=", this.started, "ALIVE=", this.snake.alive);
 
