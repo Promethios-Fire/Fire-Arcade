@@ -19,9 +19,10 @@ var SpawnArea = new Phaser.Class({
         this.setOrigin(0,0);
 
         scene.children.add(this);
+        this.portalCords = []; // Used as Null
     },
 
-    genPortalChords: function (scene)
+    genChords: function (scene)
     {
         
         var xMin = this.x/GRID;
