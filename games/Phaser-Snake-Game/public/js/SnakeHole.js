@@ -420,7 +420,7 @@ class GameScene extends Phaser.Scene
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
-        if (!this.snake.alive) {          
+        if (!this.snake.alive && !this.snake.regrouping) {          
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
             
@@ -453,7 +453,6 @@ class GameScene extends Phaser.Scene
             }
 
             this.move_pause = true;
-            this.snake.alive = true;
             this.snake.regrouping = true;              //this.scene.restart();
             
             // not here
@@ -494,12 +493,13 @@ class GameScene extends Phaser.Scene
                 });
 
                 this.snake.alive = true; // Reset Snake to Alive.
+                debugger
                 //this.scene.pause();
                     //console.log(part.x,part.y);
             }
         };
         
-        console.log("REGROUPING=",this.snake.regrouping,", MOVE_PAUSE=", this.move_pause, this.snake.heading, "STARTED=", this.started, "ALIVE=");
+        console.log("REGROUPING=",this.snake.regrouping,", MOVE_PAUSE=", this.move_pause, this.snake.heading, "STARTED=", this.started, "ALIVE=", this.snake.alive);
 
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && !this.move_pause && this.started){
