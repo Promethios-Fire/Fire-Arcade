@@ -29,7 +29,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
