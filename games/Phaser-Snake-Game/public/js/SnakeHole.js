@@ -510,7 +510,7 @@ class GameScene extends Phaser.Scene {
         lane1.forEach(area => {
             if (area.hasPortal()) {
                 _i += 1;
-                console.log(_areas, "Portal Count=", _i);
+                //console.log(_areas, "Portal Count=", _i);
             }
             if (_i >= 3) { // Don't let any lane have more than 3 portals
                 console.log("This lane Is Full");
