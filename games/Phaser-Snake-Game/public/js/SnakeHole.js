@@ -1083,7 +1083,7 @@ class InputScene extends Phaser.Scene {
         switch (event.keyCode) {
             case 87: // w
 
-            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1101,7 +1101,7 @@ class InputScene extends Phaser.Scene {
 
             case 65: // a
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) {
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) {
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1118,7 +1118,7 @@ class InputScene extends Phaser.Scene {
 
             case 83: // s
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1135,7 +1135,7 @@ class InputScene extends Phaser.Scene {
 
             case 68: // d
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1151,7 +1151,7 @@ class InputScene extends Phaser.Scene {
 
             case 38: // UP
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) {
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) {
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1167,7 +1167,7 @@ class InputScene extends Phaser.Scene {
 
             case 37: // LEFT
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1183,7 +1183,7 @@ class InputScene extends Phaser.Scene {
 
             case 40: // DOWN
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666);
@@ -1199,7 +1199,7 @@ class InputScene extends Phaser.Scene {
 
             case 39: // RIGHT
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666);
