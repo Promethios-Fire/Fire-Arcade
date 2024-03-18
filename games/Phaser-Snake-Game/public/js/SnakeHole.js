@@ -170,8 +170,11 @@ class GameScene extends Phaser.Scene {
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
 
+        // Animations
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 });
+        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: GRID, frameHeight: GRID });
+        
         // Audio
         this.load.setPath('assets/audio');
 
@@ -255,7 +258,8 @@ class GameScene extends Phaser.Scene {
         const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(5).setOrigin(0.5,0.5);
         const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(5).setOrigin(0.5,0.5);
         const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(5).setOrigin(0.5,0.5);
-        startingArrowsAnimS.flipY=true;
+        
+        startingArrowsAnimS.flipY = true;
         startingArrowsAnimE.angle = 90;
         startingArrowsAnimW.angle = 270;
         startingArrowsAnimN.play('idle');
@@ -274,6 +278,28 @@ class GameScene extends Phaser.Scene {
         });
         var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
         //var smokePoofAnim = smokePoof.play("spawn")
+
+        // Dream Wall Shimmer
+        this.anims.create({
+            key: 'shimmer',
+            frames: this.anims.generateFrameNumbers('dreamWallAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}),
+            frameRate: 16,
+            repeat: -1
+        });
+
+        const dreamWallSkip = [0,1,2,11,20,29];
+
+        for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
+            if (!dreamWallSkip.includes(index)) {
+                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
+                wallShimmerRight.play('shimmer');
+                
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
+                wallShimmerLeft.play('shimmer');
+                wallShimmerLeft.flipX = true;
+            }
+        }
+        
         // Audio
         SOUND_CRUNCH.forEach(soundID => {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
@@ -394,7 +420,7 @@ class GameScene extends Phaser.Scene {
         var areaCC = new SpawnArea(this, 17,23,6,4, "CC", 0x6666ff);
         var areaCD = new SpawnArea(this, 25,23,6,4, "CD", 0x6666ff);
 
-        var groups = [
+        const groups = [
 
             [areaAA, areaAB, areaAC, areaAD],
             [areaBA, areaBB, areaBC, areaBD],
@@ -482,7 +508,7 @@ class GameScene extends Phaser.Scene {
         // Verify there is enough space. If not choose another lane.
         let _i = 0;
         lane1.forEach(area => {
-            if (area.portalChords) {
+            if (area.hasPortal()) {
                 _i += 1;
                 console.log(_areas, "Portal Count=", _i);
             }
@@ -748,8 +774,9 @@ class WinScene extends Phaser.Scene
         //card.setOrigin(0,0);
         
         const scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
-
         scoreScreen.setOrigin(0.5,0);
+
+
 
         
         
