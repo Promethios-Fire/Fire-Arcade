@@ -942,11 +942,11 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9.5, 12, 'div', {
+        this.countDown = this.add.dom(GRID*9.5, 16, 'div', {
             color: 'white',
-            'font-size': '24px',
+            'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
-            padding: '3px 5px',
+            padding: '1px 5px',
             'border-radius': '4px',
             outline: 'solid'
         }).setOrigin(1,0);
