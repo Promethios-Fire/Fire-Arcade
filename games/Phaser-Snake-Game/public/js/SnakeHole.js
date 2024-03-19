@@ -8,7 +8,8 @@ import { Snake } from './classes/Snake.js';
 //******************************************************************** */
 // GameSettings 
 
-const GAME_VERSION = 'v0.2.03.22.002';
+const GAME_VERSION = 'v0.2.03.22.004';
+
 export const GRID = 24;  //.................... Size of Sprites and GRID
 var FRUIT = 5;           //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
@@ -170,11 +171,13 @@ class GameScene extends Phaser.Scene {
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
 
-        // Art
+        // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
-        //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden
+        //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
+        this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: GRID, frameHeight: GRID });
+
         
         // Audio
         this.load.setPath('assets/audio');
@@ -279,7 +282,8 @@ class GameScene extends Phaser.Scene {
         const startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(5).setOrigin(0.5,0.5);
         const startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(5).setOrigin(0.5,0.5);
         const startingArrowsAnimW = this.add.sprite(_x - 24, _y + 12).setDepth(5).setOrigin(0.5,0.5);
-        startingArrowsAnimS.flipY=true;
+        
+        startingArrowsAnimS.flipY = true;
         startingArrowsAnimE.angle = 90;
         startingArrowsAnimW.angle = 270;
         startingArrowsAnimN.play('idle');
@@ -298,6 +302,28 @@ class GameScene extends Phaser.Scene {
         });*/
         var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
         //var smokePoofAnim = smokePoof.play("spawn")
+
+        // Dream Wall Shimmer
+        this.anims.create({
+            key: 'shimmer',
+            frames: this.anims.generateFrameNumbers('dreamWallAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10]}),
+            frameRate: 16,
+            repeat: -1
+        });
+
+        const dreamWallSkip = [0,1,2,11,20,29];
+
+        for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
+            if (!dreamWallSkip.includes(index)) {
+                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
+                wallShimmerRight.play('shimmer');
+                
+                var wallShimmerLeft = this.add.sprite(0, GRID * index).setDepth(10).setOrigin(0,0);
+                wallShimmerLeft.play('shimmer');
+                wallShimmerLeft.flipX = true;
+            }
+        }
+        
         // Audio
         SOUND_CRUNCH.forEach(soundID => {
                 this.crunchSounds.push(this.sound.add(soundID[0]));
@@ -393,6 +419,8 @@ class GameScene extends Phaser.Scene {
         */
         
         
+        // Stage Logic
+        
         var makePair = function (scene, to, from) {
             
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
@@ -418,7 +446,7 @@ class GameScene extends Phaser.Scene {
         var areaCC = new SpawnArea(this, 17,23,6,4, "CC", 0x6666ff);
         var areaCD = new SpawnArea(this, 25,23,6,4, "CD", 0x6666ff);
 
-        var groups = [
+        const groups = [
 
             [areaAA, areaAB, areaAC, areaAD],
             [areaBA, areaBB, areaBC, areaBD],
@@ -506,9 +534,9 @@ class GameScene extends Phaser.Scene {
         // Verify there is enough space. If not choose another lane.
         let _i = 0;
         lane1.forEach(area => {
-            if (area.portalChords) {
+            if (area.hasPortal()) {
                 _i += 1;
-                console.log(_areas, "Portal Count=", _i);
+                //console.log(_areas, "Portal Count=", _i);
             }
             if (_i >= 3) { // Don't let any lane have more than 3 portals
                 console.log("This lane Is Full");
@@ -600,7 +628,7 @@ class GameScene extends Phaser.Scene {
                 duration: 720,
                 ease: 'Sine.easeOutIn',
                 repeat: 0,
-                delay: this.tweens.stagger(0)
+                delay: 500
             });
 
             tween.on('complete', test => {
@@ -620,14 +648,14 @@ class GameScene extends Phaser.Scene {
             console.log("YOU WIN");
 
             ourUI.scoreUI.setText(`Score: ${ourUI.score}`);
-            ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
-
+            //ourUI.bestScoreUI.setText(`Best :  ${ourUI.score}`);
+            this.events.emit('saveScore');
 
             this.scene.pause();
 
 
             this.scene.start('WinScene');
-            //this.events.emit('saveScore');
+            
         }
 
         // Only Calculate things when snake is moved.
@@ -751,21 +779,6 @@ class WinScene extends Phaser.Scene
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourWinScene = this.scene.get('WinScene');
-
-
-        const scoreScreenStyle = {
-            width: '450px',
-            //height: '22px',
-            color: 'white',
-            'font-size': '16px',
-            'font-family': ["Sono", 'sans-serif'],
-            'font-weight': '400',
-            'padding': '2px 0px 2px 12px',
-            //'font-weight': 'bold',
-            'word-wrap': 'break-word',
-            //'border-radius': '24px',
-            outline: 'solid',
-        }
         ///////
         
         this.add.text(SCREEN_WIDTH/2, GRID*3, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
@@ -773,16 +786,42 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        const scoreScreen = this.add.dom(SCREEN_WIDTH/2, GRID * 6.5, 'div', scoreScreenStyle);
+        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 7.5, 'div', {
+            "fontSize":'32px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            color: 'white',
+            'text-align': 'right',
 
-        scoreScreen.setOrigin(0.5,0);
+        });
+        highScore.setText(
+            `Score: ${ourUI.score}
+            HighScore: ${ourUI.bestScore}
+            ---------------
+            `
+        
+        ).setOrigin(1, 0);
 
         
+        const scoreScreenStyle = {
+            width: '270px',
+            //height: '22px',
+            color: 'white',
+            'font-size': '14px',
+            'font-family': ["Sono", 'sans-serif'],
+            'font-weight': '400',
+            'padding': '12px 0px 12px 12px',
+            //'font-weight': 'bold',
+            'word-wrap': 'break-word',
+            //'border-radius': '24px',
+            outline: 'solid',
+        }
+        
+        const scoreScreen = this.add.dom(SCREEN_WIDTH/2 + GRID, GRID * 7, 'div', scoreScreenStyle);
+        scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        ` 
-        /************ WINNING SCORE *************/
-        SCORE: ${ourUI.score}
+        `SCORE: ${ourUI.score}
         FRUIT SCORE AVERAGE: ${Math.round(ourUI.score / LENGTH_GOAL)}
         
         TURNS: ${ourInputScene.turns}
@@ -792,14 +831,13 @@ class WinScene extends Phaser.Scene
         BOOST TIME: ${ourInputScene.boostTime} FRAMES
         
         BETA: ${GAME_VERSION}
-        ................RUN STATS.................
 
         BONK RESETS: ${ourUI.lives - 1}
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
         `);
 
         const logScreenStyle = {
-            width: '432px',
+            width: '141px',
             //height: '22px',
             color: 'white',
             'font-size': '12px',
@@ -812,8 +850,29 @@ class WinScene extends Phaser.Scene
             //outline: 'solid',
         }
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2, GRID * 22, 'div', logScreenStyle);
-        fruitLog.setText(`[${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);
+        var bestLogText = JSON.parse(localStorage.getItem('bestFruitLog'));
+        var bestScoreAve = JSON.parse(localStorage.getItem('bestScoreAve'))
+
+        if (bestLogText) {
+            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12, 'div', logScreenStyle);
+            bestLog.setText(
+                `Best - ave(${bestScoreAve})
+                ------------------
+                [${bestLogText}]`
+            ).setOrigin(1,0);    
+        }
+        
+
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12, 'div', logScreenStyle);
+        fruitLog.setText(
+            `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
+            ------------------ 
+            [${ourUI.scoreHistory.sort().reverse()}]`
+        ).setOrigin(1,0);
+
+        // [${ourUI.scoreHistory.sort().reverse()}]`).setOrigin(0.5,1);    
+        
+            
 
         //card.setScale(0.7);
 
@@ -858,6 +917,8 @@ class WinScene extends Phaser.Scene
 
 }
 
+
+
 class UIScene extends Phaser.Scene {
     constructor () {
         super({ key: 'UIScene', active: false });
@@ -865,7 +926,15 @@ class UIScene extends Phaser.Scene {
     
     init() {
         this.score = 0;
-        this.bestScore = 0;
+
+        
+        var bestLocal = JSON.parse(localStorage.getItem('best'))
+        if (bestLocal) {
+            this.bestScore = Number(bestLocal);
+        }
+        else {
+            this.bestScore = 0;
+        }
         this.length = 0;
 
         this.scoreMulti = 0;
@@ -903,6 +972,14 @@ class UIScene extends Phaser.Scene {
         }).setOrigin(0,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
+
+        // Store the Current Version in Cookies
+        localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
+
+        var bestLocal = JSON.parse(localStorage.getItem('best'))
+        if (bestLocal) {
+            this.bestScore = Number(bestLocal);
+        }
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UIStyle);
@@ -912,6 +989,7 @@ class UIScene extends Phaser.Scene {
         // Best Score
         this.bestScoreUI = this.add.dom(0, 12 - 2 , 'div', UIStyle);
         this.bestScoreUI.setOrigin(0,0);
+        this.bestScoreUI.setText(`Best : ${this.bestScore}`);
         //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
         
         // Lives
@@ -932,6 +1010,19 @@ class UIScene extends Phaser.Scene {
             delay: 10000,
             paused: false
          });
+
+
+         // Countdown Text
+        this.countDown = this.add.dom(GRID*9.5, 16, 'div', {
+            color: 'white',
+            'font-size': '22px',
+            'font-family': ["Sono", 'sans-serif'],
+            padding: '1px 5px',
+            'border-radius': '4px',
+            outline: 'solid'
+        }).setOrigin(1,0);
+        this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+
         
         if (DEBUG) {
             this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
@@ -1004,10 +1095,12 @@ class UIScene extends Phaser.Scene {
             
 
              // Restart Score Timer
-            this.scoreTimer = this.time.addEvent({
-            delay: 10000,
-            paused: false
-            });
+            if (this.length < LENGTH_GOAL) {
+                this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                    delay: 10000,
+                    paused: false
+                 });   
+            }
             
         }, this);
 
@@ -1016,7 +1109,14 @@ class UIScene extends Phaser.Scene {
             if (this.score > this.bestScore) {
                 this.bestScore = this.score;
                 this.bestScoreUI.setText(`Best : ${this.bestScore}`);
+
+                var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
+                localStorage.setItem('bestFruitLog', bestScoreHistory);
+
+                localStorage.setItem('bestScoreAve', Math.round(this.score / LENGTH_GOAL));
             }
+
+            localStorage.setItem('best', this.bestScore);
             
             // Reset Score for new game
             //this.score = 0;
@@ -1024,12 +1124,10 @@ class UIScene extends Phaser.Scene {
             //this.fruitCount = 0;
             //this.scoreHistory = [];
 
-            this.scoreUI.setText(`Score: ${this.score}`);
+            //this.scoreUI.setText(`Score: ${this.score}`);
 
-            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                delay: 10000,
-                paused: false
-             });
+            
+            
 
         }, this);
         
@@ -1037,8 +1135,21 @@ class UIScene extends Phaser.Scene {
     update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
         
+        
+        if (this.length < LENGTH_GOAL) {
+        
+            if (timeTick < SCORE_FLOOR ) {
+                this.countDown.setText(this.score + SCORE_FLOOR);
+            } else {
+                this.countDown.setText(this.score + (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10));
+            }
+        }
+        else {
+            this.countDown.setText(this.score);
+        } 
+        
         if (DEBUG) {
-            if (timeTick < SCORE_FLOOR) {
+            if (timeTick < SCORE_FLOOR ) {
             
             } else {
                 this.timerText.setText(timeTick);
@@ -1082,7 +1193,7 @@ class InputScene extends Phaser.Scene {
         switch (event.keyCode) {
             case 87: // w
 
-            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1100,7 +1211,7 @@ class InputScene extends Phaser.Scene {
 
             case 65: // a
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) {
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) {
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1117,7 +1228,7 @@ class InputScene extends Phaser.Scene {
 
             case 83: // s
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1134,7 +1245,7 @@ class InputScene extends Phaser.Scene {
 
             case 68: // d
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1150,7 +1261,7 @@ class InputScene extends Phaser.Scene {
 
             case 38: // UP
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) {
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) {
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1166,7 +1277,7 @@ class InputScene extends Phaser.Scene {
 
             case 37: // LEFT
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)
@@ -1182,7 +1293,7 @@ class InputScene extends Phaser.Scene {
 
             case 40: // DOWN
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666);
@@ -1198,7 +1309,7 @@ class InputScene extends Phaser.Scene {
 
             case 39: // RIGHT
 
-            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.body.length <= 2) { 
+            if (gameScene.snake.heading  === UP || gameScene.snake.heading  === DOWN || gameScene.snake.heading  === STOP) { 
                 
                 // Calculate Corner Time
                 this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666);
