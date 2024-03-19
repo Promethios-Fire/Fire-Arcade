@@ -113,6 +113,7 @@ var Snake = new Phaser.Class({
                 fruit.move(scene);
                 fruit.visible = true;
             }, [], this);
+            
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
             if (index == 8){ //this is to ensure index isn't called outside of array length

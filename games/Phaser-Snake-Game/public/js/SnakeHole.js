@@ -395,6 +395,8 @@ class GameScene extends Phaser.Scene {
         */
         
         
+        // Stage Logic
+        
         var makePair = function (scene, to, from) {
             
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
@@ -859,6 +861,8 @@ class WinScene extends Phaser.Scene
 
 }
 
+
+
 class UIScene extends Phaser.Scene {
     constructor () {
         super({ key: 'UIScene', active: false });
@@ -904,6 +908,8 @@ class UIScene extends Phaser.Scene {
         }).setOrigin(0,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
+            
+        
         
         // Score Text
         this.scoreUI = this.add.dom(0 , GRID*2 + 2, 'div', UIStyle);
@@ -933,6 +939,19 @@ class UIScene extends Phaser.Scene {
             delay: 10000,
             paused: false
          });
+
+
+         // Countdown Text
+        this.countDown = this.add.dom(GRID*9.5, 12, 'div', {
+            color: 'white',
+            'font-size': '24px',
+            'font-family': ["Sono", 'sans-serif'],
+            padding: '3px 5px',
+            'border-radius': '4px',
+            outline: 'solid'
+        }).setOrigin(1,0);
+        this.countDown.setText(this.scoreTimer.getRemainingSeconds().toFixed(1) * 10);
+
         
         if (DEBUG) {
             this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
@@ -1037,6 +1056,14 @@ class UIScene extends Phaser.Scene {
     }
     update() {
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        
+        
+
+        if (timeTick < SCORE_FLOOR) {
+            this.countDown.setText(this.score + SCORE_FLOOR);
+        } else {
+            this.countDown.setText(this.score + (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10));
+        } 
         
         if (DEBUG) {
             if (timeTick < SCORE_FLOOR) {
