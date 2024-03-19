@@ -50,8 +50,8 @@ const SpawnArea = new Phaser.Class({
             }
         });
 
-        // Don't spawn over apples
-        scene.apples.forEach( fruit => {
+        // Don't spawn over atoms
+        scene.atoms.forEach( fruit => {
             if(fruit.x === x*GRID && fruit.y === y*GRID){
                 console.log("HELP THIS SPACE IS OCUPADO BY FRUIT",fruit.x, fruit.y);
                 cords = this.genChords(scene);

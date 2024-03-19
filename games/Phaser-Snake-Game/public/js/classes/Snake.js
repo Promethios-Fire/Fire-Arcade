@@ -2,6 +2,7 @@ import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT,
     LEFT, RIGHT, UP, DOWN, DEBUG,
     LENGTH_GOAL
 } from "../SnakeHole.js";
+import { Food } from "./Food.js";
 
 var Snake = new Phaser.Class({
     initialize:
@@ -23,7 +24,6 @@ var Snake = new Phaser.Class({
     
     grow: function (scene)
     {
-        
         // Current Tail of the snake
         this.tail = this.body.slice(-1);
         
@@ -97,21 +97,21 @@ var Snake = new Phaser.Class({
         this.alive = false;
     }
 
-    // Check collision for all Fruits
-    scene.apples.forEach(fruit => {  
-        if(this.head.x === fruit.x && this.head.y === fruit.y){
-            scene.events.emit('addScore', fruit); // Sends to UI Listener 
-            
+    // Check collision for all atoms
+    scene.atoms.forEach(_atom => {  
+        if(this.head.x === _atom.x && this.head.y === _atom.y){
+            scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
-            
-            // Avoid double fruit getting while in transition
-            fruit.x = 0;
-            fruit.y = 0;
-            fruit.visible = false;
+            // Avoid double _atom getting while in transition
+            _atom.x = 0;
+            _atom.y = 0;
+            _atom.visible = false;
+            _atom.electrons.visible = false;
+            //_atom.electrons.stop();
             
             scene.time.delayedCall(500, function () {
-                fruit.move(scene);
-                fruit.visible = true;
+                _atom.move(scene);
+                _atom.visible = true;
             }, [], this);
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
@@ -125,10 +125,9 @@ var Snake = new Phaser.Class({
 
             //  Scene.crunch01.play();
             //  Dispatch a Scene event
-
             //debugger
-            scene.apples.forEach(fruit => {
-                fruit.startDecay(scene);
+            scene.atoms.forEach(_atom => {
+                _atom.startDecay(scene);
             });
             
             if (DEBUG) {console.log(                         

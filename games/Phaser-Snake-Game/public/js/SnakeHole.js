@@ -28,7 +28,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-export const DEBUG = false;
+export const DEBUG = true;
 export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
@@ -134,7 +134,7 @@ class GameScene extends Phaser.Scene {
     init() {
         
         // Arrays for collision detection
-        this.apples = [];
+        this.atoms = [];
         this.walls = [];
         this.portals = [];
 
@@ -170,8 +170,12 @@ class GameScene extends Phaser.Scene {
         this.load.image('boostMeterFrame', 'assets/sprites/boostMeterFrame.png');
         this.load.image("mask", "assets/sprites/boostMask.png");
 
+        // Art
+        this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
+        this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
-        this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 });
+        //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden
+        
         // Audio
         this.load.setPath('assets/audio');
 
@@ -226,6 +230,26 @@ class GameScene extends Phaser.Scene {
 
         // Animation set
         this.anims.create({
+            key: 'atom01idle',
+            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10]}),
+            frameRate: 8,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'atom02idle',
+            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 , 21]}),
+            frameRate: 8,
+            repeat: -1
+        })
+
+        this.anims.create({
+            key: 'electronIdle',
+            frames: this.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        
+        this.anims.create({
             key: 'increasing',
             frames: this.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
             frameRate: 8,
@@ -266,12 +290,12 @@ class GameScene extends Phaser.Scene {
         //boostMeter.setMask(this.mask); // image.mask = mask;
         //boostMeter.mask.invertAlpha = true;
 
-        this.anims.create({
+        /*this.anims.create({ // will mostlikely remove later -Holden
             key: 'spawn',
             frames: this.anims.generateFrameNumbers('fruitAppearSmokeAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11 ] }),
             frameRate: 16,
             repeat: 0
-        });
+        });*/
         var smokePoof = this.add.sprite(0,0).setOrigin(0,0);
         //var smokePoofAnim = smokePoof.play("spawn")
         // Audio
@@ -517,8 +541,10 @@ class GameScene extends Phaser.Scene {
 
         var pos = area.genChords(scene);
 
-        var food = new Food(scene);
-        food.setPosition(pos[0]*GRID, pos[1]*GRID);
+        var atom = new Food(scene);
+        atom.setPosition(pos[0]*GRID, pos[1]*GRID);
+        atom.electrons.setPosition(pos[0]*GRID, pos[1]*GRID);
+        
         //console.log(scene.portals);
 
     }
@@ -657,7 +683,7 @@ class GameScene extends Phaser.Scene {
                 if (timeTick < SCORE_FLOOR ) {
                     
                 } else {
-                    this.apples.forEach( fruit => {
+                    this.atoms.forEach( fruit => {
                         fruit.fruitTimerText.setText(timeTick);
                     });
                 }
