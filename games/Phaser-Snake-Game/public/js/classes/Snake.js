@@ -109,13 +109,12 @@ var Snake = new Phaser.Class({
             _atom.x = 0;
             _atom.y = 0;
             _atom.visible = false;
-            _atom.electrons.visible = false;
+            //_atom.electrons.visible = false;
             //_atom.electrons.stop();
-            
-            scene.time.delayedCall(500, function () {
-                _atom.move(scene);
-                _atom.visible = true;
-            }, [], this);
+            _atom.electrons.setPosition(0, 0);
+            _atom.electrons.visible = false;
+        
+
             
             // Play crunch sound
             var index = Math.round(Math.random() * scene.crunchSounds.length); 
@@ -126,12 +125,34 @@ var Snake = new Phaser.Class({
             var soundRandom = scene.crunchSounds[index];
             
             soundRandom.play();
+            
+            // Moves the eaten atom after a delay including the electron.
+            scene.time.delayedCall(500, function () {
+                _atom.move(scene);
+                _atom.play("atom01idle", true);
+                _atom.visible = true;
+                _atom.electrons.visible = true;
+                _atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.
+            }, [], this);
 
-            //  Scene.crunch01.play();
-            //  Dispatch a Scene event
-            //debugger
-            scene.atoms.forEach(_atom => {
-                _atom.startDecay(scene);
+
+            // Refresh decay on all atoms.
+            scene.atoms.forEach(__atom => {
+                if (__atom.x === 0 && __atom.y === 0) {
+                    // Start decay timer for the eaten Apple now. 
+                    _atom.startDecay(scene);
+                    // The rest is called after the delay.
+                    
+                } 
+                else {
+                // For every other atom do everything now
+                __atom.play("atom01idle", true);
+                __atom.electrons.setVisible(true);
+                //this.electrons.anims.restart();
+                __atom.absorable = true;
+                __atom.startDecay(scene);
+                }
+
             });
             
             if (DEBUG) {console.log(                         
