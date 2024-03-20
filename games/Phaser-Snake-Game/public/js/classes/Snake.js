@@ -100,6 +100,9 @@ var Snake = new Phaser.Class({
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y){
+            if(_atom.absorable == true){
+                scene.energyAmount += 10;
+            }
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
             // Avoid double _atom getting while in transition

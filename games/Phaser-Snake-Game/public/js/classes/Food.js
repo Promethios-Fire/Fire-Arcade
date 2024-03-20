@@ -25,9 +25,8 @@ var Food = new Phaser.Class({
         //this.startDecay(scene);
         this.setDepth(100);
         this.play("atom01idle");
-        this.electrons = scene.add.sprite().setOrigin(.25,.125).setDepth(10);
+        this.electrons = scene.add.sprite().setOrigin(.2,.175).setDepth(10);
         this.electrons.play("electronIdle");
-        //this.electrons.visible = false;
         //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
         this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
@@ -108,11 +107,6 @@ var Food = new Phaser.Class({
         console.log(this.x,this.y)
         this.electrons.setPosition(pos.x * GRID, pos.y * GRID);
         console.log(this.electrons.x,this.electrons.y)
-        //console.log("atoms",this.atoms.x);
-        //this.electrons = scene.add.sprite(this.x, this.y).setOrigin(.25,.125).setDepth(10);
-        //this.electrons.play("electronIdle");
-        //this.electrons.setVisible(true);
-        //console.log("electrons",this.electrons.x);
 
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
@@ -121,18 +115,18 @@ var Food = new Phaser.Class({
 
     startDecay: function(scene){
         scene.time.delayedCall(500, function () { //Turn off animation timer
+            this.play("atom01idle");
             this.electrons.setVisible(true);
-            //fruit.move(scene);
-            //fruit.visible = true;
+            this.absorable = true;
         }, [], this);
-        
-        //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
 
         this.decayStage01.destroy(); // Destory Old Timers
         this.decayStage02.destroy();
 
         this.decayStage01 = scene.time.addEvent({ delay: 2000, callback: fruit => {
             this.electrons.setVisible(false);
+            this.absorable = false;
+            //console.log(scene.atoms.absorable)
             this.play("atom02idle");
         }, callbackScope: scene });
 

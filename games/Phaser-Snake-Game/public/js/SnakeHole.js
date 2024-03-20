@@ -29,7 +29,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 
 // DEBUG OPTIONS
 
-export const DEBUG = true;
+export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
@@ -234,13 +234,13 @@ class GameScene extends Phaser.Scene {
         // Animation set
         this.anims.create({
             key: 'atom01idle',
-            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10]}),
+            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
             frameRate: 8,
             repeat: -1
         })
         this.anims.create({
             key: 'atom02idle',
-            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 11, 12, 13, 14, 15, 16, 17, 18, 19, 20 , 21]}),
+            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
             frameRate: 8,
             repeat: -1
         })
