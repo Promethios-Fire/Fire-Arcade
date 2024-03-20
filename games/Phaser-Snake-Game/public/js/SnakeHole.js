@@ -163,7 +163,7 @@ class GameScene extends Phaser.Scene {
 
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
-        this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap.json');
+        this.load.tilemapTiledJSON('map', 'assets/Tiled/snakeMap-Stage-0.json');
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -311,7 +311,8 @@ class GameScene extends Phaser.Scene {
             repeat: -1
         });
 
-        const dreamWallSkip = [0,1,2,11,20,29];
+        const dreamWallSkip = [0,1,2,29];
+        const dreamWallSkipHorz = [];
 
         for (let index = 0; index <= SCREEN_HEIGHT/GRID; index++) {
             if (!dreamWallSkip.includes(index)) {
@@ -323,6 +324,21 @@ class GameScene extends Phaser.Scene {
                 wallShimmerLeft.flipX = true;
             }
         }
+        
+        for (let index = 0; index <= SCREEN_WIDTH/GRID; index++) {
+            if (!dreamWallSkipHorz.includes(index)) {
+                var wallShimmerTop = this.add.sprite(GRID * index, GRID * 2).setDepth(10).setOrigin(0,0);
+                wallShimmerTop.play('shimmer');
+                wallShimmerTop.angle = 90;
+                
+                var wallShimmerBottom = this.add.sprite(GRID * index, SCREEN_HEIGHT).setDepth(10).setOrigin(0,0);
+                wallShimmerBottom.play('shimmer');
+                wallShimmerBottom.angle = 270;
+            }
+        }
+
+
+
         
         // Audio
         SOUND_CRUNCH.forEach(soundID => {
@@ -426,9 +442,11 @@ class GameScene extends Phaser.Scene {
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(scene.portalColors); // May Error if more portals than colors.
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
-            var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
+            var _p1 = new Portal(scene, color, to, from);
+            var _p2 = new Portal(scene, color, from, to);
         }
+
+        this.stage = 'Stage 1'
         
         // AREA NAME is [GROUP][ID]
         var areaAA = new SpawnArea(this, 1,5,6,4, "AA", 0x6666ff);
@@ -459,45 +477,13 @@ class GameScene extends Phaser.Scene {
             [areaAA, areaAB, areaAC, areaAD],
             [areaCA, areaCB, areaCC, areaCD],
         ];
+    
 
-        // The first two pairs have some consistency to make sure we never have a disjointed map.
-        
-        // First Portal Cords
-        var cordsPA_1 = areaBA.genChords(this);
-        areaBA.portalCords = cordsPA_1;
+        makePair(this, [10, 10], 
+                       [20, 20]);
 
-        // Choose a Random Lane (Either top or bottom)
-        var nextGroup = Phaser.Utils.Array.RemoveRandomElement(nextArea);
-
-        // Choose random area from that lane and get chords
-        var areaPA_2 = Phaser.Math.RND.pick(nextGroup);
-        var cordsPA_2 = areaPA_2.genChords(this);
-        areaPA_2.portalCords = cordsPA_2;
-
-        makePair(this, cordsPA_1, cordsPA_2);
-
-
-
-        // Second Portal Pair
-        var cordsPB_1 = areaBD.genChords(this);
-        areaBD.portalCords = cordsPB_1;
-
-        // Other Lane gets the second portal
-        var otherGroup = Phaser.Math.RND.pick(nextArea);
-        var areaPB_2 = Phaser.Math.RND.pick(otherGroup);
-        var cordsPB_2 = areaPB_2.genChords(this);
-        areaPB_2.portalCords = cordsPB_2
-
-        makePair(this, cordsPB_1, cordsPB_2);
-
-        
-        // Generate next to portals
-        var pair3 = this.chooseAreaPair(this, groups);
-        makePair(this, pair3[0].genChords(this), pair3[1].genChords(this));
-
-        var pair4 = this.chooseAreaPair(this, groups);
-        makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
-        
+        makePair(this, [10, 20], 
+                       [20, 10]);
 
         // Fair Fruit Spawn (5x)
         
@@ -786,7 +772,7 @@ class WinScene extends Phaser.Scene
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
         
-        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 7.5, 'div', {
+        const highScore = this.add.dom(SCREEN_WIDTH/2 - GRID, GRID * 6.5, 'div', {
             "fontSize":'32px',
             'font-family': ["Sono", 'sans-serif'],
             'font-weight': '400',
@@ -795,7 +781,9 @@ class WinScene extends Phaser.Scene
 
         });
         highScore.setText(
-            `Score: ${ourUI.score}
+            
+            `${ourGame.stage}
+            Score: ${ourUI.score}
             HighScore: ${ourUI.bestScore}
             ---------------
             `
@@ -850,11 +838,11 @@ class WinScene extends Phaser.Scene
             //outline: 'solid',
         }
 
-        var bestLogText = JSON.parse(localStorage.getItem('bestFruitLog'));
-        var bestScoreAve = JSON.parse(localStorage.getItem('bestScoreAve'))
+        var bestLogText = JSON.parse(localStorage.getItem(`${ourGame.stage}-bestFruitLog`));
+        var bestScoreAve = JSON.parse(localStorage.getItem(`${ourGame.stage}-bestScoreAve`))
 
         if (bestLogText) {
-            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12, 'div', logScreenStyle);
+            var bestLog = this.add.dom(SCREEN_WIDTH/2, GRID * 12.5, 'div', logScreenStyle);
             bestLog.setText(
                 `Best - ave(${bestScoreAve})
                 ------------------
@@ -863,7 +851,7 @@ class WinScene extends Phaser.Scene
         }
         
 
-        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12, 'div', logScreenStyle);
+        var fruitLog = this.add.dom(SCREEN_WIDTH/2 - GRID * 7, GRID * 12.5, 'div', logScreenStyle);
         fruitLog.setText(
             `Current - ave(${Math.round(ourUI.score / LENGTH_GOAL)})
             ------------------ 
@@ -928,7 +916,8 @@ class UIScene extends Phaser.Scene {
         this.score = 0;
 
         
-        var bestLocal = JSON.parse(localStorage.getItem('best'))
+        const ourGame = this.scene.get('GameScene');
+        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stage}-best`))
         if (bestLocal) {
             this.bestScore = Number(bestLocal);
         }
@@ -976,7 +965,7 @@ class UIScene extends Phaser.Scene {
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
-        var bestLocal = JSON.parse(localStorage.getItem('best'))
+        var bestLocal = JSON.parse(localStorage.getItem(`${ourGame.stage}-best`))
         if (bestLocal) {
             this.bestScore = Number(bestLocal);
         }
@@ -1111,12 +1100,12 @@ class UIScene extends Phaser.Scene {
                 this.bestScoreUI.setText(`Best : ${this.bestScore}`);
 
                 var bestScoreHistory = `[${this.scoreHistory.sort().reverse()}]`
-                localStorage.setItem('bestFruitLog', bestScoreHistory);
+                localStorage.setItem(`${ourGame.stage}-bestFruitLog`, bestScoreHistory);
 
-                localStorage.setItem('bestScoreAve', Math.round(this.score / LENGTH_GOAL));
+                localStorage.setItem(`${ourGame.stage}-bestScoreAve`, Math.round(this.score / LENGTH_GOAL));
             }
 
-            localStorage.setItem('best', this.bestScore);
+            localStorage.setItem(`${ourGame.stage}-best`, this.bestScore);
             
             // Reset Score for new game
             //this.score = 0;

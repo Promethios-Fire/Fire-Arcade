@@ -82,11 +82,11 @@ var Snake = new Phaser.Class({
     }
     else if (this.heading === UP)
     {
-        y = Phaser.Math.Wrap(y - GRID, 0, SCREEN_HEIGHT);
+        y = Phaser.Math.Wrap(y - GRID, GRID * 2, SCREEN_HEIGHT);
     }
     else if (this.heading === DOWN)
     {
-        y = Phaser.Math.Wrap(y + GRID, 0 - GRID, SCREEN_HEIGHT - GRID);
+        y = Phaser.Math.Wrap(y + GRID, GRID , SCREEN_HEIGHT - GRID);
     }
     
     // Move all Snake Segments
@@ -126,7 +126,7 @@ var Snake = new Phaser.Class({
             
             soundRandom.play();
             
-            // Moves the eaten atom after a delay including the electron.
+            // Moves the eaten atom and electron after a delay.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);
                 _atom.play("atom01idle", true);
