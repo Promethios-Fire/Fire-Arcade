@@ -87,6 +87,7 @@ var Snake = new Phaser.Class({
             });
             
             scene.time.delayedCall(SPEEDWALK * 4, event => {
+                
                 console.log("YOU CAN PORTAL AGAIN.");
                 this.portal_buffer_on = true;
                 

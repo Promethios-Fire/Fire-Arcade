@@ -17,7 +17,7 @@ export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
 
 // 1 frame is 16.666 milliseconds
 // 83.33 - 99.996
-export const SPEEDWALK = 99; // 96 In milliseconds  
+export const SPEEDWALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
 var SPEEDSPRINT = 33; // 24
