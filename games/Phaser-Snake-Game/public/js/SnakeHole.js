@@ -17,7 +17,7 @@ export const LENGTH_GOAL = 32; //24 //32?................... Win Condition
 
 // 1 frame is 16.666 milliseconds
 // 83.33 - 99.996
-var SPEEDWALK = 99; // 96 In milliseconds  
+export const SPEEDWALK = 99; // 96 In milliseconds  
 
 // 16.66 33.32
 var SPEEDSPRINT = 33; // 24
@@ -341,7 +341,10 @@ class GameScene extends Phaser.Scene {
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             this.started = true;
-            ourInputScene.updateDirection(this, e);
+            if (!this.snake.pause_movement) {
+                ourInputScene.updateDirection(this, e);
+                
+            }
             if (startingArrowState == true){
                 startingArrowState = false;
                 startingArrowsAnimN.setVisible(false)
@@ -621,7 +624,7 @@ class GameScene extends Phaser.Scene {
             this.move_pause = true;
             
             var tween = this.tweens.add({
-                targets: this.snake.body, // Start removing the tail.
+                targets: this.snake.body, 
                 x: SCREEN_WIDTH/2,
                 y: SCREEN_HEIGHT/2,
                 yoyo: false,
@@ -632,14 +635,10 @@ class GameScene extends Phaser.Scene {
             });
 
             tween.on('complete', test => {
-                //debugger
-                //this.snake.body.reverse() // Head back at front
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 this.started = false;
                 this.snake.heading = 0;
-                //this.scene.restart();
-                //this.fruitCount = 0; // ON FOR TESTING
             });
         }
         
@@ -665,6 +664,7 @@ class GameScene extends Phaser.Scene {
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
  
+            // PORTAL HIGHLIGHT LOGIC
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
             closestPortal.fx.setActive(false);

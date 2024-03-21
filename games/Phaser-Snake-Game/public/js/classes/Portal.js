@@ -12,6 +12,7 @@ var Portal = new Phaser.Class({
         this.setTexture('portals', 0);
         this.setPosition(from[0] * GRID, from[1] * GRID);
         this.setOrigin(.125,.125);
+        this.setDepth(5);
 
         this.target = { x: to[0], y: to[1]};
 
