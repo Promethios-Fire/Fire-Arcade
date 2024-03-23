@@ -83,7 +83,6 @@ var Food = new Phaser.Class({
             if (wall.x < SCREEN_WIDTH) {
                 // Hack to sanitize index undefined value
                 // Current Tiled input script adds additional X values.
-                console.log(wall.x, wall.y);
                 testGrid[wall.x][wall.y] = false;
             }
         });
@@ -98,7 +97,6 @@ var Food = new Phaser.Class({
 
         scene.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-            console.log(_dreamWall.x/GRID,_dreamWall.y/GRID, "x,y=",testGrid[_dreamWall.x/GRID][_dreamWall.x/GRID]);
         });
 
         console.log("END X AND Y", END_X, END_Y);

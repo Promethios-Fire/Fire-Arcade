@@ -240,9 +240,9 @@ class GameScene extends Phaser.Scene {
 
         /////////////////////////////////////////////////
         // UI BLOCKS
-        this.add.image(GRID * 22.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(50);
-        this.add.image(GRID * 27, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(50);
-        this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'blocks', 12).setOrigin(1,0).setDepth(50);
+        this.add.image(GRID * 21.5, GRID * 1, 'blocks', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+        this.add.image(GRID * 25.5, GRID * 1, 'blocks', 1).setOrigin(0,0).setDepth(50);      // Snake Body
+        this.add.image(GRID * 29.5 - 4, GRID * 1, 'blocks', 12).setOrigin(0,0).setDepth(50); // Tried to center flag
         ////////////////////////////////////////////
         
         // Snake needs to render immediately 
@@ -267,7 +267,7 @@ class GameScene extends Phaser.Scene {
         this.add.image(SCREEN_WIDTH/2,GRID*.25,'boostMeterFrame').setDepth(51).setOrigin(0.5,0);
 
         this.mask = this.make.image({
-            x: GRID * 16,
+            x: SCREEN_WIDTH/2,
             y: GRID*.25,
             key: 'mask',
             add: false
@@ -737,7 +737,7 @@ class GameScene extends Phaser.Scene {
             ourUI.livesUI.setText(`x ${ourUI.lives}`);
 
             //ourUI.length = 0;
-            ourUI.fruitCountUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
+            ourUI.lengthGoalUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
 
 
             //game.destroy();
@@ -1116,14 +1116,14 @@ class UIScene extends Phaser.Scene {
             //'font-weight': 'bold',
             //'border-radius': '24px',
             //outline: 'solid',
-            'text-align': 'right',
+            //'text-align': 'right',
         };
    
-        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 1, GRID * .5, 'div', {
+        const gameVersionUI = this.add.dom(SCREEN_WIDTH - GRID * 2, SCREEN_HEIGHT, 'div', {
             color: 'white',
             'font-size': '10px',
             'font-family': ["Sono", 'sans-serif'],
-        }).setOrigin(0,1);
+        }).setOrigin(1,1);
       
         gameVersionUI.setText(`snakehole.${GAME_VERSION}`).setOrigin(1,1);
 
@@ -1148,13 +1148,13 @@ class UIScene extends Phaser.Scene {
         
         // Lives
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        this.livesUI = this.add.dom(GRID * 23.5, GRID * 2 + 2, 'div', UIStyle);
+        this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UIStyle);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
 
         // Goal UI
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.fruitCountUI = this.add.dom(GRID * 28, GRID * 2 + 2, 'div', UIStyle);
-        this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`).setOrigin(0,1);
+        this.lengthGoalUI = this.add.dom(GRID * 26.5, GRID * 2 + 2, 'div', UIStyle);
+        this.lengthGoalUI.setText(`${String.prototype.padStart(2, this.length)}/${LENGTH_GOAL}`).setOrigin(0,1);
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
@@ -1167,7 +1167,7 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9.5, 16, 'div', {
+        this.countDown = this.add.dom(GRID*9 + 9, 16, 'div', {
             color: 'white',
             'font-size': '22px',
             'font-family': ["Sono", 'sans-serif'],
@@ -1252,7 +1252,7 @@ class UIScene extends Phaser.Scene {
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
-            this.fruitCountUI.setText(`${this.length}/${LENGTH_GOAL}`);
+            this.lengthGoalUI.setText(`${String.prototype.padStart(2, this.length)}/${LENGTH_GOAL}`);
             
 
              // Restart Score Timer
