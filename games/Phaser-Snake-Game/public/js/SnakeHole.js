@@ -30,7 +30,7 @@ var SCORE_MULTI_GROWTH = 0.01;
 // DEBUG OPTIONS
 
 export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0.0;   // Between 0,1 to make portal areas appear
+export const DEBUG_AREA_ALPHA = 0.25;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
@@ -141,7 +141,7 @@ class StageManagerScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = "Stage-01";
+        this.stage = "Stage-02";
 
     }
 
@@ -247,7 +247,8 @@ class GameScene extends Phaser.Scene {
         
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
-        this.snake = new Snake(this, SCREEN_WIDTH/GRID/2, SCREEN_HEIGHT/GRID/2);
+        this.snake = new Snake(this, 15, 15);
+        //debugger
         this.snake.heading = STOP;
         
         // Tilemap
@@ -403,8 +404,8 @@ class GameScene extends Phaser.Scene {
         })
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
-        var wrapBlock06 = this.add.sprite(0, GRID * END_Y).play("wrapBlock06").setOrigin(0,0).setDepth(15);
-        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+        var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
+        var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
         
     
 
@@ -433,9 +434,9 @@ class GameScene extends Phaser.Scene {
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
-        for (let index = 2; index < END_Y; index++) {
+        for (let index = 2; index < END_Y - 1; index++) {
             if (!dreamWallSkip.includes(index)) {
-                var wallShimmerRight = this.add.sprite(GRID * 31, GRID * index).setDepth(10).setOrigin(0,0);
+                var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(10).setOrigin(0,0);
                 wallShimmerRight.play('wrapBlock05');
                 this.dreamWalls.push(wallShimmerRight);
                 
@@ -451,7 +452,7 @@ class GameScene extends Phaser.Scene {
             wallShimmerTop.play('wrapBlock02');
             this.dreamWalls.push(wallShimmerTop);
                 
-            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y).setDepth(10).setOrigin(0,0);
+            var wallShimmerBottom = this.add.sprite(GRID * index, GRID * END_Y - GRID).setDepth(10).setOrigin(0,0);
             wallShimmerBottom.play('wrapBlock07');
             this.dreamWalls.push(wallShimmerBottom);
         
@@ -1515,8 +1516,8 @@ class InputScene extends Phaser.Scene {
 
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
-    width: 768,
-    height: 720,
+    width: 744,
+    height: 744,
     //seed: 1,
     parent: 'phaser-example',
     physics: {

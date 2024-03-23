@@ -71,7 +71,7 @@ var Food = new Phaser.Class({
         for (var x1 = 0; x1 <= END_X; x1++) {
             testGrid[x1] = {};
     
-            for (var y1 = 0; y1 <= END_Y; y1++)
+            for (var y1 = 2; y1 < END_Y; y1++)
             {
                 testGrid[x1][y1] = true;
             }
@@ -83,6 +83,7 @@ var Food = new Phaser.Class({
             if (wall.x < SCREEN_WIDTH) {
                 // Hack to sanitize index undefined value
                 // Current Tiled input script adds additional X values.
+                console.log(wall.x, wall.y);
                 testGrid[wall.x][wall.y] = false;
             }
         });
