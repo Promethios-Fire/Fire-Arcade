@@ -141,7 +141,7 @@ class StageManagerScene extends Phaser.Scene {
     }
 
     create() {
-        this.stage = "Stage-02";
+        this.stage = "Stage-03";
 
     }
 
@@ -752,7 +752,7 @@ class GameScene extends Phaser.Scene {
                 this.snake.body.forEach( part => {
                 graphics.beginPath();
                 graphics.moveTo(part.x, part.y);
-                graphics.lineTo(SCREEN_WIDTH/2, SCREEN_HEIGHT/2);
+                graphics.lineTo(GRID * 15, GRID * 15);
                 graphics.closePath();
                 graphics.strokePath();
                 });
@@ -763,8 +763,8 @@ class GameScene extends Phaser.Scene {
             
             var tween = this.tweens.add({
                 targets: this.snake.body, 
-                x: SCREEN_WIDTH/2,
-                y: SCREEN_HEIGHT/2,
+                x: GRID * 15,
+                y: GRID * 15,
                 yoyo: false,
                 duration: 720,
                 ease: 'Sine.easeOutIn',
