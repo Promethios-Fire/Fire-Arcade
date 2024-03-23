@@ -99,7 +99,6 @@ var Food = new Phaser.Class({
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
         });
 
-        console.log("END X AND Y", END_X, END_Y);
         // Don't let fruit spawn on dreamwall blocks
         //scene.dreamWalls.forEach(_dreamWall => {
         //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
