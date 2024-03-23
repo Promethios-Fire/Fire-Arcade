@@ -571,20 +571,20 @@ class GameScene extends Phaser.Scene {
         }
         
         // AREA NAME is [GROUP][ID]
-        var areaAA = new SpawnArea(this, 1,5,6,4, "AA", 0x6666ff);
+        var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
         var areaAB = new SpawnArea(this, 9,5,6,4, "AB", 0x6666ff);
-        var areaAC = new SpawnArea(this, 17,5,6,4, "AC", 0x6666ff);
-        var areaAD = new SpawnArea(this, 25,5,6,4, "AD", 0x6666ff);
+        var areaAC = new SpawnArea(this, 16,5,6,4, "AC", 0x6666ff);
+        var areaAD = new SpawnArea(this, 23,5,6,4, "AD", 0x6666ff);
 
-        var areaBA = new SpawnArea(this, 1,14,6,4, "BA", 0x6666ff);
+        var areaBA = new SpawnArea(this, 2,14,6,4, "BA", 0x6666ff);
         var areaBB = new SpawnArea(this, 9,14,6,4, "BB", 0x6666ff);
-        var areaBC = new SpawnArea(this, 17,14,6,4, "BC", 0x6666ff);
-        var areaBD = new SpawnArea(this, 25,14,6,4, "BD", 0x6666ff);
+        var areaBC = new SpawnArea(this, 16,14,6,4, "BC", 0x6666ff);
+        var areaBD = new SpawnArea(this, 23,14,6,4, "BD", 0x6666ff);
 
-        var areaCA = new SpawnArea(this, 1,23,6,4, "CA", 0x6666ff);
+        var areaCA = new SpawnArea(this, 2,23,6,4, "CA", 0x6666ff);
         var areaCB = new SpawnArea(this, 9,23,6,4, "CB", 0x6666ff);
-        var areaCC = new SpawnArea(this, 17,23,6,4, "CC", 0x6666ff);
-        var areaCD = new SpawnArea(this, 25,23,6,4, "CD", 0x6666ff);
+        var areaCC = new SpawnArea(this, 16,23,6,4, "CC", 0x6666ff);
+        var areaCD = new SpawnArea(this, 23,23,6,4, "CD", 0x6666ff);
 
         const groups = [
 
