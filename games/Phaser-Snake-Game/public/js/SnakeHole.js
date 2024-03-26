@@ -60,41 +60,6 @@ class StartScene extends Phaser.Scene {
 
 }
 
-class StageManagerScene extends Phaser.Scene {
-    constructor () {
-        super({key: 'StageManagerScene', active: true});
-    }
-
-    init() {
-
-        // These are set during the Start Scene
-        this.previousStage = '';
-        this.currentStage = STAGES[0]; // Start with first stage in the list.
-
-    }
-
-    preload() {
-        //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage2.json');
-
-    }
-
-    create() {
-        this.stage = this.currentStage['id'];
-        
-        //this.stageVarient = '-a';
-    
-
-    }
-
-    update(time) {
-        
-    }
-
-    end() {
-
-    }
-}
-
 var Stage = new Phaser.Class({
     initialize:
 
@@ -125,11 +90,14 @@ class GameScene extends Phaser.Scene {
     
     preload () {
  
+        this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.spritesheet('blocks', 'assets/Tiled/tileSheetx24.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
         // Tilemap
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
-        //console.log(ourStageManager.stage);
+        //console.log(ourStageManager.stage); 
+        console.log("PRELOAD:", this.stage);
         this.load.tilemapTiledJSON('map', `assets/Tiled/${this.stage}.json`);
         //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
     }
@@ -305,7 +273,7 @@ var config = {
         createContainer: true
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, StageManagerScene, GameScene, WinScene]
+    scene: [ StartScene, GameScene, WinScene]
 
 };
 
