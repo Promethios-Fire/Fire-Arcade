@@ -1,11 +1,11 @@
 
 
-var STAGES = [ // Stage IDs and number of varients.
-// These need to match the name of the json filed created by Tiled.
-    {'id':'Stage-01', 'varients':[], },
-    {'id':'Stage-02', 'varients':[], },
-    {'id':'Stage-03', 'varients':[], }, 
-]
+var STAGES = {
+    'Stage-01': 'Stage-03', 
+    'Stage-03': 'Stage-01', 
+}
+    
+
 
 // TODOL: Need to truncate this list based on number of portals areas.
 // DO this dynamically later based on the number of portal areas.
@@ -60,6 +60,43 @@ class StartScene extends Phaser.Scene {
 
 }
 
+class StageManagerScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'StageManagerScene', active: true});
+    }
+
+    init() {
+
+        // These are set during the Start Scene
+        //this.previousStage = '';
+        //this.currentStage = STAGES[0]; // Start with first stage in the list.
+
+    }
+
+    preload() {
+        //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage2.json');
+        this.load.tilemapTiledJSON('Stage-01', `assets/Tiled/Stage-01.json`);
+        this.load.tilemapTiledJSON('Stage-03', `assets/Tiled/Stage-03.json`);
+
+    }
+
+    create() {
+        //this.stage = this.currentStage['id'];
+        
+        //this.stageVarient = '-a';
+    
+
+    }
+
+    update(time) {
+        
+    }
+
+    end() {
+
+    }
+}
+
 var Stage = new Phaser.Class({
     initialize:
 
@@ -98,14 +135,14 @@ class GameScene extends Phaser.Scene {
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         //console.log(ourStageManager.stage); 
         console.log("PRELOAD:", this.stage);
-        this.load.tilemapTiledJSON('map', `assets/Tiled/${this.stage}.json`);
+        //this.load.tilemapTiledJSON('map', `assets/Tiled/${this.stage}.json`);
         //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
     }
 
     create () {
         
         // Tilemap
-        this.map = this.make.tilemap({ key: 'map', tileWidth: 24, tileHeight: 24 });
+        this.map = this.make.tilemap({ key: this.stage, tileWidth: 24, tileHeight: 24 });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
@@ -235,7 +272,9 @@ class WinScene extends Phaser.Scene
 
                 //ourGame.scene.stop();
                 //ourGame.preload(); this.scene.restart({ level: this.currentLevel + 1 })
-                ourGame.scene.restart( {stage: 'Stage-03'} );
+                console.log("ourGame.stage=", ourGame.stage);
+                console.log("STAGES[ourGame.stage]=", STAGES[ourGame.stage]);
+                ourGame.scene.restart( {stage: STAGES[ourGame.stage]} );
                 console.log("AFTER RESET", ourGame.stage);
 
                 ourWinScene.scene.switch('GameScene');
@@ -273,7 +312,7 @@ var config = {
         createContainer: true
     },
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, GameScene, WinScene]
+    scene: [ StartScene, StageManagerScene, GameScene, WinScene]
 
 };
 
