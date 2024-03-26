@@ -6,8 +6,7 @@ var Portal = new Phaser.Class({
 
     initialize:
 
-    function Portal(scene, color, from, to)
-    {
+    function Portal(scene, color, from, to) {
         Phaser.GameObjects.Image.call(this, scene);
         this.setTexture('portals', 0);
         this.setPosition(from[0] * GRID, from[1] * GRID);
