@@ -75,7 +75,7 @@ class StageManagerScene extends Phaser.Scene {
 
     preload() {
         //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage2.json');
-        this.load.tilemapTiledJSON('Stage-01', `assets/Tiled/Stage-01.json`);
+        
         this.load.tilemapTiledJSON('Stage-03', `assets/Tiled/Stage-03.json`);
 
     }
@@ -132,6 +132,7 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('portals', 'assets/sprites/portalSheet.png', { frameWidth: 32, frameHeight: 32 });
 
         // Tilemap
+        this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
         this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
         //console.log(ourStageManager.stage); 
         console.log("PRELOAD:", this.stage);
