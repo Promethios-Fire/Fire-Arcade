@@ -141,6 +141,7 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        const ourWinScene = this.scene.get('WinScene');
         
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: 24, tileHeight: 24 });
@@ -154,7 +155,11 @@ class GameScene extends Phaser.Scene {
 
         this.time.addEvent({
             delay: 500,
-            callback: () => this.scene.switch('WinScene')
+            callback: () => {
+            
+                ourWinScene.scene.restart();
+                this.scene.switch('WinScene');
+            }
           });
 
 
