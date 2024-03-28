@@ -183,7 +183,7 @@ class GameScene extends Phaser.Scene {
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
 
-        this.move_pause = false;
+        this.move_pause = true;
         this.started = false;
 
         const { stage = 'Stage-01' } = props
@@ -258,7 +258,7 @@ class GameScene extends Phaser.Scene {
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, 15, 15);
         //debugger
-        this.snake.heading = STOP;
+        this.snake.direction = STOP;
         
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
@@ -402,16 +402,26 @@ class GameScene extends Phaser.Scene {
         
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
-            if (!this.snake.pause_movement) {
+            if (this.move_pause) {
+                console.log("move_pause", this.snake.direction);
                 ourInputScene.updateDirection(this, e);
-                
             }
+            else {
+                console.log("!move_pause", this.snake.direction);
+                ourInputScene.moveDirection(this, e);
+            }
+
             if (startingArrowState == true){
+                
+                // turn off arrows and move snake.
                 startingArrowState = false;
                 startingArrowsAnimN.setVisible(false)
                 startingArrowsAnimS.setVisible(false)
                 startingArrowsAnimE.setVisible(false)
                 startingArrowsAnimW.setVisible(false)
+                
+                this.move_pause = false;
+                ourInputScene.moveDirection(this, e);
             }
         })
 
@@ -713,7 +723,7 @@ class GameScene extends Phaser.Scene {
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
-                //this.snake.heading = 0;
+                //this.snake.direction = 0;
                 this.hold_move = false;
             });
         }
@@ -735,6 +745,7 @@ class GameScene extends Phaser.Scene {
 
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
+            console.log("Move", this.snake.direction);
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
@@ -844,102 +855,6 @@ class GameScene extends Phaser.Scene {
     }
 }
 
-function loadAnimations(scene) {
-  scene.anims.create({
-    key: 'atom01idle',
-    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
-    frameRate: 12,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'atom02idle',
-    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'atom03idle',
-    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
-    frameRate: 6,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'atom04idle',
-    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
-    frameRate: 4,
-    repeat: -1
-  })
-
-  scene.anims.create({
-    key: 'electronIdle',
-    frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
-    frameRate: 16,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'electronDispersion01',
-    frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
-    frameRate: 16,
-    repeat: 0
-  })
-
-  scene.anims.create({
-    key: 'increasing',
-    frames: scene.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
-    frameRate: 8,
-    repeat: -1
-  });
-
-  //WRAP_BLOCK_ANIMS
-  scene.anims.create({
-    key: 'wrapBlock01',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9, 10 ,11]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock02',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12,13,14,15,16,17,18,19,20,21,22,23]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock03',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 24,25,26,27,28,29,30,31,32,33,34,35]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock04',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 36,37,38,39,40,41,42,43,44,45,46,47]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock05',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 48,49,50,51,52,53,54,55,56,57,58,59]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock06',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 60,61,62,63,64,65,66,67,68,69,70,71]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock07',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 72,73,74,75,76,77,78,79,80,81,82,83]}),
-    frameRate: 8,
-    repeat: -1
-  })
-  scene.anims.create({
-    key: 'wrapBlock08',
-    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
-    frameRate: 8,
-    repeat: -1
-  })
-}
 
 class WinScene extends Phaser.Scene
 {
@@ -1473,6 +1388,7 @@ class InputScene extends Phaser.Scene {
     update() {
     }
     updateDirection(gameScene, event) {
+        console.log("updateDirection");
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
@@ -1481,155 +1397,269 @@ class InputScene extends Phaser.Scene {
         switch (event.keyCode) {
             case 87: // w
 
-            if (gameScene.snake.heading === LEFT  || gameScene.snake.heading  === RIGHT || // Prevents backtracking to death
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
+            if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
                 // At anytime you can update the direction of the snake.
                 gameScene.snake.head.setTexture('blocks', 6);
-                gameScene.snake.heading = UP;
+                gameScene.snake.direction = UP;
                 
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 this.turns += 1; 
                     
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                }
             }
             break;
 
             case 65: // a
 
-            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) {
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
                 
                 gameScene.snake.head.setTexture('blocks', 4);
-                gameScene.snake.heading = LEFT;
+                gameScene.snake.direction = LEFT;
 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                }
             }
             break;
 
             case 83: // s
 
-            if (gameScene.snake.heading  === LEFT  || gameScene.snake.heading  === RIGHT || 
-                 gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
+            if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
+                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
 
                 gameScene.snake.head.setTexture('blocks', 7);
-                gameScene.snake.heading = DOWN;
+                gameScene.snake.direction = DOWN;
 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                if (!gameScene.snake.hold_move) {  
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                }
             }
             break;
 
             case 68: // d
 
-            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
                 gameScene.snake.head.setTexture('blocks', 5);
-                gameScene.snake.heading = RIGHT;
+                gameScene.snake.direction = RIGHT;
 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
- 
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                    }
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
             }
             break;
 
             case 38: // UP
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || 
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) {
+            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
 
                 gameScene.snake.head.setTexture('blocks', 6);
-                gameScene.snake.heading = UP;
+                gameScene.snake.direction = UP;
 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                    }
             }
             break;
 
             case 37: // LEFT
 
-            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
                 
                 gameScene.snake.head.setTexture('blocks', 4);
-                gameScene.snake.heading = LEFT;
+                gameScene.snake.direction = LEFT;
 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                    }
             }
             break;
 
             case 40: // DOWN
 
-            if (gameScene.snake.heading  === LEFT || gameScene.snake.heading  === RIGHT || 
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
+            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
                 gameScene.snake.head.setTexture('blocks', 7);
-                gameScene.snake.heading = DOWN;
+                gameScene.snake.direction = DOWN;
                 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                    }
             }
             break;
 
             case 39: // RIGHT
 
-            if (gameScene.snake.heading  === UP   || gameScene.snake.heading  === DOWN || 
-                gameScene.snake.heading  === STOP || gameScene.snake.body.length < 2) { 
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
 
                 gameScene.snake.head.setTexture('blocks', 5);
-                gameScene.snake.heading = RIGHT;
+                gameScene.snake.direction = RIGHT;
                 
                 this.turns += 1;
-                this.inputSet.push([gameScene.snake.heading, gameScene.time.now]);
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
                 
-                if (!gameScene.snake.hold_move) {
-                    this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
-                    gameScene.snake.move(gameScene);
-                    gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
-                    }
+            }
+            break;
+
+            case 32: // SPACE
+              if (DEBUG) { console.log(event.code, gameScene.time.now); }
+              this.inputSet.push([START_SPRINT, gameScene.time.now]);
+              break;
+        } 
+    }
+    moveDirection(gameScene, event) {
+        console.log("Move Direction");
+        // console.log(event.keyCode, this.time.now); // all keys
+        //console.profile("UpdateDirection");
+        //console.time("UpdateDirection");
+        //console.log(this.turns);
+        
+        switch (event.keyCode) {
+            case 87: // w
+
+            if (gameScene.snake.direction === LEFT  || gameScene.snake.direction  === RIGHT || // Prevents backtracking to death
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
+                
+                // At anytime you can update the direction of the snake.
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.direction = UP;
+                
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+                this.turns += 1; 
+                    
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                
+            }
+            break;
+
+            case 65: // a
+
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
+                
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.direction = LEFT;
+
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666)   
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+                
+            }
+            break;
+
+            case 83: // s
+
+            if (gameScene.snake.direction  === LEFT  || gameScene.snake.direction  === RIGHT || 
+                 gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
+                
+
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.direction = DOWN;
+
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+ 
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            }
+            break;
+
+            case 68: // d
+
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
+                
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.direction = RIGHT;
+
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+ 
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            }
+            break;
+
+            case 38: // UP
+
+            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) {
+
+                gameScene.snake.head.setTexture('blocks', 6);
+                gameScene.snake.direction = UP;
+
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            }
+            break;
+
+            case 37: // LEFT
+
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
+                
+                gameScene.snake.head.setTexture('blocks', 4);
+                gameScene.snake.direction = LEFT;
+
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            }
+            break;
+
+            case 40: // DOWN
+
+            if (gameScene.snake.direction  === LEFT || gameScene.snake.direction  === RIGHT || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
+
+                gameScene.snake.head.setTexture('blocks', 7);
+                gameScene.snake.direction = DOWN;
+                
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+                
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            }
+            break;
+
+            case 39: // RIGHT
+
+            if (gameScene.snake.direction  === UP   || gameScene.snake.direction  === DOWN || 
+                gameScene.snake.direction  === STOP || gameScene.snake.body.length < 2) { 
+
+                gameScene.snake.head.setTexture('blocks', 5);
+                gameScene.snake.direction = RIGHT;
+                
+                this.turns += 1;
+                this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+                
+                this.cornerTime += Math.floor((gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime))/16.66666) 
+                gameScene.snake.move(gameScene);
+                gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
 
@@ -1640,6 +1670,103 @@ class InputScene extends Phaser.Scene {
         } 
     }
 }
+
+function loadAnimations(scene) {
+    scene.anims.create({
+      key: 'atom01idle',
+      frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
+      frameRate: 12,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'atom02idle',
+      frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'atom03idle',
+      frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
+      frameRate: 6,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'atom04idle',
+      frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
+      frameRate: 4,
+      repeat: -1
+    })
+  
+    scene.anims.create({
+      key: 'electronIdle',
+      frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
+      frameRate: 16,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'electronDispersion01',
+      frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
+      frameRate: 16,
+      repeat: 0
+    })
+  
+    scene.anims.create({
+      key: 'increasing',
+      frames: scene.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
+      frameRate: 8,
+      repeat: -1
+    });
+  
+    //WRAP_BLOCK_ANIMS
+    scene.anims.create({
+      key: 'wrapBlock01',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9, 10 ,11]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock02',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12,13,14,15,16,17,18,19,20,21,22,23]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock03',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 24,25,26,27,28,29,30,31,32,33,34,35]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock04',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 36,37,38,39,40,41,42,43,44,45,46,47]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock05',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 48,49,50,51,52,53,54,55,56,57,58,59]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock06',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 60,61,62,63,64,65,66,67,68,69,70,71]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock07',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 72,73,74,75,76,77,78,79,80,81,82,83]}),
+      frameRate: 8,
+      repeat: -1
+    })
+    scene.anims.create({
+      key: 'wrapBlock08',
+      frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
+      frameRate: 8,
+      repeat: -1
+    })
+  }
 
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI

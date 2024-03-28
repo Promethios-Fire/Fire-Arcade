@@ -61,7 +61,6 @@ var Snake = new Phaser.Class({
             var portalSound = scene.portalSounds[0]
             portalSound.play();
 
-            //this.pause_movement = false;
             scene.lastMoveTime += SPEEDWALK * 2;
             var _tween = scene.tweens.add({
                 targets: this.head, 
