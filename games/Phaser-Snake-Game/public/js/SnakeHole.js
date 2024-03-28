@@ -402,21 +402,26 @@ class GameScene extends Phaser.Scene {
         
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
+            // Separate if statements so the first will 
+            // run with as small of a delay as possible
+            // for input responsiveness
+            if (!this.move_pause) {
+                ourInputScene.moveDirection(this, e);
+            }
+
             if (this.move_pause) {
                 ourInputScene.updateDirection(this, e);
-            }
-            else {
-                ourInputScene.moveDirection(this, e);
             }
 
             if (startingArrowState == true){
                 
                 // turn off arrows and move snake.
                 startingArrowState = false;
-                startingArrowsAnimN.setVisible(false)
-                startingArrowsAnimS.setVisible(false)
-                startingArrowsAnimE.setVisible(false)
-                startingArrowsAnimW.setVisible(false)
+                startingArrowsAnimN.setVisible(false);
+                startingArrowsAnimS.setVisible(false);
+                startingArrowsAnimE.setVisible(false);
+                startingArrowsAnimW.setVisible(false);
+                this.move_pause = false;
                 
                 //this.move_pause = false;
                 //ourInputScene.moveDirection(this, e);
@@ -1509,7 +1514,6 @@ class InputScene extends Phaser.Scene {
         } 
     }
     moveDirection(gameScene, event) {
-        console.log("Move Direction");
         // console.log(event.keyCode, this.time.now); // all keys
         //console.profile("UpdateDirection");
         //console.time("UpdateDirection");
