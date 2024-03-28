@@ -87,14 +87,18 @@ var Snake = new Phaser.Class({
     });
 
         // Death by eating itself
+        //debugger
         let tail = this.body.slice(1);
 
         // if any tailpos == headpos
         if(
             tail.some(
-                pos => pos.x === this.body[0].x && pos.y === this.body[0].y) 
+                pos => {
+                    pos.x === this.body[0].x && pos.y === this.body[0].y
+                }) 
         ){
             if (scene.started) {
+                
                 this.death(scene);
             }
         }

@@ -26,7 +26,8 @@ var SPEEDSPRINT = 33; // 24
 
 
 var SCORE_FLOOR = 24; // Floor of Fruit score as it counts down.
-var BOOST_ADD_FLOOR = 80;
+const BOOST_ADD_FLOOR = 80;
+const COMBO_ADD_FLOOR = 87;
 var SCORE_MULTI_GROWTH = 0.01;
 
 var comboCounter = 0;
@@ -38,9 +39,9 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 
 // Game Objects
 
-var atomSounds = [];
-var portalSounds = [];
-var pointSounds = [];
+//var atomSounds = [];
+//var portalSounds = [];
+//var pointSounds = [];
 
 // Tilemap variables
 var map;  // Phaser.Tilemaps.Tilemap 
@@ -88,8 +89,7 @@ var SOUND_PORTAL = [
 ]
 
 const DREAMWALLSKIP = [0,1,2];
-// TODOL: Need to truncate this list based on number of portals areas.
-// DO this dynamically later based on the number of portal areas.
+
 
 const STAGES_NEXT = {
     'Stage-01': ['Stage-02a','Stage-02b'],
@@ -105,7 +105,7 @@ const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
 'font-family': ["Sono", 'sans-serif'],
 'font-weight': '400',
-'padding': '0px 0px 0px 12px'}
+'padding': '0px 0px 0px 12px'};
 
 class StartScene extends Phaser.Scene {
     constructor () {
@@ -220,6 +220,7 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
 
+
         //WRAP BLOCKS:
         this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
 
@@ -284,100 +285,7 @@ class GameScene extends Phaser.Scene {
 
         // #region Animations
         // Animation set 
-        this.anims.create({
-            key: 'atom01idle',
-            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
-            frameRate: 12,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'atom02idle',
-            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'atom03idle',
-            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
-            frameRate: 6,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'atom04idle',
-            frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
-            frameRate: 4,
-            repeat: -1
-        })
-
-        this.anims.create({
-            key: 'electronIdle',
-            frames: this.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
-            frameRate: 16,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'electronDispersion01',
-            frames: this.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
-            frameRate: 16,
-            repeat: 0
-        })
-        
-        this.anims.create({
-            key: 'increasing',
-            frames: this.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
-            frameRate: 8,
-            repeat: -1
-        });
-
-        //WRAP_BLOCK_ANIMS
-        this.anims.create({
-            key: 'wrapBlock01',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9, 10 ,11]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock02',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12,13,14,15,16,17,18,19,20,21,22,23]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock03',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 24,25,26,27,28,29,30,31,32,33,34,35]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock04',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 36,37,38,39,40,41,42,43,44,45,46,47]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock05',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 48,49,50,51,52,53,54,55,56,57,58,59]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock06',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 60,61,62,63,64,65,66,67,68,69,70,71]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock07',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 72,73,74,75,76,77,78,79,80,81,82,83]}),
-            frameRate: 8,
-            repeat: -1
-        })
-        this.anims.create({
-            key: 'wrapBlock08',
-            frames: this.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
-            frameRate: 8,
-            repeat: -1
-        })
+        loadAnimations(this);
         // #endregion
 
         const keys = [ 'increasing' ];
@@ -923,7 +831,7 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.boostTime += 1;
             }
         }
-        if (timeLeft <= BOOST_ADD_FLOOR + 10 && timeLeft >= SCORE_FLOOR) {
+        if (timeLeft <= COMBO_ADD_FLOOR && timeLeft >= SCORE_FLOOR) { // Ask holden about this line later.
             this.comboCounter = 0;
         }
         
@@ -934,6 +842,103 @@ class GameScene extends Phaser.Scene {
             this.energyAmount = 0;
         }
     }
+}
+
+function loadAnimations(scene) {
+  scene.anims.create({
+    key: 'atom01idle',
+    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
+    frameRate: 12,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'atom02idle',
+    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'atom03idle',
+    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 24, 25, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35]}),
+    frameRate: 6,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'atom04idle',
+    frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47]}),
+    frameRate: 4,
+    repeat: -1
+  })
+
+  scene.anims.create({
+    key: 'electronIdle',
+    frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 , 10, 11, 12, 13, 14, 15, 16, 17, 18, 19]}),
+    frameRate: 16,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'electronDispersion01',
+    frames: scene.anims.generateFrameNumbers('electronCloudAnim',{ frames: [ 20, 21, 22, 23, 24, 25]}),
+    frameRate: 16,
+    repeat: 0
+  })
+
+  scene.anims.create({
+    key: 'increasing',
+    frames: scene.anims.generateFrameNumbers('boostMeterAnim', { frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9 ] }),
+    frameRate: 8,
+    repeat: -1
+  });
+
+  //WRAP_BLOCK_ANIMS
+  scene.anims.create({
+    key: 'wrapBlock01',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6 ,7 ,8 ,9, 10 ,11]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock02',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 12,13,14,15,16,17,18,19,20,21,22,23]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock03',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 24,25,26,27,28,29,30,31,32,33,34,35]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock04',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 36,37,38,39,40,41,42,43,44,45,46,47]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock05',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 48,49,50,51,52,53,54,55,56,57,58,59]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock06',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 60,61,62,63,64,65,66,67,68,69,70,71]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock07',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 72,73,74,75,76,77,78,79,80,81,82,83]}),
+    frameRate: 8,
+    repeat: -1
+  })
+  scene.anims.create({
+    key: 'wrapBlock08',
+    frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
+    frameRate: 8,
+    repeat: -1
+  })
 }
 
 class WinScene extends Phaser.Scene
