@@ -104,19 +104,19 @@ var Snake = new Phaser.Class({
 
     //if () {
         
-        if (this.heading === LEFT)
+        if (this.direction === LEFT)
         {
             x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
         }
-        else if (this.heading === RIGHT)
+        else if (this.direction === RIGHT)
         {
             x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
         }
-        else if (this.heading === UP)
+        else if (this.direction === UP)
         {
             y = Phaser.Math.Wrap(y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
         }
-        else if (this.heading === DOWN)
+        else if (this.direction === DOWN)
         {
             y = Phaser.Math.Wrap(y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
         }
@@ -211,7 +211,7 @@ var Snake = new Phaser.Class({
         this.alive = false;
         this.hold_move = true;
 
-        this.heading = STOP;
+        this.direction = STOP;
         gameScene.started = false;
     }
 });

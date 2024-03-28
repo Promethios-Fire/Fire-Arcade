@@ -403,11 +403,9 @@ class GameScene extends Phaser.Scene {
         // Keyboard Inputs
         this.input.keyboard.on('keydown', e => {
             if (this.move_pause) {
-                console.log("move_pause", this.snake.direction);
                 ourInputScene.updateDirection(this, e);
             }
             else {
-                console.log("!move_pause", this.snake.direction);
                 ourInputScene.moveDirection(this, e);
             }
 
@@ -420,8 +418,8 @@ class GameScene extends Phaser.Scene {
                 startingArrowsAnimE.setVisible(false)
                 startingArrowsAnimW.setVisible(false)
                 
-                this.move_pause = false;
-                ourInputScene.moveDirection(this, e);
+                //this.move_pause = false;
+                //ourInputScene.moveDirection(this, e);
             }
         })
 
@@ -745,7 +743,6 @@ class GameScene extends Phaser.Scene {
 
         // Only Calculate things when snake is moved.
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
-            console.log("Move", this.snake.direction);
             this.lastMoveTime = time;
             
             // This code calibrates how many milliseconds per frame calculated.
@@ -1388,11 +1385,7 @@ class InputScene extends Phaser.Scene {
     update() {
     }
     updateDirection(gameScene, event) {
-        console.log("updateDirection");
-        // console.log(event.keyCode, this.time.now); // all keys
-        //console.profile("UpdateDirection");
-        //console.time("UpdateDirection");
-        //console.log(this.turns);
+
         
         switch (event.keyCode) {
             case 87: // w
