@@ -14,6 +14,7 @@ const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 256; //28.. //32?................... Win Condition
+const  STARTING_LIVES = 25;
 
 
 // 1 frame is 16.666 milliseconds
@@ -1163,7 +1164,7 @@ class UIScene extends Phaser.Scene {
         this.globalFruitCount = 0;
         this.bonks = 0;
 
-        var {lives = 25 } = props
+        var {lives = STARTING_LIVES } = props
         this.lives = lives;
 
         this.scoreHistory = [];
