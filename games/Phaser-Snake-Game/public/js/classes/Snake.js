@@ -117,7 +117,7 @@ var Snake = new Phaser.Class({
             this.direction = STOP;
             this.bonked = true;
             
-            //this.death(scene);
+            this.death(scene);
         }
 
         // Bonk Self
@@ -130,7 +130,7 @@ var Snake = new Phaser.Class({
                 if (!scene.started) {
                     this.direction = STOP;
                     this.bonked = true;
-                    //this.death(scene);
+                    this.death(scene);
                 }
             }
         })

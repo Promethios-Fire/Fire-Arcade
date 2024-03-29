@@ -97,7 +97,7 @@ const STAGES_NEXT = {
     'Stage-03': []
 }
 
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 const END_STAGE = 'Stage-03';
 
 const UISTYLE = { color: 'lightyellow',
@@ -247,17 +247,15 @@ class GameScene extends Phaser.Scene {
     create () {
         
     
-        var ourInputScene = this.scene.get('InputScene');
+        const ourInputScene = this.scene.get('InputScene');
         
         this.stageUUID = this.cache.json.get(`${this.stage}-json`)["uuid"];
 
-
-        
         // Snake needs to render immediately 
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, 15, 15);
         //debugger
-        this.snake.direction = LEFT;
+        this.snake.direction = STOP;
         
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
@@ -346,10 +344,6 @@ class GameScene extends Phaser.Scene {
 
         // Dream Wall Shimmer
 
-
-        
-        
-
         // Dream wall corners 
         
         // Dream walls for Horizontal Wrap
@@ -425,6 +419,34 @@ class GameScene extends Phaser.Scene {
                 
                 //this.move_pause = false;
                 //ourInputScene.moveDirection(this, e);
+            }
+            if (this.snake.regrouping && e.keyCode === 32) {
+                
+                // On key down.
+                // If you hold space into the regrouping animation this code is safe.
+                // You must press down SPACE after starting regrouping.
+                console.log("regrouping now respawn");
+                var pressTime = this.time.now;
+                console.log("PRESSTIME", pressTime);
+
+                /*
+                this.input.once('keyup', e => { // Capture for releasing sprint
+                    console.log(e.keyCode);
+                    var unPressTime = this.time.now;
+                    console.log(unPressTime - pressTime);
+                    
+                    //if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
+                    //ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
+                })
+
+                /*/
+                const ourUI = this.scene.get('UIScene');
+ 
+                ourUI.lives -= 1;
+                ourUI.scene.restart( { score: ourUI.stageStartScore, lives: ourUI.lives });
+                ourUI.scene.restart(  );
+                //ourUIScene.scene.restart();
+                this.scene.restart();
             }
         })
 
@@ -687,8 +709,8 @@ class GameScene extends Phaser.Scene {
             // DO THIS ON REAL RESET DEATH
             //this.events.emit('saveScore');
             
-            ourUI.lives += 1;
-            ourUI.livesUI.setText(`x ${ourUI.lives}`);
+            ourUI.bonks += 1;
+            //ourUI.livesUI.setText(`x ${ourUI.bonks}`);
 
             //ourUI.length = 0;
             ourUI.lengthGoalUI.setText(`${ourUI.length}/${LENGTH_GOAL}`);
@@ -1009,7 +1031,7 @@ class WinScene extends Phaser.Scene
         
         BETA: ${GAME_VERSION}
 
-        BONK RESETS: ${ourUI.lives - 1}
+        BONK RESETS: ${ourUI.bonks}
         TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds
         `);
 
@@ -1130,15 +1152,19 @@ class UIScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
 
         //this.score = 0;
-        const { score = 0 } = props
+        var { score = 0 } = props
         this.score = score;
+        this.stageStartScore = score;
         
 
         this.length = 0;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
-        this.lives = 1;
+        this.bonks = 0;
+
+        var {lives = 25 } = props
+        this.lives = lives;
 
         this.scoreHistory = [];
     }
@@ -1189,7 +1215,7 @@ class UIScene extends Phaser.Scene {
         
         //this.bestScoreUI.setText(""); // Hide until you get a score to put here.
         
-        // Lives
+        // bonks
         // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
         this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', UISTYLE);
         this.livesUI.setText(`x ${this.lives}`).setOrigin(0,1);
