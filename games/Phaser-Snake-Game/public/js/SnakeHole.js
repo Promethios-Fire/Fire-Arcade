@@ -221,6 +221,7 @@ class GameScene extends Phaser.Scene {
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('boostMarker', 'assets/sprites/boostMarkerAnim.png', { frameWidth: 26, frameHeight: 24 });
 
         //WRAP BLOCKS:
         this.load.spritesheet('wrapBlockAnim', 'assets/sprites/wrapBlockAnim.png', { frameWidth: 24, frameHeight: 24 });
@@ -285,7 +286,25 @@ class GameScene extends Phaser.Scene {
         
 
         // #region Animations
-        // Animation set 
+        // Animation set
+        this.anims.create({
+            key: 'boostBuilding',
+            frames: this.anims.generateFrameNumbers('boostMarker',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'boostDrainingStart',
+            frames: this.anims.generateFrameNumbers('boostMarker',{ frames: [ 6,7,8]}),
+            frameRate: 16,
+            repeat: -1
+        })
+        this.anims.create({
+            key: 'boostDrainingLoop',
+            frames: this.anims.generateFrameNumbers('boostMarker',{ frames: [ 6,7,8]}),
+            frameRate: 16,
+            repeat: -1
+        })
         this.anims.create({
             key: 'atom01idle',
             frames: this.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
@@ -388,6 +407,10 @@ class GameScene extends Phaser.Scene {
         boostBar.play('increasing');
 
         boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+        const boostMarker = this.add.sprite(SCREEN_WIDTH/2, GRID*.25).setOrigin(0.5,0);
+        boostMarker.play('boostBuilding')
+        boostMarker.setDepth(55);
 
         this.anims.create({
             key: 'idle',
@@ -924,6 +947,8 @@ class GameScene extends Phaser.Scene {
             this.moveInterval = SPEEDWALK; // Less is Faster
             this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount += .25; // Recharge Boost Slowly
+
+            this.boostMarker.play('boostDrainging')
         }
         else {
             // Has Boost Logic
