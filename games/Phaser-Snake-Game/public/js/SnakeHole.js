@@ -11,10 +11,9 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 const GAME_VERSION = 'v0.3.03.29.001';
-
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 256; //28.. //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -98,7 +97,7 @@ const STAGES_NEXT = {
     'Stage-03': []
 }
 
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-03';
 
 const UISTYLE = { color: 'lightyellow',
@@ -258,7 +257,7 @@ class GameScene extends Phaser.Scene {
         // Create the snake the  first time so it renders immediately
         this.snake = new Snake(this, 15, 15);
         //debugger
-        this.snake.direction = STOP;
+        this.snake.direction = LEFT;
         
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
@@ -405,6 +404,7 @@ class GameScene extends Phaser.Scene {
             // Separate if statements so the first will 
             // run with as small of a delay as possible
             // for input responsiveness
+            this.snake.bonked = false;
             if (!this.move_pause) {
                 ourInputScene.moveDirection(this, e);
             }
@@ -588,6 +588,10 @@ class GameScene extends Phaser.Scene {
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+        var atom = new Food(this);
+        atom.setPosition(this.snake.head.x - GRID, this.snake.head.y);
+        atom.electrons.setPosition(this.snake.head.x - GRID, this.snake.head.y);
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order

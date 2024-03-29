@@ -19,6 +19,8 @@ var Snake = new Phaser.Class({
         
         this.body.push(this.head);
 
+        this.bonked = false;
+
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
         
@@ -108,36 +110,40 @@ var Snake = new Phaser.Class({
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
         }
-
-        console.log(this.direction, xN/GRID, yN/GRID);
         
+        // Bonk Wall
         if (scene.map.getTileAtWorldXY( xN, yN )) {
             console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
-            this.death(scene);
+            this.direction = STOP;
+            this.bonked = true;
+            
+            //this.death(scene);
         }
+
+        // Bonk Self
+        var tail = this.body.slice(1);
     
-            // Death by eating itself
-            //debugger
-            let tail = this.body.slice(1);
-    
-            // if any tailpos == headpos
-            if(
-                tail.some(
-                    pos => {
-                        pos.x === this.body[0].x && pos.y === this.body[0].y
-                    }) 
-            ){
-                if (scene.started) {
-                    this.death(scene);
+        //var checkbody = (pos) => {pos.x === this.head.x && pos.y === this.head.y};
+        tail.some(part => {
+            if (part.x === xN && part.y === yN) {
+                
+                if (!scene.started) {
+                    this.direction = STOP;
+                    this.bonked = true;
+                    //this.death(scene);
                 }
             }
-    //}
+        })
 
     
     // Actually Move the Snake Head
+    
+    
+    
     if (this.alive) {
-        // Then the Body all 
-        Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+        if (!this.bonked) {
+            Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+        }
     }
     
     
