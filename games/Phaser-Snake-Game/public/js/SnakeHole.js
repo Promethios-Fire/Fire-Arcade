@@ -25,7 +25,7 @@ export const SPEEDWALK = 99; // 99 In milliseconds
 var SPEEDSPRINT = 33; // 24
 
 
-var SCORE_FLOOR = 24; // Floor of Fruit score as it counts down.
+var SCORE_FLOOR = 20; // Floor of Fruit score as it counts down.
 const BOOST_ADD_FLOOR = 80;
 const COMBO_ADD_FLOOR = 87;
 var SCORE_MULTI_GROWTH = 0.01;
@@ -615,9 +615,6 @@ class GameScene extends Phaser.Scene {
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
 
-        var atom = new Food(this);
-        atom.setPosition(this.snake.head.x - GRID, this.snake.head.y);
-        atom.electrons.setPosition(this.snake.head.x - GRID, this.snake.head.y);
         
         //////////// Add things to the UI that are loaded by the game scene.
         // This makes sure it is created in the correct order
