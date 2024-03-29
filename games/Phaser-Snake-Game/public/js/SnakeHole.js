@@ -14,7 +14,7 @@ const GAME_VERSION = 'v0.3.03.29.001';
 
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 2; //28.. //32?................... Win Condition
 
 
 // 1 frame is 16.666 milliseconds
@@ -98,7 +98,7 @@ const STAGES_NEXT = {
     'Stage-03': []
 }
 
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 const END_STAGE = 'Stage-03';
 
 const UISTYLE = { color: 'lightyellow',
@@ -186,7 +186,7 @@ class GameScene extends Phaser.Scene {
         this.move_pause = true;
         this.started = false;
 
-        const { stage = 'Stage-01' } = props
+        const { stage = START_STAGE } = props
         this.stage = stage;
         console.log("FIRST INIT", this.stage);
     
@@ -884,11 +884,14 @@ class WinScene extends Phaser.Scene
         // For now we emulate the first level
 
         // Tilemap
-        this.map = this.make.tilemap({ key: "Stage-01", tileWidth: GRID, tileHeight: GRID });
+        this.map = this.make.tilemap({ key: START_STAGE, tileWidth: GRID, tileHeight: GRID });
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
         this.layer = this.map.createLayer('Wall', this.tileset);
-        this.layer.setDepth(25);
+        this.layer.setDepth(5);
+
+        this.scoreCardBackground = this.add.rectangle(0, GRID * 2, GRID * 31, GRID * 28, 0x384048, 0.75);
+        this.scoreCardBackground.setOrigin(0,0).setDepth(8);
 
         var wrapBlock01 = this.add.sprite(0, GRID * 2).play("wrapBlock01").setOrigin(0,0).setDepth(15);
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
@@ -924,7 +927,7 @@ class WinScene extends Phaser.Scene
 
 
         ///////
-        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0);
+        this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0).setDepth(25);
         
         //var card = this.add.image(5*GRID, 5*GRID, 'howToCard').setDepth(10);
         //card.setOrigin(0,0);
@@ -1057,7 +1060,7 @@ class WinScene extends Phaser.Scene
             }
             
             var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
-            continueText.setText(continue_text).setOrigin(0.5,0);
+            continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
 
             this.tweens.add({
@@ -1667,6 +1670,8 @@ class InputScene extends Phaser.Scene {
         } 
     }
 }
+
+
 
 function loadAnimations(scene) {
     scene.anims.create({

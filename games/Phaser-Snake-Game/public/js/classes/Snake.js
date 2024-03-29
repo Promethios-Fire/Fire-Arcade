@@ -47,6 +47,7 @@ var Snake = new Phaser.Class({
     // start with current head position
     let x = this.head.x;
     let y = this.head.y;
+
     
     scene.portals.forEach(portal => { 
         if(this.head.x === portal.x && this.head.y === portal.y && this.portal_buffer_on === true){
@@ -85,50 +86,65 @@ var Snake = new Phaser.Class({
         }
     });
 
-        // Death by eating itself
-        //debugger
-        let tail = this.body.slice(1);
+    // Look ahead for bonks
 
-        // if any tailpos == headpos
-        if(
-            tail.some(
-                pos => {
-                    pos.x === this.body[0].x && pos.y === this.body[0].y
-                }) 
-        ){
-            if (scene.started) {
-                
-                this.death(scene);
-            }
-        }
+    var xN = this.head.x;
+    var yN = this.head.y;
 
-    //if () {
         
         if (this.direction === LEFT)
         {
-            x = Phaser.Math.Wrap(x - GRID, 0, SCREEN_WIDTH);
+            xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
         }
         else if (this.direction === RIGHT)
         {
-            x = Phaser.Math.Wrap(x + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
+            xN = Phaser.Math.Wrap(this.head.x  + GRID, 0 - GRID, SCREEN_WIDTH - GRID);
         }
         else if (this.direction === UP)
         {
-            y = Phaser.Math.Wrap(y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
+            yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
         }
         else if (this.direction === DOWN)
         {
-            y = Phaser.Math.Wrap(y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
+            yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 1, SCREEN_HEIGHT - GRID * 2 );
         }
-    //}
+
+        console.log(this.direction, xN/GRID, yN/GRID);
+        
+        if (scene.map.getTileAtWorldXY( xN, yN )) {
+            console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
+            this.death(scene);
+        }
     
-    // Move all Snake Segments
-    Phaser.Actions.ShiftPosition(this.body, x, y, this.tail);
+            // Death by eating itself
+            //debugger
+            let tail = this.body.slice(1);
+    
+            // if any tailpos == headpos
+            if(
+                tail.some(
+                    pos => {
+                        pos.x === this.body[0].x && pos.y === this.body[0].y
+                    }) 
+            ){
+                if (scene.started) {
+                    this.death(scene);
+                }
+            }
+    //}
+
+    
+    // Actually Move the Snake Head
+    if (this.alive) {
+        // Then the Body all 
+        Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+    }
+    
+    
+    
 
     // Check if dead by map
-    if (scene.map.getTileAtWorldXY( this.head.x, this.head.y )) {
-        this.death(scene);
-    }
+
     var i
     var pointSounds = scene.pointSounds[scene.comboCounter -1]
 
