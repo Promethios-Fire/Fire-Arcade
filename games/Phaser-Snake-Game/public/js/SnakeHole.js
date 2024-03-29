@@ -13,7 +13,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.3.03.29.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 256; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 25;
 
 
@@ -98,7 +98,7 @@ const STAGES_NEXT = {
     'Stage-03': []
 }
 
-const START_STAGE = 'Stage-02a';
+const START_STAGE = 'Stage-01';
 const END_STAGE = 'Stage-03';
 
 const UISTYLE = { color: 'lightyellow',
@@ -441,6 +441,9 @@ class GameScene extends Phaser.Scene {
                 })
 
                 /*/
+                this.events.off('addScore');
+                this.events.off('saveScore');
+
                 const ourUI = this.scene.get('UIScene');
  
                 ourUI.lives -= 1;
@@ -1113,7 +1116,7 @@ class WinScene extends Phaser.Scene
                 
                 if (ourGame.stage != END_STAGE) {
                 
-                    ourUI.scene.restart( { score: ourUI.score } );
+                    ourUI.scene.restart( { score: ourUI.score, lives: ourUI.lives } );
                 
                     var next_stage = Phaser.Math.RND.pick(STAGES_NEXT[ourGame.stage]) // Pick a next scene randomly from the next possible stages
                     ourGame.scene.restart( { stage: next_stage } );
