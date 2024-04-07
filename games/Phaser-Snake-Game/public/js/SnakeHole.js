@@ -119,7 +119,7 @@ const STAGES_NEXT = {
     'Stage-02e': [['Stage-03c', 85]],
     'Stage-03a': [['Stage-04', 88]],
     'Stage-03b': [['Stage-04', 99]],
-    'Stage-03c': [['Stage-04', 86]],
+    'Stage-03c': [['Stage-04', 85]],
     'Stage-04': [['Stage-05', 88]],
     'Stage-05': [['Stage-06', 84]],
     'Stage-06': [['Stage-07', 83]],
