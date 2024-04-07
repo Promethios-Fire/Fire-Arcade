@@ -119,7 +119,7 @@
             "scale": 0.8976478494623656,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 135.9107584038332,
+                "x": 134.7967357939657,
                 "y": 516.9064909785133
             }
         },
@@ -133,8 +133,8 @@
             "scale": 0.7953776041666667,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 394.7810428092003,
-                "y": 530.5656053040843
+                "x": 391.00924940656466,
+                "y": 528.051076368994
             }
         },
         "Stage-02e.json#tileSheet": {
@@ -175,7 +175,7 @@
             "scale": 0.8976478494623656,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 133.6827131840982,
+                "x": 132.56869057423074,
                 "y": 513.5644231489108
             }
         },
@@ -189,8 +189,8 @@
             "scale": 0.7953776041666667,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 396.03830727674546,
-                "y": 531.8228697716297
+                "x": 393.5237783416551,
+                "y": 529.3083408365393
             }
         },
         "Stage-03c.json#tileSheet": {
@@ -238,8 +238,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 369,
-                "y": 496
+                "x": 368,
+                "y": 495
             }
         },
         "Stage-05.json#tileSheet": {
@@ -256,7 +256,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 370.2717495067779,
-                "y": 369.32476293514924
+                "y": 368.3777763635207
             }
         },
         "Stage-06.json#tileSheet": {
@@ -307,7 +307,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.9978725372307,
-                "y": 372.99787253723065
+                "y": 371.62149662380915
             }
         },
         "Stage-11.json#tileSheet": {
@@ -406,6 +406,8 @@
     ],
     "project": "SnakeTiled.tiled-project",
     "recentFiles": [
+        "Stage-02e.json",
+        "Stage-03c.json",
         "Bonus-Stage-x1.json",
         "snakeMap.tmj",
         "Stage-03b.json",
@@ -413,9 +415,7 @@
         "Stage-02d.json",
         "Stage-11.json",
         "Stage-05.json",
-        "Stage-03c.json",
         "Stage-01.json",
-        "Stage-02e.json",
         "Stage-02b.json",
         "Stage-02a.json"
     ],
