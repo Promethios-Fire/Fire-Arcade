@@ -75,10 +75,10 @@
         },
         "Stage-02a.json": {
             "scale": 0.7953776041666667,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 238.88024883359247,
-                "y": 364.6066955881149
+                "x": 305.5152656134893,
+                "y": 363.3494311205697
             }
         },
         "Stage-02a.json#tileSheet": {
@@ -406,6 +406,7 @@
     ],
     "project": "SnakeTiled.tiled-project",
     "recentFiles": [
+        "Stage-02a.json",
         "Stage-02e.json",
         "Stage-03c.json",
         "Bonus-Stage-x1.json",
@@ -416,8 +417,7 @@
         "Stage-11.json",
         "Stage-05.json",
         "Stage-01.json",
-        "Stage-02b.json",
-        "Stage-02a.json"
+        "Stage-02b.json"
     ],
     "resizeMap.removeObjects": true,
     "tileset.embedInMap": true,
