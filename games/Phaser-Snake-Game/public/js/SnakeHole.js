@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.4.04.19.002';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 4; //28.. //32?................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -1362,14 +1362,10 @@ class TimeAttackScene extends Phaser.Scene{
 
     init () {
 
-        // this.stageHistory = []; !Initalized in the start screen
-        // This keeps the history from being reset during a run.
         this.inTimeAttack = false;
-
 
     }
     preload () {
-        //this.stageHistory = [];
 
     }
     create() {
@@ -1390,10 +1386,20 @@ class TimeAttackScene extends Phaser.Scene{
         // Average Food
         var sumFood = allFoodLog.reduce((a,b) => a + b, 0);
 
-        var lowestStageUI;
-        var lowestStage;
-        var lowestScore = 9999999999;
 
+        var playedStages = [];
+        var selectIndex = 0;
+
+        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+
+        
+
+        
+        var _i = 0;
+        var lowestScore = 9999999999;
+        
+        // Only loads the UI to the scene if you have played a level. 
+        // Allows this scene to start at the beginning without displaying anything, but when you restart the scene it plays correctly.
         
 
         if (this.stageHistory) {
@@ -1409,6 +1415,8 @@ class TimeAttackScene extends Phaser.Scene{
                 var baseScore = _stageData.calcBase();
                 var realScore = _stageData.calcScore();
                 var foodLogOrdered = _stageData.foodLog.slice().sort().reverse();
+
+                
 
                 allFoodLog.push(...foodLogOrdered);
 
@@ -1427,26 +1435,23 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 //////
+                var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
+                    color: 'white',
+                    'font-size': '28px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+
+
                 if (realScore < lowestScore) {
+                    selectIndex = _i;
                     lowestScore = realScore;
-                    lowestStage = _stageData.stage;
-                    lowestStageUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
+                };
+                    
 
-                    lowestStageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
 
-                } else {
-                    var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
-                        color: 'white',
-                        'font-size': '28px',
-                        'font-family': ["Sono", 'sans-serif'],
-                    });
-
-                    levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
-                }
+                playedStages.push([levelUI, _stageData.stage]);
+                
             
 
                 // Run Stats
@@ -1473,11 +1478,13 @@ class TimeAttackScene extends Phaser.Scene{
                 });
                 foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
 
+                _i += 1;
                 stageY += GRID * 2;
 
             }); // End Level For Loop
 
-            lowestStageUI.node.style.color = "red";
+            playedStages[selectIndex][0].node.style.color = "red";
+            
         
             
 
@@ -1538,7 +1545,7 @@ class TimeAttackScene extends Phaser.Scene{
                 if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
                     console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
 
-                    lowestStage = unlockStage[0];
+                    lowestStage = unlockStage[0]; ////// BROKE
                     
                 }
                 else {
@@ -1563,7 +1570,7 @@ class TimeAttackScene extends Phaser.Scene{
                 var continue_text = '[SPACE TO END GAME]';
     
                 if (ourUI.lives > 0) {
-                    continue_text = `[GOTO ${lowestStage}]`;
+                    continue_text = `[GOTO ${playedStages[selectIndex][1]}]`;
                 }
                 
                 var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
@@ -1602,7 +1609,7 @@ class TimeAttackScene extends Phaser.Scene{
                     ourUI.lives -= 1; 
 
                     ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
-                    ourGame.scene.restart( { stage: lowestStage } );
+                    ourGame.scene.restart( { stage: playedStages[selectIndex][1] } );
 
                     ourTimeAttack.scene.stop();
 
