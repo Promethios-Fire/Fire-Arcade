@@ -83,7 +83,7 @@ var Snake = new Phaser.Class({
             
             scene.time.delayedCall(SPEEDWALK * 4, event => {
                 
-                console.log("YOU CAN PORTAL AGAIN.");
+                //console.log("YOU CAN PORTAL AGAIN.");
                 this.portal_buffer_on = true;
                 this.hold_move = false;
                 
@@ -119,7 +119,7 @@ var Snake = new Phaser.Class({
         // Bonk Wall
         if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal) {
             // Only count a wall hit ahead if not on a portal.
-            console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
+            //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
             this.direction = STOP;
             this.bonked = true;
             

@@ -11,7 +11,7 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.4.04.05.010';
+const GAME_VERSION = 'v0.4.04.05.011';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
@@ -779,7 +779,7 @@ class GameScene extends Phaser.Scene {
 
         // Lose State
         if (!this.snake.alive && !this.snake.regrouping) {
-            console.log("DEAD, Now Rregroup", this.snake.alive);
+            //console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
             // game.scene.scene.restart(); // This doesn't work correctly
             if (DEBUG) { console.log("DEAD"); }
@@ -825,7 +825,7 @@ class GameScene extends Phaser.Scene {
             });
 
             tween.on('complete', test => {
-                console.log("COMPLETE AND SET ALIVE")
+                //console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
                 this.snake.alive = true;
                 
@@ -1231,6 +1231,7 @@ class ScoreScene extends Phaser.Scene
                         var nextStages = STAGES_NEXT[ourGame.stage];
                         var unlockedStages = [];
     
+                        // #region Next Stage
                         console.log("CHECK NEXT STAGES");
                         nextStages.forEach( _stage => {
     
@@ -1243,7 +1244,7 @@ class ScoreScene extends Phaser.Scene
                                 "currentBase=", currentBase,
                                 "newUnlocked=", (currentBase > goalSum && ourTimeAttack.histSum < goalSum)
                             )
-                            if (ourTimeAttack.histSum > goalSum) {
+                            if (ourTimeAttack.histSum >= goalSum) {
                                 unlockedStages.push(_stage);
                             }
 
@@ -1509,7 +1510,7 @@ class TimeAttackScene extends Phaser.Scene{
 
             runScoreUI.setText(`Current Run Score ${runScore}`).setOrigin(0,0);
 
-            // #region Check Unlock Level
+            // #region Unlock New Level?
 
             if (this.scene.get('GameScene').stage != END_STAGE) {
 
@@ -1524,7 +1525,7 @@ class TimeAttackScene extends Phaser.Scene{
                     var _goalSum = _stage[1] * foodToNow;
                     unlockStage = _stage;
                     goalSum = unlockStage[1] * foodToNow;
-                    if (this.histSum < _goalSum && baseScore > _goalSum) {
+                    if (this.histSum <= _goalSum && baseScore > _goalSum) {
                         return true;
                     }
                 });
@@ -1532,7 +1533,7 @@ class TimeAttackScene extends Phaser.Scene{
                 // Calc score required up to this point
                 // Add Stage History Sum Here
     
-                console.log(this.newUnlocked);
+                console.log("New Unlocked this Run", this.newUnlocked);
                 
                 if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
                     console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
@@ -2481,6 +2482,8 @@ function loadAnimations(scene) {
     })
   }
 // #endregion
+
+// #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
@@ -2507,7 +2510,7 @@ var config = {
 
 };
 
-// Screen Settings
+// #region Screen Settings
 export const SCREEN_WIDTH = config.width;
 export const SCREEN_HEIGHT = config.height; 
 
@@ -2520,6 +2523,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
     throw "SCREEN DOESN'T DIVIDE INTO GRID EVENLY SILLY";
 }
 
+// region const Game
 export const game = new Phaser.Game(config);
 
 
