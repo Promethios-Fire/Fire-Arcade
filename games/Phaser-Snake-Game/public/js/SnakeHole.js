@@ -1483,7 +1483,45 @@ class TimeAttackScene extends Phaser.Scene{
 
             }); // End Level For Loop
 
-            playedStages[selectIndex][0].node.style.color = "red";
+
+            var selected = playedStages[selectIndex]
+
+            selected[0].node.style.color = "red";
+
+
+
+            // #region Stage Select Code
+            // Default End Game
+            var continue_text = '[SPACE TO END GAME]';
+    
+            if (ourUI.lives > 0) {
+                continue_text = `[GOTO ${selected[1]}]`;
+            }
+            
+            var continueTextUI = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'}).setVisible(false);
+            continueTextUI.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+
+            this.input.keyboard.on('keydown-DOWN', function() {
+                selected[0].node.style.color = "white";
+                selectIndex = Phaser.Math.Wrap(selectIndex + 1, 0, playedStages.length);
+                
+                selected = playedStages[selectIndex];
+                selected[0].node.style.color = "red";
+
+                continueTextUI.setText(`[GOTO ${selected[1]}]`);
+            }, [], this);
+    
+            this.input.keyboard.on('keydown-UP', function() {
+                selected[0].node.style.color = "white";
+                selectIndex = Phaser.Math.Wrap(selectIndex - 1, 0, playedStages.length);
+                
+                selected = playedStages[selectIndex];
+                selected[0].node.style.color = "red";
+
+                continueTextUI.setText(`[GOTO ${selected[1]}]`);
+            }, [], this);
+
+            
             
         
             
@@ -1557,6 +1595,7 @@ class TimeAttackScene extends Phaser.Scene{
     
             }
             // #endregion
+            
 
 
             ////////// Run Average
@@ -1567,18 +1606,12 @@ class TimeAttackScene extends Phaser.Scene{
 
             //console.log ("sum:", sumFood, "Ave:", sumAveFood);
             this.time.delayedCall(900, function() {
-                var continue_text = '[SPACE TO END GAME]';
-    
-                if (ourUI.lives > 0) {
-                    continue_text = `[GOTO ${playedStages[selectIndex][1]}]`;
-                }
-                
-                var continueText = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'});
-                continueText.setText(continue_text).setOrigin(0.5,0).setDepth(25);
+
+                continueTextUI.setVisible(true);
     
     
                 this.tweens.add({
-                    targets: continueText,
+                    targets: continueTextUI,
                     alpha: { from: 0, to: 1 },
                     ease: 'Sine.InOut',
                     duration: 1000,
