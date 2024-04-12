@@ -1388,7 +1388,7 @@ class TimeAttackScene extends Phaser.Scene{
 
 
         var playedStages = [];
-        var selectIndex = 0;
+        var index = 0;
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
 
@@ -1443,7 +1443,7 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 if (realScore < lowestScore) {
-                    selectIndex = _i;
+                    index = _i;
                     lowestScore = realScore;
                 };
                     
@@ -1484,7 +1484,7 @@ class TimeAttackScene extends Phaser.Scene{
             }); // End Level For Loop
 
 
-            var selected = playedStages[selectIndex]
+            var selected = playedStages[index]
 
             selected[0].node.style.color = "red";
 
@@ -1501,21 +1501,24 @@ class TimeAttackScene extends Phaser.Scene{
             var continueTextUI = this.add.text(SCREEN_WIDTH/2, GRID*26,'', {"fontSize":'48px'}).setVisible(false);
             continueTextUI.setText(continue_text).setOrigin(0.5,0).setDepth(25);
 
+            console.log("played Stages", playedStages);
+
             this.input.keyboard.on('keydown-DOWN', function() {
                 selected[0].node.style.color = "white";
-                selectIndex = Phaser.Math.Wrap(selectIndex + 1, 0, playedStages.length);
-                
-                selected = playedStages[selectIndex];
+                index = Phaser.Math.Wrap(index + 1, -1, playedStages.length-1); // No idea why -1 works here. But it works so leave it until it doesn't/
+
+                selected = playedStages[index];
                 selected[0].node.style.color = "red";
 
                 continueTextUI.setText(`[GOTO ${selected[1]}]`);
+                
             }, [], this);
     
             this.input.keyboard.on('keydown-UP', function() {
                 selected[0].node.style.color = "white";
-                selectIndex = Phaser.Math.Wrap(selectIndex - 1, 0, playedStages.length);
+                index = Phaser.Math.Wrap(index - 1, 0, playedStages.length);
                 
-                selected = playedStages[selectIndex];
+                selected = playedStages[index];
                 selected[0].node.style.color = "red";
 
                 continueTextUI.setText(`[GOTO ${selected[1]}]`);
@@ -1642,7 +1645,7 @@ class TimeAttackScene extends Phaser.Scene{
                     ourUI.lives -= 1; 
 
                     ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
-                    ourGame.scene.restart( { stage: playedStages[selectIndex][1] } );
+                    ourGame.scene.restart( { stage: playedStages[index][1] } );
 
                     ourTimeAttack.scene.stop();
 
