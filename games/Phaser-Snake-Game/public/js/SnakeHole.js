@@ -1435,7 +1435,7 @@ class TimeAttackScene extends Phaser.Scene{
 
 
                 //////
-                var levelUI = this.add.dom(GRID * 9, stageY, 'div', {
+                var stageUI = this.add.dom(GRID * 9, stageY, 'div', {
                     color: 'white',
                     'font-size': '28px',
                     'font-family': ["Sono", 'sans-serif'],
@@ -1448,9 +1448,9 @@ class TimeAttackScene extends Phaser.Scene{
                 };
                     
 
-                levelUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
+                stageUI.setText(`${bestChar}${_stageData.stage}`).setOrigin(1,0);
 
-                playedStages.push([levelUI, _stageData.stage]);
+                playedStages.push([stageUI, _stageData.stage]);
                 
             
 
@@ -1476,7 +1476,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-size': '12px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
-                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
+                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0.5);
 
                 _i += 1;
                 stageY += GRID * 2;
@@ -1487,6 +1487,19 @@ class TimeAttackScene extends Phaser.Scene{
             var selected = playedStages[index]
 
             selected[0].node.style.color = "red";
+
+            // Snake Head Code
+
+            var selector = this.add.sprite(GRID, selected[0].y + 6, 'snakeDefault', 5);
+            //this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
+            selector.setOrigin(0.5,0);
+
+            var upArrow = this.add.sprite(GRID, selected[0].y - 42).setDepth(15).setOrigin(0.5,0);
+            var downArrow = this.add.sprite(GRID, selected[0].y + 32).setDepth(15).setOrigin(0.5,0);
+
+            upArrow.play('idle');
+            downArrow.flipY = true;
+            downArrow.play('idle');
 
 
 
@@ -1509,6 +1522,10 @@ class TimeAttackScene extends Phaser.Scene{
 
                 selected = playedStages[index];
                 selected[0].node.style.color = "red";
+                selector.y = selected[0].y + 6;
+                
+                upArrow.y = selected[0].y - 42;
+                downArrow.y = selected[0].y + 32;
 
                 continueTextUI.setText(`[GOTO ${selected[1]}]`);
                 
@@ -1520,6 +1537,10 @@ class TimeAttackScene extends Phaser.Scene{
                 
                 selected = playedStages[index];
                 selected[0].node.style.color = "red";
+                selector.y = selected[0].y + 6;
+                
+                upArrow.y = selected[0].y - 42;
+                downArrow.y = selected[0].y + 32;
 
                 continueTextUI.setText(`[GOTO ${selected[1]}]`);
             }, [], this);
@@ -1586,7 +1607,7 @@ class TimeAttackScene extends Phaser.Scene{
                 if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
                     console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
 
-                    lowestStage = unlockStage[0]; ////// BROKE
+                    //lowestStage = unlockStage[0]; ////// BROKE
                     
                 }
                 else {
