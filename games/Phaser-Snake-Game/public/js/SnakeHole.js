@@ -174,6 +174,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 40, frameHeight: 44 });
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
 
 
         //WRAP BLOCKS:
@@ -395,6 +396,8 @@ class GameScene extends Phaser.Scene {
         var wrapBlock03 = this.add.sprite(GRID * END_X, GRID * 2).play("wrapBlock03").setOrigin(0,0).setDepth(15);
         var wrapBlock06 = this.add.sprite(0, GRID * END_Y - GRID).play("wrapBlock06").setOrigin(0,0).setDepth(15);
         var wrapBlock08 = this.add.sprite(GRID * END_X, GRID * END_Y - GRID).play("wrapBlock08").setOrigin(0,0).setDepth(15);
+
+        //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
     
 
@@ -867,8 +870,15 @@ class GameScene extends Phaser.Scene {
         // #region Check move
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
-
+            let random = Phaser.Math.Between(0, 9);
             this.lastMoveTime = time;
+            
+            if(this.spaceKey.isDown){
+                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
+                boostTrailX.once('animationcomplete',()=>{
+                    boostTrailX.destroy();
+                })
+            }
             
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
@@ -2071,9 +2081,11 @@ class UIScene extends Phaser.Scene {
         
             // Has Boost Logic
             if(this.energyAmount > 1){
+                //CREATE BOOST ELECTRICITY HERE
                 this.scene.get('GameScene').moveInterval = SPEEDSPRINT;
             }
             else{
+                //DISSIPATE LIVE ELECTRICITY
                 this.scene.get('GameScene').moveInterval = SPEEDWALK;
             }
             this.mask.setScale(this.energyAmount/100,1);
@@ -2543,6 +2555,12 @@ function loadAnimations(scene) {
       frames: scene.anims.generateFrameNumbers('wrapBlockAnim',{ frames: [ 84,85,86,87,88,89,90,91,92,93,94,95]}),
       frameRate: 8,
       repeat: -1
+    })
+    scene.anims.create({
+      key: 'boostTrailX01',
+      frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
+      frameRate: 12,
+      repeat: 1
     })
   }
 // #endregion
