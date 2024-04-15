@@ -872,9 +872,11 @@ class GameScene extends Phaser.Scene {
             
             let random = Phaser.Math.Between(0, 9);
             this.lastMoveTime = time;
+            let snakeTail = this.snake.body.length-1;
             
             if(this.spaceKey.isDown){
-                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
+                var boostTrailX = this.add.sprite(this.snake.body[snakeTail].x, this.snake.body[snakeTail].y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
+                //console.log(this.snake.body.x,this.snake.body.y)
                 boostTrailX.once('animationcomplete',()=>{
                     boostTrailX.destroy();
                 })
