@@ -872,13 +872,13 @@ class GameScene extends Phaser.Scene {
             
             let random = Phaser.Math.Between(0, 9);
             this.lastMoveTime = time;
-            let snakeTail = this.snake.body.length-1;
+            let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
             
-            if(this.spaceKey.isDown){
-                var boostTrailX = this.add.sprite(this.snake.body[snakeTail].x, this.snake.body[snakeTail].y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
-                //console.log(this.snake.body.x,this.snake.body.y)
+            if(this.spaceKey.isDown){ //needs to only happen when boost bar has energy, will abstract later
+                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
+                //console.log(this.energyAmount)
                 boostTrailX.once('animationcomplete',()=>{
-                    boostTrailX.destroy();
+                    boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
                 })
             }
             
