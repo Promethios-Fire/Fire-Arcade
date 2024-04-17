@@ -878,7 +878,11 @@ class GameScene extends Phaser.Scene {
                 var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
                 //console.log(this.energyAmount)
                 boostTrailX.once('animationcomplete',()=>{
-                    boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
+                    boostTrailX.play("boostTrailXdissipate");
+                    boostTrailX.once('animationcomplete',()=>{
+                        boostTrailX.destroy()
+                    })
+                    //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
                 })
             }
             
@@ -2561,9 +2565,15 @@ function loadAnimations(scene) {
     scene.anims.create({
       key: 'boostTrailX01',
       frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
-      frameRate: 12,
-      repeat: 1
+      frameRate: 16,
+      repeat: 0
     })
+    scene.anims.create({
+        key: 'boostTrailXdissipate',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 10,11,12,13,14]}),
+        frameRate: 16,
+        repeat: 0
+      })
   }
 // #endregion
 
