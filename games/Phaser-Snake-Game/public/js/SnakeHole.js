@@ -880,7 +880,7 @@ class GameScene extends Phaser.Scene {
                 boostTrailX.once('animationcomplete',()=>{
                     boostTrailX.play("boostTrailXdissipate");
                     boostTrailX.once('animationcomplete',()=>{
-                        boostTrailX.destroy()
+                        boostTrailX.destroy() 
                     })
                     //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
                 })
