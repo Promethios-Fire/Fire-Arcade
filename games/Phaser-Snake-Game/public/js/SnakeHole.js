@@ -499,6 +499,8 @@ class GameScene extends Phaser.Scene {
             this.spaceWhileReGrouping = false;
         })
 
+        this.frameIndex = 0
+
         // #endregion
         
 
@@ -761,6 +763,8 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
 
+        var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here
+
         // console.log("update -- time=" + time + " delta=" + delta);
 
         // #region Hold Reset
@@ -868,15 +872,24 @@ class GameScene extends Phaser.Scene {
         // Only Calculate every move window
 
         // #region Check move
+
+        if (this.frameIndex < 9){
+            this.frameIndex += 1;
+        }
+        else{
+            this.frameIndex = 0;
+        }
+
         if(time >= this.lastMoveTime + this.moveInterval && this.snake.alive) {
             
-            let random = Phaser.Math.Between(0, 9);
+            //Phaser.Math.Between(0, 9);
+
             this.lastMoveTime = time;
             let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
             
-            if(this.spaceKey.isDown){ //needs to only happen when boost bar has energy, will abstract later
-                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: random}, true).setOrigin(0,.333)
-                //console.log(this.energyAmount)
+            if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+                console.log(this.frameIndex)
+                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: this.frameIndex}, true).setOrigin(0,.333)
                 boostTrailX.once('animationcomplete',()=>{
                     boostTrailX.play("boostTrailXdissipate");
                     boostTrailX.once('animationcomplete',()=>{
@@ -1890,7 +1903,7 @@ class UIScene extends Phaser.Scene {
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
             
             if (timeLeft > BOOST_ADD_FLOOR) {
-                ourGame.energyAmount += 10;
+                this.energyAmount += 10;
             }
             
             if (timeLeft > SCORE_FLOOR) {
