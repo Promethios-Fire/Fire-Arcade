@@ -764,7 +764,7 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
 
-        var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here
+        var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
         // console.log("update -- time=" + time + " delta=" + delta);
 
@@ -887,10 +887,12 @@ class GameScene extends Phaser.Scene {
 
             this.lastMoveTime = time;
             let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
+            var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);
+            var boosting
             
             if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
-                var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);
-                boostOutline.play("snakeOutlineAnim");
+                //boostOutline.destroy();
+                boosting = true;
                 console.log(this.frameIndex)
                 var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
                 boostTrailX.once('animationcomplete',()=>{
@@ -901,6 +903,18 @@ class GameScene extends Phaser.Scene {
                     //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
                 })
             }
+            else{
+                boosting = false;
+            }
+
+            if (boosting){
+                boostOutline.play("snakeOutlineAnim");
+            }
+            else{
+                boostOutline.destroy();
+                console.log("destroying");
+            }
+            //console.log(boosting)
             
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
