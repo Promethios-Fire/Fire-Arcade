@@ -889,7 +889,7 @@ class GameScene extends Phaser.Scene {
             
             if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
                 console.log(this.frameIndex)
-                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: "boostTrailX01", startFrame: this.frameIndex}, true).setOrigin(0,.333)
+                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
                 boostTrailX.once('animationcomplete',()=>{
                     boostTrailX.play("boostTrailXdissipate");
                     boostTrailX.once('animationcomplete',()=>{
@@ -2576,11 +2576,65 @@ function loadAnimations(scene) {
       repeat: -1
     })
     scene.anims.create({
-      key: 'boostTrailX01',
+      key: 'boostTrailX1',
       frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9]}),
       frameRate: 16,
       repeat: 0
     })
+    scene.anims.create({
+        key: 'boostTrailX2',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 1, 2, 3, 4, 5, 6, 7, 8, 9 ,0]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX3',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 2, 3, 4, 5, 6, 7, 8, 9 ,0 ,1]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX4',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 3, 4, 5, 6, 7, 8, 9, 0, 1, 2]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX5',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 4, 5, 6, 7, 8, 9, 0, 1, 2, 3]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX6',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 5, 6, 7, 8, 9, 0, 1, 2, 3, 4]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX7',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 6, 7, 8, 9, 0, 1, 2, 3, 4, 5]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX8',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 7, 8, 9, 0, 1, 2, 3, 4, 5, 6]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX9',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 8, 9, 0, 1, 2, 3, 4, 5, 6, 7]}),
+        frameRate: 16,
+        repeat: 0
+      })
+      scene.anims.create({
+        key: 'boostTrailX0',
+        frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 9, 0, 1, 2, 3, 4, 5, 6, 7, 8]}),
+        frameRate: 16,
+        repeat: 0
+      })
     scene.anims.create({
         key: 'boostTrailXdissipate',
         frames: scene.anims.generateFrameNumbers('boostTrailX',{ frames: [ 10,11,12,13,14]}),
