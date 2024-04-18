@@ -175,6 +175,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
+        this.load.spritesheet('snakeOutlineBoosting', 'assets/sprites/snakeOutlineAnim.png', { frameWidth: 28, frameHeight: 28 });
 
 
         //WRAP BLOCKS:
@@ -888,6 +889,8 @@ class GameScene extends Phaser.Scene {
             let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
             
             if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
+                var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);
+                boostOutline.play("snakeOutlineAnim");
                 console.log(this.frameIndex)
                 var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
                 boostTrailX.once('animationcomplete',()=>{
@@ -2481,6 +2484,12 @@ class InputScene extends Phaser.Scene {
 
  // #region Animations
 function loadAnimations(scene) {
+    scene.anims.create({
+        key: 'snakeOutlineAnim',
+        frames: scene.anims.generateFrameNumbers('snakeOutlineBoosting',{ frames: [ 0, 1, 2]}),
+        frameRate: 12,
+        repeat: -1
+    })
     scene.anims.create({
       key: 'atom01idle',
       frames: scene.anims.generateFrameNumbers('atomicPickup01Anim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]}),
