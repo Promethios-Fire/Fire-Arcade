@@ -292,6 +292,9 @@ class GameScene extends Phaser.Scene {
         this.portals = [];
         this.dreamWalls = [];
 
+        // Boost Array
+        this.boostOutlines = [];
+
         this.lastMoveTime = 0; // The last time we called move()
 
         this.comboCounter = comboCounter;
@@ -474,6 +477,7 @@ class GameScene extends Phaser.Scene {
             // Separate if statements so the first will 
             // run with as small of a delay as possible
             // for input responsiveness
+
             this.snake.bonked = false;
             if (!this.move_pause || !this.startMoving) {
                 this.startMoving = true;
@@ -887,7 +891,7 @@ class GameScene extends Phaser.Scene {
 
             this.lastMoveTime = time;
             let snakeTail = this.snake.body.length-1; //original tail reference wasn't working --bandaid fix -Holden
-            var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);
+            
             var boosting
             
             if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
@@ -908,11 +912,15 @@ class GameScene extends Phaser.Scene {
             }
 
             if (boosting){
+                var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);
+                this.boostOutlines.push(boostOutline)
                 boostOutline.play("snakeOutlineAnim");
             }
             else{
-                boostOutline.destroy();
-                console.log("destroying");
+                this.boostOutlines.forEach(boostOutline =>{
+                    boostOutline.destroy();
+                })
+                //console.log(this.boostOutlines[0]);
             }
             //console.log(boosting)
             
