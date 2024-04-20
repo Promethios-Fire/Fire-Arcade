@@ -292,12 +292,12 @@ class GameScene extends Phaser.Scene {
         this.portals = [];
         this.dreamWalls = [];
 
-        // Boost Array
-        this.boostOutlines = [];
-
         this.lastMoveTime = 0; // The last time we called move()
 
         this.comboCounter = comboCounter;
+
+        // Boost Array
+        this.boostOutlines = [];
 
         // Sounds
         this.atomSounds = [];
@@ -342,7 +342,8 @@ class GameScene extends Phaser.Scene {
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
-        
+
+
         // a = Global average best score + minScore 
         //For a=1400, min=1, max=100, goal=28
         // Floor(score bonus)
@@ -364,6 +365,10 @@ class GameScene extends Phaser.Scene {
     
         this.snake.direction = STOP;
         
+        //Physics Overlap
+        //this.physics.add.overlap(sprite, boostOutline);
+        //this.physics.add.overlap(sprite, snake.body);
+
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
@@ -496,8 +501,15 @@ class GameScene extends Phaser.Scene {
             }
 
         })
-
+        this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
+            
+            //var boostOutline = this.add.sprite(this.snake.body.x, this.snake.body.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+            //this.boostOutlines.push(boostOutline)
+            
+            //console.log("space pressed")
+        })
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
+            //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
@@ -897,27 +909,44 @@ class GameScene extends Phaser.Scene {
             if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
                 //boostOutline.destroy();
                 boosting = true;
-                console.log(this.frameIndex)
-                var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
+                //console.log(this.frameIndex)
+                /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
                 boostTrailX.once('animationcomplete',()=>{
                     boostTrailX.play("boostTrailXdissipate");
                     boostTrailX.once('animationcomplete',()=>{
                         boostTrailX.destroy() 
                     })
                     //boostTrailX.destroy();//instead of destroying on animation end, play different animation on release
-                })
+                })*/
             }
             else{
                 boosting = false;
             }
 
             if (boosting){
-                var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);
-                this.boostOutlines.push(boostOutline)
-                boostOutline.play("snakeOutlineAnim");
+                this.snake.body.forEach( part => {
+                    var latestOutline = (this.boostOutlines.length - this.snake.body.length);
+                    if(this.boostOutlines.length > this.snake.body.length){
+                        this.boostOutlines[latestOutline].destroy();
+                    }
+                    //this.boostOutlines.length = this.snake.body.length;
+                    console.log("boost length = ",this.boostOutlines.length)
+                    console.log("snake length = ",this.snake.body.length)
+                    var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+                    this.boostOutlines.push(boostOutline)
+                    boostOutline.play("snakeOutlineAnim");
+                })
+                /*this.boostOutlines.forEach(boostOutline =>{
+                    //console.log(latestOutline)
+                    this.boostOutlines[latestOutline].destroy();
+                    
+                })*/
             }
             else{
                 this.boostOutlines.forEach(boostOutline =>{
+                    //var latestOutline = this.boostOutlines.length-1;
+                    //this.boostOutlines[latestOutline].destroy();
                     boostOutline.destroy();
                 })
                 //console.log(this.boostOutlines[0]);
