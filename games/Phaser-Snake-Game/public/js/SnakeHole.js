@@ -11,10 +11,10 @@ import {PORTAL_COLORS} from './const.js';
 // GameSettings 
 
 
-const GAME_VERSION = 'v0.4.04.19.002';
+const GAME_VERSION = 'v0.5.04.19.003';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28.. //32?................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_LIVES = 12;
 
 
@@ -59,7 +59,7 @@ var calcBonus = function (scoreInput) {
     var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
     return _speedBonus
 }
-console.log(calcBonus(2800));
+
 
 
 
@@ -122,18 +122,21 @@ const STAGES_NEXT = {
     'Stage-02c': [['Stage-03b', 50]],
     'Stage-02d': [['Stage-03b', 50]],
     'Stage-02e': [['Stage-03c', 85]],
-    'Stage-03a': [['Stage-04', 88]],
-    'Stage-03b': [['Stage-04', 99]],
-    'Stage-03c': [['Stage-04', 85]],
-    'Stage-04': [['Stage-05', 88]],
-    'Stage-05': [['Stage-06', 84]],
-    'Stage-06': [['Stage-07', 83]],
-    'Stage-07': [['Stage-08', 82]],
+    'Stage-03a': [['Stage-04', 60]],
+    'Stage-03b': [['Stage-04', 60]],
+    'Stage-03c': [['Stage-04', 60]],
+    'Stage-04': [['Stage-55', 70]],
+    'Stage-55': [['Stage-06', 75]],
+    'Stage-06': [['Stage-07', 80]],
+    'Stage-07': [['Stage-88', 80]],
+    'Stage-88': [['Stage-09', 80]],
+    'Stage-09': [['Stage-10', 80]],
     'Bonus-Stage-x1': [],
 }
 
+// #region START STAGE
 const START_STAGE = 'Stage-01';
-const END_STAGE = 'Stage-08';
+const END_STAGE = 'Stage-10';
 
 const UISTYLE = { color: 'lightyellow',
 'font-size': '16px',
@@ -312,7 +315,7 @@ class GameScene extends Phaser.Scene {
 
         this.move_pause = true;
         this.startMoving = false;
-        this.winnedYet = false;
+        this.stageOver = false;
 
         const { stage = START_STAGE } = props
         this.stage = stage;
@@ -324,6 +327,7 @@ class GameScene extends Phaser.Scene {
         this.moveInterval = SPEEDWALK;
 
         this.spaceWhileReGrouping = false;
+
     
 
     }
@@ -366,6 +370,8 @@ class GameScene extends Phaser.Scene {
         this.snake = new Snake(this, 15, 15);
     
         this.snake.direction = STOP;
+
+        // #region TileMap
         
         //Physics Overlap
         //this.physics.add.overlap(sprite, boostOutline);
@@ -378,8 +384,10 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.layer = this.map.createLayer('Wall', [this.tileset,this.tileset2]);
-        this.layer.setDepth(25);
+        this.wallLayer = this.map.createLayer('Wall', [this.tileset]);
+        this.wallLayer.setDepth(25);
+        
+        
     
         // add background
         this.add.image(0, GRID*2, 'bg01').setDepth(-1).setOrigin(0,0);
@@ -502,6 +510,7 @@ class GameScene extends Phaser.Scene {
                 this.spaceWhileReGrouping = true;
             }
 
+
         })
         this.input.keyboard.on('keydown-SPACE', e => { // Capture for releasing sprint
             
@@ -510,21 +519,24 @@ class GameScene extends Phaser.Scene {
             
             //console.log("space pressed")
         })
+
         this.input.keyboard.on('keyup-SPACE', e => { // Capture for releasing sprint
             //console.log("space released")
             if (DEBUG) { console.log(event.code+" unPress", this.time.now); }
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.spaceWhileReGrouping = false;
-        })
+        });
 
         this.frameIndex = 0
 
         // #endregion
         
 
-        // Add all tiles to walls for collision
+    
+        // Map only contains Walls at this point
         this.map.forEachTile( tile => {
+
             // Empty tiles are indexed at -1. 
             // Any tilemap object that is not empty will be considered a wall
             // Index is the sprite value, not the array index. Normal wall is Index 4
@@ -534,6 +546,7 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+        
 
         // Make Fruit
         //for (let index = 0; index < FRUIT; index++) {
@@ -599,6 +612,215 @@ class GameScene extends Phaser.Scene {
             p1.targetObject = p2;
             p2.targetObject = p1;
         }
+
+
+        // Add try loop to get all Portal Layers
+
+        // do while loop Portal-X
+        
+        
+
+        let _from;
+        let _to;
+
+        const PORTAL_X_START = 256; // TILEs in phaser are 1 indexed, but in TILED are 0 indexed.
+        const PORTAL_N_DIFF = 32;
+
+
+        const A_FROM = 34
+        const A_TO = 38
+
+        const B_FROM = 162;
+        const B_TO = 166;
+
+
+        
+
+        //do {
+            
+        //} while (i < PORTAL_N_START || i );
+
+        
+
+        
+        // #region Portal-X
+        if (this.map.getLayer('Portal-X')) {
+            var portalLayerX = this.map.createLayer('Portal-X', [this.tileset]);
+            var portalArrayX = [];
+
+            portalLayerX.forEachTile(tile => {
+
+                if (tile.index > 0) {
+    
+                    if (portalArrayX[tile.index]) {
+                        portalArrayX[tile.index].push([tile.x, tile.y]);
+                    }
+                    else {
+                        portalArrayX[tile.index] = [[tile.x, tile.y]];
+                    }
+                } 
+            });
+
+            let toIndex;
+
+            for (let index = PORTAL_X_START + 1; index < PORTAL_X_START + 1 + PORTAL_N_DIFF; index++) {
+    
+                if (portalArrayX[index]) {
+                    // consider throwing an error if a portal doesn't have a correctly defined _to or _from
+                    
+                    toIndex = index + PORTAL_N_DIFF
+                    _from = Phaser.Math.RND.pick(portalArrayX[index]);
+                    _to = Phaser.Math.RND.pick(portalArrayX[toIndex]);
+                    console.log("Portal X Logic: FROM TO",_from, _to);
+                    makePair(this, _to, _from);
+                }
+            }
+
+            portalLayerX.visible = false;
+        }
+        // #endregion
+
+        // #region Portal-N
+
+        const portalTileRules = {
+            321:99,
+            353:1,
+            354:1,
+            355:1,
+            356:1,
+            357:1,
+            358:1,
+            359:1,
+            360:1,
+            385:2,
+            386:2,
+            387:2,
+            388:2,
+            389:2,
+            390:2,
+            417:3,
+            418:3,
+            419:3,
+            420:3,
+            421:3,
+            422:3,
+            423:3,
+            424:3
+        };
+        
+        var layerIndex = 1
+
+
+        
+
+        while (this.map.getLayer(`Portal-${layerIndex}`)) {
+
+            console.log(`Portal-${layerIndex} Logic`);
+            var portalLayerN = this.map.createLayer(`Portal-${layerIndex}`, [this.tileset]);
+            var portalArrayN = {};
+            
+            var toN = [];
+            var fromN = [];
+
+            portalLayerN.forEachTile(tile => {
+
+                if (tile.index > 0) {
+    
+                    if (portalArrayN[tile.index]) {
+                        portalArrayN[tile.index].push([tile.x, tile.y]);
+                    }
+                    else {
+                        portalArrayN[tile.index] = [[tile.x, tile.y]];
+                    }
+                } 
+            });
+
+            
+            console.log("portalLayerX", portalArrayN);
+
+
+            for (var [key, value] of Object.entries(portalArrayN)) {
+                //console.log("Checking TileIndex", key, "has no more than", portalTileRules[key], "portals")
+
+                var count = 0;
+                
+                // Special Case Block. Put a from portal. 
+                // TODO Probably needs to recursively try when double up portals.
+                if (portalTileRules[key] == undefined) {
+                    fromN = Phaser.Math.RND.pick(portalArrayN[key]);
+
+                    delete portalArrayN[key];
+
+                }
+                else {
+                    //
+                    var count = 0;
+                    value.forEach(tile => {
+                        this.portals.some( portal => {
+                            if(portal.x === tile[0]*GRID && portal.y === tile[1]*GRID){
+                                count += 1;
+                                //console.log("HELP THIS SPACE IS OCUPADO BY PORTAL",portal.x, portal.y);
+                                //cords = this.genChords(scene);
+                            }
+                        });
+                    });
+                    
+
+                    if (count >= portalTileRules[key]) {
+                        delete portalArrayN[key];
+                        console.log("DELETING CAUSE PORTAL HERE", key);   
+                    }
+
+                }
+
+            }
+
+            // Define From Portal if not yet defined above.
+            if (fromN.length < 1) {
+                var fromAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
+                var fromArea = portalArrayN[fromAreaKey];
+                var fromN = Phaser.Math.RND.pick(fromArea);
+                
+                delete portalArrayN[fromAreaKey];     
+            }
+
+            // Define To Portal Randomly from avaible tiles.
+            var toAreaKey = Phaser.Math.RND.pick(Object.keys(portalArrayN));
+            var toArea = portalArrayN[toAreaKey];
+            toN = Phaser.Math.RND.pick(toArea);
+            delete portalArrayN[toAreaKey];
+
+
+            console.log("MAKE PORTAL", fromN, toN);
+            makePair(this, fromN, toN);
+    
+            portalLayerN.visible = false;
+            layerIndex ++; 
+ 
+        }
+
+        // #endregion
+
+
+        
+
+        
+    
+
+        //Phaser.Math.RND.pick(nextGroup)
+       
+
+        
+        //makePair(this, _to, _from);
+
+
+        //this.p2Layer = this.map.createLayer('Portal-2', [this.tileset]);
+
+
+
+
+        // #region Old Logic 
+        /*
         
         // AREA NAME is [GROUP][ID]
         var areaAA = new SpawnArea(this, 2,5,6,4, "AA", 0x6666ff);
@@ -667,6 +889,10 @@ class GameScene extends Phaser.Scene {
         makePair(this, pair4[0].genChords(this), pair4[1].genChords(this));
         
 
+        
+         
+        
+
         // Fair Fruit Spawn (5x)
         
         // Top Row
@@ -682,6 +908,18 @@ class GameScene extends Phaser.Scene {
         // Bottom Row
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
         this.setFruit(this,[areaCA,areaCB,areaCC,areaCD]);
+
+        // #endregion
+        */
+
+        // #region New Stage Logic
+
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+        var atom = new Food(this);
+
 
 
         // #endregion
@@ -705,7 +943,6 @@ class GameScene extends Phaser.Scene {
             var bestLocal = 0;
         }
 
-        
 
 
         ourUI.bestScoreUI.setText(`Best : ${bestLocal}`);
@@ -803,7 +1040,7 @@ class GameScene extends Phaser.Scene {
 
         
 
-        // Lose State
+        // #region Bonk and Regroup
         if (!this.snake.alive && !this.snake.regrouping) {
             //console.log("DEAD, Now Rregroup", this.snake.alive);
             this.snakeCrash.play();    
@@ -818,6 +1055,7 @@ class GameScene extends Phaser.Scene {
             
 
 
+            // Do this on hardcore mode and take a life down.
             //game.destroy();
             //this.scene.restart();
             
@@ -844,7 +1082,7 @@ class GameScene extends Phaser.Scene {
                 x: GRID * 15,
                 y: GRID * 15,
                 yoyo: false,
-                duration: 720,
+                duration: 1000,
                 ease: 'Sine.easeOutIn',
                 repeat: 0,
                 delay: 500
@@ -869,9 +1107,9 @@ class GameScene extends Phaser.Scene {
         }
         
         // #region Win State
-        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.winnedYet) {
+        if (ourUI.length >= LENGTH_GOAL && LENGTH_GOAL != 0 && !this.stageOver) {
             console.log("YOU WIN" , this.stage);
-            this.winnedYet = true; // stops update loop from moving snake.
+            this.stageOver = true; // stops update loop from moving snake Score Scene.
             this.move_pause = true; // Keeps snake from turning
 
             ourUI.scoreUI.setText(`Stage: ${ourUI.scoreHistory.reduce((a,b) => a + b, 0)}`);
@@ -965,48 +1203,54 @@ class GameScene extends Phaser.Scene {
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
  
-            // PORTAL HIGHLIGHT LOGIC
+            
+
+            if (this.portals.length > 0) {
+            
+                // PORTAL HIGHLIGHT LOGIC
             // Calculate Closest Portal to Snake Head
             let closestPortal = Phaser.Math.RND.pick(this.portals); // Start with a random portal
-            closestPortal.fx.setActive(false);
+                
             
-            // Distance on an x y grid
+                closestPortal.fx.setActive(false);
+                
+                // Distance on an x y grid
 
-            var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
-                                                                closestPortal.x/GRID, closestPortal.y/GRID);
+                var closestPortalDist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
+                                                                    closestPortal.x/GRID, closestPortal.y/GRID);
 
-            this.portals.forEach( portal => {
-                var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
-                                                    portal.x/GRID, portal.y/GRID);
+                this.portals.forEach( portal => {
+                    var dist = Phaser.Math.Distance.Between(this.snake.head.x/GRID, this.snake.head.y/GRID, 
+                                                        portal.x/GRID, portal.y/GRID);
 
-                if (dist < closestPortalDist) { // Compare and choose closer portals
-                    closestPortalDist = dist;
-                    closestPortal = portal;
-                }
-            });
-
-
-            // This is a bit eccessive because I only store the target portal coordinates
-            // and I need to get the portal object to turn on the effect. Probably can be optimized.
-            // Good enough for testing.
-            if (closestPortalDist < 6) {
-                this.portals.forEach(portal => {
-                    if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
-                        portal.fx.setActive(true);
-                        
-                        //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
-                        portal.fx.outerStrength = 6 - closestPortalDist;
-
-                        closestPortal.fx.setActive(true);
-                        //closestPortal.fx.innerStrength = 3 - closestPortalDist;
-                        closestPortal.fx.outerStrength = 0;
-
+                    if (dist < closestPortalDist) { // Compare and choose closer portals
+                        closestPortalDist = dist;
+                        closestPortal = portal;
                     }
                 });
-            };
+
+
+                // This is a bit eccessive because I only store the target portal coordinates
+                // and I need to get the portal object to turn on the effect. Probably can be optimized.
+                // Good enough for testing.
+                if (closestPortalDist < 6) {
+                    this.portals.forEach(portal => {
+                        if (portal.x/GRID === closestPortal.target.x && portal.y/GRID === closestPortal.target.y) {
+                            portal.fx.setActive(true);
+                            
+                            //portal.fx.innerStrength = 6 - closestPortalDist*0.5;
+                            portal.fx.outerStrength = 6 - closestPortalDist;
+
+                            closestPortal.fx.setActive(true);
+                            //closestPortal.fx.innerStrength = 3 - closestPortalDist;
+                            closestPortal.fx.outerStrength = 0;
+
+                        }
+                    });
+                };
+            } // End Closest Portal
+            
             const ourUI = this.scene.get('UIScene');
-
-
        
             if (DEBUG) {
                 const ourUI = this.scene.get('UIScene');
@@ -1026,7 +1270,7 @@ class GameScene extends Phaser.Scene {
             
             
             // Move at last second
-            if (!this.winnedYet) {
+            if (!this.stageOver) {
                 this.snake.move(this);
             }
             
@@ -1181,7 +1425,7 @@ class ScoreScene extends Phaser.Scene
         
         
         stageScoreUI.setText(
-            `Base: ${stageScore}
+            `Base Score: ${stageScore}
             Speed Bonus: +${speedBonus}
             Stage Score: ${stageScore+speedBonus}
             HighScore: ${bestLocal + bestBonus}
@@ -1208,13 +1452,12 @@ class ScoreScene extends Phaser.Scene
         scoreScreen.setOrigin(0,0);
         
         scoreScreen.setText(
-        `STAGE STATS - ${ourGame.stage}
+        `EXTRA STAGE STATS - ${ourGame.stage}
         ----------------------
-        SCORE: ${ourUI.score}
         LENGTH: ${ourUI.length}
-        FRUIT SCORE AVERAGE: ${stageAve}
+        FOOD LOG AVERAGE: ${stageAve}
         
-        TURNS: ${ourInputScene.turns}
+        TOTAL TURNS: ${ourInputScene.turns}
         CORNER TIME: ${ourInputScene.cornerTime} FRAMES
         
         BONUS Boost Time: ${ourInputScene.boostBonusTime} FRAMES
@@ -1347,7 +1590,7 @@ class ScoreScene extends Phaser.Scene
                                 else {
                                     var currentAve = currentBase / (ourTimeAttack.stageHistory.length * 28);
                                     ourTimeAttack.newUnlocked = [
-                                        _stage[0], // Stage Namr
+                                        _stage[0], // Stage Name
                                         _stage[1], // Requirement Average
                                         currentAve]; // Average now
                                 }
@@ -1568,7 +1811,7 @@ class TimeAttackScene extends Phaser.Scene{
                     'font-size': '12px',
                     'font-family': ["Sono", 'sans-serif'],
                 });
-                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0.5);
+                foodLogUIBottom.setText(foodLogOrdered.slice(logWrapLenth - foodLogOrdered.length)).setOrigin(0,0);
 
                 _i += 1;
                 stageY += GRID * 2;
@@ -1660,7 +1903,9 @@ class TimeAttackScene extends Phaser.Scene{
             
             console.log("Runscore:", runScore);
 
-            var runScoreUI = this.add.dom(GRID * 10, stageY  + 4, 'div', {
+            stageY = stageY + 4
+
+            var runScoreUI = this.add.dom(GRID * 10, stageY, 'div', {
                 color: 'yellow',
                 'font-size': '28px',
                 'font-family': ["Sono", 'sans-serif'],
@@ -1677,11 +1922,15 @@ class TimeAttackScene extends Phaser.Scene{
 
                 
                 var unlockStage;
-                var goalSum;
-                var foodToNow = this.stageHistory.length * 28;
+                var goalSum; // Use sum instead of average to keep from unlocking stages early.
+                var foodToNow = this.stageHistory.length * 28; // Calculated value of how many total fruit collect by this stage
+                stageY = stageY + GRID * 2;
+                
+
+                var lastStage = this.stageHistory.slice(-1);
                 
                 // Unlock Difficulty needs to be in order
-                STAGES_NEXT[ourGame.stage].some( _stage => {
+                STAGES_NEXT[lastStage[0].stage].some( _stage => {
 
                     var _goalSum = _stage[1] * foodToNow;
                     unlockStage = _stage;
@@ -1693,20 +1942,80 @@ class TimeAttackScene extends Phaser.Scene{
 
                 // Calc score required up to this point
                 // Add Stage History Sum Here
+
+                if (this.newUnlocked) {
+                    console.log("New Unlocked this Run", this.newUnlocked); // Display mid run unlocks
+                }
     
-                console.log("New Unlocked this Run", this.newUnlocked);
+                var nextStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                    color: 'grey',
+                    'font-size': '20px',
+                    'font-family': ["Sono", 'sans-serif'],
+                    'text-decoration': 'underline',
+                });
+
+                nextStageUI.setText("Unlock Next Stage").setOrigin(1,0);
+
+                stageY += GRID;
+                
+                // #region Unlock UI
+
+                var unlockStageUI = this.add.dom(GRID * 9, stageY, 'div', {
+                    color: 'white',
+                    'font-size': '28px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+
+                unlockStageUI.setText(unlockStage[0]).setOrigin(1,0);
+
+                // Run Stats
+                var requiredAveUI = this.add.dom( GRID * 10, stageY + 4 , 'div', {
+                    color: 'white',
+                    'font-size': '14px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+                
+                var currentAveUI = this.add.dom( GRID * 10, stageY + GRID + 4, 'div', {
+                    color: 'white',
+                    'font-size': '14px',
+                    'font-family': ["Sono", 'sans-serif'],
+                });
+
+                var currentAve = baseScore / foodToNow; 
+                var requiredAve = goalSum / foodToNow;
+
+
+                requiredAveUI.setText(`${requiredAve.toFixed(1)}: Required Food Score Average to Unlock  `).setOrigin(0,0);
+                currentAveUI.setText(`${currentAve.toFixed(1)}: Current Food Score Average`).setOrigin(0,0.5);
+
+                var unlockMessageUI = this.add.dom( GRID * 10, stageY - 18 , 'div', {
+                    color: 'white',
+                    'font-size': '14px',
+                    'font-family': ["Sono", 'sans-serif'],
+                    'font-style': 'italic',
+                });
                 
                 if (goalSum && baseScore > goalSum && this.histSum < goalSum) {
-                    console.log("YOU UNLOCKED A NEW LEVEL!!" , unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
+                    unlockMessageUI.setText("YOU UNLOCKED A NEW LEVEL!! Try now it out now!").setOrigin(0,0);
+                    unlockMessageUI.node.style.color = "limegreen";
+                    currentAveUI.node.style.color = "limegreen";
+
+                    playedStages.push([unlockStageUI, unlockStage[0]]);
+                    
+                    //console.log(unlockStage[0], "FoodAve:", baseScore / foodToNow, "FoodAveREQ:", goalSum / foodToNow);
 
                     //lowestStage = unlockStage[0]; ////// BROKE
                     
                 }
                 else {
-                    console.log(
-                        "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
-                        "to unlock", unlockStage[0], 
-                        "and you got", baseScore / foodToNow);
+                    unlockMessageUI.setText("Redo a previous stage to increase your average.").setOrigin(0,0);
+                    unlockMessageUI.node.style.color = "red";
+                    currentAveUI.node.style.color = "yellow";
+
+                    //console.log(
+                    //    "BETTER LUCK NEXT TIME!! You need", goalSum / foodToNow, 
+                    //    "to unlock", unlockStage[0], 
+                    //    "and you got", baseScore / foodToNow);
                 }
     
             }
@@ -1721,9 +2030,11 @@ class TimeAttackScene extends Phaser.Scene{
             var sumAveFood = sumFood / allFoodLog.length;
 
             //console.log ("sum:", sumFood, "Ave:", sumAveFood);
+             
             this.time.delayedCall(900, function() {
 
-                continueTextUI.setVisible(true);
+                // #region Continue Text 
+                //continueTextUI.setVisible(true);
     
     
                 this.tweens.add({
@@ -1943,7 +2254,14 @@ class UIScene extends Phaser.Scene {
                 'text-align': 'right',
             };
 
-            var scoreText = this.add.dom(fruit.x -10, fruit.y - GRID, 'div', scoreStyle);
+            var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', {
+                color: 'lightyellow',
+                'font-size': '22px',
+                'font-family': ["Sono", 'sans-serif'],
+                'font-weight': '400',
+                'font-weight': 'bold',
+                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
+            });
             scoreText.setOrigin(0,0);
             
             // Remove score text after a time period.

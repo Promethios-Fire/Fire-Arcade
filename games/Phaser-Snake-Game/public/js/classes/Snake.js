@@ -117,9 +117,12 @@ var Snake = new Phaser.Class({
         }
         
         // Bonk Wall
+        scene.map.setLayer("Wall");
         if (scene.map.getTileAtWorldXY( xN, yN ) && !onPortal) {
+            
             // Only count a wall hit ahead if not on a portal.
             //console.log("HIT", scene.map.getTileAtWorldXY( xN, yN ).layer.name);
+            
             this.direction = STOP;
             this.bonked = true;
             
