@@ -910,8 +910,10 @@ class GameScene extends Phaser.Scene {
             
             if(this.spaceKey.isDown && energyAmountX > 0){ //needs to only happen when boost bar has energy, will abstract later
                 boosting = true;
-                var boostGhost = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 3).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
+                var boostGhost = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 3).setOrigin(0,0).setDepth(0);//setOrigin(0,0).setDepth(15)
+                //var boostGhostSmall = this.add.sprite(this.snake.body[this.snake.body.length -1].x, this.snake.body[this.snake.body.length -1].y, 'snakeDefault', 2).setOrigin(0,0).setDepth(15);//setOrigin(0,0).setDepth(15)
                 this.boostGhosts.push(boostGhost);
+                //this.boostGhosts.push(boostGhostSmall)
                 //console.log(this.frameIndex)
                 /*var boostTrailX = this.add.sprite(this.snake.head.x, this.snake.head.y).play({key: ("boostTrailX" + [this.frameIndex]), startFrame: 0}, true).setOrigin(0,.333)
                 boostTrailX.once('animationcomplete',()=>{
@@ -926,10 +928,7 @@ class GameScene extends Phaser.Scene {
                 boosting = false;
             }
             if (this.boostGhosts.length > 1){
-                console.log(this.boostGhosts.length)
-                //boostGhost.destroy();
                 this.boostGhosts[this.boostGhosts.length-2].destroy();
-                //this.boostGhosts.length = 0;
             }
 
             if (boosting){
@@ -938,10 +937,11 @@ class GameScene extends Phaser.Scene {
                     if(this.boostOutlines.length > this.snake.body.length){
                         this.boostOutlines[latestOutline].destroy();
                     }
+      
                     //console.log("boost length = ",this.boostOutlines.length)
                     //console.log("snake length = ",this.snake.body.length)
                     //var boostOutline = this.add.sprite(this.snake.head.x, this.snake.head.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
-                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(15);//setOrigin(0,0).setDepth(15)
+                    var boostOutline = this.add.sprite(part.x, part.y).setOrigin(.083333,.083333).setDepth(0);//setOrigin(0,0).setDepth(15)
                     this.boostOutlines.push(boostOutline)
                     boostOutline.play("snakeOutlineAnim");
                 })
@@ -950,15 +950,17 @@ class GameScene extends Phaser.Scene {
                 this.boostOutlines.forEach(boostOutline =>{
                     boostOutline.destroy();
                 })
-                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
-                    this.boostOutlines.length = 1;
-                }
                 this.boostGhosts.forEach(boostGhost =>{
                     boostGhost.destroy();
                 })
-                //console.log(this.boostOutlines[0]);
+                if (this.boostOutlines.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostOutlines.length = 1;
+                }
+                if (this.boostGhosts.length > 1){ //if this is less than 1, an extra outline persists
+                    this.boostGhosts.length = 1;
+                } 
+
             }
-            //console.log(boosting)
             
             // This code calibrates how many milliseconds per frame calculated.
             // console.log(Math.round(time - (this.lastMoveTime + this.moveInterval)));
