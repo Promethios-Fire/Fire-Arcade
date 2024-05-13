@@ -17,6 +17,12 @@ export const GRID = 24;        //.................... Size of Sprites and GRID
 export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
+// #region DEBUG OPTIONS
+
+export const DEBUG = false;
+export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
+const SCORE_SCENE_DEBUG = false;
+
 
 
 // 1 frame is 16.666 milliseconds
@@ -36,11 +42,6 @@ const NO_BONK_BASE = 1000;
 
 var comboCounter = 0;
 
-// #region DEBUG OPTIONS
-
-export const DEBUG = false;
-export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const SCORE_SCENE_DEBUG = false;
 
 // Game Objects
 
@@ -244,7 +245,7 @@ const STAGES_NEXT = {
 
 
 // #region START STAGE
-const START_STAGE = 'Stage-01';
+const START_STAGE = 'Stage-02a';
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
 
 
@@ -396,6 +397,11 @@ class StartScene extends Phaser.Scene {
                 ourUI.bonks = 3;
                 ourUI.length = 28;
                 ourUI.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
+                ourUI.zedLevel = 77;
+                ourUI.medals = {
+                    "fast":'silver',
+                    "Rank":'gold'
+                }
 
                 ourInput.turns = 79;
                 ourInput.cornerTime = 190;
@@ -444,6 +450,7 @@ class GameScene extends Phaser.Scene {
         // #region Init Vals
         // Arrays for collision detection
         this.atoms = [];
+        this.foodHistory = [];
         this.walls = [];
         this.portals = [];
         this.dreamWalls = [];
@@ -1463,6 +1470,8 @@ class GameScene extends Phaser.Scene {
             // Move at last second
             if (!this.stageOver) {
                 this.snake.move(this);
+                ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
+                ourInputScene.moveCount += 1;
                 //move ghost segments here
             }
 
@@ -1626,6 +1635,88 @@ class GameScene extends Phaser.Scene {
     }
 }
 
+// #region Stage Data
+var StageData = new Phaser.Class({
+
+    initialize:
+
+    function StageData(stageID, stageUUID, foodLog, zeds, medals)
+    {
+        this.stage = stageID;
+        this.uuid = stageUUID;
+        this.foodLog = foodLog;
+        
+        // Default vals
+        this.diffBonus = 100;
+        var zedOutput = calcZedLevel(zeds)
+        this.zedLevel = zedOutput.level;
+        this.medals = medals;
+        this.bonks = 0;
+        
+        //this.newBest = newBest;
+        //this.scoreTotal = scoreTotal;
+    },
+    
+    toString(){
+        return `${this.stage}`;
+    },
+
+    calcBase() {
+        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
+        return stageScore;
+    },
+
+    preAdditive() {
+        return this.calcBase() + calcBonus(this.calcBase());
+    },
+
+    zedLevelBonus() {
+        return this.zedLevel / 200;
+    },
+
+    medalBonus() {
+        return Object.values(this.medals).length / 1000;
+    },
+
+    bonusMult() {
+        var zedLevelBonus = this.zedLevelBonus();
+        var medalBonus = this.medalBonus();
+        return Number(this.diffBonus/100 + zedLevelBonus + medalBonus);
+        
+    },
+
+    postMult() {
+        return this.preAdditive() * this.bonusMult();
+    },
+    
+    bonkBonus(){
+        var _bonkBonus = Math.floor(NO_BONK_BASE / (this.bonks+1))
+
+        if (_bonkBonus > 49) {
+            return _bonkBonus;
+        }
+        else {
+            return 0;
+        }
+    },
+    
+    cornerBonus() {
+        return Math.ceil(this.cornerTime / 100) * 10;
+    },
+
+    boostBonus() {
+        return Math.ceil(this.boostFrames / 10) * 10;
+    },
+    
+    scoreTotal() {
+        var _postMult = this.postMult();
+        var _bonkBonus = this.bonkBonus();
+        return _postMult + _bonkBonus + this.cornerBonus() + this.boostBonus();
+    },
+    
+});
+// #endregion
+
 
 class ScoreScene extends Phaser.Scene {
 // #region ScoreScene
@@ -1637,6 +1728,7 @@ class ScoreScene extends Phaser.Scene {
         this.rollSpeed = 250;
         this.lastRollTime = 0;
         this.difficulty = 0;
+        this.stageData = {};
     }
 
     preload() {
@@ -1648,6 +1740,26 @@ class ScoreScene extends Phaser.Scene {
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
+
+        this.stageData = new StageData(
+            ourGame.stage, 
+            ourGame.stageUUID, 
+            ourUI.scoreHistory,
+            ourTimeAttack.zeds,
+            ourUI.medals
+        );
+        
+        this.stageData.bonks = ourUI.bonks;
+        this.stageData.cornerTime = Math.floor(ourInputScene.cornerTime);
+        this.stageData.boostFrames = ourInputScene.boostBonusTime;
+        this.stageData.moveCount = ourInputScene.moveCount;
+        this.stageData.foodHistory = ourGame.foodHistory;
+        this.stageData.moveHistory = ourInputScene.moveHistory;
+        
+
+
+        console.log(JSON.stringify(this.stageData));
+        
 
 
         
@@ -1690,10 +1802,7 @@ class ScoreScene extends Phaser.Scene {
         
 
         // Pre Calculate needed values
-        var baseScore = ourUI.scoreHistory.reduce((a,b) => a + b, 0);
-        var stageAve = baseScore/ourUI.scoreHistory.length;
-
-        var speedBonus = calcBonus(baseScore);
+        var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
 
         var bestLog = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestFruitLog`));
         var bestLocal = bestLog.reduce((a,b) => a + b, 0);
@@ -1713,7 +1822,7 @@ class ScoreScene extends Phaser.Scene {
 
 
         // #region Atomic Food List
-        var atomList = ourUI.scoreHistory.slice();
+        var atomList = this.stageData.foodLog.slice();
         // dead atom = 1 
         //const BOOST_ADD_FLOOR = 100;
         //const COMBO_ADD_FLOOR = 108;
@@ -1739,7 +1848,6 @@ class ScoreScene extends Phaser.Scene {
 
             switch (true) {
                 case logTime > COMBO_ADD_FLOOR:
-                    console.log(logTime, "combo",i);
                     anim = "atom01idle";
                     if (i != 0) { // First Can't Connect
                         this.add.rectangle(_x - 12, _y, 12, 3, 0xFFFF00, 1
@@ -1770,24 +1878,21 @@ class ScoreScene extends Phaser.Scene {
         });*/
         ///////
 
-        this.add.dom(SCREEN_WIDTH/2 + GRID * 9.5, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: "white",
+        this.add.dom(SCREEN_WIDTH/2, GRID * 4.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "4px 4px 0px #000000",
             "font-size":'32px',
             'font-weight': 400,
             'text-align': 'center',
             'text-transform': 'uppercase',
             "font-family": '"Press Start 2P", system-ui',
-            "animation": 'glow 1s ease-in-out infinite alternate'
             })).setHTML(
-                `${ourGame.stage} CLEAR`
-        ).setOrigin(1, 0);
+                `${this.stageData.stage} CLEAR`
+        ).setOrigin(0.5, 0);
 
         // #region Main Stats
 
         var bonkBonus = NO_BONK_BASE/(ourUI.bonks+1);
         let diffBonus = ourGame.stageDiffBonus * .01;
-        this.scoreTotal = ((baseScore+speedBonus) * diffBonus) + bonkBonus
 
         const scorePartsStyle = {
             color: "white",
@@ -1806,63 +1911,82 @@ class ScoreScene extends Phaser.Scene {
                 SPEED BONUS:`
         ).setOrigin(1, 0);
 
+
+        var _baseScore = this.stageData.calcBase();
+        var _speedbonus = calcBonus(this.stageData.calcBase());
         const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `${baseScore}</span>
-                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(speedBonus)}</span>
-                <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(baseScore + speedBonus)}</span>`
+                `${commaInt(_baseScore)}</span>
+                <span style="color:${COLOR_FOCUS};font-weight:600;">+${commaInt(_speedbonus)}</span>
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + _speedbonus)}</span>`
         ).setOrigin(1, 0);
+        
 
-        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3.75, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML(
-                `DIFFICULTY +${ourGame.stageDiffBonus}%
-                ZED LVL +2.4%
-                MEDAL +0.3%
+                `Difficulty +${this.stageData.diffBonus}%
+                Zed Lvl +${Number(this.stageData.zedLevelBonus() * 100).toFixed(1)}%
+                Medal +${this.stageData.medalBonus() * 100}%
                 `
         ).setOrigin(1,0);
-        console.log(ourGame.stageDiffBonus);
-
-        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
+        
+        var _bonusMult = this.stageData.bonusMult();
+        var _postMult = this.stageData.postMult();
+        const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `x ${Number(ourGame.stageDiffBonus + 2.4 + 0.3).toFixed(1)}%
-                <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(Math.ceil((baseScore+speedBonus) * (diffBonus + 0.024 + 0.003)))}</span>`
+                `X ${Number(_bonusMult * 100).toFixed(1)}%
+                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`
         ).setOrigin(1, 0);
 
-        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `NO-BONK BONUS:
-                
-                <span style ="text-transform: uppercase">${ourGame.stage} </span> SCORE:`
+                `No-Bonk Bonus:
+                Corner Time:
+                Boost Bonus:`
         ).setOrigin(1,0);
 
-        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
+                //"font-size": '18px',
             })).setHTML(
-                `<span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><hr style="font-size:3px"/><br/>`
+                `+${this.stageData.bonkBonus()}
+                +${this.stageData.cornerBonus()}
+                +${this.stageData.boostBonus()}`
         ).setOrigin(1, 0);
+
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 20 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
+            {
+                "font-style": 'bold',
+                "font-size": "28px",
+                "text-align": 'right',
+                //"animation": 'glow 1s ease-in-out infinite alternate'
+            })).setHTML(
+                `Stage Score: <span style="animation:glow 1s ease-in-out infinite alternate;">+${commaInt(Math.floor(this.stageData.scoreTotal()))}</span>`
+        ).setOrigin(1, 0.5).setDepth(20);
         
-        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.5, this.scoreTotal.toFixed(0),
-        { fontFamily: "Sono", fontStyle: 'bold',
-        fontSize: 28, color: '#ffff00', align: 'right' })
-        .setOrigin(0.5, 0.5).setDepth(20);
-        const fx1 = stageScore.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
-        this.tweens.add({
+        //const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, Math.floor(this.stageData.scoreTotal()),
+        //{ fontFamily: "Sono", fontStyle: 'bold',
+        //fontSize: 28, color: '#ffff00', align: 'right' })
+        //.setOrigin(0.5, 0.5).setDepth(20);
+
+        //const fx1 = stageScore.postFX.addGlow(0xffffff, 0, 0, false, 0.1, 24);
+        /*this.tweens.add({
             targets: fx1,
             outerStrength: 2,
             yoyo: true,
             loop: -1,
             ease: 'sine.inout'
-        });
+        });*/
 
 
         // #region Rank Sprites
         
-        const medianScore = 8000;
+        const medianSpeedBonus = 6000;
 
         const COPPER = 0;
         const BRONZE = 1;
@@ -1871,18 +1995,19 @@ class ScoreScene extends Phaser.Scene {
         const PLATINUM = 4;
 
         let rank;
+        let bonusScore = calcBonus(this.stageData.baseScore)
 
         switch (true) {
-            case this.scoreTotal > medianScore * 2:
+            case bonusScore > medianSpeedBonus * 2:
                 rank = PLATINUM;
                 break;
-            case this.scoreTotal > medianScore * 1.5:
+            case bonusScore > medianSpeedBonus * 1.5:
                 rank = GOLD;
                 break;
-            case this.scoreTotal > medianScore:
+            case bonusScore > medianSpeedBonus:
                 rank = SILVER;
                 break;
-            case this.scoreTotal > medianScore * .5:
+            case bonusScore > medianSpeedBonus * .5:
                 rank = BRONZE;
                 break;
             default:
@@ -1936,9 +2061,9 @@ class ScoreScene extends Phaser.Scene {
 
         var cardY = 8;
         var styleCard = {
-            width: '242px',
-            "font-size": '14px',
-            "max-height": '246px',
+            width: '246px',
+            "font-size": '12px',
+            "max-height": '236px',
             "font-weight": 300,
             "padding": '12px 12px 12px 12px',
             "text-align": 'left', 
@@ -1962,8 +2087,10 @@ class ScoreScene extends Phaser.Scene {
                 AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span>
                 BONKS: <span style = "float: right">${ourUI.bonks}</span>
 
+                MOVE COUNT: <span style="float: right">${ourInputScene.moveCount}</span>
+                MOVE VERIFY: <span style="float: right">${ourInputScene.moveHistory.length}</span>
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span>
-                CORNER TIME: <span style = "float: right">${cornerTimeSec} SEC</span>
+                CORNER TIME: <span style = "float: right">${Math.ceil(ourInputScene.cornerTime)} FRAMES</span>
 
                 BONUS BOOST: <span style = "float: right">${bonusTimeSec} SEC</span>
                 BOOST TIME: <span style = "float: right">${boostTimeSec} SEC</span>
@@ -2103,9 +2230,9 @@ class ScoreScene extends Phaser.Scene {
         
 
         // #region Hash Display Code
-        this.foodLogSeed = ourUI.scoreHistory.slice();
+        this.foodLogSeed = this.stageData.foodLog.slice();
         this.foodLogSeed.push((ourInputScene.time.now/1000 % ourInputScene.cornerTime).toFixed(0));
-        this.foodLogSeed.push(this.scoreTotal.toFixed(0));
+        this.foodLogSeed.push(Math.floor(this.stageData.scoreTotal));
 
         // Starts Best as Current Copy
         this.bestSeed = this.foodLogSeed.slice();
@@ -2127,7 +2254,9 @@ class ScoreScene extends Phaser.Scene {
             color: COLOR_SCORE,
             "font-size":'28px',
             'font-weight': 500,
-        })).setText(`Current Score: ${commaInt(ourUI.score + speedBonus)}`).setOrigin(0.5,0).setDepth(60);
+        })).setText(
+            `Current Score: ${commaInt(ourUI.score + this.stageData.scoreTotal - this.stageData.baseScore - calcBonus(this.stageData.baseScore))}`
+        ).setOrigin(0.5,0).setDepth(60);
 
         // #endregion
         /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -2342,7 +2471,15 @@ class ScoreScene extends Phaser.Scene {
 
             if (this.prevZeds + this.difficulty > ourTimeAttack.zeds) {
                 ourTimeAttack.zeds = this.prevZeds + this.difficulty;
-                ourTimeAttack.zedsUI.setHTML(`ZEDS : <span style ="color:${COLOR_BONUS};text-decoration:underline;">${commaInt(ourTimeAttack.zeds)}`);
+                var zedsObj = calcZedLevel(ourTimeAttack.zeds);
+
+                ourTimeAttack.zedsUI.setHTML(
+                    `<span style ="color: limegreen;
+                    font-size: 16px;
+                    border: limegreen solid 1px;
+                    border-radius: 5px;
+                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
+                );
             }
 
             //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
@@ -2374,40 +2511,6 @@ const ROLL_SPEED = [
 console.log("ROLL LENGTH", ROLL_SPEED.length);
 
 
-// #region Stage Data
-var StageData = new Phaser.Class({
-
-    initialize:
-
-    function StageData(stageID, foodLog, stageUUID, scoreTotal, newBest = false)
-    {
-        this.stage = stageID;
-        this.foodLog = foodLog;
-        this.newBest = newBest;
-        this.uuid = stageUUID;
-        this.scoreTotal = scoreTotal;
-    },
-    
-    toString(){
-        return `${this.stage}`
-    },
-
-    calcScore() {
-        //var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
-        //var bonusScore = calcBonus(stageScore);
-
-        //return stageScore + bonusScore;
-        return this.scoreTotal;
-    },
-
-    calcBase() {
-        var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
-
-        return stageScore;
-    },
-    
-});
-// #endregion
 
 class TimeAttackScene extends Phaser.Scene{
     // #region TimeAttackScene
@@ -2451,6 +2554,9 @@ class TimeAttackScene extends Phaser.Scene{
         var playedStages = [];
         var index = 0;
 
+        // Value passes by reference and so must pass the a value you don't want changed.
+       
+
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
 
         
@@ -2461,29 +2567,37 @@ class TimeAttackScene extends Phaser.Scene{
 
         // Is Zero if there is none.
         this.zeds = Number(JSON.parse(localStorage.getItem(`zeds`)));
+        var zedsObj = calcZedLevel(this.zeds);
+        
+         
+        
 
         calcSumOfBest(this);
 
         const styleBottomText = {
-            "font-size": '14px',
+            "font-size": '12px',
             "font-weight": 400,
             "text-align": 'right',
-        }
+        }   
 
-        this.zedsUI = this.add.dom(GRID * 1, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
+        this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
             styleBottomText
             )).setHTML(
-                `ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(this.zeds)}</span>`
+                `<span style ="color: limegreen;
+                font-size: 16px;
+                border: limegreen solid 1px;
+                border-radius: 5px;
+                padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)}</span>`
         ).setOrigin(0,0.5);
 
 
-        this.sumOfBestUI = this.add.dom(GRID * 6, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
         ).setOrigin(0,0.5);
 
-        this.stagesCompleteUI = this.add.dom(GRID * 15, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
+        this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
             styleBottomText    
             )).setText(
                 `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
@@ -2880,8 +2994,10 @@ class UIScene extends Phaser.Scene {
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
         this.bonks = 0;
+        this.medals = {};
+        this.zedLevel = 0;
 
-        var {lives = STARTING_ATTEMPTS } = props
+        var {lives = STARTING_ATTEMPTS } = props;
         this.lives = lives;
 
         this.scoreHistory = [];
@@ -3121,9 +3237,14 @@ class UIScene extends Phaser.Scene {
         ourGame.events.on('saveScore', function () {
             const ourTimeAttack = ourGame.scene.get('TimeAttackScene');
             const ourScoreScene = ourGame.scene.get('ScoreScene');
+            const ourUIScene = ourGame.scene.get('UIScene');
 
 
-            var stageData = new StageData(ourGame.stage, this.scoreHistory, ourGame.stageUUID, ourScoreScene.scoreTotal);
+            // Building StageData for Savin
+            var stageData = ourScoreScene.stageData;
+            
+
+            //console.log(stageData.toString());
 
             var stageFound = false;
             
@@ -3152,8 +3273,7 @@ class UIScene extends Phaser.Scene {
                 })
                 if (!stageFound) {
                     // Playing a new unlocked stage. Get one life back.
-                    this.lives += 1;
-                    ourTimeAttack.stageHistory.push(stageData);
+                    //ourTimeAttack.stageHistory.push(stageData);
                 }
             }
             else {
@@ -3167,14 +3287,16 @@ class UIScene extends Phaser.Scene {
             // #region Do Unlock Calculation of all Best Logs
             
             var historicalLog = [];
-            
-            ourTimeAttack.stageHistory.forEach( _stage => {
-                var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
-                if (stageBestLog) {
-                    historicalLog = [...historicalLog, ...stageBestLog];
-                }
-            });
-
+            if (ourTimeAttack.stageHistory.length > 1) {
+                ourTimeAttack.stageHistory.forEach( _stage => {
+                    var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestFruitLog`));
+                    if (stageBestLog) {
+                        historicalLog = [...historicalLog, ...stageBestLog];
+                    }
+                });
+                
+            }
+        
             // make this an event?
             ourTimeAttack.histSum = historicalLog.reduce((a,b) => a + b, 0);
         
@@ -3325,6 +3447,8 @@ class InputScene extends Phaser.Scene {
         this.boostTime = 0; // Sum of all boost pressed
         this.boostBonusTime = 0; // Sum of boost during boost bonuse time.
         this.cornerTime = 0; // Frames saved when cornering before the next Move Time.
+        this.moveHistory = [];
+        this.moveCount = 0;
     }
 
     preload() {
@@ -3485,6 +3609,7 @@ class InputScene extends Phaser.Scene {
                     
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));  
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
                 
             }
@@ -3505,6 +3630,7 @@ class InputScene extends Phaser.Scene {
 
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));   
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
                 
             }
@@ -3525,6 +3651,7 @@ class InputScene extends Phaser.Scene {
  
                 this.cornerTime += Math.floor(gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gamescene.snake.head.x, gamescene.snake.head.y]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3543,6 +3670,7 @@ class InputScene extends Phaser.Scene {
  
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3561,6 +3689,8 @@ class InputScene extends Phaser.Scene {
 
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3579,6 +3709,8 @@ class InputScene extends Phaser.Scene {
 
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3597,6 +3729,8 @@ class InputScene extends Phaser.Scene {
                 
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime)); 
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;
@@ -3615,6 +3749,8 @@ class InputScene extends Phaser.Scene {
                 
                 this.cornerTime += (gameScene.moveInterval - (gameScene.time.now - gameScene.lastMoveTime));
                 gameScene.snake.move(gameScene);
+                this.moveHistory.push([gameScene.snake.head.x/GRID, gameScene.snake.head.y/GRID]);
+                this.moveCount += 1;
                 gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
             }
             break;

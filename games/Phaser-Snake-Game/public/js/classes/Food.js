@@ -7,7 +7,8 @@ var Food = new Phaser.Class({
     initialize:
 
     function Food (scene) {
-        Phaser.GameObjects.Sprite.call(this, scene)
+        Phaser.GameObjects.Sprite.call(this, scene);
+
 
         if (DEBUG) { // Add Timer Text next to fruit
             const ourUI = scene.scene.get('UIScene');
@@ -48,7 +49,7 @@ var Food = new Phaser.Class({
         }, callbackScope: scene });
 
 
-        this.move(scene); //Do we need this still?
+        this.move(scene);
 
         scene.atoms.push(this);
 
@@ -56,6 +57,7 @@ var Food = new Phaser.Class({
     },
     
     move: function (scene) {
+        const ourInputScene = scene.scene.get("InputScene");
         //this.electrons = scene.add.sprite(0, 0).setOrigin(.25,.125).setDepth(10);
         //let x;
         //let y;
@@ -135,9 +137,11 @@ var Food = new Phaser.Class({
             }
         }
         
-        var pos = Phaser.Math.RND.pick(validLocations)
+        var pos = Phaser.Math.RND.pick(validLocations);
+        
 
         this.setPosition(pos.x * GRID, pos.y * GRID); // This seems to magically reset the fruit timers
+        scene.foodHistory.push([pos.x, pos.y, ourInputScene.moveCount]);
         //console.log(this.x,this.y)
         this.electrons.setPosition(pos.x * GRID, pos.y * GRID);
         //console.log(this.electrons.x,this.electrons.y)
