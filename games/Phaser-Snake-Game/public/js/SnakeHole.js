@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.5.05.03.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 
 
@@ -281,6 +281,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
         this.load.image('scoreScreenMask', 'assets/sprites/UI_ScoreScreenMask.png');
         this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -1685,7 +1686,7 @@ class ScoreScene extends Phaser.Scene {
 
         this.add.image(GRID * 2,GRID * 8,'scoreScreenBG').setDepth(20).setOrigin(0,0);
         this.add.image(0,GRID * 26.5,'scoreScreenBG2').setDepth(9).setOrigin(0,0);
-        //this.add.image(GRID * 17.625, - GRID * 2,'scoreScreenMask').setDepth(21).setOrigin(0,0);
+        this.add.sprite(GRID * 22.5, GRID * 18.5,'downArrowAnim').play('downArrowIdle').setDepth(21).setOrigin(0,0);
         
 
         // Pre Calculate needed values
@@ -3643,6 +3644,12 @@ function loadAnimations(scene) {
     scene.anims.create({
         key: 'portalIdle',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    })
+    scene.anims.create({
+        key: 'downArrowIdle',
+        frames: scene.anims.generateFrameNumbers('downArrowAnim',{ frames: [ 0, 1, 2, 3, 4, 5, 6, 7]}),
         frameRate: 8,
         repeat: -1
     })
