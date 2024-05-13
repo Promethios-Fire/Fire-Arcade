@@ -13,40 +13,22 @@
 
 
 
-  ::-webkit-scrollbar {
-    width: 15px;
-   height: 15px;
-  }
-  
-  ::-webkit-scrollbar-thumb {
-      background-color: #fff;
-      background-image: url(https://i.imgur.com/Qtm9Z60.png);
-      border-top: 1px solid #bdbdbd;
-      border-left: 1px solid #bdbdbd;
-      border-right: 1px solid black;
-      border-bottom: 1px solid black;
-  }
-  
-  ::-webkit-scrollbar-track {
-      background-color: #fff;
-      background-image: url(https://i.imgur.com/IGXGYKz.png);
-  }
-  
-  ::-webkit-scrollbar-button {
-    background-color: darkgrey;
-    background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAADwAAAAPBAMAAABKPLFCAAAABGdBTUEAALGPC/xhBQAAACBjSFJNAAB6JgAAgIQAAPoAAACA6AAAdTAAAOpgAAA6mAAAF3CculE8AAAAIVBMVEUAAACGhILr6ulbWlqop6ddXV0hISHk4+MAAABubm3///8cDMtbAAAAAXRSTlMAQObYZgAAAAFiS0dECmjQ9FYAAAAJcEhZcwAACxMAAAsTAQCanBgAAAAHdElNRQfgChMNNQqYsOkJAAAAfElEQVQY02MQhAABQRTAABVlEFICA0EIpYjGpZ60CUTaGcoNQpVWTodIlxmBuaqtEGl3JXUnED+sCCKtngqWNptmBJY2KwKqF1RS7YTZPSMIyFVOV08GSytnJith6lYpUiqB2B0RhM1uuMtVsbucusGCTZoRJYpgACoqCABTOTzVZ8THeQAAACV0RVh0ZGF0ZTpjcmVhdGUAMjAxNi0xMC0xOVQxNTo1MToyOCswMjowMPJE7xwAAAAldEVYdGRhdGU6bW9kaWZ5ADIwMTYtMTAtMTlUMTU6NTE6MjgrMDI6MDCDGVegAAAAAElFTkSuQmCC')
-  }
-  ::-webkit-scrollbar-button:vertical:start {
-    background-position: -45px 0;
-  }
-  
-  ::-webkit-scrollbar-button:vertical:end {
-    background-position: 0 0;
-  }
-  
-  ::-webkit-scrollbar-button:horizontal:start {
-    background-position: -15px 0;
-  }
-  ::-webkit-scrollbar-button:horizontal:end {
-    background-position: -30px 0;
-  }
+  /* width */
+::-webkit-scrollbar {
+  width: 12px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: #323353bf; 
+}
+ 
+/* Handle */
+::-webkit-scrollbar-thumb {
+  background: #ffffff; 
+}
+
+/* Handle on hover */
+::-webkit-scrollbar-thumb:hover {
+  background: #8fd3ff; 
+}

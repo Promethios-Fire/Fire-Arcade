@@ -1791,7 +1791,7 @@ class ScoreScene extends Phaser.Scene {
 
         const scorePartsStyle = {
             color: "white",
-            "text-shadow": "2px 2px 4px #000000",
+            //"text-shadow": "2px 2px 4px #000000",
             "font-size":'16px',
             "font-weight": 400,
             "text-align": 'right',
@@ -1802,8 +1802,8 @@ class ScoreScene extends Phaser.Scene {
             scorePartsStyle, {
             
             })).setHTML(
-                `Base Score:
-                Speed Bonus:`
+                `BASE SCORE:
+                SPEED BONUS:`
         ).setOrigin(1, 0);
 
         const preAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -1818,9 +1818,9 @@ class ScoreScene extends Phaser.Scene {
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML(
-                `Difficulty +${ourGame.stageDiffBonus}%
-                Zed Lvl +2.4%
-                Medal +0.3%
+                `DIFFICULTY +${ourGame.stageDiffBonus}%
+                ZED LVL +2.4%
+                MEDAL +0.3%
                 `
         ).setOrigin(1,0);
         console.log(ourGame.stageDiffBonus);
@@ -1828,23 +1828,25 @@ class ScoreScene extends Phaser.Scene {
         const multValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `X ${Number(ourGame.stageDiffBonus + 2.4 + 0.3).toFixed(1)}%
+                `x ${Number(ourGame.stageDiffBonus + 2.4 + 0.3).toFixed(1)}%
                 <hr style="font-size:3px"/><span style="font-size:20px">${commaInt(Math.ceil((baseScore+speedBonus) * (diffBonus + 0.024 + 0.003)))}</span>`
         ).setOrigin(1, 0);
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*3, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `No-Bonk Bonus:`
+                `NO-BONK BONUS:
+                
+                <span style ="text-transform: uppercase">${ourGame.stage} </span> SCORE:`
         ).setOrigin(1,0);
 
         const postAdditiveValuesUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 0.5, GRID * 16.5, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `<span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><br/>`
+                `<span style="font-size:18px"> +${bonkBonus.toFixed(0)}</span><hr style="font-size:3px"/><br/>`
         ).setOrigin(1, 0);
         
-        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.125, this.scoreTotal.toFixed(0),
+        const stageScore = this.add.text(SCREEN_WIDTH/2 - GRID * .825, GRID * 18.5, this.scoreTotal.toFixed(0),
         { fontFamily: "Sono", fontStyle: 'bold',
         fontSize: 28, color: '#ffff00', align: 'right' })
         .setOrigin(0.5, 0.5).setDepth(20);
@@ -1887,11 +1889,11 @@ class ScoreScene extends Phaser.Scene {
                 rank = COPPER;
         }
 
-        var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
+        var letterRank = this.add.sprite(GRID * 3.5,GRID * 17.0,"ranksSheet",rank).setDepth(20).setOrigin(0,0);
         
         // region Particle Emitter
         if(rank >= SILVER){
-            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
+            this.add.particles(GRID * 4.0,GRID * 17.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle01',
@@ -1899,7 +1901,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
-            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+            this.add.particles(GRID * 4.0,GRID * 17.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
                 anim: 'twinkle02',
@@ -1907,7 +1909,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
-            this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
+            this.add.particles(GRID * 4.0,GRID * 17.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
                 anim: 'twinkle03',
@@ -1934,9 +1936,9 @@ class ScoreScene extends Phaser.Scene {
 
         var cardY = 8;
         var styleCard = {
-            width: '246px',
+            width: '242px',
             "font-size": '14px',
-            "max-height": '236px',
+            "max-height": '246px',
             "font-weight": 300,
             "padding": '12px 12px 12px 12px',
             "text-align": 'left', 
