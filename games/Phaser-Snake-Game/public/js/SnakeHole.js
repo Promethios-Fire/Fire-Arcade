@@ -1919,6 +1919,8 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Stat Cards
+        var cornerTimeSec = ourInputScene.cornerTime.toFixed(0) /1000
+
         var cardY = 8;
         var styleCard = {
             width: '246px',
@@ -1931,7 +1933,7 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line',
             'overflow-y': 'scroll',
             'scroll-behavior': 'smooth',
-            //'-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, .9),rgba(0, 0, 0, 0))'
+            //'-webkit-mask-image': 'linear-gradient(rgba(0, 0, 0, 1), rgba(0, 0, 0, 1), rgba(0, 0, 0, 1),rgba(0, 0, 0, 0))'
             //'scrollbar-width': 'none', //Could potentially make a custom scroll bar to match the aesthetics
         }
 
@@ -1948,7 +1950,7 @@ class ScoreScene extends Phaser.Scene {
                 BONKS: <span style = "float: right">${ourUI.bonks}</span>
 
                 TOTAL TURNS: <span style = "float: right">${ourInputScene.turns}</span>
-                CORNER TIME: <span style = "float: right">${ourInputScene.cornerTime} FRAMES</span>
+                CORNER TIME: <span style = "float: right">${cornerTimeSec} SECONDS</span>
 
                 BONUS BOOST: <span style = "float: right">${ourInputScene.boostBonusTime} FRAMES</span>
                 BOOST TIME: <span style = "float: right">${ourInputScene.boostTime} FRAMES</span>
