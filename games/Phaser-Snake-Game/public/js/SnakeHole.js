@@ -1397,7 +1397,6 @@ class GameScene extends Phaser.Scene {
         var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
         this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
-        console.log(this.dist)
 
         if (this.snake.alive) {
             this.tweens.add({
