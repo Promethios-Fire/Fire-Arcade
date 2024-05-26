@@ -40,6 +40,8 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
 
+// Not like this
+var comboCounter = 0;
 
 
 // Game Objects
@@ -266,11 +268,11 @@ class StartScene extends Phaser.Scene {
         this.load.image('bg01', 'assets/sprites/background01.png');
 
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-        this.load.spritesheet('snakeDefault', 'assets/sprites/snakeSheetDefault.png', { frameWidth: GRID, frameHeight: GRID });
+        this.load.spritesheet('snakeDefault', ['assets/sprites/snakeSheetDefault.png','assets/sprites/snakeSheetDefault_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
         this.load.image('portalParticle01','assets/sprites/portalParticle01.png')
         // Tilemap
-        this.load.image('tileSheetx24', 'assets/Tiled/tileSheetx24.png');
+        this.load.image('tileSheetx24', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png']);
 
 
 
@@ -285,7 +287,7 @@ class StartScene extends Phaser.Scene {
         this.load.image("mask", "assets/sprites/boostMask.png");
         this.load.image('scoreScreenBG', 'assets/sprites/UI_ScoreScreenBG01.png');
         this.load.image('scoreScreenBG2', 'assets/sprites/UI_ScoreScreenBG02.png');
-        this.load.spritesheet('ranksSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('ranksSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
         this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -352,7 +354,8 @@ class StartScene extends Phaser.Scene {
 
         ///
         
-
+        
+        
         // Load all animations once.
         this.anims.create({
             key: 'idle',
@@ -526,6 +529,7 @@ class GameScene extends Phaser.Scene {
 
         this.lastMoveTime = 0; // The last time we called move()
 
+        this.comboCounter = comboCounter;
 
         // Boost Array
         this.boostOutlinesBody = [];
@@ -581,6 +585,8 @@ class GameScene extends Phaser.Scene {
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
 
+        
+
 
         // a = Global average best score + minScore 
         //For a=1400, min=1, max=100, goal=28
@@ -613,7 +619,7 @@ class GameScene extends Phaser.Scene {
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
 
-        this.wallLayer = this.map.createLayer('Wall', [this.tileset]);
+        this.wallLayer = this.map.createLayer('Wall', [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
         
         
@@ -626,6 +632,8 @@ class GameScene extends Phaser.Scene {
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
         
+        
+
         this.startingArrowsAnimN = this.add.sprite(_x + 12, _y - 22).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimS = this.add.sprite(_x + 12, _y + 46).setDepth(15).setOrigin(0.5,0.5);
         this.startingArrowsAnimE = this.add.sprite(_x + 46, _y + 12).setDepth(15).setOrigin(0.5,0.5);
@@ -647,7 +655,11 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
-    
+        this.lights.enable();
+        this.lights.setAmbientColor(0xE4E4E4);
+
+        this.staggerMagnitude = 30
+        
 
         //wrapBlock03.play("wrapBlock03")
         //wrapBlock06.play("wrapBlock06")
@@ -738,7 +750,7 @@ class GameScene extends Phaser.Scene {
                     var boostOutline = this.add.sprite(
                         this.snake.head.x, 
                         this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(8);
+                    ).setOrigin(.083333,.083333).setDepth(15);
                     
                     boostOutline.play("snakeOutlineAnim");
                     this.boostOutlinesBody.push(boostOutline);
@@ -768,7 +780,7 @@ class GameScene extends Phaser.Scene {
                 var boostOutline = this.add.sprite(
                     this.snake.body[index].x, 
                     this.snake.body[index].y
-                ).setOrigin(.083333,.083333).setDepth(8);
+                ).setOrigin(.083333,.083333).setDepth(15);
                 boostOutline.alpha = 0;
                 var fadeinTween = this.tweens.add({
                     targets: boostOutline,
@@ -1097,6 +1109,37 @@ class GameScene extends Phaser.Scene {
 
         // #endregion
         this.portals.forEach(portal => {
+            var portalLightColor = 0xFFFFFF;
+            switch (portal.tintTopLeft) {
+                case 0xFF0000: // RED
+                    portalLightColor = 0xFF0000;
+                    break;
+                case 0xff9900: // ORANGE
+                    portalLightColor = 0xC05D00;
+                    break;
+                case 0xffff00: // YELLOW
+                    portalLightColor = 0xACAC04;
+                    break;
+                case 0x00ff00: // GREEN
+                    portalLightColor = 0x00B000;
+                    break;
+                case 0x00ffff: // CYAN
+                    portalLightColor = 0x00FFFF;
+                    break;   
+                case 0x4a86e8: // BLUE
+                    portalLightColor = 0x074FEA;
+                    break;        
+                case 0x9900ff: // VIOLET
+                    portalLightColor = 0x9900FF;
+                    break;
+                case 0xff00ff: //FUCHSIA
+                    portalLightColor = 0xFF00FF;
+                    break; 
+                default:
+                    console.log("default portal color break")
+                    break;
+            }
+            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
@@ -1228,7 +1271,7 @@ class GameScene extends Phaser.Scene {
         var atom = new Food(this);
         var atom = new Food(this);
 
-
+        this.dist = 260
 
         // #endregion
 
@@ -1259,7 +1302,17 @@ class GameScene extends Phaser.Scene {
         // Throw An event to start UI screen?
 
         ////////////////////////////////////////////
+        this.graphics = this.add.graphics();
 
+        this.pathRegroup = { t: 0, vec: new Phaser.Math.Vector2() };
+        this.curveRegroup = new Phaser.Curves.Ellipse(GRID * 15, GRID * 15, this.dist);
+        this.tweens.add({
+            targets: this.pathRegroup,
+            t: 1,
+            ease: 'Linear',
+            duration: 4000,
+            repeat: -1
+        });
     }
     
     chooseAreaPair (scene, groups) {
@@ -1324,15 +1377,76 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    vortexIn(){
+        this.tweens.add({
+            targets: this.curveRegroup,
+            xRadius: 0,
+            yRadius: 0,
+            ease: 'Sine.easeOutIn',
+            duration: 500,
+            yoyo: false,
+            repeat: 0
+        });
+    }
+
     // #region Game Update
     update (time, delta) {
         const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
-
+        // console.log("update -- time=" + time + " delta=" + delta);
         var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
-        // console.log("update -- time=" + time + " delta=" + delta);
+        var spawnPoint = new Phaser.Geom.Point(GRID * 15, GRID * 15)
 
+        this.dist = Phaser.Math.Distance.BetweenPoints(this.snake.head, (spawnPoint));
+
+        if (this.snake.alive) {
+            this.tweens.add({
+                targets: this.curveRegroup,
+                xRadius: this.dist,
+                yRadius: this.dist,
+                ease: 'Linear',
+                duration: 20,
+                yoyo: false,
+                repeat: 0
+            }); 
+        }
+
+
+        if (this.staggerMagnitude < 10){
+            this.staggerMagnitude = 10;
+        }
+        
+
+        if (this.snake.alive) {
+            this.staggerMagnitude = 30
+            //this.curveRegroup.x = this.snake.head.x
+            //this.curveRegroup.y = this.snake.head.y
+        }
+
+
+        this.curveRegroup.getPoint(this.pathRegroup.t, this.pathRegroup.vec);
+
+        this.graphics.clear(); //Used to DEBUG, need graphics created in GameScene create function
+        this.graphics.fillStyle(0xff0000, 1);
+        //this.graphics.fillCircle(this.pathRegroup.vec.x, this.pathRegroup.vec.y, 8);
+    
+        if (!this.snake.alive) {
+            this.staggerMagnitude -= 0.5
+            //this.curveRegroup.x = GRID * 15
+            //this.curveRegroup.y = GRID * 15
+            this.tween = this.tweens.add({
+                targets: this.snake.body, 
+                x: this.pathRegroup.vec.x,
+                y: this.pathRegroup.vec.y,
+                yoyo: false,
+                duration: 500,
+                ease: 'Sine.easeOutIn',
+                repeat: 0,
+                delay: this.tweens.stagger(this.staggerMagnitude)
+            });
+        }
+        
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME && this.snake.regrouping && this.spaceWhileReGrouping) {
                 console.log("SPACE LONG ENOUGH BRO");
@@ -1385,18 +1499,12 @@ class GameScene extends Phaser.Scene {
             this.snake.regrouping = true;
             this.move_pause = true;
             
-            var tween = this.tweens.add({
-                targets: this.snake.body, 
-                x: GRID * 15,
-                y: GRID * 15,
-                yoyo: false,
-                duration: 1000,
-                ease: 'Sine.easeOutIn',
-                repeat: 0,
-                delay: 500
-            });
-
-            tween.on('complete', test => {
+            this.vortexIn();
+           
+            this.tween.on('complete', test => {
+                //this.vortexOut();
+                this.curveRegroup.x = GRID * 15
+                this.curveRegroup.y = GRID * 15
                 //console.log("COMPLETE AND SET ALIVE")
                 this.snake.regrouping = false;
                 this.snake.alive = true;
@@ -1408,9 +1516,7 @@ class GameScene extends Phaser.Scene {
                 this.startingArrowsAnimN.setVisible(true);
                 this.startingArrowsAnimS.setVisible(true);
                 this.startingArrowsAnimE.setVisible(true);
-                this.startingArrowsAnimW.setVisible(true);
-
-                
+                this.startingArrowsAnimW.setVisible(true);   
             });
         }
         
@@ -2158,6 +2264,9 @@ class ScoreScene extends Phaser.Scene {
         
         // region Particle Emitter
         if(rank >= SILVER){
+            lightColor = silverLightColor
+            lightColor2 = goldLightColor
+            console.log(lightColor)
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle01Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -2166,6 +2275,9 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(20);
         }
         if(rank === GOLD){
+            lightColor = goldLightColor
+            lightColor2 = goldLightColor
+            console.log(lightColor)
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
                 x:{min: 0, max: 32},
                 y:{min: 0, max: 68},
@@ -2174,6 +2286,9 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(20);
         }
         if(rank === PLATINUM){
+            lightColor = platLightColor
+            lightColor2 = goldLightColor
+            console.log(lightColor)
             this.add.particles(GRID * 4.0,GRID * 16.0, "twinkle03Anim", {
                 x:{steps: 8, min: -8, max: 40},
                 y:{steps: 8, min: 8, max: 74},
@@ -2186,6 +2301,8 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(667,[1]).setDepth(20);
         }
 
+        this.spotlight = this.lights.addLight(0, 0, 500, lightColor).setIntensity(1.5);
+        this.spotlight2 = this.lights.addLight(0, 0, 500, lightColor2).setIntensity(1.5);
         // #region Stat Cards
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
         console.log(ourInputScene.cornerTime)
@@ -2538,6 +2655,24 @@ class ScoreScene extends Phaser.Scene {
         const ourPlayerData = this.scene.get('PlayerDataScene');
 
         var scoreCountDown = this.foodLogSeed.slice(-1);
+
+        this.curve.getPoint(this.path.t, this.path.vec);
+        this.curve.getPoint(this.path2.t, this.path2.vec);
+
+        this.spotlight.x = this.path.vec.x;
+        this.spotlight.y = this.path.vec.y;
+
+        this.spotlight2.x = this.path2.vec.x;
+        this.spotlight2.y = this.path2.vec.y;
+
+        /*this.graphics.clear(); //Used to debug where light is
+        this.graphics.lineStyle(2, 0xffffff, 1);
+        this.curve.draw(this.graphics, 64);
+        this.graphics.fillStyle(0xff0000, 1);
+        this.graphics.fillCircle(this.path.vec.x, this.path.vec.y, 8).setDepth(30);
+        this.graphics.fillCircle(this.path2.vec.x, this.path2.vec.y, 8).setDepth(30);*/
+
+
         if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
             this.lastRollTime = time;
             const ourTimeAttack = this.scene.get("TimeAttackScene");
@@ -3079,6 +3214,7 @@ class UIScene extends Phaser.Scene {
     create() {
        const ourGame = this.scene.get('GameScene');
 
+
        // UI Icons
        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
 
@@ -3352,6 +3488,8 @@ class UIScene extends Phaser.Scene {
             
 
         }, this);
+
+        
         
     }
     update() {
@@ -3371,6 +3509,8 @@ class UIScene extends Phaser.Scene {
             this.scene.start('ScoreScene');
         }
         // #endregion
+
+        
         
         if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
@@ -3863,7 +4003,7 @@ function loadAnimations(scene) {
     })
     scene.anims.create({
         key: 'twinkle02',
-        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6]}),
+        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3, 4, 5, 6]}),
         frameRate: 6,
         repeat: 0
     })

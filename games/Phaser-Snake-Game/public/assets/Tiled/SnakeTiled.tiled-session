@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Stage-02d.json",
+    "activeFile": "Stage-03a.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -15,8 +15,8 @@
             "scale": 0.7038411458333332,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.95347331421704,
-                "y": 372.95347331421715
+                "x": 364.42882249560637,
+                "y": 365.8495976320415
             }
         },
         "Bonus-Stage-x1.json#tileSheet": {
@@ -62,11 +62,11 @@
             "scaleInDock": 1
         },
         "Stage-01.json": {
-            "scale": 2,
+            "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 371.75,
-                "y": 371.75
+                "x": 451,
+                "y": 469
             }
         },
         "Stage-01.json#tileSheet": {
@@ -93,8 +93,8 @@
             "scale": 0.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 785,
-                "y": 433
+                "x": 455,
+                "y": 367
             }
         },
         "Stage-02a.json#tileSheet": {
@@ -104,11 +104,11 @@
             "scaleInDock": 1
         },
         "Stage-02b.json": {
-            "scale": 0.7953776041666667,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.52165015961367,
-                "y": 371.5216501596137
+                "x": 373,
+                "y": 499
             }
         },
         "Stage-02b.json#tileSheet": {
@@ -118,11 +118,11 @@
             "scaleInDock": 1
         },
         "Stage-02c.json": {
-            "scale": 1.1351478494623655,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 370.4363270380676,
-                "y": 371.3172695518324
+                "x": 351,
+                "y": 397
             }
         },
         "Stage-02c.json#tileSheet": {
@@ -132,11 +132,11 @@
             "scaleInDock": 1
         },
         "Stage-02d.json": {
-            "scale": 0.8976478494623656,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 370.4125177809388,
-                "y": 371.52654039080636
+                "x": 395,
+                "y": 461
             }
         },
         "Stage-02d.json#tileSheet": {
@@ -146,11 +146,11 @@
             "scaleInDock": 1
         },
         "Stage-02e.json": {
-            "scale": 1.5,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.66666666666663,
-                "y": 371.66666666666663
+                "x": 513,
+                "y": 581
             }
         },
         "Stage-02e.json#tileSheet": {
@@ -174,25 +174,25 @@
             "scaleInDock": 1
         },
         "Stage-03a.json": {
-            "scale": 0.75,
+            "scale": 0.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 372.6666666666667,
-                "y": 372.66666666666674
+                "x": 563,
+                "y": 395
             }
         },
         "Stage-03a.json#tileSheet": {
             "scaleInDock": 2
         },
         "Stage-03a.json#tileSheetx24": {
-            "scaleInDock": 2
+            "scaleInDock": 0.75
         },
         "Stage-03b.json": {
-            "scale": 0.8976478494623656,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.6405630006738,
-                "y": 372.64056300067375
+                "x": 407,
+                "y": 421
             }
         },
         "Stage-03b.json#tileSheet": {
@@ -202,11 +202,11 @@
             "scaleInDock": 1
         },
         "Stage-03c.json": {
-            "scale": 1,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.5,
-                "y": 372.5
+                "x": 527,
+                "y": 459
             }
         },
         "Stage-03c.json#tileSheet": {
@@ -219,8 +219,8 @@
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.6666666666667,
-                "y": 372.66666666666674
+                "x": 370,
+                "y": 369.99999999999994
             }
         },
         "Stage-04.json#tileSheet": {
@@ -254,8 +254,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.5,
-                "y": 372.5
+                "x": 369.5,
+                "y": 370.5
             }
         },
         "Stage-05.json#tileSheet": {
@@ -441,8 +441,8 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.5,
-                "y": 372.5
+                "x": 370.5,
+                "y": 371.5
             }
         },
         "Stage-AA.json#tileSheet": {
@@ -489,11 +489,11 @@
             "scaleInDock": 1
         },
         "Stage-x8.json": {
-            "scale": 1.4799059139784947,
+            "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.98310703419463,
-                "y": 371.98310703419463
+                "x": 501,
+                "y": 287
             }
         },
         "Stage-x8.json#tileSheet": {
@@ -534,8 +534,8 @@
             "scale": 0.5891826923076923,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 384.43084455324356,
-                "y": 360.66911464708284
+                "x": 381.0363117095063,
+                "y": 358.9718482252141
             }
         },
         "snakeMap.tmj#tileSheet": {
@@ -548,8 +548,8 @@
             "scale": 0.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 373,
-                "y": 373
+                "x": 372.5,
+                "y": 372.5
             }
         },
         "snakeMap.tmx#tileSheet": {
@@ -562,27 +562,49 @@
         "snakeMap.tmx#tileSheetx24": {
             "scaleInDock": 1
         },
-        "testing.json": {
-            "scale": 1.5,
+        "testing - Copy.json": {
+            "scale": 0.8057123655913978,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.66666666666663,
-                "y": 371.66666666666663
+                "x": 372.9618817249145,
+                "y": 372.9618817249145
+            }
+        },
+        "testing - Copy.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing.json": {
+            "scale": 0.75,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 342,
+                "y": 305.99999999999994
             }
         },
         "testing.json#tileSheetx24": {
             "scaleInDock": 1
         },
-        "testing2.json": {
+        "testing02.json": {
+            "scale": 1,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 516.5,
+                "y": 329.5
+            }
+        },
+        "testing02.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testing03.json": {
             "scale": 0.75,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 299.33333333333337,
-                "y": 283.33333333333326
+                "x": 310,
+                "y": 515.3333333333333
             }
         },
-        "testing2.json#tileSheetx24": {
-            "scaleInDock": 0.5
+        "testing03.json#tileSheetx24": {
+            "scaleInDock": 1
         }
     },
     "map.height": 31,
