@@ -2255,6 +2255,20 @@ class ScoreScene extends Phaser.Scene {
 
 
         // #region Rank Sprites
+
+        var lightColor = 0xFFFFFF;
+        var lightColor2 = 0xFFFFFF;
+        const platLightColor = 0xEEA8EE;
+        const platLightColor2 = 0x25DD19;
+        const goldLightColor = 0xE7C1BB;
+        const goldLightColor2 = 0xE9FF5E;
+        const silverLightColor = 0xABCADA;
+        const silverLightColor2 = 0xABDADA;
+        const bronzeLightColor = 0xE8C350;
+        const bronzeLightColor2 = 0xE8C350;
+        const copperLightColor = 0xB59051;
+        const copperLightColor2 = 0xB59051;
+        
         
         let rank = this.stageData.stageRank()
         
@@ -2656,8 +2670,8 @@ class ScoreScene extends Phaser.Scene {
 
         var scoreCountDown = this.foodLogSeed.slice(-1);
 
-        this.curve.getPoint(this.path.t, this.path.vec);
-        this.curve.getPoint(this.path2.t, this.path2.vec);
+        //this.curve.getPoint(this.path.t, this.path.vec);
+        //this.curve.getPoint(this.path2.t, this.path2.vec);
 
         this.spotlight.x = this.path.vec.x;
         this.spotlight.y = this.path.vec.y;
