@@ -14,7 +14,7 @@ var Snake = new Phaser.Class({
         this.hold_move = false;
         this.portal_buffer_on = true;  // To avoid taking a portal right after.
 
-        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0).setPipeline('Light2D');
+        this.head = scene.add.image(x * GRID, y * GRID, 'snakeDefault', 0);
         this.head.setOrigin(0,0).setDepth(10);
         
         this.body.unshift(this.head);
@@ -26,8 +26,6 @@ var Snake = new Phaser.Class({
 
 
         this.tail = new Phaser.Geom.Point(x, y); // Start the tail as the same place as the head.
-
-        this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, 96, 0xAF67FF).setIntensity(1);
     },
     
     grow: function (scene)
@@ -51,7 +49,7 @@ var Snake = new Phaser.Class({
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
-        newPart.setOrigin(0,0).setDepth(9).setPipeline('Light2D');
+        newPart.setOrigin(0,0).setDepth(9);
         
 
         if (this.body.length > 1){
@@ -72,9 +70,6 @@ var Snake = new Phaser.Class({
     // Alias x and y to the current head position
     let x = this.head.x;
     let y = this.head.y;
-
-    this.snakeLight.x = x + GRID/2;
-    this.snakeLight.y = y + GRID/2;
 
     var onPortal = false;
     
