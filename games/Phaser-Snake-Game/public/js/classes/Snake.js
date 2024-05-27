@@ -181,7 +181,6 @@ var Snake = new Phaser.Class({
                         }
                     });
                     
-                    
                     if (!portalSafe) {
                         this.direction = STOP;
                         if (scene.bonkable) {
@@ -193,12 +192,10 @@ var Snake = new Phaser.Class({
                         // Only colide if the snake has left the center square    
                     }  
                 }
-            })
-            
+            }) 
         }
         // #endregion
-        
-
+        const ourUI = scene.scene.get('UIScene'); // needs to move to somewhere more efficent
     
     // Actually Move the Snake Head
     if (this.alive && this.direction != STOP) {
@@ -206,30 +203,27 @@ var Snake = new Phaser.Class({
             Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
     }
-    
 
     // Check collision for all atoms
     scene.atoms.forEach(_atom => {  
         if(this.head.x === _atom.x && this.head.y === _atom.y && !this.traveling){
             const ourUI = scene.scene.get('UIScene');
             var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-            //console.log("time since last fruit:", timeSinceFruit);
-            
+
             if(timeSinceFruit > COMBO_ADD_FLOOR){
-                 
-                //console.log("combo",this.lastPlayedCombo)
-                
-                scene.pointSounds[this.lastPlayedCombo].play();
-                
+                if (this.lastPlayedCombo > 0) {
+                    ourUI.comboCounter += 1;
+                    ourUI.comboBounce();
+                    };
+                scene.pointSounds[this.lastPlayedCombo].play();       
                 if (this.lastPlayedCombo < 7) {
                     this.lastPlayedCombo += 1;
                 }
             }
             else {
                 this.lastPlayedCombo = 0;
+                ourUI.comboCounter = 0;
             }
-            
-
 
             scene.events.emit('addScore', _atom); // Sends to UI Listener 
             this.grow(scene);
@@ -295,7 +289,7 @@ var Snake = new Phaser.Class({
 
         this.direction = STOP;
         gameScene.started = false;
-    }
+    },
 });
 
 export { Snake };

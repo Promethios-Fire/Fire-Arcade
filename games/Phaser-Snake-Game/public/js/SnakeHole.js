@@ -40,7 +40,6 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
 
-var comboCounter = 0;
 
 
 // Game Objects
@@ -291,6 +290,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
+        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -352,8 +352,7 @@ class StartScene extends Phaser.Scene {
 
         ///
         
-        
-        
+
         // Load all animations once.
         this.anims.create({
             key: 'idle',
@@ -527,7 +526,6 @@ class GameScene extends Phaser.Scene {
 
         this.lastMoveTime = 0; // The last time we called move()
 
-        this.comboCounter = comboCounter;
 
         // Boost Array
         this.boostOutlinesBody = [];
@@ -582,8 +580,6 @@ class GameScene extends Phaser.Scene {
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
-
-        
 
 
         // a = Global average best score + minScore 
@@ -742,7 +738,7 @@ class GameScene extends Phaser.Scene {
                     var boostOutline = this.add.sprite(
                         this.snake.head.x, 
                         this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(15);
+                    ).setOrigin(.083333,.083333).setDepth(8);
                     
                     boostOutline.play("snakeOutlineAnim");
                     this.boostOutlinesBody.push(boostOutline);
@@ -772,7 +768,7 @@ class GameScene extends Phaser.Scene {
                 var boostOutline = this.add.sprite(
                     this.snake.body[index].x, 
                     this.snake.body[index].y
-                ).setOrigin(.083333,.083333).setDepth(15);
+                ).setOrigin(.083333,.083333).setDepth(8);
                 boostOutline.alpha = 0;
                 var fadeinTween = this.tweens.add({
                     targets: boostOutline,
@@ -3070,6 +3066,7 @@ class UIScene extends Phaser.Scene {
 
         // BOOST METER
         this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
+        this.comboCounter = 0;
     }
 
     preload () {
@@ -3081,7 +3078,6 @@ class UIScene extends Phaser.Scene {
     
     create() {
        const ourGame = this.scene.get('GameScene');
-
 
        // UI Icons
        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
@@ -3105,6 +3101,20 @@ class UIScene extends Phaser.Scene {
        boostBar.play('increasing');
 
        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+       // Combo Sprites
+
+       this.visible = false;
+
+       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
+       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
+       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
+       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
+       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
+      
+       //this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 6).setDepth(20);
        // #endregion
 
         
@@ -3337,12 +3347,11 @@ class UIScene extends Phaser.Scene {
 
             
 
+
             
             
 
         }, this);
-
-        
         
     }
     update() {
@@ -3362,8 +3371,6 @@ class UIScene extends Phaser.Scene {
             this.scene.start('ScoreScene');
         }
         // #endregion
-
-        
         
         if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
         
@@ -3424,10 +3431,56 @@ class UIScene extends Phaser.Scene {
 
         //#endregion Boost Logic
         
+        // #region Combo Logic
 
-
+        if (this.comboCounter > 0 && !this.visible) {
+            this.comboAppear();
+        }
+        else if (this.comboCounter == 0 && this.visible){
+            this.comboFade();
+        }
+        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.visible) {
+            this.comboFade();
+        }
     }
     
+    comboBounce(){
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            y: { from: GRID * 4, to: GRID * 3 },
+            ease: 'Sine.InOut',
+            duration: 200,
+            repeat: 0,
+            delay: this.tweens.stagger(60),
+            yoyo: true
+            });
+    }
+    comboAppear(){
+        console.log("appearing")
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+        });
+        this.visible = true;
+        }
+    comboFade(){
+        console.log("fading")
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 500,
+            repeat: 0,
+        });
+        this.visible = false;
+        this.comboCounter = 0;
+    }
 
 end() {
 
@@ -3810,7 +3863,7 @@ function loadAnimations(scene) {
     })
     scene.anims.create({
         key: 'twinkle02',
-        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6 ,7]}),
+        frames: scene.anims.generateFrameNumbers('twinkle02Anim',{ frames: [0, 1, 2, 3 ,4 ,5 ,6]}),
         frameRate: 6,
         repeat: 0
     })
