@@ -3495,10 +3495,9 @@ class UIScene extends Phaser.Scene {
 
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
-                console.log(this.coinSpawnCounter);
 
                 if (this.coinSpawnCounter < 1) {
-                    console.log("COIN TIME YAY");
+                    console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = ourGame.validSpawnLocations();
                     var pos = Phaser.Math.RND.pick(validLocations)
