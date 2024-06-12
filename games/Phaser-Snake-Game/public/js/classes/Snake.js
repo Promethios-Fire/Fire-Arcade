@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     LEFT, RIGHT, UP, DOWN, STOP, DEBUG, commaInt,
-    LENGTH_GOAL, SPEED_WALK, COMBO_ADD_FLOOR
+    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
 
@@ -59,8 +59,8 @@ var Snake = new Phaser.Class({
         // Add a new part at  the current tail position
         // The head moves away from the snake 
         // The Tail position stays where it is and then every thing moves in series
-        var newPart = scene.add.image(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
-        newPart.setOrigin(0,0).setDepth(9).setPipeline('Light2D');
+        var newPart = scene.add.sprite(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
+        newPart.setOrigin(0,0).setDepth(15).setPipeline('Light2D');
         
 
         if (this.body.length > 1){
@@ -182,27 +182,45 @@ var Snake = new Phaser.Class({
             }) 
         }
         // #endregion
-    
-    // Actually Move the Snake Head
-    if (scene.gState != GState.BONK && this.direction != STOP) {
-            Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
-    }
 
-    for (let index = 0; index < scene.coins.length; index++) {
-        var _coin = scene.coins[index];
-        if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
-            console.log("Hit Coin");
+        // Check Tail collides with portal and make portaling snake part invisible.
 
-            ourPlayerData.coins += 1;
-            ourUI.coinUIText.setHTML(
-                `${commaInt(ourPlayerData.coins)}`
-            )
-
-            _coin.destroy();
-            scene.coins.splice(index,1);
-            console.log(scene.coins)
+        if (GState.PLAY === scene.gState) { //GState.PLAY
+            
+                
+            scene.portals.forEach(portal => { 
+                if(this.tail.x * GRID === portal.x && this.tail.y * GRID === portal.y)  {
+                    debugger
+                    portal.snakePortalingSprite.visible = false;
+                    portal.targetObject.snakePortalingSprite.visible = false;
+                }
+            });
         }
-    }
+
+
+
+
+    
+        // Actually Move the Snake Head
+        if (scene.gState != GState.BONK && this.direction != STOP) {
+                Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+        }
+
+        for (let index = 0; index < scene.coins.length; index++) {
+            var _coin = scene.coins[index];
+            if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
+                console.log("Hit Coin");
+
+                ourPlayerData.coins += 1;
+                ourUI.coinUIText.setHTML(
+                    `${commaInt(ourPlayerData.coins)}`
+                )
+
+                _coin.destroy();
+                scene.coins.splice(index,1);
+                console.log(scene.coins)
+            }
+        }
 
     /*
     scene.coins.forEach(_coin => {
@@ -249,10 +267,17 @@ var Snake = new Phaser.Class({
             //_atom.electrons.setPosition(0, 0);
             _atom.electrons.visible = false;
         
-            // Play atom sound
-            var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
-            scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
-            
+            if (scene.moveInterval = SPEED_WALK) {
+                // Play atom sound
+                var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
+                scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
+            } else if (scene.moveInterval = SPEED_SPRINT) {
+                
+                // Play sniper sound here.
+                // There are some moveInterval shenanigans happening here. 
+                // Need to debug when exactly the move call happens compared to setting the movesInterval.
+            }
+
             // Moves the eaten atom after a delay including the electron.
             scene.time.delayedCall(500, function () {
                 _atom.move(scene);

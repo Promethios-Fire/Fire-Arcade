@@ -30,7 +30,7 @@ const SCORE_SCENE_DEBUG = false;
 export const SPEED_WALK = 99; // 99 In milliseconds  
 
 // 16.66 33.32
-const SPEED_SPRINT = 33; // 24  // Also 16 is cool // 32 is the next
+export const SPEED_SPRINT = 33; // 24  // Also 16 is cool // 32 is the next
 
 
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
@@ -266,7 +266,7 @@ const STAGES_NEXT = {
     'testing08': ['testing'],
 }
 // #region START STAGE
-const START_STAGE = 'Stage-07'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-3a'; // Is var because it is set during debugging UI
 
 
@@ -1575,6 +1575,12 @@ class GameScene extends Phaser.Scene {
                 console.log("PORTALING", this.gState);
 
                 if (DEBUG) { console.log("PORTAL"); }
+
+                //portal.snakePortalingSprite.visible = true;
+                //portal.targetObject.snakePortalingSprite.visible = true;
+
+                console.log(portal.target);
+
 
                 //Phaser.Actions.ShiftPosition(this.snake.body, snake.head.x, snake.head.y, this.tail);
 

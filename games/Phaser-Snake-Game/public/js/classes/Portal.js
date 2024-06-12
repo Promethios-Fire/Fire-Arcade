@@ -18,6 +18,11 @@ var Portal = new Phaser.Class({
 
         this.target = { x: to[0], y: to[1]};
         this.targetObject = {};
+        this.snakePortalingSprite = scene.add.sprite(from[0] * GRID, from[1] * GRID, 'snakeDefault', 1
+        ).setDepth(16).setOrigin(0,0).setPipeline('Light2D');
+
+        this.snakePortalingSprite.setTint(0x00FFFF);
+        this.snakePortalingSprite.visible = false;
 
         scene.portals.push(this);
         
