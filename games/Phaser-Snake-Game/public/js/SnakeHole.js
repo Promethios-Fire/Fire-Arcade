@@ -1576,8 +1576,8 @@ class GameScene extends Phaser.Scene {
 
                 if (DEBUG) { console.log("PORTAL"); }
 
-                //portal.snakePortalingSprite.visible = true;
-                //portal.targetObject.snakePortalingSprite.visible = true;
+                portal.snakePortalingSprite.visible = true;
+                portal.targetObject.snakePortalingSprite.visible = true;
 
                 console.log(portal.target);
 

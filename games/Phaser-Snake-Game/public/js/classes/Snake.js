@@ -189,7 +189,7 @@ var Snake = new Phaser.Class({
             
                 
             scene.portals.forEach(portal => { 
-                if(this.tail.x * GRID === portal.x && this.tail.y * GRID === portal.y)  {
+                if(this.body.slice(-2).x * GRID === portal.x && this.body.slice(-2) * GRID === portal.y)  {
                     debugger
                     portal.snakePortalingSprite.visible = false;
                     portal.targetObject.snakePortalingSprite.visible = false;
