@@ -42,7 +42,7 @@ const NO_BONK_BASE = 1000;
 
 
 //debug stuff
-const PORTAL_PAUSE = 2;
+const PORTAL_PAUSE = 2; 
 
 
 // Speed Multiplier Stats
@@ -1576,10 +1576,12 @@ class GameScene extends Phaser.Scene {
 
                 if (DEBUG) { console.log("PORTAL"); }
 
-                portal.snakePortalingSprite.visible = true;
-                portal.targetObject.snakePortalingSprite.visible = true;
+                // Show portal snake body after head arrives.
+                if (this.snake.body.length > 2) {
+                    portal.snakePortalingSprite.visible = true;   
+                }
 
-                console.log(portal.target);
+
 
 
                 //Phaser.Actions.ShiftPosition(this.snake.body, snake.head.x, snake.head.y, this.tail);
@@ -1607,6 +1609,11 @@ class GameScene extends Phaser.Scene {
                     this.gState = GState.PLAY;
                     this.scene.get('UIScene').scoreTimer.paused = false;
                     console.log("Game State === PLAY", this.gState === GState.PLAY); // Will be set to PLAY
+
+                    // Show portal snake body after head arrives.
+                    if (this.snake.body.length > 2) {
+                        portal.targetObject.snakePortalingSprite.visible = true;   
+                    }
                 });
                                     
                 return ;  //Don't know why this is here but I left it -James

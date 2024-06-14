@@ -186,15 +186,31 @@ var Snake = new Phaser.Class({
         // Check Tail collides with portal and make portaling snake part invisible.
 
         if (GState.PLAY === scene.gState) { //GState.PLAY
+
             
-                
-            scene.portals.forEach(portal => { 
-                if(this.body.slice(-2).x * GRID === portal.x && this.body.slice(-2) * GRID === portal.y)  {
-                    debugger
-                    portal.snakePortalingSprite.visible = false;
-                    portal.targetObject.snakePortalingSprite.visible = false;
-                }
-            });
+            if (this.body.length > 2) {
+
+            
+                scene.portals.forEach(portal => {
+            
+                    
+
+                    if(this.body[this.body.length -2].x === portal.x && 
+                        this.body[this.body.length -2].y === portal.y)  {
+                        /***
+                         * -2 checks the second to last piece because the tail
+                         *  overlaps otherwise. This looks better.
+                         */
+                        portal.snakePortalingSprite.visible = false;
+                        portal.targetObject.snakePortalingSprite.visible = false;
+                    }
+                });
+
+            }
+            /*
+           
+
+            */
         }
 
 
@@ -351,6 +367,12 @@ var Snake = new Phaser.Class({
         // Do this on hardcore mode and take a life down.
         //game.destroy();
         //this.scene.restart();
+
+        // If portalling interupted make sure all portal segments are invisible.
+        scene.portals.forEach ( portal => {
+            portal.snakePortalingSprite.visible = false;
+        });
+
         
         scene.tweenRespawn = scene.vortexIn(this.body, 15, 15);
 
