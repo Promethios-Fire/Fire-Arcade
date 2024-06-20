@@ -79,7 +79,7 @@ var Snake = new Phaser.Class({
     // #region Move
     move: function (scene) {
         const ourUI = scene.scene.get('UIScene');
-        const ourPersistentScene = scene.scene.get('PersistentScene');
+        const ourPersistScene = scene.scene.get('PersistScene');
 
     
         // Alias x and y to the current head position
@@ -112,22 +112,22 @@ var Snake = new Phaser.Class({
     if (this.direction === LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
-            ourPersistentScene.bgCoords.x -= .25;
+            ourPersistScene.bgCoords.x -= .25;
         }
         else if (this.direction === RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x + GRID, 0, SCREEN_WIDTH);
-            ourPersistentScene.bgCoords.x += .25;
+            ourPersistScene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
-            ourPersistentScene.bgCoords.y -= .25;
+            ourPersistScene.bgCoords.y -= .25;
         }
         else if (this.direction === DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 1 );
-            ourPersistentScene.bgCoords.y += .25;
+            ourPersistScene.bgCoords.y += .25;
         }
         
         // #region Bonk Walls
@@ -211,9 +211,9 @@ var Snake = new Phaser.Class({
             if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
                 console.log("Hit Coin");
 
-                ourPersistentScene.coins += 1;
+                ourPersistScene.coins += 1;
                 ourUI.coinUIText.setHTML(
-                    `${commaInt(ourPersistentScene.coins)}`
+                    `${commaInt(ourPersistScene.coins)}`
                 )
 
                 _coin.destroy();
@@ -311,7 +311,7 @@ var Snake = new Phaser.Class({
 
     // #region Bonk()
     bonk: function (scene) {
-        const ourPersistentScene = scene.scene.get('PersistentScene');
+        const ourPersistScene = scene.scene.get('PersistScene');
         const ourUI = scene.scene.get('UIScene');
         
         scene.gState = GState.BONK;
@@ -321,9 +321,9 @@ var Snake = new Phaser.Class({
         scene.screenShake();
 
         if (!scene.winned) {
-            ourPersistentScene.coins += -1;
+            ourPersistScene.coins += -1;
             ourUI.coinUIText.setHTML(
-                `${commaInt(ourPersistentScene.coins)}`
+                `${commaInt(ourPersistScene.coins)}`
             );
         }
 

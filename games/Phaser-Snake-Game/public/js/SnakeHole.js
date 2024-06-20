@@ -466,9 +466,9 @@ class StartScene extends Phaser.Scene {
     }
 }
 
-class PersistentScene extends Phaser.Scene {
+class PersistScene extends Phaser.Scene {
     constructor () {
-        super({key: 'PersistentScene', active: true});
+        super({key: 'PersistScene', active: true});
     }
 
     init() {
@@ -598,6 +598,8 @@ class PersistentScene extends Phaser.Scene {
         })).setText(
             `snakehole.${GAME_VERSION}`
     ).setOrigin(1,1);
+
+    this.scene.moveBelow("StartScene", "PersistScene");
 
 
     }
@@ -730,7 +732,7 @@ class GameScene extends Phaser.Scene {
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
-        const ourPersistent = this.scene.get('PersistentScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         this.spaceKey = this.input.keyboard.addKey("Space");
         console.log("FIRST INIT", this.stage, "timeattack=", ourTimeAttack.inTimeAttack);
@@ -764,7 +766,7 @@ class GameScene extends Phaser.Scene {
         this.stageUUID = this.map.properties[0].value; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.map.properties[1].value; // TODO: Get them by name and throw errors.
 
-        ourPersistent.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
+        ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -1758,8 +1760,8 @@ class GameScene extends Phaser.Scene {
     }
 
     checkLoseCon() {
-        const ourPersistent = this.scene.get("PersistentScene");
-        return ourPersistent.coins < 0;
+        const ourPersist = this.scene.get("PersistScene");
+        return ourPersist.coins < 0;
     }
 
     nextStage() {
@@ -2232,7 +2234,7 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourStartScene = this.scene.get('StartScene');
-        const ourPersistent = this.scene.get('PersistentScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         var stageDataJSON = {
             bonks: ourUI.bonks,
@@ -2300,8 +2302,8 @@ class ScoreScene extends Phaser.Scene {
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             //calcSumOfBest(ourStartScene); // Note: This really should be an event.
-            //this.scene.get("PersistentScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
-            //this.scene.get("PersistentScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
+            //this.scene.get("PersistScene").sumOfBestUI.setHTML(`SUM OF BEST : <span style="color:goldenrod">${commaInt(ourStartScene.sumOfBest)}`);
+            //this.scene.get("PersistScene").stagesCompleteUI.setText(`STAGES COMPLETE : ${ourStartScene.stagesComplete}`);
         }
 
         // #endregion
@@ -2823,7 +2825,7 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
-        this.prevZeds = this.scene.get("PersistentScene").zeds;
+        this.prevZeds = this.scene.get("PersistScene").zeds;
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -2855,7 +2857,7 @@ class ScoreScene extends Phaser.Scene {
             // #region Space to Continue
             this.input.keyboard.on('keydown-SPACE', function() {     
 
-                localStorage.setItem("zeds", ourPersistent.zeds);
+                localStorage.setItem("zeds", ourPersist.zeds);
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
@@ -2900,7 +2902,7 @@ class ScoreScene extends Phaser.Scene {
 
     // #region Score - Update
     update(time) {
-        const ourPersistent = this.scene.get('PersistentScene');
+        const ourPersist = this.scene.get('PersistScene');
 
         var scoreCountDown = this.foodLogSeed.slice(-1);
 
@@ -2965,11 +2967,11 @@ class ScoreScene extends Phaser.Scene {
                 You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
             );
 
-            if (this.prevZeds + this.difficulty > ourPersistent.zeds) {
-                ourPersistent.zeds = this.prevZeds + this.difficulty;
-                var zedsObj = calcZedLevel(ourPersistent.zeds);
+            if (this.prevZeds + this.difficulty > ourPersist.zeds) {
+                ourPersist.zeds = this.prevZeds + this.difficulty;
+                var zedsObj = calcZedLevel(ourPersist.zeds);
 
-                ourPersistent.zedsUI.setHTML(
+                ourPersist.zedsUI.setHTML(
                     `<span style ="color: limegreen;
                     font-size: 16px;
                     border: limegreen solid 1px;
@@ -3585,7 +3587,7 @@ class UIScene extends Phaser.Scene {
         
         this.coinUIText = this.add.dom(GRID*22 - 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE
             )).setHTML(
-                `${commaInt(this.scene.get("PersistentScene").coins)}`
+                `${commaInt(this.scene.get("PersistScene").coins)}`
         ).setOrigin(0,0);
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
@@ -4441,7 +4443,7 @@ var config = {
     },
     
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, PersistentScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, PersistScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 
 };
 
