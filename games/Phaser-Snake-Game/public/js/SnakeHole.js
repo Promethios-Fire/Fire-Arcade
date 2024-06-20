@@ -64,13 +64,12 @@ var calcSumOfBest = function(scene) {
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
 
-    entries.forEach(entry => {
-        
-        var key = entry[0].split("-");
+    entries.forEach(log => {
+        var key = log[0].split("-");
         if (key[key.length - 1] === "bestStageData") {
             scene.stagesComplete += 1
 
-            var levelLog = new StageData(JSON.parse(entry[1]));
+            var levelLog = new StageData(JSON.parse(log[1]));
             var _scoreTotal = levelLog.calcTotal();
             scene.sumOfBest += _scoreTotal;
         }
@@ -764,15 +763,15 @@ class GameScene extends Phaser.Scene {
         // Tilemap
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
-        this.mapProperties = {};
+        this.tiledProperties = {};
 
         this.map.properties.forEach(prop => {
-            this.mapProperties[prop.name] = prop.value;
+            this.tiledProperties[prop.name] = prop.value;
         });
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
-        this.stageUUID = this.mapProperties.UUID; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.mapProperties.diffBonus; // TODO: Get them by name and throw errors.
+        this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
         ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
@@ -2121,6 +2120,8 @@ var StageData = new Phaser.Class({
         this.zedLevel = props.zedLevel;
 
         this.uuid = props.uuid;
+        if (this.slug) { this.slug = props.slug }
+        
         this.foodHistory = props.foodHistory;
         this.moveHistory = props.moveHistory;
 
@@ -2256,7 +2257,12 @@ class ScoreScene extends Phaser.Scene {
             moveHistory: ourInputScene.moveHistory,
             stage:ourGame.stage,
             uuid:ourGame.stageUUID,
-            zedLevel: calcZedLevel(ourTimeAttack.zeds).level,
+            zedLevel: calcZedLevel(ourTimeAttack.zeds).level
+        }
+
+        // For properties that may not exist.
+        if (ourGame.tiledProperties.slug) {
+            stageDataJSON["slug"] = ourGame.tiledProperties.slug
         }
 
         this.stageData = new StageData(stageDataJSON);
