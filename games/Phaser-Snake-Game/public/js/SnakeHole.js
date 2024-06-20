@@ -1775,7 +1775,10 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
 
-        var nextStages = STAGES_NEXT[this.stage]
+        debugger
+
+        // The first split and join santizes any spaces.
+        var nextStages = this.tiledProperties.nextStages.split(" ").join("").split(","); 
         var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
 
         ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
