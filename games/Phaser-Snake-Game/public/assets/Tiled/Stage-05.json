@@ -269,6 +269,11 @@
          "name":"diffBonus",
          "type":"int",
          "value":160
+        }, 
+        {
+         "name":"next",
+         "type":"string",
+         "value":"Stage-06"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

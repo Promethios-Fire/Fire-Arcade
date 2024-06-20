@@ -449,6 +449,11 @@
          "value":"100"
         }, 
         {
+         "name":"next",
+         "type":"string",
+         "value":"Stage-03a"
+        }, 
+        {
          "name":"slug",
          "type":"string",
          "value":"babies-first-wall"

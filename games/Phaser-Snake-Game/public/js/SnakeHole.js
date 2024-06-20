@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -229,41 +229,6 @@ export const GState = Object.freeze({
 
 const DREAMWALLSKIP = [0,1,2];
 
-// #region STAGES_NEXT
-const STAGES_NEXT = {
-    'Stage-01': ['Stage-02a'], // ['Stage-02a', 'Stage-02b', 'Stage-02c', 'Stage-02d', 'Stage-02e'],
-    
-    'Stage-02a': ['Stage-03a'],
-    'Stage-02b': ['Stage-03a'],
-    //'Stage-02c': ['Stage-03b'],
-    //'Stage-02d': ['Stage-03b'],
-    'Stage-02e': ['Stage-03c'],
-    
-    'Stage-03a': ['Stage-04'],
-    'Stage-03b': ['Stage-04'],
-    'Stage-03c': ['Stage-04'],
-    
-    'Stage-04': ['Stage-05'],
-    'Stage-05': ['Stage-06'],
-    'Stage-06': ['Stage-07'],
-    'Stage-07': ['Stage-08'],
-    'Stage-08': ['Stage-09'],
-    'Stage-09': ['Stage-10'],
-    'Stage-10': ['Stage-11'],
-    'Stage-11': ['Stage-12'],
-    'Bonus-Stage-x1': [],
-    'testing04': ['Stage-02a','Stage-02b','Stage-02c','Stage-02d','Stage-02e'],
-    'testing-05': ['Stage-03a'],
-
-    'testing02': ['testing03-1'],
-    'testing03-1': ['testing05-1'],
-    'testing05-1': ['testing05-2'],
-    'testing05-2': ['testing06'],
-    'testing06': ['testing06-2'],
-    'testing06-2': ['testing03-2'],
-    'testing03-2': ['testing08'],
-    'testing08': ['testing'],
-}
 // #region START STAGE
 const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-12'; // Is var because it is set during debugging UI
@@ -1775,10 +1740,8 @@ class GameScene extends Phaser.Scene {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
 
-        debugger
-
         // The first split and join santizes any spaces.
-        var nextStages = this.tiledProperties.nextStages.split(" ").join("").split(","); 
+        var nextStages = this.tiledProperties.next.split(" ").join("").split(","); 
         var nextStage = Phaser.Math.RND.pick(nextStages); // TODO Add Check for unlocks on each stage.
 
         ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
@@ -2263,12 +2226,14 @@ class ScoreScene extends Phaser.Scene {
             zedLevel: calcZedLevel(ourTimeAttack.zeds).level
         }
 
-        // For properties that may not exist.
-        if (ourGame.tiledProperties.slug) {
-            stageDataJSON["slug"] = ourGame.tiledProperties.slug
-        }
 
         this.stageData = new StageData(stageDataJSON);
+
+               // For properties that may not exist.
+        if (ourGame.tiledProperties.slug != undefined) {
+            debugger
+            this.stageData.slug = ourGame.tiledProperties.slug;
+        }
         
         console.log(JSON.stringify(this.stageData));
 
