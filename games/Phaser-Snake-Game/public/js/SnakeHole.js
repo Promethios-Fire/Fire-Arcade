@@ -486,7 +486,7 @@ class PersistentScene extends Phaser.Scene {
     
     create() {
 
-    // #region Bottom Bar
+    // #region Persistent Scene
 
     this.anims.create({
         key: 'coin01idle',
@@ -495,8 +495,64 @@ class PersistentScene extends Phaser.Scene {
         repeat: -1
       })
 
-    // Is Zero if there is none.
+    // # Backgrounds
 
+    // for changing bg sprites
+    this.bgTimer = 0;
+
+            // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
+            this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
+            this.UIbackground.setScale(4); 
+    
+            // Furthest BG Object
+            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
+            this.bg0.tileScaleX = 3;
+            this.bg0.tileScaleY = 3;
+    
+            // Scrolling BG1
+            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
+            this.bg.tileScaleX = 3;
+            this.bg.tileScaleY = 3;
+            
+            // BG Mask
+            this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT/2,
+                key: 'bg02mask',
+                add: false
+            }).setOrigin(.5,.5);
+            
+            const mask = this.mask;
+            mask.scale = 3;
+            this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
+            
+            // Scrolling BG2 Planets
+            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
+            this.bg2.tileScaleX = 3;
+            this.bg2.tileScaleY = 3;
+            
+            // Scrolling BG3 Stars (depth is behind planets)
+            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
+            this.bg3.tileScaleX = 3;
+            this.bg3.tileScaleY = 3;
+    
+            // Hue Shift
+            this.fx = this.bg.preFX.addColorMatrix();
+            this.fx2 = this.bg0.preFX.addColorMatrix();
+    
+    
+            //if (this.stage === "Stage-04") {
+            //    this.fx.hue(330);
+            //}
+            this.scrollFactorX = 0;
+            this.scrollFactorY = 0;
+            this.bgCoords = new Phaser.Math.Vector2(0,0);
+
+    
+    
+    
+    
+      // Is Zero if there is none.
     var rawZeds = localStorage.getItem(`zeds`);
     // Catch if any reason undefined gets saved to localstorage
     if (rawZeds === 'undefined') {
@@ -545,7 +601,52 @@ class PersistentScene extends Phaser.Scene {
 
 
     }
-    update() {
+    update(time, delta) {
+
+                //this.scrollFactorX += .025;
+        //this.scrollFactorY += .025;
+
+        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
+        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
+
+        // not all of these need to be interpolated; wastes processing
+
+        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
+        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
+
+        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
+        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
+
+        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
+        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
+            
+        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
+        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
+
+        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
+        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
+
+        this.bgTimer += delta;
+
+        if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
+            this.bg3.setTexture('bg02_3_2') 
+            this.bg.setTexture('bg02frame2') 
+            if (this.bgTimer >= 2000) {
+                this.bg3.setTexture('bg02_3')
+                this.bg.setTexture('bg02') 
+                this.bgTimer = 0
+            }   
+        }
 
     }
 
@@ -716,59 +817,6 @@ class GameScene extends Phaser.Scene {
 
         // Add ghost wall layer here. @holden
         
-        
-    
-        // add background
-
-        // for changing bg sprites
-        this.bgTimer = 0;
-
-        // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-        this.UIbackground = this.add.sprite(0, 0,'UIbg').setDepth(40).setOrigin(0,0);
-        this.UIbackground.setScale(4) 
-
-        // Furthest BG Object
-        this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'bg02_4').setDepth(-4).setOrigin(0,0); 
-        this.bg0.tileScaleX = 3
-        this.bg0.tileScaleY = 3
-
-        // Scrolling BG1
-        this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'bg02').setDepth(-3).setOrigin(0,0);
-        this.bg.tileScaleX = 3;
-        this.bg.tileScaleY = 3;
-        
-        // BG Mask
-        this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
-            x: SCREEN_WIDTH/2,
-            y: SCREEN_HEIGHT/2,
-            key: 'bg02mask',
-            add: false
-        }).setOrigin(.5,.5);
-        
-        const mask = this.mask
-        mask.scale = 3
-        this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); 
-        
-        // Scrolling BG2 Planets
-        this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
-        this.bg2.tileScaleX = 3;
-        this.bg2.tileScaleY = 3;
-        
-        // Scrolling BG3 Stars (depth is behind planets)
-        this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_3').setDepth(-2).setOrigin(0,0);
-        this.bg3.tileScaleX = 3;
-        this.bg3.tileScaleY = 3;
-
-        // Hue Shift
-        this.fx = this.bg.preFX.addColorMatrix();
-        this.fx2 = this.bg0.preFX.addColorMatrix();
-
-
-        if (this.stage === "Stage-04") {
-            this.fx.hue(330);
-        }
-        //this.fx.hue(0);
-        //this.fx2.hue(0);
 
         /*const tween = this.tweens.addCounter({
             from: 0,
@@ -824,9 +872,7 @@ class GameScene extends Phaser.Scene {
             }
         
 
-        this.scrollFactorX = 0
-        this.scrollFactorY = 0
-        this.bgCoords = new Phaser.Math.Vector2(0,0)
+
 
         // Dream wall corners 
         
@@ -991,7 +1037,7 @@ class GameScene extends Phaser.Scene {
             this.bg3.setTexture('bg02_3_2')
         });
 
-        const FADE_OUT_TILES = [104];
+        const FADE_OUT_TILES = [104]; // todo move to consts
 
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
@@ -1466,7 +1512,7 @@ class GameScene extends Phaser.Scene {
             add: false
         }).setOrigin(0.5,0.5);
 
-        this.snakeMask.setScale(1); //Note I'd like to be able to set the scale per level so I can fine tune this during level design.
+        this.snakeMask.setScale(1); //Note I'd like to be able to set the scale per level so I can fine tune this during level design. -- James
 
 
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
@@ -1764,38 +1810,7 @@ class GameScene extends Phaser.Scene {
             
         }
         
-        //this.scrollFactorX += .025;
-        //this.scrollFactorY += .025;
 
-        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
-        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
-
-        // not all of these need to be interpolated; wastes processing
-
-        this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
-
-        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
-        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
-
-        this.bg.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 1;
-        this.bg.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 1;
-            
-        this.bg2.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 2;
-        this.bg2.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 2;
-
-        this.bg3.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.5;
-        this.bg3.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.5;
 
         // #region Hold Reset
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME 
@@ -1882,17 +1897,7 @@ class GameScene extends Phaser.Scene {
 
 
         // #endregion
-        this.bgTimer += delta;
 
-        if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
-            this.bg3.setTexture('bg02_3_2') 
-            this.bg.setTexture('bg02frame2') 
-            if (this.bgTimer >= 2000) {
-                this.bg3.setTexture('bg02_3')
-                this.bg.setTexture('bg02') 
-                this.bgTimer = 0
-            }   
-        }
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {

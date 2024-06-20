@@ -21,12 +21,13 @@ var Portal = new Phaser.Class({
         this.snakePortalingSprite = scene.add.sprite(from[0] * GRID, from[1] * GRID, 'snakeDefault', 1
         ).setDepth(16).setOrigin(0,0).setPipeline('Light2D');
 
-        //this.snakePortalingSprite.setTint(0x00FFFF);
-        this.snakePortalingSprite.visible = false;
 
         scene.portals.push(this);
         
         this.tint = color.color; // Color is a Phaser Color Object
+        this.snakePortalingSprite.setTint(color.color);
+        this.snakePortalingSprite.visible = false;
+
         scene.children.add(this);
 
         // Add Glow
