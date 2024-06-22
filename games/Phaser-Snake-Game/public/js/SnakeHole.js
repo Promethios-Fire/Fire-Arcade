@@ -4566,6 +4566,8 @@ var config = {
     width: 744,
     height: 744,
     renderer: Phaser.AUTO,
+    clearBeforeRender: false,
+    preserveDrawingBuffer: true,
     //seed: 1,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {
@@ -4609,6 +4611,7 @@ if (SCREEN_HEIGHT % GRID != 0 || SCREEN_WIDTH % GRID != 0 ) {
 
 // region const Game
 export const game = new Phaser.Game(config);
+
 
 
 
