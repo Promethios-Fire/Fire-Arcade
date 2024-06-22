@@ -948,9 +948,9 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
-        this.lightMasksContainer = this.make.container(0, 0);
+        //this.lightMasksContainer = this.make.container(0, 0);
          
-            this.lights.enable();
+            //this.lights.enable();
             if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
@@ -1461,7 +1461,7 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             
-            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
+            //this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
             
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
@@ -2670,8 +2670,8 @@ class ScoreScene extends Phaser.Scene {
         // #region Rank Sprites
         //var tilesprite = this.add.tileSprite(400, 300, 800, 600, 'brick').setPipeline('Light2D');
 
-        this.lights.enable();
-        this.lights.setAmbientColor(0x3B3B3B);
+        //this.lights.enable();
+        //this.lights.setAmbientColor(0x3B3B3B);
         
         let rank = this.stageData.stageRank()
         
