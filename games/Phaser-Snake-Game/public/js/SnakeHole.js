@@ -257,7 +257,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UIbg', 'assets/sprites/UI_background.png');
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
-        //this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
+        this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
         this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
         this.load.image('bg02_2', 'assets/sprites/background02_2.png');
         this.load.image('bg02_3', 'assets/sprites/background02_3.png');
@@ -295,8 +295,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
 
-        //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
-        //this.load.image("portalMask", "assets/sprites/portalMask.png");
+        this.load.image("snakeMask", "assets/sprites/snakeMask.png");
+        this.load.image("portalMask", "assets/sprites/portalMask.png");
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -948,9 +948,9 @@ class GameScene extends Phaser.Scene {
 
         //var boostTrailX = this.add.sprite(24, 72).play("boostTrailX01").setOrigin(0,0)
         
-        //this.lightMasksContainer = this.make.container(0, 0);
+        this.lightMasksContainer = this.make.container(0, 0);
          
-            //this.lights.enable();
+            this.lights.enable();
             if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
@@ -1461,7 +1461,7 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             
-            //this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
+            this.lights.addLight(portal.x +16, portal.y + 16, 128,  portalLightColor).setIntensity(1.25);
             
             this.add.particles(portal.x, portal.y, "portalParticle01", {
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
@@ -1476,12 +1476,12 @@ class GameScene extends Phaser.Scene {
             }).setFrequency(332,[1]).setDepth(20);
             
             if (!this.hasGhostTiles) {
-                /*this.portalMask = this.make.image({
+                this.portalMask = this.make.image({
                     x: portal.x,
                     y: portal.y,
                     key: 'portalMask',
                     add: false,
-                });*/
+                });
                 
                 this.lightMasks.push(this.portalMask)
             }
@@ -1563,7 +1563,7 @@ class GameScene extends Phaser.Scene {
         **/
 
         // TODO move to snake object?
-        /*this.snakeMask = this.make.image({
+        this.snakeMask = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
             key: 'snakeMask',
@@ -1600,7 +1600,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
 
         this.lightMasksContainer.add(this.lightMasks);
-        this.lightMasksContainer.setVisible(false);*/
+        this.lightMasksContainer.setVisible(false);
         if (DARK_MODE) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
@@ -1924,8 +1924,8 @@ class GameScene extends Phaser.Scene {
             this.snake.snakeLight.x = this.snake.head.x
             this.snake.snakeLight.y = this.snake.head.y
 
-            //this.snakeMask.x = this.snake.head.x
-            //this.snakeMask.y = this.snake.head.y
+            this.snakeMask.x = this.snake.head.x
+            this.snakeMask.y = this.snake.head.y
 
             this.staggerMagnitude -= 0.5
             //this.curveRegroup.x = GRID * 15
@@ -2034,7 +2034,7 @@ class GameScene extends Phaser.Scene {
             // #region Check Update
 
             // could we move this into snake.move()
-            /*this.snakeMask.x = this.snake.head.x
+            this.snakeMask.x = this.snake.head.x
             this.snakeMask.y = this.snake.head.y
 
             this.snakeMaskN.x = this.snake.head.x
@@ -2047,7 +2047,7 @@ class GameScene extends Phaser.Scene {
             this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT
 
             this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
-            this.snakeMaskW.y = this.snake.head.y*/
+            this.snakeMaskW.y = this.snake.head.y
             //Phaser.Math.Between(0, 9);
 
             
@@ -2670,8 +2670,8 @@ class ScoreScene extends Phaser.Scene {
         // #region Rank Sprites
         //var tilesprite = this.add.tileSprite(400, 300, 800, 600, 'brick').setPipeline('Light2D');
 
-        //this.lights.enable();
-        //this.lights.setAmbientColor(0x3B3B3B);
+        this.lights.enable();
+        this.lights.setAmbientColor(0x3B3B3B);
         
         let rank = this.stageData.stageRank()
         
@@ -3564,7 +3564,7 @@ class UIScene extends Phaser.Scene {
         super({ key: 'UIScene', active: false });
     }
     
-    init(props) {
+    /*init(props) {
         //this.score = 0;
         var { score = 0 } = props
         this.score = score;
@@ -3776,7 +3776,7 @@ class UIScene extends Phaser.Scene {
                 /*'font-size': '22px', //old settings
                 'font-weight': '400',
                 'font-weight': 'bold',
-                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,*/
+                'text-shadow': '-1px 1px 0 #000, 1px 1px 0 #000, 1px -1px 0 #000, -1px -1px 0 #000' ,
             })).setOrigin(0,0);
             
             // Remove score text after a time period.
@@ -3939,7 +3939,7 @@ class UIScene extends Phaser.Scene {
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly during portaling. After the timer pauses at the Score Floor
              *  the countdown timer will go to 0.
-             */
+             
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
     
             if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
@@ -4057,7 +4057,7 @@ class UIScene extends Phaser.Scene {
         });
         this.visible = false;
         this.comboCounter = 0;
-    }
+    }*/
 
 end() {
 
@@ -4320,7 +4320,7 @@ class InputScene extends Phaser.Scene {
             // Starting Game State
             gameScene.gState = GState.PLAY;
             console.log("GSTATE === PLAY", gameScene.gState === GState.PLAY);
-            this.scene.get('UIScene').scoreTimer.paused = false;
+            //this.scene.get('UIScene').scoreTimer.paused = false;
                 
             // turn off arrows and move snake.
             gameScene.startingArrowState = false;
