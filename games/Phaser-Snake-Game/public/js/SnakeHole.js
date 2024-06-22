@@ -257,7 +257,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UIbg', 'assets/sprites/UI_background.png');
         this.load.image('bg01', 'assets/sprites/background01.png');
         this.load.image('bg02', 'assets/sprites/background02.png');
-        this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
+        //this.load.image('bg02mask', 'assets/sprites/background02_mask.png');
         this.load.image('bg02frame2', 'assets/sprites/background02_frame2.png');
         this.load.image('bg02_2', 'assets/sprites/background02_2.png');
         this.load.image('bg02_3', 'assets/sprites/background02_3.png');
@@ -295,8 +295,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
         this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 36, frameHeight: 48 });
 
-        this.load.image("snakeMask", "assets/sprites/snakeMask.png");
-        this.load.image("portalMask", "assets/sprites/portalMask.png");
+        //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
+        //this.load.image("portalMask", "assets/sprites/portalMask.png");
 
         // Animations
         this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -857,12 +857,12 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset])//.setPipeline('Light2D');
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset]).setPipeline('Light2D');
         this.wallLayer.setDepth(25);
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff)//.setPipeline('Light2D');
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
 
@@ -950,7 +950,7 @@ class GameScene extends Phaser.Scene {
         
         this.lightMasksContainer = this.make.container(0, 0);
          
-            //this.lights.enable();
+            this.lights.enable();
             if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
@@ -1476,12 +1476,12 @@ class GameScene extends Phaser.Scene {
             }).setFrequency(332,[1]).setDepth(20);
             
             if (!this.hasGhostTiles) {
-                this.portalMask = this.make.image({
+                /*this.portalMask = this.make.image({
                     x: portal.x,
                     y: portal.y,
                     key: 'portalMask',
                     add: false,
-                });
+                });*/
                 
                 this.lightMasks.push(this.portalMask)
             }
@@ -1563,7 +1563,7 @@ class GameScene extends Phaser.Scene {
         **/
 
         // TODO move to snake object?
-        this.snakeMask = this.make.image({
+        /*this.snakeMask = this.make.image({
             x: GRID * 0,
             y: GRID * 0,
             key: 'snakeMask',
@@ -1600,7 +1600,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasks.push(this.snakeMask,this.snakeMaskN, this.snakeMaskE, this.snakeMaskS, this.snakeMaskW)
 
         this.lightMasksContainer.add(this.lightMasks);
-        this.lightMasksContainer.setVisible(false);
+        this.lightMasksContainer.setVisible(false);*/
         if (DARK_MODE) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
@@ -1924,8 +1924,8 @@ class GameScene extends Phaser.Scene {
             this.snake.snakeLight.x = this.snake.head.x
             this.snake.snakeLight.y = this.snake.head.y
 
-            this.snakeMask.x = this.snake.head.x
-            this.snakeMask.y = this.snake.head.y
+            //this.snakeMask.x = this.snake.head.x
+            //this.snakeMask.y = this.snake.head.y
 
             this.staggerMagnitude -= 0.5
             //this.curveRegroup.x = GRID * 15
@@ -2034,7 +2034,7 @@ class GameScene extends Phaser.Scene {
             // #region Check Update
 
             // could we move this into snake.move()
-            this.snakeMask.x = this.snake.head.x
+            /*this.snakeMask.x = this.snake.head.x
             this.snakeMask.y = this.snake.head.y
 
             this.snakeMaskN.x = this.snake.head.x
@@ -2047,7 +2047,7 @@ class GameScene extends Phaser.Scene {
             this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT
 
             this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
-            this.snakeMaskW.y = this.snake.head.y
+            this.snakeMaskW.y = this.snake.head.y*/
             //Phaser.Math.Between(0, 9);
 
             
@@ -2677,7 +2677,7 @@ class ScoreScene extends Phaser.Scene {
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",
             rank
-        ).setDepth(20).setOrigin(0,0)//.setPipeline('Light2D');
+        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
         
         this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -3680,7 +3680,7 @@ class UIScene extends Phaser.Scene {
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
 
-        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)//.setPipeline('Light2D');      // Snake Body
+        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)//Snake Body
         var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
  
         snakeBody.scale = .667;
