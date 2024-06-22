@@ -857,12 +857,12 @@ class GameScene extends Phaser.Scene {
             this.wallVarient = "Wall";
         }
 
-        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset]).setPipeline('Light2D');
+        this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset])//.setPipeline('Light2D');
         this.wallLayer.setDepth(25);
 
         if (this.map.getLayer('Ghost-1')) {
             this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
+            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff)//.setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
 
@@ -950,7 +950,7 @@ class GameScene extends Phaser.Scene {
         
         this.lightMasksContainer = this.make.container(0, 0);
          
-            this.lights.enable();
+            //this.lights.enable();
             if (!DARK_MODE) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
@@ -2677,7 +2677,7 @@ class ScoreScene extends Phaser.Scene {
         
         var letterRank = this.add.sprite(GRID * 3.5,GRID * 16.0,"ranksSheet",
             rank
-        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+        ).setDepth(20).setOrigin(0,0)//.setPipeline('Light2D');
         
         this.letterRankCurve = new Phaser.Curves.Ellipse(letterRank.x + 24, letterRank.y + 32, 96);
         this.letterRankPath = { t: 0, vec: new Phaser.Math.Vector2() };
@@ -3680,7 +3680,7 @@ class UIScene extends Phaser.Scene {
         //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
 
-        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50).setPipeline('Light2D');      // Snake Body
+        var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)//.setPipeline('Light2D');      // Snake Body
         var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
  
         snakeBody.scale = .667;
@@ -4565,7 +4565,7 @@ var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     width: 744,
     height: 744,
-    renderer: Phaser.AUTO,
+    renderer: Phaser.WEBGL_MULTI,
     clearBeforeRender: false,
     preserveDrawingBuffer: true,
     //seed: 1,
