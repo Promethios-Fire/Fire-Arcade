@@ -436,9 +436,9 @@ class StartScene extends Phaser.Scene {
             else {
                                                 
                 this.scene.setVisible(false);
-                this.scene.get("InputScene").setVisible(false);
+                //this.scene.get("UIScene").setVisible(false);
                 
-                his.scene.launch('UIScene');
+                this.scene.launch('UIScene');
                 this.scene.launch('GameScene');
                 //var ourGameScene = this.scene.get("GameScene");
                 //console.log(e)
