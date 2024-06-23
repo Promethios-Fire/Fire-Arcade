@@ -3913,12 +3913,12 @@ class UIScene extends Phaser.Scene {
         
     }
     update(time) {
-        //var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+        var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
-        if (LENGTH_GOAL === 0){
+        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
             // Temp Code for bonus level
-            //console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
+            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
 
             this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             this.bestScoreUI.setText(`Best :  ${this.score}`);
@@ -3944,27 +3944,27 @@ class UIScene extends Phaser.Scene {
             this.countDown.setText(countDown.toString().padStart(3,"0"));
         }
 
-        //if (timeTick != this.lastTimeTick) {
-            //this.lastTimeTick = timeTick;
+        if (timeTick != this.lastTimeTick) {
+            this.lastTimeTick = timeTick;
 
-        if(!this.scoreTimer.paused) {
-            this.coinSpawnCounter -= 1;
+            if(!this.scoreTimer.paused) {
+                this.coinSpawnCounter -= 1;
 
-            if (this.coinSpawnCounter < 1) {
-                console.log("COIN TIME YAY. SPAWN a new coin");
+                if (this.coinSpawnCounter < 1) {
+                    console.log("COIN TIME YAY. SPAWN a new coin");
 
-                var validLocations = this.ourGame.validSpawnLocations();
-                var pos = Phaser.Math.RND.pick(validLocations)
+                    var validLocations = this.ourGame.validSpawnLocations();
+                    var pos = Phaser.Math.RND.pick(validLocations)
 
-                var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim'
-                ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-                
-                this.ourGame.coins.push(_coin);
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'coinPickup01Anim'
+                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+                    
+                    this.ourGame.coins.push(_coin);
 
-                this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(60,120);
+                }
             }
         }
-        
         
 
 
@@ -4011,9 +4011,9 @@ class UIScene extends Phaser.Scene {
         else if (this.comboCounter == 0 && this.comboActive){
             this.comboFade();
         }
-        /*if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
+        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
             this.comboFade();
-        }*/
+        }
     }
     
     comboBounce(){
