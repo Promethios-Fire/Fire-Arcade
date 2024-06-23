@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.001';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -275,9 +275,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx24.png','assets/Tiled/tileSheetx24_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-
-
-                //this.load.tilemapTiledJSON('map', 'assets/Tiled/Stage1.json');
+        this.load.image('nextStagePortal', '/assets/sprites/portalBlue.png');
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -656,6 +654,7 @@ class GameScene extends Phaser.Scene {
         this.walls = [];
         this.portals = [];
         this.dreamWalls = [];
+        this.nextStagePortals = [];
 
         this.lastMoveTime = 0; // The last time we called move()
         this.nextScore = 0; // Calculated and stored after score screen finishes.
@@ -710,7 +709,7 @@ class GameScene extends Phaser.Scene {
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
         //const ourGame = this.scene.get("GameScene");
-        console.log(this.stage);
+        
         
 
 
@@ -1122,79 +1121,35 @@ class GameScene extends Phaser.Scene {
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
+                if (this.map.getLayer('Next')) {
 
-                this.gState = GState.TRANSITION;
+                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset]);
+                    var tiledIndex = 641; // First column in the row.
+                    //debugger;
+                    this.nextStages.forEach( stageName => {
 
-                this.snake.head.setTexture('snakeDefault', 0);
+                        var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
+                        console.log("MAKING PORTAL TILE AT", tile.index, tile.x, tile.y);
 
-                var wallSprites = [];
-                var fadeOutSprites = []; 
+                        var stageText = this.add.text(tile.x * GRID, tile.y * GRID - GRID, 
+                            stageName
+                        ).setDepth(35).setOrigin(0,0);
 
-                this.wallLayer.culledTiles.forEach( tile => {
+                        var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
+                            'nextStagePortal' 
 
-                    if (tile.y > 1 && tile.y < 30) {
-                        
-                        var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
-                        ).setOrigin(0,0).setDepth(50);
-                        
-                        if (FADE_OUT_TILES.includes(tile.index)) {
-                            fadeOutSprites.push(_sprite);
-                        } else {
-                            wallSprites.push(_sprite);
-                        }               
-                    }
-                    
-                });
-                this.wallLayer.visible = false;
+                        ).setDepth(35).setOrigin(0.21,0.21).setScale(2);
 
-                Phaser.Utils.Array.Shuffle(wallSprites);
-                
-                var allTheThings = [
-                    ...this.coins,
-                    ...this.portals,
-                    ...this.atoms,
-                    ...wallSprites
-                ];
+                        this.nextStagePortals.push(portalImage);
 
-                var snakeholeTween = this.tweens.add({
-                    targets: this.snake.body, 
-                    x: 15 * GRID, //this.pathRegroup.vec.x,
-                    y: 15 * GRID, //this.pathRegroup.vec.y,
-                    yoyo: false,
-                    duration: 500,
-                    ease: 'Sine.easeOutIn',
-                    repeat: 0,
-                    delay: this.tweens.stagger(30)
-                });
+                        tiledIndex++;
+                    });
 
-                
+                }
 
-                var blackholeTween = this.tweens.add({
-                    targets: allTheThings, 
-                    x: 15 * GRID, //this.pathRegroup.vec.x,
-                    y: 15 * GRID, //this.pathRegroup.vec.y,
-                    yoyo: false,
-                    duration: 500,
-                    ease: 'Sine.easeOutIn',
-                    repeat: 0,
-                    delay: this.tweens.stagger(30)
-                });
-
-                var fadeoutTween = this.tweens.add({
-                    targets: fadeOutSprites,
-                    alpha: 0,
-                    duration: 1000,
-                    ease: 'linear'
-                  }, this);
-
-
-                blackholeTween.on('complete', () => {
-                    this.nextStage();
-                });
-                    
-                
             }
-
+            
+ 
         });
 
         // #endregion
@@ -1795,6 +1750,83 @@ class GameScene extends Phaser.Scene {
             }
         });
     }
+
+    warpToNext(nextStageIndex) {
+
+        this.gState = GState.TRANSITION;
+
+        this.snake.head.setTexture('snakeDefault', 0);
+
+        var wallSprites = [];
+        var fadeOutSprites = []; 
+
+        this.wallLayer.culledTiles.forEach( tile => {
+
+            if (tile.y > 1 && tile.y < 30) {
+                
+                var _sprite = this.add.sprite(tile.x*GRID, tile.y*GRID, 'tileSprites', tile.index - 1,
+                ).setOrigin(0,0).setDepth(50);
+                
+                if (FADE_OUT_TILES.includes(tile.index)) {
+                    fadeOutSprites.push(_sprite);
+                } else {
+                    wallSprites.push(_sprite);
+                }               
+            }
+            
+        });
+        this.wallLayer.visible = false;
+
+        Phaser.Utils.Array.Shuffle(wallSprites);
+        
+        var allTheThings = [
+            ...this.coins,
+            ...this.portals,
+            ...this.atoms,
+            ...wallSprites
+        ];
+
+        var snakeholeTween = this.tweens.add({
+            targets: this.snake.body, 
+            x: 15 * GRID, //this.pathRegroup.vec.x,
+            y: 15 * GRID, //this.pathRegroup.vec.y,
+            yoyo: false,
+            duration: 500,
+            ease: 'Sine.easeOutIn',
+            repeat: 0,
+            delay: this.tweens.stagger(30)
+        });
+
+        
+
+        var blackholeTween = this.tweens.add({
+            targets: allTheThings, 
+            x: 15 * GRID, //this.pathRegroup.vec.x,
+            y: 15 * GRID, //this.pathRegroup.vec.y,
+            yoyo: false,
+            duration: 500,
+            ease: 'Sine.easeOutIn',
+            repeat: 0,
+            delay: this.tweens.stagger(30)
+        });
+
+        var fadeoutTween = this.tweens.add({
+            targets: fadeOutSprites,
+            alpha: 0,
+            duration: 1000,
+            ease: 'linear'
+            }, this);
+
+
+        blackholeTween.on('complete', () => {
+            this.nextStage(this.nextStages[nextStageIndex]);
+        });
+                    
+                
+            
+
+
+    }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
         if (DARK_MODE) {
@@ -1843,7 +1875,7 @@ class GameScene extends Phaser.Scene {
         return ourPersist.coins < 0;
     }
 
-    nextStage() {
+    nextStage(stageName) {
         const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
 
@@ -1866,8 +1898,8 @@ class GameScene extends Phaser.Scene {
         //console.log(STAGE_UNLOCKS['babies-first-wall'].call());
 
         // #region Check Unlocked
+        //*
         var unlockedLevels = [];
-        
         this.nextStages.forEach( stageName => {
             var dataName = `${stageName}data`;
             var data = this.cache.json.get(dataName);
@@ -1891,9 +1923,10 @@ class GameScene extends Phaser.Scene {
              */
             nextStage = Phaser.Math.RND.pick(this.nextStages);
         }
+        
 
         ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives } );
-        this.scene.restart( { stage: nextStage } );
+        this.scene.restart( { stage: stageName } );
         ourInputScene.scene.restart();
 
         // Add if time attack code here

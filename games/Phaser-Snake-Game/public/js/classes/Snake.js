@@ -204,6 +204,17 @@ var Snake = new Phaser.Class({
         if (scene.gState != GState.BONK && this.direction != STOP) {
                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
+        
+        // Check for Warp Portals
+        if (scene.winned) {
+            for (let index = 0; index < scene.nextStagePortals.length; index++) {
+                if (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y) {
+                    console.log("ITS WARPING TIME to WORLD", index);
+                    scene.warpToNext(index);
+                }
+                
+            }
+        }
 
         // #region Coin Collision
         for (let index = 0; index < scene.coins.length; index++) {
