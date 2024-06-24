@@ -103,7 +103,12 @@
         {
          "name":"next",
          "type":"string",
-         "value":""
+         "value":"Stage-03a, Stage-03b, Portal_Stage-03"
+        }, 
+        {
+         "name":"slug",
+         "type":"string",
+         "value":"bidirectional-portals"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

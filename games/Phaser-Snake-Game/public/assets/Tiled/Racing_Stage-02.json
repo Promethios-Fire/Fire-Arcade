@@ -187,7 +187,12 @@
         {
          "name":"next",
          "type":"string",
-         "value":""
+         "value":"Racing_Stage-03, Stage-03a, Stage-03b"
+        }, 
+        {
+         "name":"slug",
+         "type":"string",
+         "value":"easy-racer"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

@@ -99,6 +99,16 @@
          "name":"diffBonus",
          "type":"int",
          "value":100
+        }, 
+        {
+         "name":"next",
+         "type":"string",
+         "value":"Stage-06"
+        }, 
+        {
+         "name":"slug",
+         "type":"string",
+         "value":"unidirectional-portals"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
