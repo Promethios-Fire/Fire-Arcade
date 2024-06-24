@@ -143,6 +143,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 var map;  // Phaser.Tilemaps.Tilemap 
 var tileset;
 var tileset2;
+const FADE_OUT_TILES = [104];
 
 //  Direction consts
 export const LEFT = 3;
@@ -1116,8 +1117,6 @@ class GameScene extends Phaser.Scene {
             this.pressedSpaceDuringWait = false;
         });
 
-        const FADE_OUT_TILES = [104];
-
         // #region Transition Visual
         this.input.keyboard.on('keydown-N', e => {
             if (this.winned) {
@@ -1884,12 +1883,15 @@ class GameScene extends Phaser.Scene {
                 return true
             },
             'babies-first-wall': function () {
-                return false
+                return true
             },
             'horz-row': function () {
-                return false
+                return true
             },
             'now-vertical': function () {
+                return true
+            },
+            'dark-precision': function () {
                 return true
             }
         }
@@ -1906,9 +1908,10 @@ class GameScene extends Phaser.Scene {
             
             data.forEach( propObj => {
                 if (propObj.name === 'slug') {
-                    if (STAGE_UNLOCKS[propObj.value].call()) {
-                        unlockedLevels.push(stageName);
-                    }
+                    
+                    //if (STAGE_UNLOCKS[propObj.value].call()) {
+                    //    unlockedLevels.push(stageName);
+                    //}
                 }
             });
         });
