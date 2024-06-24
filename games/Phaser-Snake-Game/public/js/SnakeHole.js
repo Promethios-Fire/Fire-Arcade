@@ -495,18 +495,6 @@ class PersistScene extends Phaser.Scene {
             this.bg.tileScaleX = 3;
             this.bg.tileScaleY = 3;
             
-            // BG Mask
-            /*this.mask = this.make.tileSprite({  //@holden name that says more what this mask is would be nice. I can't tell just by reading it.
-                x: SCREEN_WIDTH/2,
-                y: SCREEN_HEIGHT/2,
-                key: 'bg02mask',
-                add: false
-            }).setOrigin(.5,.5);
-            
-            const mask = this.mask;
-            mask.scale = 3;
-            this.bg.mask = new Phaser.Display.Masks.BitmapMask(this, mask); */
-            
             // Scrolling BG2 Planets
             this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'bg02_2').setDepth(-1).setOrigin(0,0);
             this.bg2.tileScaleX = 3;

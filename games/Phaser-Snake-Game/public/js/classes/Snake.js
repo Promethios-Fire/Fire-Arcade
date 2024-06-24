@@ -30,15 +30,15 @@ var Snake = new Phaser.Class({
             this.lightDiameter = 192
         }
         else{
-            this.lightIntensity = .5
+            this.lightIntensity = .75
             this.lightDiameter = 92
         }
 
         this.snakeLight = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightE = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
-        this.snakeLightW = scene.lights.addLight(this.head.x, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightN = scene.lights.addLight(this.head.x, this.head.y + SCREEN_HEIGHT/2, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightE = scene.lights.addLight(this.head.x + SCREEN_WIDTH/2, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightS = scene.lights.addLight(this.head.x, this.head.y - SCREEN_HEIGHT/2, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
+        this.snakeLightW = scene.lights.addLight(this.head.x - SCREEN_WIDTH/2, this.head.y, this.lightDiameter, 0xAF67FF).setIntensity(this.lightIntensity);
     },
     
     // #region Grow
