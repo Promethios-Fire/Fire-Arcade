@@ -710,42 +710,7 @@ class GameScene extends Phaser.Scene {
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
 
-        //UI
-
-        const panel = this.add.nineslice(GRID * 15.5, GRID * 8, 'uiGlass', 'Glass', 450, 72, 72, 72, 36, 36);
-        panel.setDepth(100)
-        panel.setScale(0)
-
-        const goalText = [
-            'GOAL : COLLECT 28 ATOMS',
-        ];
-        const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)
-
-        this.panelTween = this.tweens.add({
-            targets: [panel,text],
-            scale: 1,
-            width: 420,
-            height: 36,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });
-
-        this.panelTweenCollapse = this.tweens.add({
-            targets: [panel,text],
-            scale: 0,
-            width: 0,
-            height: 0,
-            duration: 300,
-            ease: 'sine.inout',
-            yoyo: false,
-            repeat: 0,
-        });
-        this.panelTweenCollapse.pause();
+       
 
 
         // SOUND
@@ -1007,7 +972,7 @@ class GameScene extends Phaser.Scene {
                     this.lastMoveTime = this.time.now;
                 }
                 ourInputScene.moveDirection(this, e);
-                this.panelTweenCollapse.resume();
+                //this.panelTweenCollapse.resume();
                 
                 
                 if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
@@ -3553,8 +3518,8 @@ class UIScene extends Phaser.Scene {
     init(props) {
         //this.score = 0;
         var { score = 0 } = props
-        this.score = score;
-        this.stageStartScore = score;
+        this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
+        this.stageStartScore = Math.trunc(score);
         
         this.length = 0;
 
@@ -3587,6 +3552,42 @@ class UIScene extends Phaser.Scene {
     create() {
        this.ourGame = this.scene.get('GameScene');
        this.ourInputScene = this.scene.get('InputScene');
+
+        //9-Slice Panels
+
+        const panel = this.add.nineslice(GRID * .125, GRID * 3.125, 'uiGlass', 'GlassThin', 100, 36, 80, 18);
+        panel.setDepth(100).setOrigin(0,.5)
+
+        const goalText = [
+            'GOAL : COLLECT 28 ATOMS',
+        ];
+        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
+        text.setOrigin(0.5, 0.5);
+        text.setScale(0)
+        text.setDepth(101)*/
+
+        /*this.panelTween = this.tweens.add({
+            targets: [panel],
+            scale: 1,
+            width: 420,
+            height: 36,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });
+
+        this.panelTweenCollapse = this.tweens.add({
+            targets: [panel],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });*/
+        //this.panelTweenCollapse.pause();
 
 
 
@@ -3729,10 +3730,10 @@ class UIScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(GRID*21 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreUI = this.add.dom(0, GRID * 3.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `SCORE :`
         ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*24, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
             `${commaInt(this.score.toString())}`
         ).setOrigin(0,1);
 
@@ -3814,9 +3815,9 @@ class UIScene extends Phaser.Scene {
             //    `${deltaScore}`
             //)
             
-            this.runningScoreUI.setText(
+            /*this.runningScoreUI.setText(
                 `SCORE :`
-            );
+            );*/
             this.runningScoreLabelUI.setText(
                 `${commaInt(runningScore.toString())}`
             );
@@ -4547,8 +4548,6 @@ var config = {
     width: 744,
     height: 744,
     renderer: Phaser.WEBGL_MULTI,
-    clearBeforeRender: false,
-    preserveDrawingBuffer: true,
     //seed: 1,
     autoCenter: Phaser.Scale.CENTER_HORIZONTALLY,
     scale: {

@@ -5,7 +5,7 @@
 			"format": "RGBA8888",
 			"size": {
 				"w": 144,
-				"h": 144
+				"h": 192
 			},
 			"scale": 1,
 			"frames": [
@@ -28,6 +28,27 @@
 						"y": 0,
 						"w": 144,
 						"h": 144
+					}
+				},
+				{
+					"filename": "GlassThin",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 144,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 144,
+						"h": 48
+					},
+					"frame": {
+						"x": 0,
+						"y": 144,
+						"w": 144,
+						"h": 48
 					}
 				}
 			]
