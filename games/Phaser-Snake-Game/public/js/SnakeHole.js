@@ -3785,30 +3785,47 @@ class UIScene extends Phaser.Scene {
         
 
         // Score Text
-        this.scoreUI = this.add.dom(1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`STAGE`).setOrigin(0,0);
-        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0);
+        //this.scoreUI = this.add.dom(1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(`STAGE`).setOrigin(0,0);
+        //this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(`0`).setOrigin(0,0);
+        //this.bestScoreUI = this.add.dom(11, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(`BEST`).setOrigin(0,0);
+        //this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(this.ourGame.bestBase).setOrigin(0,0);
 
-        this.bestScoreUI = this.add.dom(11, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`BEST`).setOrigin(0,0);;
-        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.ourGame.bestBase).setOrigin(0,0);
+
+
+        //this.runningScoreUI = this.add.dom(0, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `SCORE`
+        //).setOrigin(0,1);
+        //this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `${commaInt(this.score.toString())}`
+        //).setOrigin(0,1);
         
         
 
+        // #region Text version
+        const textUIStyle = {
+
+        }
+
+        this.scoreUI = this.add.text(0, GRID, `Stage :`, textUIStyle).setOrigin(0,0);;
+        this.scoreLabelUI = this.add.text(GRID * 3 , GRID * 1.25, "0", textUIStyle).setOrigin(0,0);
+        this.bestScoreUI = this.add.text(11, GRID * 0.325 , `Best`, textUIStyle).setOrigin(0,0);
+        this.bestScoreLabelUI = this.add.text(GRID * 3, GRID * 0.325, this.ourGame.bestBase, textUIStyle).setOrigin(0,0);
+        this.runningScoreUI = this.add.text(0, GRID * 3, `SCORE`, textUIStyle).setOrigin(0,1);
+        this.runningScoreLabelUI = this.add.text(GRID*3, GRID * 3, `${commaInt(this.score.toString())}`, textUIStyle).setOrigin(0,1);
 
 
-   
         
 
-        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        //).setText(`x ${this.lives}`).setOrigin(0,1);
+
+
 
         // Goal UI
-        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
-        this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        //this.lengthGoalUI = this.add.dom(GRID*28.0, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+        this.lengthGoalUI = this.add.text(GRID*28.0, GRID, textUIStyle);
 
         var snakeBody = this.add.sprite(GRID * 30.5, GRID - 4, 'snakeDefault', 1).setOrigin(1,1).setDepth(50)//Snake Body
         var flagGoal = this.add.sprite(GRID * 30.5, GRID + 4, 'ui-blocks', 3).setOrigin(1,0).setDepth(50); // Tried to center flag
@@ -3819,11 +3836,12 @@ class UIScene extends Phaser.Scene {
         
         var length = `${this.length}`;
         if (LENGTH_GOAL != 0) {
-            this.lengthGoalUI.setHTML(
-                `${length.padStart(2, "0")}<br/>
-                <hr style="font-size:3px"/>
-                ${LENGTH_GOAL.toString().padStart(2, "0")}`
-            ).setOrigin(0,0.5);
+            //this.lengthGoalUI.setHTML(
+            //    `${length.padStart(2, "0")}<br/>
+            //    <hr style="font-size:3px"/>
+            //    ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            //).setOrigin(0,0.5);
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL.toString().padStart(2, "0")}`);
         }
         else {
             // Special Level
@@ -3831,7 +3849,6 @@ class UIScene extends Phaser.Scene {
             this.lengthGoalUI.x = GRID * 27
         }
         
-        //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
@@ -3861,17 +3878,20 @@ class UIScene extends Phaser.Scene {
 
         //this.coinsUIIcon.setScale(0.5);
         
-        this.coinUIText = this.add.dom(GRID*23.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: COLOR_SCORE,
-            'color': 'white',
-            'font-weight': '400',
-            //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
-            'font-size': '22px',
-            'font-family': 'Oxanium',
-            //'padding': '3px 8px 0px 0px',
-        })).setHTML(
-                `${commaInt(this.scene.get("PersistScene").coins)}`
-        ).setOrigin(0,0);
+        //this.coinUIText = this.add.dom(GRID*23.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        //    color: COLOR_SCORE,
+        //    'color': 'white',
+        //    'font-weight': '400',
+        //    //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+        //    'font-size': '22px',
+        //    'font-family': 'Oxanium',
+        //    //'padding': '3px 8px 0px 0px',
+        //})).setHTML(
+        //        `${commaInt(this.scene.get("PersistScene").coins)}`
+        //).setOrigin(0,0);
+        this.coinUIText = this.add.text(GRID*23.125, 12, `${commaInt(this.scene.get("PersistScene").coins)}`, textUIStyle).setOrigin(0,0);
+
+
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
         //    `LASTΔ :`
@@ -3880,12 +3900,7 @@ class UIScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(0, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `SCORE`
-        ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1);
+        
 
         
         if (DEBUG) {
@@ -3990,11 +4005,12 @@ class UIScene extends Phaser.Scene {
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
-                this.lengthGoalUI.setHTML(
-                    `${length.padStart(2, "0")}<br/>
-                    <hr style="font-size:3px"/>
-                    ${LENGTH_GOAL.toString().padStart(2, "0")}`
-                )
+                //this.lengthGoalUI.setHTML(
+                //    `${length.padStart(2, "0")}<br/>
+                //    <hr style="font-size:3px"/>
+                //    ${LENGTH_GOAL.toString().padStart(2, "0")}`
+                //)
+                this.lengthGoalUI.setText(`${length.padStart(2, "0")}/${LENGTH_GOAL.toString().padStart(2, "0")}`)
             }
             else {
                 this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
@@ -4103,6 +4119,7 @@ class UIScene extends Phaser.Scene {
     }
     // #region UI Update
     update(time) {
+        
         var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         this.scoreDigitLength = this.runningScore.toString().length;
         this.panel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
@@ -4135,7 +4152,7 @@ class UIScene extends Phaser.Scene {
                 this.scoreTimer.paused = true;
             }
 
-            this.countDown.setText(countDown.toString().padStart(3,"0"));
+            //this.countDown.setText(countDown.toString().padStart(3,"0"));
         }
 
         if (timeTick != this.lastTimeTick) {
@@ -4170,7 +4187,7 @@ class UIScene extends Phaser.Scene {
                     
                     // Boost Stats
                     this.ourInputScene.boostTime += 6;
-                    this.mask.setScale(this.energyAmount/100,1);
+                    //this.mask.setScale(this.energyAmount/100,1);
                     this.energyAmount -= 1;
                 } else{
                     //DISSIPATE LIVE ELECTRICITY
@@ -4179,14 +4196,17 @@ class UIScene extends Phaser.Scene {
         
             } else {
                 this.ourGame.moveInterval = SPEED_WALK; // Less is Faster
-                this.mask.setScale(this.energyAmount/100,1);
+                //this.mask.setScale(this.energyAmount/100,1);
                 this.energyAmount += .25; // Recharge Boost Slowly
             }
         } else if (GState.START_WAIT === this.ourGame.gState) {
-            this.mask.setScale(this.energyAmount/100,1);
+            //this.mask.setScale(this.energyAmount/100,1);
             this.energyAmount += 1; // Recharge Boost Slowly
 
         }
+
+        
+
 
         // Reset Energy if out of bounds.
         if (this.energyAmount >= 100) {
