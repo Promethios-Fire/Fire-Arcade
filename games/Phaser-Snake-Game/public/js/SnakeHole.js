@@ -3862,16 +3862,18 @@ class UIScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
-            'color': '#FCFFB2',
-            'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
-            'font-size': '22px',
-            'font-weight': '400',
-            'font-family': 'Oxanium',
-            'padding': '2px 7px 0px 0px',
-            })).setHTML(
-                countDown.toString().padStart(3,"0")
-        ).setOrigin(1,0.5);
+        //this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        //    'color': '#FCFFB2',
+        //    'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
+        //    'font-size': '22px',
+        //    'font-weight': '400',
+        //    'font-family': 'Oxanium',
+        //    'padding': '2px 7px 0px 0px',
+        //    })).setHTML(
+        //        countDown.toString().padStart(3,"0")
+        //).setOrigin(1,0.5);
+
+        this.countDown = this.add.text(GRID*9 + 9, GRID, countDown.toString().padStart(3,"0") , textUIStyle).setOrigin(1,0.5);
 
         this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'coinPickup01Anim'
         ).play('coin01idle').setDepth(101).setOrigin(0,0);
@@ -4152,7 +4154,7 @@ class UIScene extends Phaser.Scene {
                 this.scoreTimer.paused = true;
             }
 
-            //this.countDown.setText(countDown.toString().padStart(3,"0"));
+            this.countDown.setText(countDown.toString().padStart(3,"0"));
         }
 
         if (timeTick != this.lastTimeTick) {
