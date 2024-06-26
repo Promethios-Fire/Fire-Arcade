@@ -3714,42 +3714,42 @@ class UIScene extends Phaser.Scene {
     }
     
     create() {
-       this.ourGame = this.scene.get('GameScene');
-       this.ourInputScene = this.scene.get('InputScene');
-       const ourUI = this.ourGame.scene.get('UIScene');
+        this.ourGame = this.scene.get('GameScene');
+        this.ourInputScene = this.scene.get('InputScene');
+        const ourUI = this.ourGame.scene.get('UIScene');
 
-       this.UIScoreContainer = this.make.container(0,0);
+        this.UIScoreContainer = this.make.container(0,0);
 
         
 
 
 
-       // UI Icons
-       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+        // UI Icons
+        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
 
 
-       // #region Boost Meter UI
-       this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.25,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+        // #region Boost Meter UI
+        this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
+        this.add.image(GRID * 8.25,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
-       this.mask = this.make.image({
-           x: SCREEN_WIDTH/2,
-           y: GRID,
-           key: 'mask',
-           add: false
-       }).setOrigin(0.5,0.5);
+        this.mask = this.make.image({
+            x: SCREEN_WIDTH/2,
+            y: GRID,
+            key: 'mask',
+            add: false
+        }).setOrigin(0.5,0.5);
 
-       const keys = ['increasing'];
-       const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID).setOrigin(0.5,0.5);
-       boostBar.setDepth(50);
-       boostBar.play('increasing');
+        const keys = ['increasing'];
+        const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID).setOrigin(0.5,0.5);
+        boostBar.setDepth(50);
+        boostBar.play('increasing');
 
-       boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+        boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
 
-       const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
+        const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
 
-       this.chargeUpTween = this.tweens.add({
+        this.chargeUpTween = this.tweens.add({
             targets: fx1,
             outerStrength: 16,
             duration: 300,
@@ -3759,19 +3759,19 @@ class UIScene extends Phaser.Scene {
         });
         this.chargeUpTween.pause();
 
-       // Combo Sprites
+        // Combo Sprites
 
-       this.comboActive = false; //used to communicate when to activate combo tweens
+        this.comboActive = false; //used to communicate when to activate combo tweens
 
-       this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
-       this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
-       this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
-       this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
-       this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
-       this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
+        this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
+        this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+        this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
+        this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
+        this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+        this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
+        this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
        
-       // #endregion
+        // #endregion
 
         
         //this.load.json(`${ourGame.stage}-json`, `assets/Tiled/${ourGame.stage}.json`);
@@ -3794,6 +3794,8 @@ class UIScene extends Phaser.Scene {
             ).setText(`BEST`).setOrigin(0,0);;
         this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
             ).setText(this.ourGame.bestBase).setOrigin(0,0);
+        
+        
 
 
 
