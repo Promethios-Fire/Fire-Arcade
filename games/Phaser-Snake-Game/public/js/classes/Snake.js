@@ -223,9 +223,10 @@ var Snake = new Phaser.Class({
                 console.log("Hit Coin");
 
                 ourPersistScene.coins += 1;
-                ourUI.coinUIText.setHTML(
-                    `${commaInt(ourPersistScene.coins)}`
-                )
+                //ourUI.coinUIText.setHTML(
+                //    `${commaInt(ourPersistScene.coins)}`
+                //)
+                ourUI.coinUIText.setText(`${commaInt(ourPersistScene.coins)}`);
 
                 _coin.destroy();
                 scene.coins.splice(index,1);
