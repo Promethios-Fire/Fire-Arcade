@@ -589,11 +589,10 @@ class PersistScene extends Phaser.Scene {
             `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
     ).setOrigin(0,0.5);*/
 
-    this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '12px',
-        })).setText(
-            `snakehole.${GAME_VERSION}`
-    ).setOrigin(1,1);
+    //this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
+    //   })).setText(
+    //       `snakehole.${GAME_VERSION}`
+    //).setOrigin(1,1);
 
     this.scene.moveBelow("StartScene", "PersistScene");
 
@@ -838,7 +837,7 @@ class GameScene extends Phaser.Scene {
         this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
-        ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
+        //ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -2231,7 +2230,7 @@ class GameScene extends Phaser.Scene {
                     
                 } else {
                     this.atoms.forEach( fruit => {
-                        fruit.fruitTimerText.setText(timeTick);
+                        //fruit.fruitTimerText.setText(timeTick);
                     });
                 }
                 
@@ -3834,15 +3833,15 @@ class UIScene extends Phaser.Scene {
         
 
         // Score Text
-        this.scoreUI = this.add.dom(1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`STAGE`).setOrigin(0,0);
-        this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`0`).setOrigin(0,0);
+        //this.scoreUI = this.add.dom(1 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(`STAGE`).setOrigin(0,0);
+        //this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(`0`).setOrigin(0,0);
 
-        this.bestScoreUI = this.add.dom(11, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(`BEST`).setOrigin(0,0);;
-        this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-            ).setText(this.ourGame.bestBase).setOrigin(0,0);
+        //this.bestScoreUI = this.add.dom(11, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(`BEST`).setOrigin(0,0);;
+        //this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+        //    ).setText(this.ourGame.bestBase).setOrigin(0,0);
 
 
 
@@ -3874,7 +3873,7 @@ class UIScene extends Phaser.Scene {
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,1);
+            //this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,1);
             this.lengthGoalUI.x = GRID * 27
         }
         
@@ -3927,12 +3926,12 @@ class UIScene extends Phaser.Scene {
         //    `0 `
         //).setOrigin(0,1);
         
-        this.runningScoreUI = this.add.dom(0, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `SCORE`
-        ).setOrigin(0,1);
-        this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
-            `${commaInt(this.score.toString())}`
-        ).setOrigin(0,1);
+        //this.runningScoreUI = this.add.dom(0, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `SCORE`
+        //).setOrigin(0,1);
+        //this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        //    `${commaInt(this.score.toString())}`
+        //).setOrigin(0,1);
 
         
         if (DEBUG) {
@@ -3983,13 +3982,13 @@ class UIScene extends Phaser.Scene {
             
             if (timeLeft > SCORE_FLOOR) {
                 this.score += timeLeft;
-                scoreText.setText(`+${timeLeft}`);
+                //scoreText.setText(`+${timeLeft}`);
 
                 // Record Score for Stats
                 this.scoreHistory.push(timeLeft);
             } else {
                 this.score += SCORE_FLOOR;
-                scoreText.setText(`+${SCORE_FLOOR}`);
+                //scoreText.setText(`+${SCORE_FLOOR}`);
 
                 // Record Score for Stats
                 this.scoreHistory.push(SCORE_FLOOR);
@@ -4015,25 +4014,25 @@ class UIScene extends Phaser.Scene {
             /*this.runningScoreUI.setText(
                 `SCORE :`
             );*/
-            this.runningScoreLabelUI.setText(
-                `${commaInt(this.runningScore.toString())}`
-            );
+            //this.runningScoreLabelUI.setText(
+            //    `${commaInt(this.runningScore.toString())}`
+            //);
             
             
 
 
             // Update UI
 
-            this.scoreUI.setText(`STAGE`);
-            this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            //this.scoreUI.setText(`STAGE`);
+            //this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
             this.length += 1;
             this.globalFruitCount += 1; // Run Wide Counter
 
             var length = `${this.length}`;
 
-            this.bestScoreUI.setText(`BEST`);
-            this.bestScoreLabelUI.setText(this.ourGame.bestBase);
+            //this.bestScoreUI.setText(`BEST`);
+            //this.bestScoreLabelUI.setText(this.ourGame.bestBase);
             
             // Exception for Bonus Levels when the Length Goal = 0
             if (LENGTH_GOAL != 0) {
@@ -4044,7 +4043,7 @@ class UIScene extends Phaser.Scene {
                 )
             }
             else {
-                this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+                //this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
             }
             
              // Restart Score Timer
@@ -4140,11 +4139,11 @@ class UIScene extends Phaser.Scene {
         });*/
         //this.panelTweenCollapse.pause();
 
-        if (this.UIScoreContainer.length === 0) {
-                    this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
-                        this.bestScoreUI,this.bestScoreLabelUI,
-             this.runningScoreUI, this.runningScoreLabelUI])
-        }
+        //if (this.UIScoreContainer.length === 0) {
+        //            this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
+        //                this.bestScoreUI,this.bestScoreLabelUI,
+        //     this.runningScoreUI, this.runningScoreLabelUI])
+        //}
 
 
 
@@ -4164,8 +4163,8 @@ class UIScene extends Phaser.Scene {
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
 
-            this.scoreUI.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            this.bestScoreUI.setText(`Best  ${this.score}`);
+            //this.scoreUI.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            //this.bestScoreUI.setText(`Best  ${this.score}`);
 
             this.scene.pause();
 
@@ -4185,7 +4184,7 @@ class UIScene extends Phaser.Scene {
                 this.scoreTimer.paused = true;
             }
 
-            this.countDown.setText(countDown.toString().padStart(3,"0"));
+            //this.countDown.setText(countDown.toString().padStart(3,"0"));
         }
 
         if (timeTick != this.lastTimeTick) {
@@ -4966,7 +4965,7 @@ var config = {
         }
     },
     dom: {
-        createContainer: true,
+        createContainer: false,
     },
     
     //scene: [ StartScene, InputScene]
