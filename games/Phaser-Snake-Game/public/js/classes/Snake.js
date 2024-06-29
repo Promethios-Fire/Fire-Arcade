@@ -294,7 +294,7 @@ var Snake = new Phaser.Class({
     },
 
     bonk: function (scene) {
-        const ourPlayerData = scene.scene.get('PlayerDataScene');
+        const ourPersistScene = scene.scene.get('PlayerDataScene');
         const ourUI = scene.scene.get('UIScene');
         
         scene.gState = GState.BONK
@@ -303,11 +303,10 @@ var Snake = new Phaser.Class({
         scene.screenShake();
 
         if (!scene.winned) {
-            ourPlayerData.coins += -1;
-            ourUI.coinUIText.setHTML(
-                `${commaInt(ourPlayerData.coins)}`
-            )
-            
+            ourPersistScene.coins += -1;
+            //ourUI.coinUIText.setHTML(
+            //    `${commaInt(ourPersistScene.coins)}`
+            //);
         }
 
 
