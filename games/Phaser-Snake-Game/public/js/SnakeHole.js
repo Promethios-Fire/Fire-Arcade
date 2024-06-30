@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.012';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-02a'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -470,7 +470,7 @@ class StartScene extends Phaser.Scene {
                 this.scene.setVisible(false);
                 //this.scene.get("UIScene").setVisible(false);
                 
-                this.scene.launch('UIScene');
+                //this.scene.launch('UIScene');
                 this.scene.launch('GameScene');
                 //var ourGameScene = this.scene.get("GameScene");
                 //console.log(e)
@@ -727,6 +727,35 @@ class GameScene extends Phaser.Scene {
         this.hasGhostTiles = false;
         this.wallVarient = ''; // Used for Fungible wall setups.
         this.varientIndex = 0;
+
+        // from  the  UI
+        //this.score = 0;
+        var { score = 0 } = props
+        this.score = Math.trunc(score); //Math.trunc removes decimal. cleaner text but potentially not accurate for score -Holden
+        this.stageStartScore = Math.trunc(score);
+        
+        this.length = 0;
+
+        this.scoreMulti = 0;
+        this.globalFruitCount = 0;
+        this.bonks = 0;
+        this.medals = {};
+        this.zedLevel = 0;
+
+        var {lives = STARTING_ATTEMPTS } = props;
+        this.lives = lives;
+
+        var {startupAnim = true } = props;
+        this.startupAnim = startupAnim
+
+        this.scoreHistory = [];
+
+        // BOOST METER
+        this.energyAmount = 0; // Value from 0-100 which directly dictates ability to boost and mask
+        this.comboCounter = 0;
+
+
+        this.coinSpawnCounter = 100;
          
     }
     
@@ -752,8 +781,6 @@ class GameScene extends Phaser.Scene {
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
-
-
        
 
 
@@ -1664,6 +1691,413 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
+
+        // #region UI Hud
+        this.UIScoreContainer = this.make.container(0,0).setAlpha(0);
+
+        // #region Boost Meter UI
+       this.add.image(SCREEN_WIDTH/2,GRID,'megaAtlas', 'UI_boostMeterFrame.png').setDepth(51).setOrigin(0.5,0.5);
+       this.add.image(GRID * 8.25,GRID,'megaAtlas', 'UI_atomScoreFrame.png').setDepth(51).setOrigin(0.5,0.5);
+
+       this.mask = this.make.image({ // name is unclear.
+        x: SCREEN_WIDTH/2,
+        y: GRID,
+        key: 'megaAtlas',
+        frame: 'boostMask.png',
+        add: false
+    }).setOrigin(0.5,0.5);
+
+    this.mask = this.make.image({ // name is unclear.
+        x: SCREEN_WIDTH/2,
+        y: GRID,
+        key: 'megaAtlas',
+        frame: 'boostMask.png',
+        add: false
+    }).setOrigin(0.5,0.5);
+
+    const keys = ['increasing'];
+    const boostBar = this.add.sprite(SCREEN_WIDTH/2, GRID).setOrigin(0.5,0.5);
+    boostBar.setDepth(50);
+    boostBar.play('increasing');
+
+    boostBar.mask = new Phaser.Display.Masks.BitmapMask(this, this.mask);
+
+    const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
+
+    this.chargeUpTween = this.tweens.add({
+         targets: fx1,
+         outerStrength: 16,
+         duration: 300,
+         ease: 'sine.inout',
+         yoyo: true,
+         loop: 0 
+     });
+     this.chargeUpTween.pause();
+
+            // Combo Sprites
+
+    this.comboActive = false; //used to communicate when to activate combo tweens
+
+    this.letterC = this.add.sprite(GRID * 22,GRID * 4,"comboLetters", 0).setDepth(20).setAlpha(0);
+    this.letterO = this.add.sprite(GRID * 23.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+    this.letterM = this.add.sprite(GRID * 24.75,GRID * 4,"comboLetters", 2).setDepth(20).setAlpha(0);
+    this.letterB = this.add.sprite(GRID * 26,GRID * 4,"comboLetters", 3).setDepth(20).setAlpha(0);
+    this.letterO2 = this.add.sprite(GRID * 27.25,GRID * 4,"comboLetters", 1).setDepth(20).setAlpha(0);
+    this.letterExplanationPoint = this.add.sprite(GRID * 28,GRID * 4,"comboLetters", 4).setDepth(20).setAlpha(0);
+    this.letterX = this.add.sprite(GRID * 29,GRID * 4,"comboLetters", 5).setDepth(20).setAlpha(0);
+
+
+    localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
+
+    // Score Text
+    this.scoreUI = this.add.dom(5 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+    ).setText(`Stage`).setOrigin(0,0);
+    
+    this.scoreLabelUI = this.add.dom(GRID * 3 , GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+    ).setText(`0`).setOrigin(0,0);
+
+    this.bestScoreUI = this.add.dom(12, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+    ).setText(`Best`).setOrigin(0,0);
+
+    this.bestScoreLabelUI = this.add.dom(GRID * 3, GRID * 0.325 , 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
+    ).setText(this.bestBase).setOrigin(0,0);
+
+    const lengthGoalStyle = {
+        "font-size": '16px',
+        "font-weight": 400,
+        "text-align": 'right',
+    }
+    
+    this.lengthGoalUI = this.add.dom((GRID * 29.25), GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE));
+    this.lengthGoalUILabel = this.add.dom(GRID * 26.75, GRID * 1.25, 'div', Object.assign({}, STYLE_DEFAULT, lengthGoalStyle)); 
+
+    var length = `${this.length}`;
+    if (LENGTH_GOAL != 0) {
+        this.lengthGoalUI.setHTML(
+            `${length.padStart(2, "0")}<br/>
+            <hr style="font-size:3px"/>
+            ${LENGTH_GOAL.toString().padStart(2, "0")}`
+        ).setOrigin(0,0.5)//.setAlpha(0);
+        this.lengthGoalUILabel.setHTML(
+            `Length
+            <br/>
+            Goal`
+        ).setOrigin(0,0.5)//.setAlpha(0);
+    }
+    else {
+        // Special Level
+        this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
+        this.lengthGoalUI.x = GRID * 27
+    }
+
+    if (this.stage === "Stage-01") {
+        this.lengthGoalUI.setAlpha(0)
+        this.lengthGoalUILabel.setAlpha(0)
+    }
+
+    this.scoreTimer = this.time.addEvent({
+        delay: MAX_SCORE *100,
+        paused: true
+     });
+    var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+    // Countdown Text
+    this.countDown = this.add.dom(GRID*9 + 9, GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        'color': '#FCFFB2',
+        'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
+        'font-size': '22px',
+        'font-weight': '400',
+        'font-family': 'Oxanium',
+        'padding': '2px 7px 0px 0px',
+        })).setHTML(
+            countDown.toString().padStart(3,"0")
+    ).setOrigin(1,0.5);
+
+    this.coinsUIIcon = this.add.sprite(GRID*21.5, 8,'megaAtlas', 'coinPickup01Anim.png'
+    ).play('coin01idle').setDepth(101).setOrigin(0,0);
+
+    this.coinUIText = this.add.dom(GRID*24.125, 12, 'div', Object.assign({}, STYLE_DEFAULT, {
+        color: COLOR_SCORE,
+        'color': 'white',
+        'font-weight': '400',
+        //'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+        'font-size': '22px',
+        'font-family': 'Oxanium',
+        //'padding': '3px 8px 0px 0px',
+    })).setHTML(
+            `${commaInt(this.scene.get("PersistScene").coins)}`
+    ).setOrigin(0,0);
+
+    this.runningScoreUI = this.add.dom(GRID * .25, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        `Score`
+    ).setOrigin(0,1);
+    this.runningScoreLabelUI = this.add.dom(GRID*3, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
+        `${commaInt(this.score.toString())}`
+    ).setOrigin(0,1);
+
+    if (DEBUG) {
+        this.timerText = this.add.text(SCREEN_WIDTH/2 - 1*GRID , 27*GRID , 
+        this.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
+        { font: '30px Arial', 
+          fill: '#FFFFFF',
+          fontSize: "32px",
+          width: '38px',
+          "text-align": 'right',
+        });
+    }
+
+    //  Event: addScore
+    this.events.on('addScore', function (fruit) {
+
+        const ourScoreScene = this.scene.get('ScoreScene');
+
+        var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: COLOR_SCORE,
+            'color': '#FCFFB2',
+            'font-weight': '400',
+            'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+            'font-size': '22px',
+            'font-family': 'Oxanium',
+            'padding': '3px 8px 0px 0px',
+        })).setOrigin(0,0);
+        
+        // Remove score text after a time period.
+        this.time.delayedCall(1000, event => {
+            scoreText.removeElement();
+        }, [], this);
+
+        this.tweens.add({
+            targets: scoreText,
+            alpha: { from: 1, to: 0.0 },
+            y: scoreText.y - 10,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+        });
+        
+        
+        var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+        
+        if (timeLeft > BOOST_ADD_FLOOR) {
+            this.energyAmount += 25;
+        }
+        
+        if (timeLeft > SCORE_FLOOR) {
+            this.score += timeLeft;
+            scoreText.setText(`+${timeLeft}`);
+
+            // Record Score for Stats
+            this.scoreHistory.push(timeLeft);
+        } else {
+            this.score += SCORE_FLOOR;
+            scoreText.setText(`+${SCORE_FLOOR}`);
+
+            // Record Score for Stats
+            this.scoreHistory.push(SCORE_FLOOR);
+        }
+
+        // Calc Level Score
+        var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+        var lastHistory = this.scoreHistory.slice();
+        lastHistory.pop();
+        var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
+        console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+
+        this.runningScore = this.score + calcBonus(baseScore);
+        var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
+
+        //this.deltaScoreUI.setText(
+        //    `LASTΔ : +`
+        //)
+        //this.deltaScoreLabelUI.setText(
+        //    `${deltaScore}`
+        //)
+        
+        /*this.runningScoreUI.setText(
+            `SCORE :`
+        );*/
+        this.runningScoreLabelUI.setText(
+            `${commaInt(this.runningScore.toString())}`
+        );
+        
+        
+
+
+        // Update UI
+
+        this.scoreUI.setText(`Stage`);
+        this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+        
+        this.length += 1;
+        this.globalFruitCount += 1; // Run Wide Counter
+
+        var length = `${this.length}`;
+
+        this.bestScoreUI.setText(`Best`);
+        this.bestScoreLabelUI.setText(this.bestBase);
+        
+        // Exception for Bonus Levels when the Length Goal = 0
+        if (LENGTH_GOAL != 0) {
+            this.lengthGoalUI.setHTML(
+                `${length.padStart(2, "0")}<br/>
+                <hr style="font-size:3px"/>
+                ${LENGTH_GOAL.toString().padStart(2, "0")}`
+            )
+        }
+        else {
+            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+        }
+        
+        // Restart Score Timer
+        if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
+            this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
+                delay: MAX_SCORE * 100,
+                paused: false
+            });   
+        }
+        
+    }, this);
+
+    this.lastTimeTick = 0;
+
+    var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
+    this.runningScore = this.score + calcBonus(baseScore);
+    this.scoreDigitLength = this.runningScore.toString().length;
+    
+    this.scorePanel = this.add.nineslice(GRID * .125, 0, 
+        'uiGlassL', 'Glass', 
+        ((96) + (this.scoreDigitLength * 10)), 78, 
+        80, 18, 18, 18);
+    this.scorePanel.setDepth(100).setOrigin(0,0)
+
+    this.progressPanel = this.add.nineslice((GRID * 26) +6, 0, 'uiGlassR', 'Glass',114, 58, 18, 58, 18, 18);
+    this.progressPanel.setDepth(100).setOrigin(0,0)
+
+    const goalText = [
+        'GOAL : COLLECT 28 ATOMS',
+    ];
+
+    if (ourGameScene.stage === START_STAGE) {
+            
+        this.time.delayedCall(400, event => {
+            this.panelAppearTween = this.tweens.add({
+                targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                alpha: 1,
+                duration: 300,
+                ease: 'sine.inout',
+                yoyo: false,
+                repeat: 0,
+            });
+        })
+    }
+
+    // dot matrix
+
+    const hsv = Phaser.Display.Color.HSVColorWheel();
+
+    const gw = 32;
+    const gh = 32;
+    const bs = 24;
+
+    const group = this.add.group({
+        key: 'portalParticle01',
+        quantity: gw * gh,
+        gridAlign: {
+            width: gw,
+            height: gh,
+            cellWidth: bs,
+            cellHeight: bs,
+            x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
+            y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2
+        },
+        /*hitAreaCallback:{
+            hitArea: 24,
+            x: (SCREEN_WIDTH - (bs * gw)) / 2 + 4,
+            y: (SCREEN_HEIGHT - (bs * gh) + bs / 2) / 2 -2,
+            gameObject: this.scorePanel
+        }*/
+    }).setDepth(103);
+
+    const size = gw * gh;
+
+    //  set alpha
+    group.getChildren().forEach((child,) => {
+        child = this.make.image({
+            x: child.x,
+            y: child.y,
+            key: 'portalParticle01'},
+                false);
+        //const mask = child.createBitmapMask();
+        //this.scorePanel.setMask(mask)
+
+        child.setAlpha(1).setScale(1);
+        /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
+            ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
+        ) {
+            child.setAlpha(1).setScale(1);
+        }*/
+
+    //debugger
+    });
+
+    this.variations = [
+        [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
+    ];
+
+
+    this.getStaggerTween(0, group);
+
+
+
+
+    }
+    getStaggerTween (i, group)
+    {
+        const stagger = this.variations[i];
+        
+        this.tweens.add({
+            targets: group.getChildren(),
+            scale: [1.5,0],
+            alpha: [.5,0],
+            ease: 'sine.inout',
+            duration: 1400,
+            delay: this.tweens.stagger(...stagger),
+            completeDelay: 1000,
+            repeat: 0,
+            onComplete: () =>
+            {
+                group.getChildren().forEach(child => {
+
+                    child.destroy();
+
+                });
+            }
+        });
+
+
+        /*this.panelTweenCollapse = this.tweens.add({
+            targets: [panel],
+            scale: 0,
+            width: 0,
+            height: 0,
+            duration: 300,
+            ease: 'sine.inout',
+            yoyo: false,
+            repeat: 0,
+        });*/
+        //this.panelTweenCollapse.pause();
+
+        if (this.UIScoreContainer.length === 0) {
+                    this.UIScoreContainer.add([this.scoreUI,this.scoreLabelUI,
+                        this.bestScoreUI,this.bestScoreLabelUI,
+             this.runningScoreUI, this.runningScoreLabelUI])
+        }
+
+
+
+
+        
     }
     screenShake(){
         if (this.moveInterval === SPEED_SPRINT) {
@@ -1801,7 +2235,7 @@ class GameScene extends Phaser.Scene {
         this.portals.forEach(portal => { 
             if(snake.head.x === portal.x && snake.head.y === portal.y){
                 this.gState = GState.PORTAL;
-                this.scene.get('UIScene').scoreTimer.paused = true;
+                this.scoreTimer.paused = true;
 
                 console.log("PORTALING", this.gState);
 
@@ -1832,7 +2266,7 @@ class GameScene extends Phaser.Scene {
                 
                 _tween.on('complete',()=>{
                     this.gState = GState.PLAY;
-                    this.scene.get('UIScene').scoreTimer.paused = false;
+                    this.scoreTimer.paused = false;
                     console.log("Game State === PLAY", this.gState === GState.PLAY); // Will be set to PLAY
 
                     // Show portal snake body after head arrives.
@@ -1964,8 +2398,7 @@ class GameScene extends Phaser.Scene {
     }
 
     checkWinCon() { // Returns Bool
-        const ourUI = this.scene.get('UIScene');
-        return ourUI.length >= LENGTH_GOAL
+        return this.length >= LENGTH_GOAL
     }
 
     checkLoseCon() {
@@ -1974,7 +2407,6 @@ class GameScene extends Phaser.Scene {
     }
 
     nextStage(stageName) {
-        const ourUI = this.scene.get('UIScene');
         const ourInputScene = this.scene.get("InputScene");
 
         
@@ -2000,9 +2432,11 @@ class GameScene extends Phaser.Scene {
         }
         
         
-
-        ourUI.scene.restart( { score: this.nextScore, lives: ourUI.lives, startupAnim: false } );
-        this.scene.restart( { stage: stageName } );
+        this.scene.restart( { 
+            stage: stageName,
+            score: this.nextScore, 
+            lives: this.lives, 
+            startupAnim: false } );
         ourInputScene.scene.restart();
 
         // Add if time attack code here
@@ -2010,14 +2444,109 @@ class GameScene extends Phaser.Scene {
         //ourScoreScene.scene.switch('TimeAttackScene');
 
     }
+    scoreTweenShow(){
+        if (this.UIScoreContainer.y === -20) {
+            console.log('showing')
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (0),
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+                this.tweens.add({
+                targets: this.scorePanel,
+                height: 78,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+              this.tweens.add({
+                targets: [this.bestScoreLabelUI, this.bestScoreUI],
+                alpha: 1,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+        }
+    }
+    scoreTweenHide(){
+        if (this.UIScoreContainer.y === 0) {
+            console.log('hiding')
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (-20),
+                ease: 'Sine.InOut',
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+              });
+            this.tweens.add({
+                targets: this.scorePanel,
+                height: 58,
+                ease: 'Sine.InOut',
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+              });
+            this.tweens.add({
+                targets: [this.bestScoreLabelUI, this.bestScoreUI],
+                alpha: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+              });
+        }
+    }
+
+    comboBounce(){
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            y: { from: GRID * 4, to: GRID * 3 },
+            ease: 'Sine.InOut',
+            duration: 200,
+            repeat: 0,
+            delay: this.tweens.stagger(60),
+            yoyo: true
+            });
+    }
+    comboAppear(){
+        console.log("appearing")
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+        });
+        this.comboActive = true;
+        }
+    comboFade(){
+        console.log("fading")
+        this.tweens.add({
+            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint], 
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 500,
+            repeat: 0,
+        });
+        this.comboActive = false;
+        this.comboCounter = 0;
+    }
 
     // #region Game Update
     update (time, delta) {
 
-        const ourUI = this.scene.get('UIScene'); // Probably don't need to set this every loop. Consider adding to a larger context.
         const ourInputScene = this.scene.get('InputScene');
         // console.log("update -- time=" + time + " delta=" + delta);
-        var energyAmountX = ourUI.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
+        var energyAmountX = this.energyAmount; // ourUI.energyAmount can't be called further down so it's defined here. Additionally, due to scene crashing, the function can't be called without crashing
 
         
         // Floating Electrons
@@ -2052,13 +2581,11 @@ class GameScene extends Phaser.Scene {
                 console.log("SPACE LONG ENOUGH BRO");
  
                 this.events.off('addScore');
-
-                const ourUI = this.scene.get('UIScene');
  
-                ourUI.lives -= 1;
-                ourUI.scene.restart( { score: ourUI.stageStartScore, lives: ourUI.lives });
+                this.lives -= 1;
+                this.scene.restart( { score: this.stageStartScore, lives: this.lives });
                 //ourUIScene.scene.restart();
-                this.scene.restart();
+                //this.scene.restart();
         }
 
         
@@ -2088,7 +2615,7 @@ class GameScene extends Phaser.Scene {
                 }
                 
                 this.gState = GState.WAIT_FOR_INPUT;
-                this.scene.get('UIScene').scoreTimer.paused = true;
+                this.scoreTimer.paused = true;
                 console.log(this.gState, "WAIT FOR INPUT");
             });
         }
@@ -2104,7 +2631,7 @@ class GameScene extends Phaser.Scene {
             
             this.events.off('addScore');
             
-            ourUI.scene.launch('ScoreScene');
+            this.scene.launch('ScoreScene');
         }
 
         // #region Lose State
@@ -2219,11 +2746,8 @@ class GameScene extends Phaser.Scene {
                     });
                 }
             } // End Closest Portal
-            
-            const ourUI = this.scene.get('UIScene');
        
             if (DEBUG) {
-                const ourUI = this.scene.get('UIScene');
                 
                 if (timeTick < SCORE_FLOOR ) {
 
@@ -2257,7 +2781,7 @@ class GameScene extends Phaser.Scene {
 
                 if (!this.winned) {
                     this.time.delayedCall(1000, event => {
-                        ourUI.scoreTweenHide(); 
+                        this.scoreTweenHide(); 
                     }); 
                 }
                 
@@ -2282,7 +2806,7 @@ class GameScene extends Phaser.Scene {
                             }, this);
     
                         fadeoutTween.on('complete', e => {
-                            boostOutline.destroy()
+                            //boostOutline.destroy()
                         });
                     });
                     this.boostOutlinesBody = [];
@@ -2315,11 +2839,126 @@ class GameScene extends Phaser.Scene {
                     this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
 
             }
-            
+
+            // # HUD Update
+            var timeTick = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            this.scoreDigitLength = this.runningScore.toString().length;
+            this.scorePanel.width = ((96) + (this.scoreDigitLength * 10)); //should only run on score+
+
+                    // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
+        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
+            // Temp Code for bonus level
+            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
+
+            this.scoreUI.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            this.bestScoreUI.setText(`Best  ${this.score}`);
+
+            this.scene.pause();
+
+            this.scene.start('ScoreScene');
+        }
+        // #endregion
+
+        if (!this.checkWinCon() && !this.scoreTimer.paused) {
+            /***
+             * This is out of the Time Tick Loop because otherwise it won't pause 
+             * correctly during portaling. After the timer pauses at the Score Floor
+             *  the countdown timer will go to 0.
+             */
+            var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+    
+            if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
+                this.scoreTimer.paused = true;
+            }
+
+            this.countDown.setText(countDown.toString().padStart(3,"0"));
+        }
+
+        if (timeTick != this.lastTimeTick) {
+            this.lastTimeTick = timeTick;
+
+            if(!this.scoreTimer.paused) {
+                this.coinSpawnCounter -= 1;
+
+                if (this.coinSpawnCounter < 1) {
+                    console.log("COIN TIME YAY. SPAWN a new coin");
+
+                    var validLocations = this.validSpawnLocations();
+                    var pos = Phaser.Math.RND.pick(validLocations)
+
+                    var _coin = this.add.sprite(pos.x * GRID, pos.y * GRID,'megaAtlas', 'coinPickup01Anim.png'
+                    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
+
+                    // tween code not working @holden I am not sure what I am missing -James
+                    //this.tweens.add({
+                    //    targets: this.atoms,
+                    //    originY: .125,
+                    //    yoyo: true,
+                    //    ease: 'Sine.easeOutIn',
+                    //    duration: 1000,
+                    //    repeat: -1
+                    //});
+                    
+                    this.coins.push(_coin);
+
+                    this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
+                }
+            }
+        }
+
+        if (GState.PLAY === this.gState) {
+            const ourInput = this.scene.get("InputScene");
+            if (ourInput.spaceBar.isDown) {
+                // Has Boost Logic, Then Boost
+                if(this.energyAmount > 1){
+                    this.moveInterval = SPEED_SPRINT;
+                    
+                    // Boost Stats
+                    ourInput.boostTime += 6;
+                    this.mask.setScale(this.energyAmount/100,1);
+                    this.energyAmount -= 1;
+                } else{
+                    //DISSIPATE LIVE ELECTRICITY
+                    this.moveInterval = SPEED_WALK;
+                }
+        
+            } else {
+                this.moveInterval = SPEED_WALK; // Less is Faster
+                this.mask.setScale(this.energyAmount/100,1);
+                this.energyAmount += .25; // Recharge Boost Slowly
+            }
+        } else if (GState.START_WAIT === this.gState) {
+            this.mask.setScale(this.energyAmount/100,1);
+            this.energyAmount += 1; // Recharge Boost Slowly
+
+        }
+
+        // Reset Energy if out of bounds.
+        if (this.energyAmount >= 100) {
+            this.energyAmount = 100;}
+        else if(this.energyAmount <= 0) {
+            this.energyAmount = 0;
+        }
+
+        //#endregion Boost Logic
+        
+        // #region Combo Logic
+
+        if (this.comboCounter > 0 && !this.comboActive) {
+            this.comboAppear();
+        }
+        else if (this.comboCounter == 0 && this.comboActive){
+            this.comboFade();
+        }
+        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
+            this.comboFade();
+        }
 
 
 
             // #region boost update
+
+            // #region </ Game Update
  
         }
         
@@ -2488,22 +3127,22 @@ class ScoreScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
-        ourUI.scoreTweenShow();
+        ourGame.scoreTweenShow();
 
         /*var style = {
             'color': '0x828213'
           };
-        ourUI.countDown.style = style*/
-        ourUI.countDown.setHTML('OFF');
+        ourGame.countDown.style = style*/
+        ourGame.countDown.setHTML('OFF');
 
         var stageDataJSON = {
-            bonks: ourUI.bonks,
+            bonks: ourGame.bonks,
             boostFrames: ourInputScene.boostTime,
             cornerTime: Math.floor(ourInputScene.cornerTime),
             diffBonus: ourGame.stageDiffBonus,
             foodHistory: ourGame.foodHistory,
-            foodLog: ourUI.scoreHistory,
-            medals: ourUI.medals,
+            foodLog: ourGame.scoreHistory,
+            medals: ourGame.medals,
             moveCount: ourInputScene.moveCount,
             moveHistory: ourInputScene.moveHistory,
             stage:ourGame.stage,
@@ -2717,7 +3356,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Main Stats
 
-        var bonkBonus = NO_BONK_BASE/(ourUI.bonks+1);
+        var bonkBonus = NO_BONK_BASE/(ourGame.bonks+1);
         let diffBonus = ourGame.stageDiffBonus * .01;
 
         const scorePartsStyle = {
@@ -2930,12 +3569,12 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`----------- < <span style="color:${COLOR_TERTIARY};">● ○ ○</span> > -----------</br>
                 //</br>
-                //[${ourUI.scoreHistory.slice().sort().reverse()}]</br> individual food score printout array
+                //[${ourGame.scoreHistory.slice().sort().reverse()}]</br> individual food score printout array
                 `<span style ="text-transform: uppercase"> ${ourGame.stage} STATS</span>
                 <hr style="font-size:6px"/>ATTEMPTS: <span style = "float: right">xx</span>
-                LENGTH: <span style = "float: right">${ourUI.length}</span>
+                LENGTH: <span style = "float: right">${ourGame.length}</span>
                 AVERAGE: <span style = "float: right">${stageAve.toFixed(2)}</span>
-                BONKS: <span style = "float: right">${ourUI.bonks}</span>
+                BONKS: <span style = "float: right">${ourGame.bonks}</span>
 
                 MOVE COUNT: <span style="float: right">${ourInputScene.moveCount}</span>
                 MOVE VERIFY: <span style="float: right">${ourInputScene.moveHistory.length}</span>
@@ -2961,7 +3600,7 @@ class ScoreScene extends Phaser.Scene {
                 [${bestLog.foodLog.slice().sort().reverse()}]
 
                 STAGE FOOD LOG:
-                [${ourUI.scoreHistory.slice().sort().reverse()}]
+                [${ourGame.scoreHistory.slice().sort().reverse()}]
                 </br>`
                 
                 
@@ -3001,7 +3640,7 @@ class ScoreScene extends Phaser.Scene {
                 </br>
                 BETA: ${GAME_VERSION}</br>
                 </br>
-                BONK RESETS: ${ourUI.bonks}</br>
+                BONK RESETS: ${ourGame.bonks}</br>
                 TOTAL TIME ELAPSED: ${Math.round(ourInputScene.time.now/1000)} Seconds</br>`
         ).setOrigin(0,0).setVisible(false);
 
@@ -3198,8 +3837,8 @@ class ScoreScene extends Phaser.Scene {
                     
                 }
           
-                if (bestrun < ourUI.score + ourScoreScene.stageData.calcTotal()) {
-                    localStorage.setItem('BestFinalScore', ourUI.score + ourScoreScene.stageData.calcTotal());
+                if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
+                    localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
                 }
 
             });
@@ -3469,7 +4108,7 @@ class TimeAttackScene extends Phaser.Scene{
             // Default End Game
             var continue_text = '[SPACE TO END GAME]';
     
-            if (ourUI.lives > 0) {
+            if (ourGame.lives > 0) {
                 continue_text = `[GOTO ${selected[1]}]`;
             }
             
@@ -3691,11 +4330,11 @@ class TimeAttackScene extends Phaser.Scene{
     
                 this.input.keyboard.on('keydown-SPACE', function() {
 
-                if (ourUI.lives > 0) {
+                if (ourGame.lives > 0) {
 
-                    ourUI.lives -= 1; 
+                    ourGame.lives -= 1; 
 
-                    ourUI.scene.restart( { score: 0, lives: ourUI.lives } );
+                    ourGame.scene.restart( { score: 0, lives: ourGame.lives } );
                     ourGame.scene.restart( { stage: playedStages[index][1] } );
 
                     ourTimeAttack.scene.stop();
@@ -3914,10 +4553,7 @@ class UIScene extends Phaser.Scene {
         // Start Fruit Score Timer
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
-        this.scoreTimer = this.time.addEvent({
-            delay: MAX_SCORE *100,
-            paused: true
-         });
+
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
@@ -4754,7 +5390,7 @@ class InputScene extends Phaser.Scene {
             // Starting Game State
             gameScene.gState = GState.PLAY;
             console.log("GSTATE === PLAY", gameScene.gState === GState.PLAY);
-            this.scene.get('UIScene').scoreTimer.paused = false;
+            gameScene.scoreTimer.paused = false;
                 
             // turn off arrows and move snake.
             
@@ -5113,7 +5749,7 @@ var config = {
     },
     
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, PersistScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, PersistScene, GameScene, InputScene, ScoreScene, TimeAttackScene]
 };
 
 // #region Screen Settings

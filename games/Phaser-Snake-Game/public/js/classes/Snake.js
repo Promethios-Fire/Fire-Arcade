@@ -223,7 +223,7 @@ var Snake = new Phaser.Class({
                 console.log("Hit Coin");
 
                 ourPersistScene.coins += 1;
-                ourUI.coinUIText.setHTML(
+                scene.coinUIText.setHTML(
                     `${commaInt(ourPersistScene.coins)}`
                 )
 
@@ -236,14 +236,13 @@ var Snake = new Phaser.Class({
         // #region Food Collision
         scene.atoms.forEach(_atom => {  
             if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState){
-                const ourUI = scene.scene.get('UIScene');
                 scene.snakeEating();
-                var timeSinceFruit = ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+                var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
 
                 if(timeSinceFruit > COMBO_ADD_FLOOR){
                     if (this.lastPlayedCombo > 0) {
-                        ourUI.comboCounter += 1;
-                        ourUI.comboBounce();
+                        scene.comboCounter += 1;
+                        scene.comboBounce();
                         };
                     scene.pointSounds[this.lastPlayedCombo].play();       
                     if (this.lastPlayedCombo < 7) {
@@ -252,7 +251,7 @@ var Snake = new Phaser.Class({
                 }
                 else {
                     this.lastPlayedCombo = 0;
-                    ourUI.comboCounter = 0;
+                    scene.comboCounter = 0;
                 }
 
                 scene.events.emit('addScore', _atom); // Sends to UI Listener 
@@ -325,7 +324,6 @@ var Snake = new Phaser.Class({
     // #region Bonk()
     bonk: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
-        const ourUI = scene.scene.get('UIScene');
         
         scene.gState = GState.BONK;
         this.direction = STOP;
@@ -335,7 +333,7 @@ var Snake = new Phaser.Class({
 
         if (!scene.winned) {
             ourPersistScene.coins += -1;
-            ourUI.coinUIText.setHTML(
+            scene.coinUIText.setHTML(
                 `${commaInt(ourPersistScene.coins)}`
             );
         }
@@ -344,7 +342,7 @@ var Snake = new Phaser.Class({
         // game.scene.scene.restart(); // This doesn't work correctly
         if (DEBUG) { console.log("DEAD"); }
         
-        scene.scene.get("UIScene").bonks += 1;
+        scene.bonks += 1;
         
         // Do this when you want to really end the game.
         //game.destroy();
