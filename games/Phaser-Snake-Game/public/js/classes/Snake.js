@@ -112,22 +112,22 @@ var Snake = new Phaser.Class({
     if (this.direction === LEFT)
         {
             xN = Phaser.Math.Wrap(this.head.x  - GRID, 0, SCREEN_WIDTH);
-            ourPersistScene.bgCoords.x -= .25;
+            //ourPersistScene.bgCoords.x -= .25;
         }
         else if (this.direction === RIGHT)
         {
             xN = Phaser.Math.Wrap(this.head.x + GRID, 0, SCREEN_WIDTH);
-            ourPersistScene.bgCoords.x += .25;
+            //ourPersistScene.bgCoords.x += .25;
         }
         else if (this.direction === UP)
         {
             yN = Phaser.Math.Wrap(this.head.y - GRID, GRID * 2, SCREEN_HEIGHT - GRID);
-            ourPersistScene.bgCoords.y -= .25;
+            //ourPersistScene.bgCoords.y -= .25;
         }
         else if (this.direction === DOWN)
         {
             yN = Phaser.Math.Wrap(this.head.y + GRID, GRID * 2, SCREEN_HEIGHT - GRID * 1 );
-            ourPersistScene.bgCoords.y += .25;
+            //ourPersistScene.bgCoords.y += .25;
         }
         
         // #region Bonk Walls

@@ -408,7 +408,7 @@ class StartScene extends Phaser.Scene {
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
-        this.scene.launch('PersistScene');
+        //this.scene.launch('PersistScene');
 
 
         this.add.text(SCREEN_WIDTH/2, GRID*3.5, 'SNAKEHOLE',{"fontSize":'48px'}).setOrigin(0.5,0); // Sets the origin to the middle top.
@@ -483,187 +483,6 @@ class StartScene extends Phaser.Scene {
     }
 }
 
-class PersistScene extends Phaser.Scene {
-    constructor () {
-        super({key: 'PersistScene', active: false});
-    }
-
-    init() {
-        this.zeds = 0;
-        this.sumOfBest = 0;
-        this.stagesComplete = 0;
-        this.coins = 24; // 4
-    }
-    
-    preload(){
-        //this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 32, frameHeight:32 });
-
-    }
-    
-    create() {
-
-    // #region Persist Scene
-
-    
-
-    // # Backgrounds
-
-    // for changing bg sprites
-    this.bgTimer = 0;
-    this.bgTick = 0;
-    
-            // Furthest BG Object
-            this.bg0 = this.add.tileSprite(0, GRID*2, 744, 744,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-            this.bg0.tileScaleX = 3;
-            this.bg0.tileScaleY = 3;
-    
-            // Scrolling BG1
-            this.bg = this.add.tileSprite(0, GRID*2, 744, 744, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-            this.bg.tileScaleX = 3;
-            this.bg.tileScaleY = 3;
-            
-            // Scrolling BG2 Planets
-            this.bg2 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-            this.bg2.tileScaleX = 3;
-            this.bg2.tileScaleY = 3;
-            
-            // Scrolling BG3 Stars (depth is behind planets)
-            this.bg3 = this.add.tileSprite(0, GRID*2, 768, 768, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-            this.bg3.tileScaleX = 3;
-            this.bg3.tileScaleY = 3;
-    
-            // Hue Shift
-            this.fx = this.bg.preFX.addColorMatrix();
-            this.fx2 = this.bg0.preFX.addColorMatrix();
-    
-    
-            //if (this.stage === "Stage-04") {
-            //    this.fx.hue(330);
-            //}
-            this.scrollFactorX = 0;
-            this.scrollFactorY = 0;
-            this.bgCoords = new Phaser.Math.Vector2(0,0);
-
-    
-    
-    
-    
-      // Is Zero if there is none.
-    var rawZeds = localStorage.getItem(`zeds`);
-    // Catch if any reason undefined gets saved to localstorage
-    if (rawZeds === 'undefined') {
-        rawZeds = 0;
-    }
-    
-    this.zeds = Number(JSON.parse(rawZeds));
-    var zedsObj = calcZedLevel(this.zeds);
-    
-    calcSumOfBest(this);
-
-    const styleBottomText = {
-        "font-size": '12px',
-        "font-weight": 400,
-        "text-align": 'right',
-    }   
-
-    this.zedsUI = this.add.dom(GRID * 0.5, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT, 
-        styleBottomText
-        )).setHTML(
-            `<span style ="color: limegreen;
-            font-size: 16px;
-            border: limegreen solid 1px;
-            border-radius: 5px;
-            padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
-    ).setOrigin(0,0.5);
-
-
-    /*this.sumOfBestUI = this.add.dom(GRID * 7, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
-        styleBottomText    
-        )).setHTML(
-            `SUM OF BEST : <span style="color:goldenrod">${commaInt(this.sumOfBest)}</span>`
-    ).setOrigin(0,0.5);*/
-
-    /*this.stagesCompleteUI = this.add.dom(GRID * 16, SCREEN_HEIGHT - 12, 'div', Object.assign({}, STYLE_DEFAULT,
-        styleBottomText    
-        )).setText(
-            `STAGES COMPLETE : ${commaInt(this.stagesComplete)}`
-    ).setOrigin(0,0.5);*/
-
-    this.gameVersionUI = this.add.dom(SCREEN_WIDTH - 4, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
-        'font-size': '12px',
-        })).setText(
-            `snakehole.${GAME_VERSION}`
-    ).setOrigin(1,1);
-
-    this.scene.moveBelow("StartScene", "PersistScene");
-
-
-    }
-
-    checkCompletedRank = function (targetStageName, rank) {
-
-        if (this.bestOfStageData[targetStageName] != undefined ) {
-            var resultRank = this.bestOfStageData[targetStageName].stageRank()
-            var bool = resultRank > rank
-            return  bool;
-        } else {
-            debugger
-            return false;
-        }
-    }
-    
-    update(time, delta) {
-
-                //this.scrollFactorX += .025;
-        //this.scrollFactorY += .025;
-
-        //this.bgCoords.x = (this.snake.head.x /40) + this.scrollFactorX;
-        //this.bgCoords.y = (this.snake.head.y /40) + this.scrollFactorY;
-
-        // not all of these need to be interpolated; wastes processing
-
-        //this.mask.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            //(this.bgCoords.x + this.scrollFactorX), 0.025)) * -4;
-        //this.mask.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            //(this.bgCoords.y + this.scrollFactorY), 0.025)) * -4;
-
-        this.bg0.tilePositionX = (Phaser.Math.Linear(this.bg.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
-        this.bg0.tilePositionY = (Phaser.Math.Linear(this.bg.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
-
-        this.bg.tilePositionX = (this.bg0.tilePositionX ) * 4;
-        this.bg.tilePositionY = (this.bg0.tilePositionY ) * 4;
-            
-        this.bg2.tilePositionX = (this.bg0.tilePositionX ) * 8;
-        this.bg2.tilePositionY = (this.bg0.tilePositionY ) * 8;
-
-        this.bg3.tilePositionX = (this.bg0.tilePositionX ) * 2;
-        this.bg3.tilePositionY = (this.bg0.tilePositionY ) * 2;
-
-        this.bgTimer += delta;
-
-        if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
-            if (this.bgTick === 0) {
-                this.bg3.setTexture('megaAtlas', 'background02_3_2.png'); 
-                this.bg.setTexture('megaAtlas', 'background02_frame2.png'); 
-                this.bgTick += 1;
-            }
-
-            if (this.bgTimer >= 2000) {
-                if (this.bgTick === 1) {
-                    this.bg3.setTexture('megaAtlas', 'background02_3.png');
-                    this.bg.setTexture('megaAtlas','background02.png'); 
-                    this.bgTimer = 0;
-                    this.bgTick -=1;
-                }
-
-            }   
-        }
-
-    }
-
-}
 
 class GameScene extends Phaser.Scene {
     // #region GameScene
@@ -838,7 +657,7 @@ class GameScene extends Phaser.Scene {
         this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
         this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
 
-        ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
+        //ourPersist.gameVersionUI.setText(`snakehole.${GAME_VERSION} -- ${this.stage}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
 
         this.tileset = this.map.addTilesetImage('tileSheetx24');
@@ -1969,7 +1788,7 @@ class GameScene extends Phaser.Scene {
 
     checkLoseCon() {
         const ourPersist = this.scene.get("PersistScene");
-        return ourPersist.coins < 0;
+        return //ourPersist.coins < 0;
     }
 
     nextStage(stageName) {
@@ -3114,7 +2933,7 @@ class ScoreScene extends Phaser.Scene {
         })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
 
 
-        this.prevZeds = this.scene.get("PersistScene").zeds;
+        //this.prevZeds = this.scene.get("PersistScene").zeds;
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
@@ -3917,7 +3736,7 @@ class UIScene extends Phaser.Scene {
             'font-family': 'Oxanium',
             //'padding': '3px 8px 0px 0px',
         })).setHTML(
-                `${commaInt(this.scene.get("PersistScene").coins)}`
+                //`${commaInt(this.scene.get("PersistScene").coins)}`
         ).setOrigin(0,0);
         
         //this.deltaScoreUI = this.add.dom(GRID*21.1 - 3, GRID, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)).setText(
@@ -4970,7 +4789,7 @@ var config = {
     },
     
     //scene: [ StartScene, InputScene]
-    scene: [ StartScene, PersistScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
+    scene: [ StartScene, GameScene, UIScene, InputScene, ScoreScene, TimeAttackScene]
 };
 
 // #region Screen Settings
