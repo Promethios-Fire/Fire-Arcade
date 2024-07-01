@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.012';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -1401,8 +1401,6 @@ class GameScene extends Phaser.Scene {
             portalLayerX.destroy()
         }
 
-        var layers = this.map.layers;
-        debugger
         // #endregion
 
         // #region Portal-N
@@ -3835,7 +3833,7 @@ class UIScene extends Phaser.Scene {
 
        // #region Boost Meter UI
        this.add.image(SCREEN_WIDTH/2,GRID,'boostMeterFrame').setDepth(51).setOrigin(0.5,0.5);
-       this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
+       this.scoreFrame = this.add.image(GRID * 8.6,GRID,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5);
 
 
        this.mask = this.make.image({ // name is unclear.
@@ -4054,6 +4052,20 @@ class UIScene extends Phaser.Scene {
             
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.energyAmount += 25;
+
+                const ourGame = this.scene.get('GameScene')
+
+                var electronToCapacitor = ourGame.add.sprite(ourGame.snake.head.x, ourGame.snake.head.y).setOrigin(0.5,0.5).setDepth(80);
+                electronToCapacitor.play("electronIdle");
+                electronToCapacitor.anims.msPerFrame = 66;
+
+                var movingElectronTween = ourGame.tweens.add( {
+                    targets: electronToCapacitor,
+                    x: this.scoreFrame.getCenter().x,
+                    y: this.scoreFrame.getCenter().y,
+                    duration:300
+
+                });
             }
             
             if (timeLeft > SCORE_FLOOR) {
