@@ -4063,7 +4063,12 @@ class UIScene extends Phaser.Scene {
                     targets: electronToCapacitor,
                     x: this.scoreFrame.getCenter().x,
                     y: this.scoreFrame.getCenter().y,
-                    duration:300
+                    duration:300,
+                    onComplete: () => {
+                        electronToCapacitor.playAfterRepeat({ key: 'electronDispersion01' }, 0)
+
+                        //electronToCapacitor.play({ key: 'electronDispersion01' })
+                    }
 
                 });
             }
