@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.012';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -49,6 +49,8 @@ const PORTAL_PAUSE = 2;
 const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
+
+
 
 
 // #region Utils Functions
@@ -753,6 +755,10 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourTimeAttack = this.scene.get('TimeAttackScene');
         const ourPersist = this.scene.get('PersistScene');
+
+        // FX
+
+        this.barrelAmount = 1;
         
         //loadAnimations(this);
         //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
@@ -812,6 +818,10 @@ class GameScene extends Phaser.Scene {
         
 
         this.tiledProperties = {};
+
+       
+
+        this.snake.head.postFX.addBarrel(this.barrelAmount);
 
         this.map.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
@@ -1221,16 +1231,21 @@ class GameScene extends Phaser.Scene {
                                     var portalImage = this.add.image(tile.x * GRID, tile.y * GRID,
                                         'blackHole' 
                                     ).setDepth(10).setOrigin(0.4375,0.4375);
+                                    ourPersist.bg.postFX.addBarrel(1.125)
+                                    ourPersist.bg2.postFX.addBarrel(1.125)
+                                    ourPersist.bg3.postFX.addBarrel(1.125)
+                                    ourPersist.bg0.postFX.addBarrel(1.125)
+
+                                    //this.cameras.main.setPostPipeline(this.portalBarrel);
 
 
-                                    this.barrel = portalImage.postFX.addBarrel(.75);
+                                    var _barrel = portalImage.postFX.addBarrel(this.barrelAmount);
                                     
                                     
                                     this.portals.forEach(portal => {
-                                        this.portalBarrel = portal.postFX.addBarrel(.75);
+                                        this.portalBarrel = portal.postFX.addBarrel(this.barrelAmount);
                                     });
-                                    this.cameras.main.setPostPipeline(this.barrel);
-                                    this.add.tween({
+                                    /*this.add.tween({
                                         duration: 500,
                                         repeatDelay: 0,
                                         targets: this.barrel,
@@ -1248,7 +1263,7 @@ class GameScene extends Phaser.Scene {
                                                 repeat: -1
                                             })
                                         }
-                                    });
+                                    });*/
                                     
                                     
                                     if (ourPersist.bestOfStageData[stageName] != undefined) {
@@ -1292,6 +1307,13 @@ class GameScene extends Phaser.Scene {
  
         });
 
+        this.input.keyboard.on('keydown-O', e => {
+            this.barrelAmount +=.1
+        });
+        this.input.keyboard.on('keydown-P', e => {
+            this.barrelAmount -=.1
+        })
+
         // #endregion
 
         // Map only contains Walls at this point
@@ -1332,8 +1354,8 @@ class GameScene extends Phaser.Scene {
                 if(tile.index > 0) { // -1 = empty tile
                     var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
                     ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-
-                    this.coins.push(_coin);
+            
+                    var _barrel = _coin.postFX.addBarrel(this.barrelAmount)
                 }
             });
             coinLayer.destroy();
@@ -1587,7 +1609,7 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        this.cameras.main.setPostPipeline(this.portalBarrel);
+        //this.cameras.main.setPostPipeline(this.portalBarrel);
 
         //this.add.sprite(GRID * 7, GRID * 8,'coinPickup01Anim'
         //    ).play('coin01idle').setDepth(21).setOrigin(.125,.125);
@@ -1612,6 +1634,13 @@ class GameScene extends Phaser.Scene {
         var atom3 = new Food(this);
         var atom4 = new Food(this);
         var atom5 = new Food(this);
+
+        var _barrel = atom1.postFX.addBarrel(this.barrelAmount)
+        var _barrel = atom2.postFX.addBarrel(this.barrelAmount)
+        var _barrel = atom3.postFX.addBarrel(this.barrelAmount)
+        var _barrel = atom4.postFX.addBarrel(this.barrelAmount)
+        var _barrel = atom5.postFX.addBarrel(this.barrelAmount)
+
 
 
         //this.tweens.add({
