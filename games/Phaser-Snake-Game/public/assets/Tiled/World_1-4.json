@@ -185,7 +185,7 @@
         {
          "name":"diffBonus",
          "type":"int",
-         "value":150
+         "value":100
         }, 
         {
          "name":"next",

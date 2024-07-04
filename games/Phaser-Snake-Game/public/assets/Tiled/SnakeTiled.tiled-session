@@ -53,7 +53,7 @@
             "selectedLayer": 1,
             "viewCenter": {
                 "x": 640.9565954241597,
-                "y": 365.6604839468978
+                "y": 364.2594859241126
             }
         },
         "Dark_Stage-04.json#tileSheetx24": {
@@ -63,8 +63,8 @@
             "scale": 1.6612231182795698,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 440.9401674825034,
-                "y": 350.946235689146
+                "x": 440.3382013835511,
+                "y": 350.34426959019373
             }
         },
         "Dark_Stage-06.json#tileSheetx24": {
@@ -75,7 +75,7 @@
             "selectedLayer": 5,
             "viewCenter": {
                 "x": 364.95998493550513,
-                "y": 365.6604839468978
+                "y": 364.2594859241126
             }
         },
         "Ghost_Stage-03.json#tileSheetx24": {
@@ -185,7 +185,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 127.54749945402924,
-                "y": 368.8316226250273
+                "y": 368.2900196549465
             }
         },
         "Racing_Stage-02.json#tileSheetx24": {
@@ -716,7 +716,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 368.8567647358241,
-                "y": 366.5845464725643
+                "y": 365.06973429705783
             }
         },
         "World_1-2.json#tileSheetx24": {
@@ -727,7 +727,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 371.59287633071335
+                "y": 370.852651477465
             }
         },
         "World_1-3.json#tileSheetx24": {
@@ -738,7 +738,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 371.59287633071335
+                "y": 370.1124266242165
             }
         },
         "World_1-4.json#tileSheetx24": {
@@ -749,7 +749,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.1124266242165
+                "y": 369.3722017709681
             }
         },
         "World_2-2.json#tileSheetx24": {
@@ -760,7 +760,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_2-3.json#tileSheetx24": {
@@ -771,7 +771,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_2-4.json#tileSheetx24": {
@@ -793,7 +793,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_4-3-ii.json#tileSheetx24": {
@@ -804,7 +804,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_4-3-iii.json#tileSheetx24": {
@@ -825,8 +825,8 @@
             "scale": 0.7482526881720429,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 684.9290461649003,
-                "y": 366.1864559008443
+                "x": 683.5925992455542,
+                "y": 363.513562062152
             }
         },
         "World_4-4-ii.json#tileSheetx24": {
@@ -837,7 +837,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_4-4-iii.json#tileSheetx24": {
@@ -870,7 +870,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_6-3_Adv_Portaling.json#tileSheetx24": {
@@ -881,7 +881,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
-                "y": 370.852651477465
+                "y": 369.3722017709681
             }
         },
         "World_6-4_Adv_Portaling.json#tileSheetx24": {
@@ -896,6 +896,39 @@
             }
         },
         "World_7-3_Exams.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "World_7-4_Exams.json": {
+            "scale": 1.3509408602150537,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.7032136105861,
+                "y": 372.3331011839618
+            }
+        },
+        "World_7-4_Exams.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "World_8-3_Exams.json": {
+            "scale": 1.3509408602150537,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.7032136105861,
+                "y": 372.3331011839618
+            }
+        },
+        "World_8-3_Exams.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "World_8-4_Exams.json": {
+            "scale": 1.3509408602150537,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 372.7032136105861,
+                "y": 372.3331011839618
+            }
+        },
+        "World_8-4_Exams.json#tileSheetx24": {
             "scaleInDock": 1
         },
         "Wrap_Stage-03.json": {
@@ -1652,17 +1685,17 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "testing05.json",
-        "testing04.json",
-        "testing03.json",
+        "World_8-4_Exams.json",
+        "World_8-3_Exams.json",
+        "World_7-4_Exams.json",
         "World_6-4_Adv_Portaling.json",
-        "World_6-3_Adv_Portaling.json",
-        "World_6-2_Adv_Portaling.json",
         "World_4-4-iii.json",
-        "World_4-4.json",
+        "World_4-4-ii.json",
         "World_4-3-iii.json",
         "World_4-3-ii.json",
-        "World_4-3.json",
-        "World_4-2.json"
+        "World_2-4.json",
+        "World_2-3.json",
+        "World_1-4.json",
+        "Dark_Stage-04.json"
     ]
 }
