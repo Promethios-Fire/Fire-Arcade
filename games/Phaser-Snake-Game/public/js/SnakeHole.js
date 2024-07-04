@@ -14,7 +14,7 @@ import {PORTAL_COLORS} from './const.js';
 const GAME_VERSION = 'v0.7.06.21.012';
 export const GRID = 24;        //.................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const  STARTING_ATTEMPTS = 25;
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -235,7 +235,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Stage-01'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -497,7 +497,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.sumOfBest = 0;
         this.stagesComplete = 0;
-        this.coins = 24; // 4
+        this.coins = 4; // 4
     }
     
     preload(){
@@ -1179,6 +1179,26 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-N', e => {
             
             const STAGE_UNLOCKS = {
+                /* Template
+                '': function () {
+                    return ourPersist.checkCompletedRank("", );
+                },
+                */
+                'lights-out': function () {
+                    return false
+                },
+                'easy-racer': function () {
+                    return false;
+                },
+                'hello-ghosts': function () {
+                    return false;
+                },
+                'medium-happy': function () {
+                    return true;
+                },
+                'bidirectional-portals': function () {
+                    return true
+                },
                 'start': function ( ) { 
                     return true
                 },
@@ -1192,7 +1212,8 @@ class GameScene extends Phaser.Scene {
                     return true
                 },
                 'medium-wrap': function () {
-                    return ourPersist.checkCompletedRank("Stage-01", SILVER);
+                    //return ourPersist.checkCompletedRank("Stage-01", SILVER);
+                    return false;
                 },
                 'dark-precision': function () {
                     return true

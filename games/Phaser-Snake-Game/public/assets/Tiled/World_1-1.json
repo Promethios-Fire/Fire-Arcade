@@ -123,7 +123,7 @@
          "name":"Portal-X",
          "opacity":1,
          "type":"tilelayer",
-         "visible":false,
+         "visible":true,
          "width":31,
          "x":0,
          "y":0
@@ -187,7 +187,7 @@
         {
          "name":"next",
          "type":"string",
-         "value":"Stage-02a, Stage-02b, Wrap_Stage-03, Racing_Stage-02, Portal_Stage-02, Ghost_Stage-03, Dark_Stage-02, Dark_Stage-04  "
+         "value":"World_1-2, World_2-2, Wrap_Stage-03, Racing_Stage-02, Ghost_Stage-03, World_4-2, World_6-2_Adv_Portaling, Dark_Stage-02  "
         }, 
         {
          "name":"slug",

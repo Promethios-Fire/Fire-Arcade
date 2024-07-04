@@ -51,7 +51,7 @@
         {
          "name":"UUID",
          "type":"string",
-         "value":"6dfd20a4-76a1-4840-92a0-161479f65e91"
+         "value":"00000000-0000-0000-0000-000000000000"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
