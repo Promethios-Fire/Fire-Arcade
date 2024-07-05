@@ -12,10 +12,10 @@ import {PORTAL_COLORS} from './const.js';
 
 
 const GAME_VERSION = 'v0.7.06.21.012';
-export const GRID = 24;        //...................... Size of Sprites and GRID
-//var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
-const GAME_LENGTH = 4; //................................ 4 Worlds for the Demo
+export const GRID = 24;        //....................... Size of Sprites and GRID
+//var FRUIT = 5;               //....................... Number of fruit to spawn
+export const LENGTH_GOAL = 28; //28..................... Win Condition
+const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
 const GHOST_WALLS = true;
@@ -1184,8 +1184,44 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("", );
                 },
                 */
+                'double-back-portals': function () {
+                    return true;
+                },
+                'unidirectional-portals': function () {
+                    return true;
+                },
+                'hardest----for-now': function () {
+                    return true;
+                },
+                'swirl-swirl': function () {
+                    return ourPersist.checkCompletedRank("World_4-4-ii", GOLD);
+                },
+                'eye': function () {
+                    return true;
+                },
+                'plus-plus': function () {
+                    return ourPersist.checkCompletedRank("World_4-4", GOLD);
+                },
+                'col': function () {
+                    return true;
+                },
+                'its-a-snek': function () {
+                    return true;
+                },
+                'now-a-fourth': function () {
+                    return true;
+                },
+                'vertical-uturns': function () {
+                    return true;
+                },
+                'horizontal-uturns': function () {
+                    return true;
+                },
+                'vertical-gaps': function () {
+                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", GOLD);
+                },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
+                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", GOLD);
                 },
                 'first-medium': function () {
                     return true;
@@ -1201,11 +1237,11 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'medium-happy': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", SILVER);
+                    return ourPersist.checkCompletedRank("World_2-4", SILVER); // SILVER
                     return true;
                 },
                 'bidirectional-portals': function () {
-                    return ourPersist.checkCompletedRank("World_2-4", SILVER);
+                    return ourPersist.checkCompletedRank("World_4-4", GOLD); // GOLD
                     return true
                 },
                 'start': function ( ) { 
@@ -2293,12 +2329,13 @@ class GameScene extends Phaser.Scene {
         //});
 
         this.atoms.forEach(_fruit => {
-            testGrid[_fruit.x/GRID][_fruit.y/GRID] = false;
+            testGrid[Math.floor(_fruit.x)/GRID][Math.floor(_fruit.y)/GRID] = false;
         });
 
         this.portals.forEach(_portal => {
-            testGrid[_portal.x/GRID][_portal.y/GRID] = false;
+            testGrid[Math.floor(_portal.x)/GRID][Math.floor(_portal.y)/GRID] = false;
         });
+
 
         this.dreamWalls.forEach( _dreamWall => {
             testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;

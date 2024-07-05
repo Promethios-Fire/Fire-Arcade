@@ -177,7 +177,7 @@
         {
          "name":"UUID",
          "type":"string",
-         "value":"00000000-0000-0000-0000-000000000000"
+         "value":"75d73868-1ae7-4704-b8d6-7f65f1a71892"
         }, 
         {
          "name":"diffBonus",
@@ -192,7 +192,7 @@
         {
          "name":"slug",
          "type":"string",
-         "value":""
+         "value":"its-a-snek"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

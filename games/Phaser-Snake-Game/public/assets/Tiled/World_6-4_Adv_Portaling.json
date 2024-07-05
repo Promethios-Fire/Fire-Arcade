@@ -135,7 +135,7 @@
         {
          "name":"UUID",
          "type":"string",
-         "value":"00000000-0000-0000-0000-000000000000"
+         "value":"6de17952-bc6c-4481-8b2b-2d1a107e0681"
         }, 
         {
          "name":"diffBonus",
@@ -150,7 +150,7 @@
         {
          "name":"slug",
          "type":"string",
-         "value":"unidirectional-portals"
+         "value":"double-back-portals"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",

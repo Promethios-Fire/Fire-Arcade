@@ -135,7 +135,7 @@
         {
          "name":"UUID",
          "type":"string",
-         "value":"00000000-0000-0000-0000-000000000000"
+         "value":"84912890-51a3-4f95-9b56-d080713fee47"
         }, 
         {
          "name":"diffBonus",
@@ -150,7 +150,7 @@
         {
          "name":"slug",
          "type":"string",
-         "value":"hard-racer"
+         "value":"swirl-swirl"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.10.2",
