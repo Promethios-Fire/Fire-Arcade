@@ -229,7 +229,7 @@
         {
          "name":"next",
          "type":"string",
-         "value":"Stage-06"
+         "value":"end"
         }, 
         {
          "name":"slug",

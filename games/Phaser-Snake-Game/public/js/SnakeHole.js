@@ -12,10 +12,11 @@ import {PORTAL_COLORS} from './const.js';
 
 
 const GAME_VERSION = 'v0.7.06.21.012';
-export const GRID = 24;        //.................... Size of Sprites and GRID
+export const GRID = 24;        //...................... Size of Sprites and GRID
 //var FRUIT = 5;                 //.................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
-const  STARTING_ATTEMPTS = 25;
+export const LENGTH_GOAL = 2; //28..................... Win Condition
+const GAME_LENGTH = 4; //................................ 4 Worlds for the Demo
+
 const DARK_MODE = false;
 const GHOST_WALLS = true;
 // #region DEBUG OPTIONS
@@ -39,6 +40,8 @@ export const COMBO_ADD_FLOOR = 108;
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 const MAX_SCORE = 120;
 const NO_BONK_BASE = 1000;
+
+const STAGE_TOTAL = 21
 
 
 //debug stuff
@@ -746,9 +749,6 @@ class GameScene extends Phaser.Scene {
         this.medals = {};
         this.zedLevel = 0;
 
-        var {lives = STARTING_ATTEMPTS } = props;
-        this.lives = lives;
-
         var {startupAnim = true } = props;
         this.startupAnim = startupAnim
 
@@ -1184,8 +1184,15 @@ class GameScene extends Phaser.Scene {
                     return ourPersist.checkCompletedRank("", );
                 },
                 */
+                'horizontal-gaps': function () {
+                    return ourPersist.checkCompletedRank("start", PLATINUM);
+                },
+                'first-medium': function () {
+                    return true;
+                    //return ourPersist.checkCompletedRank("", );
+                },
                 'lights-out': function () {
-                    return false
+                    return false;
                 },
                 'easy-racer': function () {
                     return false;
@@ -1205,7 +1212,7 @@ class GameScene extends Phaser.Scene {
                 'babies-first-wall': function () {
                     return true
                 },
-                'horz-row': function () {
+                'horz-rows': function () {
                     return true
                 },
                 'now-vertical': function () {
@@ -3864,7 +3871,7 @@ class ScoreScene extends Phaser.Scene {
         
 
         calcSumOfBest(ourPersist);
-        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), 21);
+        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
 
         this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 3, GRID * 21, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -3919,8 +3926,13 @@ class ScoreScene extends Phaser.Scene {
         this.time.delayedCall(900, function() {
             var continue_text = '[SPACE TO CONTINUE]';
 
-            if (ourGame.stage === END_STAGE) {
-                continue_text = '[SPACE TO WIN]';
+            var gameOver = false;
+
+            if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
+                continue_text = '[RESTART TO UNLOCK NEW WORLDS]';
+                gameOver = true;
+                // Should restart here, with a popup that shows your run score info.
+                // Should be the same screen as the GameOver Screen.
             }
             
             var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.125,'div', Object.assign({}, STYLE_DEFAULT, {
@@ -3963,7 +3975,7 @@ class ScoreScene extends Phaser.Scene {
 
                 ourStartScene.globalFoodLog = _histLog;
 
-                if (ourGame.stage != END_STAGE) {
+                if (!gameOver) {
                                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
                     ourGame.gState = GState.PLAY;
