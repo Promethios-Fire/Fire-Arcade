@@ -612,7 +612,7 @@ class PersistScene extends Phaser.Scene {
 
         if (this.bestOfStageData[targetStageName] != undefined ) {
             var resultRank = this.bestOfStageData[targetStageName].stageRank()
-            var bool = resultRank > rank
+            var bool = resultRank >= rank
             return  bool;
         } else {
             //debugger
@@ -1185,7 +1185,7 @@ class GameScene extends Phaser.Scene {
                 },
                 */
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("start", PLATINUM);
+                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
                 },
                 'first-medium': function () {
                     return true;
@@ -1201,9 +1201,11 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'medium-happy': function () {
+                    return ourPersist.checkCompletedRank("World_2-4", SILVER);
                     return true;
                 },
                 'bidirectional-portals': function () {
+                    return ourPersist.checkCompletedRank("World_2-4", SILVER);
                     return true
                 },
                 'start': function ( ) { 
@@ -1216,7 +1218,7 @@ class GameScene extends Phaser.Scene {
                     return true
                 },
                 'now-vertical': function () {
-                    return true
+                    return ourPersist.checkCompletedRank("World_1-4", COPPER);
                 },
                 'medium-wrap': function () {
                     //return ourPersist.checkCompletedRank("Stage-01", SILVER);
@@ -1226,20 +1228,12 @@ class GameScene extends Phaser.Scene {
                     return true
                 },
                 'vert-rows': function () {
-                    return ourPersist.checkCompletedRank("Stage-02b", SILVER);
+                    return true;
                 }
             }
 
             if (this.winned) {
                 calcSumOfBest(ourPersist);
-
-
-                var debugStage = "Stage-01";
-                console.log("checking rank >",SILVER, debugStage , ourPersist.checkCompletedRank(debugStage , SILVER), "Stage rank = ",ourPersist.bestOfStageData[debugStage].stageRank() );
-        
-                this.nextStages.forEach( stageName => {
-                    
-                });
                 
                 
                 
@@ -3359,6 +3353,7 @@ class ScoreScene extends Phaser.Scene {
 
             this.stageData.newBest = true;
             
+            debugger
             localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
             
             //calcSumOfBest(ourStartScene); // Note: This really should be an event.
@@ -3922,6 +3917,25 @@ class ScoreScene extends Phaser.Scene {
 
         this.prevZeds = this.scene.get("PersistScene").zeds;
 
+
+        // #region Save Best Run
+        var sumOfBase = 0;
+        var _histLog = [];
+        
+        ourStartScene.stageHistory.forEach( _stage => {
+            _histLog = [ ..._histLog, ..._stage.foodLog];
+            sumOfBase += _stage.calcBase();
+            ourGame.nextScore += _stage.calcTotal();
+
+        });
+
+        ourStartScene.globalFoodLog = _histLog;
+
+        if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
+            localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
+        }
+        // #endregion
+
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(900, function() {
             var continue_text = '[SPACE TO CONTINUE]';
@@ -3929,7 +3943,7 @@ class ScoreScene extends Phaser.Scene {
             var gameOver = false;
 
             if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
-                continue_text = '[RESTART TO UNLOCK NEW WORLDS]';
+                continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
                 gameOver = true;
                 // Should restart here, with a popup that shows your run score info.
                 // Should be the same screen as the GameOver Screen.
@@ -3953,6 +3967,7 @@ class ScoreScene extends Phaser.Scene {
                 repeat: -1,
                 yoyo: true
               });
+
             
             // #region Space to Continue
             this.input.keyboard.on('keydown-SPACE', function() {     
@@ -3963,17 +3978,7 @@ class ScoreScene extends Phaser.Scene {
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 
-                var sumOfBase = 0;
-                var _histLog = [];
-                
-                ourStartScene.stageHistory.forEach( _stage => {
-                    _histLog = [ ..._histLog, ..._stage.foodLog];
-                    sumOfBase += _stage.calcBase();
-                    ourGame.nextScore += _stage.calcTotal();
 
-                });
-
-                ourStartScene.globalFoodLog = _histLog;
 
                 if (!gameOver) {
                                     // Go Back Playing To Select New Stage
@@ -3999,9 +4004,7 @@ class ScoreScene extends Phaser.Scene {
                     
                 }
           
-                if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
-                    localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
-                }
+
 
             });
         }, [], this);
