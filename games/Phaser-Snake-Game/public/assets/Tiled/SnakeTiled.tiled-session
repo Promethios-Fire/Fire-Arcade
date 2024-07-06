@@ -922,7 +922,7 @@
         },
         "World_7-4_Final_Exams.json": {
             "scale": 1.3509408602150537,
-            "selectedLayer": 4,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 372.7032136105861,
                 "y": 372.3331011839618
@@ -966,7 +966,7 @@
         },
         "World_8-4_Final_Exams.json": {
             "scale": 1.3509408602150537,
-            "selectedLayer": 0,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 372.7032136105861,
                 "y": 372.3331011839618

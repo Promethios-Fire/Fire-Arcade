@@ -1219,10 +1219,10 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'vertical-gaps': function () {
-                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", SILVER); // Gold
+                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
                 },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", SILVER); // Gold
+                    return ourPersist.checkCompletedRank("World_6-4_Adv_Portaling", SILVER); // Gold
                 },
                 'first-medium': function () {
                     return true;
@@ -1289,6 +1289,7 @@ class GameScene extends Phaser.Scene {
                             var tile = this.nextStagePortalLayer.findByIndex(tiledIndex);
                             
                             if (propObj.name === 'slug') {
+                                debugger
 
                                 if (STAGE_UNLOCKS[propObj.value] != undefined) {
                                     // Makes it so it only removes levels that have unlock slugs.
@@ -1335,6 +1336,7 @@ class GameScene extends Phaser.Scene {
                                                 portalImage.setTint(0xE5E4E2);
                                                 break;
                                             default:
+                                                // here is if you have never played a level before
                                                 portalImage.setTint(0xFFFFFF);    
                                                 break;
                                         }
@@ -3981,6 +3983,7 @@ class ScoreScene extends Phaser.Scene {
             var gameOver = false;
 
             if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
+                debugger
                 continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
                 gameOver = true;
                 // Should restart here, with a popup that shows your run score info.
