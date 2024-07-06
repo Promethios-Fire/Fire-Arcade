@@ -136,19 +136,21 @@ var Snake = new Phaser.Class({
             this.direction = STOP;
             if (scene.bonkable) {
                 this.bonk(scene);
+                debugger
                
             }
         }
 
         // #region Bonk Ghost Walls
-        if (scene.hasGhostTiles = true) {
-            scene.map.setLayer("Ghost-1");
+        if (scene.map.getLayer('Ghost-1')) {
+            scene.map.setLayer("Ghost-1"); // When there are multiple version. Get the current one here.
             if (scene.map.getTileAtWorldXY( xN, yN )) {
             
         
                 this.direction = STOP;
                 if (scene.bonkable) {
                     this.bonk(scene);
+                    debugger
                     
                 }
             }

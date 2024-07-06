@@ -905,6 +905,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer.setDepth(25);
 
         if (this.map.getLayer('Ghost-1')) {
+            debugger
             this.hasGhostTiles = true;
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset]).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
@@ -1218,10 +1219,10 @@ class GameScene extends Phaser.Scene {
                     return true;
                 },
                 'vertical-gaps': function () {
-                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", GOLD);
+                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", SILVER); // Gold
                 },
                 'horizontal-gaps': function () {
-                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", GOLD);
+                    return ourPersist.checkCompletedRank("WORLD_6-4_Adv_Portaling", SILVER); // Gold
                 },
                 'first-medium': function () {
                     return true;
@@ -2329,11 +2330,11 @@ class GameScene extends Phaser.Scene {
         //});
 
         this.atoms.forEach(_fruit => {
-            testGrid[Math.floor(_fruit.x)/GRID][Math.floor(_fruit.y)/GRID] = false;
+            testGrid[Math.floor(_fruit.x/GRID)][Math.floor(_fruit.y/GRID)] = false;
         });
 
         this.portals.forEach(_portal => {
-            testGrid[Math.floor(_portal.x)/GRID][Math.floor(_portal.y)/GRID] = false;
+            testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
         });
 
 
