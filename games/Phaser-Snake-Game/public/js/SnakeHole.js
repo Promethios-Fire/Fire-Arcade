@@ -16,7 +16,7 @@ const ANALYTICS_VERS = "0.3.240705"
 const DEV_BRANCH = "dev"
 
 
-const GAME_VERSION = 'v0.7.07.13.001';
+const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 24;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
