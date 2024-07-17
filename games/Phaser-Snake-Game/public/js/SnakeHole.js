@@ -642,6 +642,9 @@ class StartScene extends Phaser.Scene {
         else {
             this.continueText.setVisible(true)        
         }
+
+        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
+        this.continueText.setVisible(true)
         
         this.tweens.add({
             targets: this.continueText,
