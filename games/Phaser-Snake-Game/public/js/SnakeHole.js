@@ -6254,7 +6254,7 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID + GRID*2.5, 'downWASD', 0
+    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'downWASD', 0
     ).setDepth(50).setOrigin(1,0).setScale(tempButtonScale).setInteractive();
     this.downWASD.on('pointerdown', function (pointer)
     {
