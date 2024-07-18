@@ -6235,7 +6235,7 @@ class InputScene extends Phaser.Scene {
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2, 'upWASD', 0
+    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'upWASD', 0
     ).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
     this.upWASD.on('pointerdown', function (pointer)
     {
@@ -6254,7 +6254,7 @@ class InputScene extends Phaser.Scene {
     });
 
 
-    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID + GRID*2, 'downWASD', 0
+    this.downWASD = this.add.sprite(SCREEN_WIDTH - tempInOffSet * GRID, tempInputHeight * GRID + GRID*2.5, 'downWASD', 0
     ).setDepth(50).setOrigin(1,0).setScale(tempButtonScale).setInteractive();
     this.downWASD.on('pointerdown', function (pointer)
     {
