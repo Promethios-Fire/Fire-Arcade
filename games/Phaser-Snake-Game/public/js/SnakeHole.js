@@ -252,7 +252,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 
@@ -6970,10 +6970,10 @@ var config = {
 
     //},
     max : {
-        width: 744,
+        width: 744 - GRID * 2,
         height: 744 + tempHeightDiff * GRID
     },
-    width: 744, 
+    width: 744 - GRID * 2, 
     height: 744 + tempHeightDiff * GRID,
     backgroundColor: '#4488aa',
     renderer: Phaser.AUTO,
