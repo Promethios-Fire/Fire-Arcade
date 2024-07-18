@@ -71,7 +71,11 @@ var calcBonus = function (scoreInput) {
     return _speedBonus
 }
 
-var calcSumOfBest = function(scene) {
+var updateSumOfBest = function(scene) {
+    /***
+     *  This most important thing this function does is update the bestOfStageData object.
+     *  That is used to check if a black hole should be spawned to a new level.
+     */
     let entries = Object.entries(localStorage);
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
@@ -1031,7 +1035,7 @@ class PersistScene extends Phaser.Scene {
     var zedsObj = calcZedLevel(this.zeds);
     
     // This is an important step, don't leave it out.
-    calcSumOfBest(this);
+    updateSumOfBest(this);
 
     const styleBottomText = {
         "font-size": '8px',
@@ -1281,7 +1285,7 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
 
-        this.snakeCritical = false;
+        this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
         this.graphics = this.add.graphics();
         
@@ -1904,7 +1908,7 @@ class GameScene extends Phaser.Scene {
                 }
     
                 if (this.winned) {
-                    calcSumOfBest(ourPersist);
+                    updateSumOfBest(ourPersist);
                     
                     
                     
@@ -4736,7 +4740,7 @@ class ScoreScene extends Phaser.Scene {
 
 
     
-        calcSumOfBest(ourPersist);
+        updateSumOfBest(ourPersist);
         var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
 
 
