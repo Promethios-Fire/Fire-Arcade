@@ -4831,7 +4831,7 @@ class ScoreScene extends Phaser.Scene {
                 //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
                 //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
                 }
-            )).setText(continue_text).setOrigin(0.5,0).setDepth(25);
+            )).setText(continue_text).setOrigin(0.5,0).setDepth(25).setInteractive();
 
 
             this.tweens.add({
@@ -4843,12 +4843,8 @@ class ScoreScene extends Phaser.Scene {
                 yoyo: true
               });
 
-            
-            // #region Space to Continue
-            this.input.keyboard.on('keydown-SPACE', function() { 
-               
-                
-
+            const onContinue = function (scene) {
+    
                 ourGame.startingArrowsAnimN.setAlpha(1)
                 ourGame.startingArrowsAnimS.setAlpha(1)
                 ourGame.startingArrowsAnimE.setAlpha(1)
@@ -4883,7 +4879,7 @@ class ScoreScene extends Phaser.Scene {
                     "Gameplay",
                     "CompleteStage",
                     extraFields.toString(),
-                  );
+                    );
                 // Event listeners need to be removed manually
                 // Better if possible to do this as part of UIScene clean up
                 // As the event is defined there, but this works and its' here. - James
@@ -4912,9 +4908,18 @@ class ScoreScene extends Phaser.Scene {
                             `Free Play </br>
                             Press "n" to warp to the next stage.`
                     ).setOrigin(0.5,0.5);*/
-                    
-                }
+                } 
+            }
+            // #region Space to Continue
+            this.input.keyboard.on('keydown-SPACE', function() { 
+                onContinue(ourGame);
             });
+
+            continueText.on('pointerdown', e => {
+                onContinue(ourGame);
+            });
+
+
         }, [], this);
     }
 
@@ -6229,7 +6234,7 @@ class InputScene extends Phaser.Scene {
 
     var tempButtonScale = 10;
     var tempInOffSet = 8;
-    var tempInputHeight = 34;
+    var tempInputHeight = 35.5;
 
     this.input.addPointer(4);
 
