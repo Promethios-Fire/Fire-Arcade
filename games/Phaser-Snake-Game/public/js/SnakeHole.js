@@ -1600,6 +1600,8 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        /*
+
         for (let index = 2; index < END_Y - 1; index++) {
             if (!DREAMWALLSKIP.includes(index)) {
                 var wallShimmerRight = this.add.sprite(GRID * END_X, GRID * index).setDepth(50).setOrigin(0,0);
@@ -1623,6 +1625,8 @@ class GameScene extends Phaser.Scene {
             this.dreamWalls.push(wallShimmerBottom);
         
         }
+
+        */
 
         this.CapSpark = this.add.sprite(GRID * 10 -2, GRID).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
