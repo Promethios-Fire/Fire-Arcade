@@ -7385,15 +7385,15 @@ var tempHeightDiff = 16;
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     backgroundColor: '#bbbbbb', //'#4488aa'
-    width: 1280, 
-    height: 720,// + tempHeightDiff * GRID,
+    width: 744, 
+    height: 744,// + tempHeightDiff * GRID,
     min: {
-        width: 640,
-        height: 360
+        width: 372,
+        height: 372
     },
     snap: {
-        width: 640,
-        height: 360
+        width: 372,
+        height: 372
     },
     
     //renderer: Phaser.AUTO,
