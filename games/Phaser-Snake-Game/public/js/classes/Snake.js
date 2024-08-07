@@ -17,7 +17,6 @@ var Snake = new Phaser.Class({
         this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
         this.head.setOrigin(0,0).setDepth(48);
 
-        this.head.scale = 0.5
         
         this.body.unshift(this.head);
 

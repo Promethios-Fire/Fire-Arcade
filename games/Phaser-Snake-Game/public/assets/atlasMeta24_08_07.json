@@ -1,8 +1,8 @@
 {
 	"textures": [
 		{
-			"image": "atlasMeta24_06_27.png",
-			"normalMap": "atlasMeta24_06_27_n.png",
+			"image": "atlasMeta24_08_07.png",
+			"normalMap": "atlasMeta24_08_07_n.png",
 			"format": "RGBA8888",
 			"size": {
 				"w": 1274,
@@ -562,6 +562,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:eb7db2d258e5536743cf4867c00f81d8:14343dbc5d3adba00cc486d35b0d1bcd:19edeb6ecae705ac1011742b37ca6740$"
+		"smartupdate": "$TexturePacker:SmartUpdate:3e4d672d1475c32f0e9996840891a6f4:14343dbc5d3adba00cc486d35b0d1bcd:c0bf6531b451c0278ecaeaed6a83b186$"
 	}
 }
