@@ -5,11 +5,95 @@
 			"normalMap": "atlasMeta24_08_07_n.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 1274,
-				"h": 240
+				"w": 2032,
+				"h": 256
 			},
 			"scale": 1,
 			"frames": [
+				{
+					"filename": "background02.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 256
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 256
+					},
+					"frame": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 256
+					}
+				},
+				{
+					"filename": "background02_4.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 256
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 256
+					},
+					"frame": {
+						"x": 256,
+						"y": 0,
+						"w": 256,
+						"h": 256
+					}
+				},
+				{
+					"filename": "background02_3.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 256,
+						"h": 256
+					},
+					"spriteSourceSize": {
+						"x": 6,
+						"y": 0,
+						"w": 246,
+						"h": 244
+					},
+					"frame": {
+						"x": 512,
+						"y": 0,
+						"w": 246,
+						"h": 244
+					}
+				},
+				{
+					"filename": "atomicPickup01Anim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 636,
+						"h": 12
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 636,
+						"h": 12
+					},
+					"frame": {
+						"x": 512,
+						"y": 244,
+						"w": 636,
+						"h": 12
+					}
+				},
 				{
 					"filename": "UI_boostMeterAnim.png",
 					"rotated": false,
@@ -25,7 +109,7 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 0,
+						"x": 758,
 						"y": 0,
 						"w": 1274,
 						"h": 16
@@ -46,10 +130,178 @@
 						"h": 224
 					},
 					"frame": {
-						"x": 0,
+						"x": 758,
 						"y": 16,
 						"w": 224,
 						"h": 224
+					}
+				},
+				{
+					"filename": "background02_2.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 256,
+						"h": 256
+					},
+					"spriteSourceSize": {
+						"x": 11,
+						"y": 16,
+						"w": 225,
+						"h": 195
+					},
+					"frame": {
+						"x": 982,
+						"y": 16,
+						"w": 225,
+						"h": 195
+					}
+				},
+				{
+					"filename": "ranksSpriteSheet.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 120,
+						"h": 36
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 2,
+						"w": 120,
+						"h": 33
+					},
+					"frame": {
+						"x": 982,
+						"y": 211,
+						"w": 120,
+						"h": 33
+					}
+				},
+				{
+					"filename": "portalAnim.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 192,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 4,
+						"y": 3,
+						"w": 183,
+						"h": 26
+					},
+					"frame": {
+						"x": 1102,
+						"y": 211,
+						"w": 183,
+						"h": 26
+					}
+				},
+				{
+					"filename": "twinkle02Anim.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 56,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 0,
+						"w": 43,
+						"h": 7
+					},
+					"frame": {
+						"x": 1102,
+						"y": 237,
+						"w": 43,
+						"h": 7
+					}
+				},
+				{
+					"filename": "twinkle03Anim.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 32,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 0,
+						"w": 30,
+						"h": 7
+					},
+					"frame": {
+						"x": 1145,
+						"y": 237,
+						"w": 30,
+						"h": 7
+					}
+				},
+				{
+					"filename": "electronCloudAnim.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 572,
+						"h": 18
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 549,
+						"h": 18
+					},
+					"frame": {
+						"x": 1175,
+						"y": 237,
+						"w": 549,
+						"h": 18
+					}
+				},
+				{
+					"filename": "twinkle01Anim.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 32,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 2,
+						"y": 0,
+						"w": 21,
+						"h": 7
+					},
+					"frame": {
+						"x": 1148,
+						"y": 244,
+						"w": 21,
+						"h": 7
+					}
+				},
+				{
+					"filename": "portalParticle01.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 8,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 1,
+						"y": 1,
+						"w": 6,
+						"h": 6
+					},
+					"frame": {
+						"x": 1169,
+						"y": 244,
+						"w": 6,
+						"h": 6
 					}
 				},
 				{
@@ -67,7 +319,7 @@
 						"h": 128
 					},
 					"frame": {
-						"x": 224,
+						"x": 1207,
 						"y": 16,
 						"w": 128,
 						"h": 128
@@ -88,9 +340,135 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 224,
+						"x": 1285,
 						"y": 144,
 						"w": 144,
+						"h": 72
+					}
+				},
+				{
+					"filename": "UI_boostMeterFrame.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 134,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 2,
+						"w": 134,
+						"h": 20
+					},
+					"frame": {
+						"x": 1285,
+						"y": 216,
+						"w": 134,
+						"h": 20
+					}
+				},
+				{
+					"filename": "boostMeterFrame.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 128,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 2,
+						"w": 128,
+						"h": 20
+					},
+					"frame": {
+						"x": 1419,
+						"y": 216,
+						"w": 128,
+						"h": 20
+					}
+				},
+				{
+					"filename": "snakeOutlineAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 56,
+						"h": 14
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 56,
+						"h": 14
+					},
+					"frame": {
+						"x": 1207,
+						"y": 144,
+						"w": 56,
+						"h": 14
+					}
+				},
+				{
+					"filename": "snakeSheetDefault.png",
+					"rotated": false,
+					"trimmed": true,
+					"sourceSize": {
+						"w": 48,
+						"h": 48
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 48,
+						"h": 36
+					},
+					"frame": {
+						"x": 1207,
+						"y": 158,
+						"w": 48,
+						"h": 36
+					}
+				},
+				{
+					"filename": "snakeOutlineSmallAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 56,
+						"h": 14
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 56,
+						"h": 14
+					},
+					"frame": {
+						"x": 1207,
+						"y": 194,
+						"w": 56,
+						"h": 14
+					}
+				},
+				{
+					"filename": "UI_Glass_9SliceLEFT.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 72,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 72,
+						"h": 72
+					},
+					"frame": {
+						"x": 1335,
+						"y": 16,
+						"w": 72,
 						"h": 72
 					}
 				},
@@ -109,73 +487,10 @@
 						"h": 24
 					},
 					"frame": {
-						"x": 224,
-						"y": 216,
+						"x": 1335,
+						"y": 88,
 						"w": 185,
 						"h": 24
-					}
-				},
-				{
-					"filename": "UI_Glass_9SliceLEFT.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 72,
-						"h": 72
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 72,
-						"h": 72
-					},
-					"frame": {
-						"x": 352,
-						"y": 16,
-						"w": 72,
-						"h": 72
-					}
-				},
-				{
-					"filename": "snakeSheetDefault.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 48,
-						"h": 48
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 48,
-						"h": 36
-					},
-					"frame": {
-						"x": 352,
-						"y": 88,
-						"w": 48,
-						"h": 36
-					}
-				},
-				{
-					"filename": "UI_boostMeterFrame.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 134,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 134,
-						"h": 20
-					},
-					"frame": {
-						"x": 352,
-						"y": 124,
-						"w": 134,
-						"h": 20
 					}
 				},
 				{
@@ -193,8 +508,29 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 368,
-						"y": 144,
+						"x": 1407,
+						"y": 16,
+						"w": 72,
+						"h": 72
+					}
+				},
+				{
+					"filename": "UI_Panel_9SliceLEFT.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 72,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 72,
+						"h": 72
+					},
+					"frame": {
+						"x": 1479,
+						"y": 16,
 						"w": 72,
 						"h": 72
 					}
@@ -214,52 +550,10 @@
 						"h": 23
 					},
 					"frame": {
-						"x": 409,
-						"y": 216,
+						"x": 1335,
+						"y": 112,
 						"w": 105,
 						"h": 23
-					}
-				},
-				{
-					"filename": "UI_Panel_9SliceLEFT.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 72,
-						"h": 72
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 72,
-						"h": 72
-					},
-					"frame": {
-						"x": 440,
-						"y": 144,
-						"w": 72,
-						"h": 72
-					}
-				},
-				{
-					"filename": "ranksSpriteSheet.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 120,
-						"h": 36
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 120,
-						"h": 33
-					},
-					"frame": {
-						"x": 400,
-						"y": 88,
-						"w": 120,
-						"h": 33
 					}
 				},
 				{
@@ -277,157 +571,10 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 424,
-						"y": 16,
+						"x": 1429,
+						"y": 135,
 						"w": 72,
 						"h": 72
-					}
-				},
-				{
-					"filename": "boostMeterFrame.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 128,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 128,
-						"h": 20
-					},
-					"frame": {
-						"x": 486,
-						"y": 121,
-						"w": 128,
-						"h": 20
-					}
-				},
-				{
-					"filename": "atomicPickup01Anim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 636,
-						"h": 12
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 636,
-						"h": 12
-					},
-					"frame": {
-						"x": 614,
-						"y": 16,
-						"w": 636,
-						"h": 12
-					}
-				},
-				{
-					"filename": "twinkle01Anim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 32,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 0,
-						"w": 21,
-						"h": 7
-					},
-					"frame": {
-						"x": 1250,
-						"y": 16,
-						"w": 21,
-						"h": 7
-					}
-				},
-				{
-					"filename": "portalParticle01.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 8,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 1,
-						"w": 6,
-						"h": 6
-					},
-					"frame": {
-						"x": 1250,
-						"y": 23,
-						"w": 6,
-						"h": 6
-					}
-				},
-				{
-					"filename": "portalAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 192,
-						"h": 32
-					},
-					"spriteSourceSize": {
-						"x": 4,
-						"y": 3,
-						"w": 183,
-						"h": 26
-					},
-					"frame": {
-						"x": 496,
-						"y": 29,
-						"w": 183,
-						"h": 26
-					}
-				},
-				{
-					"filename": "twinkle02Anim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 56,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 0,
-						"w": 43,
-						"h": 7
-					},
-					"frame": {
-						"x": 496,
-						"y": 16,
-						"w": 43,
-						"h": 7
-					}
-				},
-				{
-					"filename": "twinkle03Anim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 32,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 0,
-						"w": 30,
-						"h": 7
-					},
-					"frame": {
-						"x": 539,
-						"y": 16,
-						"w": 30,
-						"h": 7
 					}
 				},
 				{
@@ -445,52 +592,10 @@
 						"h": 20
 					},
 					"frame": {
-						"x": 496,
-						"y": 55,
+						"x": 1440,
+						"y": 112,
 						"w": 38,
 						"h": 20
-					}
-				},
-				{
-					"filename": "UI_ArrowDownAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 128,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 4,
-						"w": 123,
-						"h": 11
-					},
-					"frame": {
-						"x": 496,
-						"y": 75,
-						"w": 123,
-						"h": 11
-					}
-				},
-				{
-					"filename": "electronCloudAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 572,
-						"h": 18
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 549,
-						"h": 18
-					},
-					"frame": {
-						"x": 534,
-						"y": 55,
-						"w": 549,
-						"h": 18
 					}
 				},
 				{
@@ -508,52 +613,31 @@
 						"h": 16
 					},
 					"frame": {
-						"x": 679,
-						"y": 29,
+						"x": 1478,
+						"y": 112,
 						"w": 124,
 						"h": 16
 					}
 				},
 				{
-					"filename": "snakeOutlineAnim.png",
+					"filename": "UI_ArrowDownAnim.png",
 					"rotated": false,
-					"trimmed": false,
+					"trimmed": true,
 					"sourceSize": {
-						"w": 56,
-						"h": 14
+						"w": 128,
+						"h": 16
 					},
 					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 56,
-						"h": 14
+						"x": 2,
+						"y": 4,
+						"w": 123,
+						"h": 11
 					},
 					"frame": {
-						"x": 803,
-						"y": 29,
-						"w": 56,
-						"h": 14
-					}
-				},
-				{
-					"filename": "snakeOutlineSmallAnim.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 56,
-						"h": 14
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 56,
-						"h": 14
-					},
-					"frame": {
-						"x": 859,
-						"y": 29,
-						"w": 56,
-						"h": 14
+						"x": 1520,
+						"y": 88,
+						"w": 123,
+						"h": 11
 					}
 				}
 			]
@@ -562,6 +646,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:3e4d672d1475c32f0e9996840891a6f4:14343dbc5d3adba00cc486d35b0d1bcd:c0bf6531b451c0278ecaeaed6a83b186$"
+		"smartupdate": "$TexturePacker:SmartUpdate:41082cb65c269df699a7aaf9620c0819:c1ba76ab8cbc28ed79d684afce81ff8a:c0bf6531b451c0278ecaeaed6a83b186$"
 	}
 }
