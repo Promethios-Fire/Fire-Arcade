@@ -1186,6 +1186,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     update(time, delta) {
+        debugger
         console.log()
                 //this.scrollFactorX += .025;
         //this.scrollFactorY += .025;

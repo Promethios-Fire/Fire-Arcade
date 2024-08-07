@@ -5,8 +5,8 @@
 			"normalMap": "atlasMeta24_08_07_n.png",
 			"format": "RGBA8888",
 			"size": {
-				"w": 2032,
-				"h": 256
+				"w": 1660,
+				"h": 280
 			},
 			"scale": 1,
 			"frames": [
@@ -32,7 +32,28 @@
 					}
 				},
 				{
-					"filename": "background02_4.png",
+					"filename": "UI_boostMeterAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 1280,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 1280,
+						"h": 24
+					},
+					"frame": {
+						"x": 0,
+						"y": 256,
+						"w": 1280,
+						"h": 24
+					}
+				},
+				{
+					"filename": "background02_2.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
@@ -55,22 +76,43 @@
 				{
 					"filename": "background02_3.png",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
 						"w": 256,
 						"h": 256
 					},
 					"spriteSourceSize": {
-						"x": 6,
+						"x": 0,
 						"y": 0,
-						"w": 246,
-						"h": 244
+						"w": 256,
+						"h": 256
 					},
 					"frame": {
 						"x": 512,
 						"y": 0,
-						"w": 246,
-						"h": 244
+						"w": 256,
+						"h": 256
+					}
+				},
+				{
+					"filename": "background02_4.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 256,
+						"h": 256
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 256,
+						"h": 256
+					},
+					"frame": {
+						"x": 768,
+						"y": 0,
+						"w": 256,
+						"h": 256
 					}
 				},
 				{
@@ -88,31 +130,10 @@
 						"h": 12
 					},
 					"frame": {
-						"x": 512,
-						"y": 244,
+						"x": 1024,
+						"y": 0,
 						"w": 636,
 						"h": 12
-					}
-				},
-				{
-					"filename": "UI_boostMeterAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 1280,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 3,
-						"y": 4,
-						"w": 1274,
-						"h": 16
-					},
-					"frame": {
-						"x": 758,
-						"y": 0,
-						"w": 1274,
-						"h": 16
 					}
 				},
 				{
@@ -130,121 +151,16 @@
 						"h": 224
 					},
 					"frame": {
-						"x": 758,
-						"y": 16,
+						"x": 1024,
+						"y": 12,
 						"w": 224,
 						"h": 224
 					}
 				},
 				{
-					"filename": "background02_2.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 256,
-						"h": 256
-					},
-					"spriteSourceSize": {
-						"x": 11,
-						"y": 16,
-						"w": 225,
-						"h": 195
-					},
-					"frame": {
-						"x": 982,
-						"y": 16,
-						"w": 225,
-						"h": 195
-					}
-				},
-				{
-					"filename": "ranksSpriteSheet.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 120,
-						"h": 36
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 2,
-						"w": 120,
-						"h": 33
-					},
-					"frame": {
-						"x": 982,
-						"y": 211,
-						"w": 120,
-						"h": 33
-					}
-				},
-				{
-					"filename": "portalAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 192,
-						"h": 32
-					},
-					"spriteSourceSize": {
-						"x": 4,
-						"y": 3,
-						"w": 183,
-						"h": 26
-					},
-					"frame": {
-						"x": 1102,
-						"y": 211,
-						"w": 183,
-						"h": 26
-					}
-				},
-				{
-					"filename": "twinkle02Anim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 56,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 0,
-						"w": 43,
-						"h": 7
-					},
-					"frame": {
-						"x": 1102,
-						"y": 237,
-						"w": 43,
-						"h": 7
-					}
-				},
-				{
-					"filename": "twinkle03Anim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 32,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 0,
-						"w": 30,
-						"h": 7
-					},
-					"frame": {
-						"x": 1145,
-						"y": 237,
-						"w": 30,
-						"h": 7
-					}
-				},
-				{
 					"filename": "electronCloudAnim.png",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
 						"w": 572,
 						"h": 18
@@ -252,140 +168,98 @@
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 549,
+						"w": 572,
 						"h": 18
 					},
 					"frame": {
-						"x": 1175,
-						"y": 237,
-						"w": 549,
+						"x": 1024,
+						"y": 236,
+						"w": 572,
 						"h": 18
 					}
 				},
 				{
-					"filename": "twinkle01Anim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 32,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 0,
-						"w": 21,
-						"h": 7
-					},
-					"frame": {
-						"x": 1148,
-						"y": 244,
-						"w": 21,
-						"h": 7
-					}
-				},
-				{
-					"filename": "portalParticle01.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 8,
-						"h": 8
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 1,
-						"w": 6,
-						"h": 6
-					},
-					"frame": {
-						"x": 1169,
-						"y": 244,
-						"w": 6,
-						"h": 6
-					}
-				},
-				{
-					"filename": "portalMask.png",
+					"filename": "startingArrowsAnim.png",
 					"rotated": false,
 					"trimmed": false,
 					"sourceSize": {
-						"w": 128,
-						"h": 128
+						"w": 192,
+						"h": 24
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 128,
-						"h": 128
+						"w": 192,
+						"h": 24
 					},
 					"frame": {
-						"x": 1207,
-						"y": 16,
-						"w": 128,
-						"h": 128
-					}
-				},
-				{
-					"filename": "UI_Glass_9Slice.png",
-					"rotated": false,
-					"trimmed": false,
-					"sourceSize": {
-						"w": 144,
-						"h": 72
-					},
-					"spriteSourceSize": {
-						"x": 0,
-						"y": 0,
-						"w": 144,
-						"h": 72
-					},
-					"frame": {
-						"x": 1285,
-						"y": 144,
-						"w": 144,
-						"h": 72
+						"x": 1280,
+						"y": 254,
+						"w": 192,
+						"h": 24
 					}
 				},
 				{
 					"filename": "UI_boostMeterFrame.png",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
 						"w": 134,
 						"h": 24
 					},
 					"spriteSourceSize": {
 						"x": 0,
-						"y": 2,
+						"y": 0,
 						"w": 134,
-						"h": 20
+						"h": 24
 					},
 					"frame": {
-						"x": 1285,
-						"y": 216,
+						"x": 1472,
+						"y": 254,
 						"w": 134,
-						"h": 20
+						"h": 24
 					}
 				},
 				{
-					"filename": "boostMeterFrame.png",
+					"filename": "snakeSheetDefault.png",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 128,
-						"h": 24
+						"w": 48,
+						"h": 48
 					},
 					"spriteSourceSize": {
 						"x": 0,
-						"y": 2,
-						"w": 128,
-						"h": 20
+						"y": 0,
+						"w": 48,
+						"h": 48
 					},
 					"frame": {
-						"x": 1419,
-						"y": 216,
-						"w": 128,
-						"h": 20
+						"x": 1606,
+						"y": 12,
+						"w": 48,
+						"h": 48
+					}
+				},
+				{
+					"filename": "portalParticle01.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 8,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 8,
+						"h": 8
+					},
+					"frame": {
+						"x": 1596,
+						"y": 12,
+						"w": 8,
+						"h": 8
 					}
 				},
 				{
@@ -403,31 +277,136 @@
 						"h": 14
 					},
 					"frame": {
-						"x": 1207,
-						"y": 144,
+						"x": 1596,
+						"y": 60,
 						"w": 56,
 						"h": 14
 					}
 				},
 				{
-					"filename": "snakeSheetDefault.png",
+					"filename": "ranksSpriteSheet.png",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
-						"w": 48,
-						"h": 48
+						"w": 120,
+						"h": 36
 					},
 					"spriteSourceSize": {
 						"x": 0,
 						"y": 0,
-						"w": 48,
+						"w": 120,
 						"h": 36
 					},
 					"frame": {
-						"x": 1207,
-						"y": 158,
-						"w": 48,
+						"x": 1248,
+						"y": 20,
+						"w": 120,
 						"h": 36
+					}
+				},
+				{
+					"filename": "twinkle02Anim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 56,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 56,
+						"h": 8
+					},
+					"frame": {
+						"x": 1248,
+						"y": 12,
+						"w": 56,
+						"h": 8
+					}
+				},
+				{
+					"filename": "twinkle01Anim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 32,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 32,
+						"h": 8
+					},
+					"frame": {
+						"x": 1304,
+						"y": 12,
+						"w": 32,
+						"h": 8
+					}
+				},
+				{
+					"filename": "twinkle03Anim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 32,
+						"h": 8
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 32,
+						"h": 8
+					},
+					"frame": {
+						"x": 1336,
+						"y": 12,
+						"w": 32,
+						"h": 8
+					}
+				},
+				{
+					"filename": "portalAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 192,
+						"h": 32
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 192,
+						"h": 32
+					},
+					"frame": {
+						"x": 1368,
+						"y": 20,
+						"w": 192,
+						"h": 32
+					}
+				},
+				{
+					"filename": "UI_atomScoreFrame.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 39,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 39,
+						"h": 24
+					},
+					"frame": {
+						"x": 1560,
+						"y": 20,
+						"w": 39,
+						"h": 24
 					}
 				},
 				{
@@ -445,10 +424,94 @@
 						"h": 14
 					},
 					"frame": {
-						"x": 1207,
-						"y": 194,
+						"x": 1596,
+						"y": 74,
 						"w": 56,
 						"h": 14
+					}
+				},
+				{
+					"filename": "portalMask.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 128
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 128
+					},
+					"frame": {
+						"x": 1248,
+						"y": 88,
+						"w": 128,
+						"h": 128
+					}
+				},
+				{
+					"filename": "UI_ArrowDownAnim.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 16
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 16
+					},
+					"frame": {
+						"x": 1248,
+						"y": 216,
+						"w": 128,
+						"h": 16
+					}
+				},
+				{
+					"filename": "boostMask.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 24
+					},
+					"frame": {
+						"x": 1248,
+						"y": 56,
+						"w": 128,
+						"h": 24
+					}
+				},
+				{
+					"filename": "UI_Glass_9Slice.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 144,
+						"h": 72
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 144,
+						"h": 72
+					},
+					"frame": {
+						"x": 1376,
+						"y": 52,
+						"w": 144,
+						"h": 72
 					}
 				},
 				{
@@ -466,31 +529,10 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 1335,
-						"y": 16,
+						"x": 1520,
+						"y": 52,
 						"w": 72,
 						"h": 72
-					}
-				},
-				{
-					"filename": "startingArrowsAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 192,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 7,
-						"y": 0,
-						"w": 185,
-						"h": 24
-					},
-					"frame": {
-						"x": 1335,
-						"y": 88,
-						"w": 185,
-						"h": 24
 					}
 				},
 				{
@@ -508,10 +550,31 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 1407,
-						"y": 16,
+						"x": 1376,
+						"y": 124,
 						"w": 72,
 						"h": 72
+					}
+				},
+				{
+					"filename": "boostMeterFrame.png",
+					"rotated": false,
+					"trimmed": false,
+					"sourceSize": {
+						"w": 128,
+						"h": 24
+					},
+					"spriteSourceSize": {
+						"x": 0,
+						"y": 0,
+						"w": 128,
+						"h": 24
+					},
+					"frame": {
+						"x": 1376,
+						"y": 196,
+						"w": 128,
+						"h": 24
 					}
 				},
 				{
@@ -529,8 +592,8 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 1479,
-						"y": 16,
+						"x": 1448,
+						"y": 124,
 						"w": 72,
 						"h": 72
 					}
@@ -538,22 +601,22 @@
 				{
 					"filename": "comboLetters.png",
 					"rotated": false,
-					"trimmed": true,
+					"trimmed": false,
 					"sourceSize": {
 						"w": 108,
 						"h": 24
 					},
 					"spriteSourceSize": {
-						"x": 3,
-						"y": 1,
-						"w": 105,
-						"h": 23
+						"x": 0,
+						"y": 0,
+						"w": 108,
+						"h": 24
 					},
 					"frame": {
-						"x": 1335,
-						"y": 112,
-						"w": 105,
-						"h": 23
+						"x": 1504,
+						"y": 196,
+						"w": 108,
+						"h": 24
 					}
 				},
 				{
@@ -571,73 +634,10 @@
 						"h": 72
 					},
 					"frame": {
-						"x": 1429,
-						"y": 135,
+						"x": 1520,
+						"y": 124,
 						"w": 72,
 						"h": 72
-					}
-				},
-				{
-					"filename": "UI_atomScoreFrame.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 39,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 1,
-						"y": 2,
-						"w": 38,
-						"h": 20
-					},
-					"frame": {
-						"x": 1440,
-						"y": 112,
-						"w": 38,
-						"h": 20
-					}
-				},
-				{
-					"filename": "boostMask.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 128,
-						"h": 24
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 4,
-						"w": 124,
-						"h": 16
-					},
-					"frame": {
-						"x": 1478,
-						"y": 112,
-						"w": 124,
-						"h": 16
-					}
-				},
-				{
-					"filename": "UI_ArrowDownAnim.png",
-					"rotated": false,
-					"trimmed": true,
-					"sourceSize": {
-						"w": 128,
-						"h": 16
-					},
-					"spriteSourceSize": {
-						"x": 2,
-						"y": 4,
-						"w": 123,
-						"h": 11
-					},
-					"frame": {
-						"x": 1520,
-						"y": 88,
-						"w": 123,
-						"h": 11
 					}
 				}
 			]
@@ -646,6 +646,6 @@
 	"meta": {
 		"app": "https://www.codeandweb.com/texturepacker",
 		"version": "3.0",
-		"smartupdate": "$TexturePacker:SmartUpdate:41082cb65c269df699a7aaf9620c0819:c1ba76ab8cbc28ed79d684afce81ff8a:c0bf6531b451c0278ecaeaed6a83b186$"
+		"smartupdate": "$TexturePacker:SmartUpdate:a5ea53a06bd407c928a4781f163f5455:c1ba76ab8cbc28ed79d684afce81ff8a:c0bf6531b451c0278ecaeaed6a83b186$"
 	}
 }
