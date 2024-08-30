@@ -321,6 +321,7 @@ class StartScene extends Phaser.Scene {
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
+        this.load.image('spaceBoyBezel','assets/sprites/spaceBoyBezel.png')
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx24_n.png']);
 
@@ -1018,7 +1019,7 @@ class SpaceBoyScene extends Phaser.Scene {
         super({key: 'SpaceBoyScene', active: true});
     }
     create() {
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        this.spaceBoyBezel = this.add.sprite(X_OFFSET,GRID * 2.625, 'spaceBoyBezel').setOrigin(0,0).setDepth(51);
     }
 }
 
