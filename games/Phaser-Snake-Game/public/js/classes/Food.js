@@ -1,4 +1,5 @@
-import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT, X_OFFSET, Y_OFFSET} from "../SnakeHole.js";
+import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT, X_OFFSET, Y_OFFSET, 
+    COMBO_ADD_FLOOR, SPEED_WALK, SPEED_SPRINT, GState} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
@@ -6,21 +7,9 @@ var Food = new Phaser.Class({
 
     initialize:
 
-    function Food (scene) {
+    function Food (scene, pos) {
         Phaser.GameObjects.Sprite.call(this, scene);
-
-
-        if (DEBUG) { // Add Timer Text next to fruit
-            const ourUI = scene.scene.get('UIScene');
-            this.fruitTimerText = scene.add.text(this.x , this.y , 
-                ourUI.scoreTimer.getRemainingSeconds().toFixed(1) * 10,
-                { font: '11px Arial', 
-                    fill: '#FFFFFF',
-                    fontSize: "32px"
-                    
-            });
-            this.fruitTimerText.setOrigin(0,0);  
-        }
+        const ourInputScene = scene.scene.get("InputScene");
 
         this.setOrigin(0,-.0625);
         this.setDepth(47);
@@ -32,54 +21,92 @@ var Food = new Phaser.Class({
         this.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
         this.electrons.anims.msPerFrame = 66;
         this.electrons.visible = false;
+
+        this.setPosition(pos.x, pos.y ); 
+        scene.foodHistory.push([(pos.x - X_OFFSET) / GRID, (pos.y - Y_OFFSET) / GRID, ourInputScene.moveCount]);
         
-
-        //this.setTexture('blocks', 8).setDepth(10); // Fresh now!
-        //this.decayStage01 = scene.time.addEvent({ delay: 1000, callback: fruit => { //was 2000
-            //this.electrons.anims.msPerFrame = 112;
-            //this.play("atom02idle");
-        //}, callbackScope: scene });
-
-        //his.decayStage02 = scene.time.addEvent({ delay: 2000, callback: fruit => { //was 7600
-            //this.play("atom03idle");
-            //this.electrons.play("electronDispersion01");
-            //this.electrons.setVisible(false);
-            //this.stop();
-            //this.setTexture('blocks', 10).setDepth(10);
-        //}, callbackScope: scene });
-
-        //this.decayStage03 = scene.time.addEvent({ delay: 7600, callback: fruit => {
-            //this.play("atom04idle");
-        //}, callbackScope: scene });
-
-        //this.startDecay(scene);
-
-        this.move(scene);
+        this.electrons.setPosition(pos.x, pos.y);
+        scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
 
         scene.atoms.push(this);
 
         scene.children.add(this); // Shows on screen
     },
+
+    onOver: function(scene) {
+        scene.snakeEating();
+            var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+            if(timeSinceFruit > COMBO_ADD_FLOOR){
+                if (scene.snake.lastPlayedCombo > 0) {
+                    scene.comboCounter += 1;
+                    scene.comboBounce();
+                    };
+                scene.pointSounds[scene.snake.lastPlayedCombo].play();       
+                if (scene.snake.lastPlayedCombo < 7) {
+                    scene.snake.lastPlayedCombo += 1;
+                }
+            }
+            else {
+                scene.snake.lastPlayedCombo = 0;
+                scene.comboCounter = 0;
+            }
+
+            scene.events.emit('addScore', this); 
+            scene.snake.grow(scene);
+            // Avoid double _atom getting while in transition
+            this.visible = false;
+
+        
+            if (scene.moveInterval = SPEED_WALK) {
+                // Play atom sound
+                var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
+                scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
+            } else if (scene.moveInterval = SPEED_SPRINT) {
+                
+                // Play sniper sound here.
+                // There are some moveInterval shenanigans happening here. 
+                // Need to debug when exactly the move call happens compared to setting the movesInterval.
+            }
+
+            // Moves the eaten atom after a delay including the electron.
+            scene.time.delayedCall(200, function () {
+                if (scene.gState != GState.TRANSITION) {
+                    this.move(scene);
+                    this.visible = true;
+                }
+
+            }, [], this);
+
+            
+            if (DEBUG) {console.log(                         
+                "FRUITCOUNT=", scene.fruitCount,
+                );
+            }
+            return 'valid';
+    },
+    
     
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
         this.playAfterDelay('atom05spawn',Phaser.Math.RND.integerInRange(0,100));
         this.chain(['atom01idle']);
+
+        scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = "empty";
         
         
         var validLocations = scene.validSpawnLocations();
         
         var pos = Phaser.Math.RND.pick(validLocations);
 
-        
-        
-
         this.setPosition(pos.x, pos.y ); // This seems to magically reset the fruit timers
         scene.foodHistory.push([(pos.x - X_OFFSET) / GRID, (pos.y - Y_OFFSET) / GRID, ourInputScene.moveCount]);
         //console.log(this.x,this.y)
         this.electrons.setPosition(pos.x, pos.y);
         //console.log(this.electrons.x,this.electrons.y)
+
+        scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
 
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice

@@ -21,7 +21,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.7.07.13.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -2127,6 +2127,38 @@ class GameScene extends Phaser.Scene {
         this.map = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
         this.mapShadow = this.make.tilemap({ key: this.stage, tileWidth: GRID, tileHeight: GRID });
 
+        this.interactLayer = []
+
+        for (let x = 0; x < this.map.width; x++) {
+            this.interactLayer[x] = [];
+            for (let y = 0; y < this.map.height; y++) {
+                this.interactLayer[x][y] = "empty";
+                //interactLayer[x][y].onOver() = function () {
+                //    return true;
+                //}
+            }
+        }
+
+        const interactables = {
+            "empty": function () {
+                return  true;
+            },
+            "food": function () {
+                return  true;
+
+            },
+            "coin": function () {
+                return  true;
+
+            },
+            "portal": function() {
+                return  true;
+            },
+            "wallPortal": function() {
+                return  true;
+            }
+        }
+
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
         //var spawnTile2 = this.mapShadow.findByIndex(9); // Snake Head Index
@@ -2245,7 +2277,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
         this.wallLayer.forEachTile(tile => {
-            if (tile.index === 481) {
+            if (tile.index === 481) { // No Food Spawn Tile
                 tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
             }
         });
@@ -2271,6 +2303,7 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
             this.ghostWallLayer.setDepth(26);
         }
+       
 
         if (this.map.getLayer('Food')) {
             this.foodLayer = this.map.createLayer('Food', [this.tileset], X_OFFSET, Y_OFFSET);
@@ -2278,12 +2311,10 @@ class GameScene extends Phaser.Scene {
 
             this.foodLayer.forEachTile(_tile => {
                 if(11 === _tile.index) {
-                    var food = new Food(this);
-                    food.x = _tile.x*GRID; // Not sure this works anymore.
-                    food.y = _tile.y*GRID;
-
-                    food.electrons.x = _tile.x*GRID;
-                    food.electrons.y = _tile.y*GRID;
+                    var food = new Food(this, {
+                        x: _tile.x*GRID + X_OFFSET, 
+                        y:_tile.y*GRID + Y_OFFSET
+                    });
                 }
             })
             this.foodLayer.destroy();
@@ -3433,11 +3464,11 @@ class GameScene extends Phaser.Scene {
   
 
 
-        var atom1 = new Food(this);
-        var atom2 = new Food(this);
-        var atom3 = new Food(this);
-        var atom4 = new Food(this);
-        var atom5 = new Food(this);
+        var atom1 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom2 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom3 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom4 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
+        var atom5 = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));
 
 
         //this.tweens.add({
@@ -5268,7 +5299,6 @@ class GameScene extends Phaser.Scene {
                     var validLocations = this.validSpawnLocations();
                     var pos = Phaser.Math.RND.pick(validLocations)
 
-                    debugger
                     var _coin = this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
                     ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
                     _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);

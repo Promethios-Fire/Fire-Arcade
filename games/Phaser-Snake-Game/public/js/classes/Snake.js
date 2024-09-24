@@ -176,12 +176,6 @@ var Snake = new Phaser.Class({
             }
         }
 
-        
-        var onTile = scene.map.getTileAtWorldXY( this.head.x, this.head.y);
-        if (GState.PLAY === scene.gState && onTile != null && onTile.properties.hasCollision){
-            
-            console.log("Playing Sound now cause I am boss and won.")
-        }
 
         // #region Bonk Ghost Walls
         if (scene.map.getLayer('Ghost-1')) {
@@ -224,6 +218,16 @@ var Snake = new Phaser.Class({
             }) 
         }
         // #endregion
+
+        var onGridX = (this.head.x - X_OFFSET) / GRID;
+        var onGridY = (this.head.y - Y_OFFSET) / GRID;
+
+        if (scene.interactLayer[onGridX][onGridY] != "empty") {
+            //debugger
+            scene.interactLayer[onGridX][onGridY].onOver(scene);
+        }
+        
+
         
 
         // Make Portal Snake body piece invisible.
@@ -280,89 +284,10 @@ var Snake = new Phaser.Class({
         }
 
         // #region Food Collision
-        scene.atoms.forEach(_atom => {  
-            if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
-                scene.snakeEating();
-                var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-
-                if(timeSinceFruit > COMBO_ADD_FLOOR){
-                    if (this.lastPlayedCombo > 0) {
-                        scene.comboCounter += 1;
-                        scene.comboBounce();
-                        };
-                    scene.pointSounds[this.lastPlayedCombo].play();       
-                    if (this.lastPlayedCombo < 7) {
-                        this.lastPlayedCombo += 1;
-                    }
-                }
-                else {
-                    this.lastPlayedCombo = 0;
-                    scene.comboCounter = 0;
-                }
-
-                scene.events.emit('addScore', _atom); // Sends to UI Listener 
-                this.grow(scene);
-                // Avoid double _atom getting while in transition
-                _atom.visible = false;
-                //_atom.electrons.visible = false;
-                //_atom.electrons.play("electronIdle");
-                //_atom.electrons.setPosition(0, 0);
-                //_atom.electrons.visible = false;
-            
-                if (scene.moveInterval = SPEED_WALK) {
-                    // Play atom sound
-                    var _index = Phaser.Math.Between(0, scene.atomSounds.length - 1);
-                    scene.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
-                } else if (scene.moveInterval = SPEED_SPRINT) {
-                    
-                    // Play sniper sound here.
-                    // There are some moveInterval shenanigans happening here. 
-                    // Need to debug when exactly the move call happens compared to setting the movesInterval.
-                }
-
-                // Moves the eaten atom after a delay including the electron.
-                scene.time.delayedCall(200, function () {
-                    if (scene.gState != GState.TRANSITION) {
-                        _atom.move(scene);
-                        //_atom.play("atom01idle", true);
-                        _atom.visible = true;
-                        //_atom.electrons.visible = true;
-                        //_atom.electrons.anims.restart(); // This offsets the animation compared to the other atoms.  
-                    }
-
-                }, [], this);
-
-                //this.electrons.play("electronIdle");
-                // Setting electron framerate here to reset it after slowing in delay 2
-                
-                // Refresh decay on all atoms.
-                //scene.atoms.forEach(__atom => {
-                    //if (__atom.x === 0 && __atom.y === 0) {
-                        // Start decay timer for the eaten Apple now. 
-                        //__atom.startDecay(scene);
-                        // The rest is called after the delay.
-                    //} 
-                    //else {
-                    // For every other atom do everything now
-                    //__atom.play("atom01idle", true);
-                    //__atom.electrons.setVisible(true);
-                    //this.electrons.anims.restart();
-                    //__atom.absorbable = true;
-                    //__atom.startDecay(scene);
-
-                    //__atom.electrons.play("electronIdle", true);
-                    //__atom.electrons.anims.msPerFrame = 66
-                    //}
-
-                //});
-                
-                if (DEBUG) {console.log(                         
-                    "FRUITCOUNT=", scene.fruitCount,
-                    );
-                }
-                return 'valid';
-            }
-        });
+        //scene.atoms.forEach(_atom => {  
+        //    if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
+        //        
+        //});
     },
 
     // #region Bonk()
