@@ -2139,26 +2139,6 @@ class GameScene extends Phaser.Scene {
             }
         }
 
-        const interactables = {
-            "empty": function () {
-                return  true;
-            },
-            "food": function () {
-                return  true;
-
-            },
-            "coin": function () {
-                return  true;
-
-            },
-            "portal": function() {
-                return  true;
-            },
-            "wallPortal": function() {
-                return  true;
-            }
-        }
-
 
         var spawnTile = this.map.findByIndex(9); // Snake Head Index
         //var spawnTile2 = this.mapShadow.findByIndex(9); // Snake Head Index
