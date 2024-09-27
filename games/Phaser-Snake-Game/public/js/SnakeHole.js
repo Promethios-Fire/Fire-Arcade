@@ -264,7 +264,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -2729,8 +2729,7 @@ class GameScene extends Phaser.Scene {
 
             if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
                 // Update snake facing direction but do not move the snake
-                console.log(this.snake.lastPortal.freeDir === true);
-                console.log()
+                console.log("Moving Freely");
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -7466,7 +7465,7 @@ class InputScene extends Phaser.Scene {
 
         switch (true) {
             case up:
-                console.log("I'm Facing Up");
+                //console.log("I'm Facing Up");
                 gameScene.snake.head.setTexture('snakeDefault', 6); 
                 gameScene.snake.direction = DIRS.UP
                 break;
@@ -7490,7 +7489,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
 
-            console.log("I'm Moving Up");
+            //console.log("I'm Moving Up");
             
             this.setPLAY(gameScene);
             

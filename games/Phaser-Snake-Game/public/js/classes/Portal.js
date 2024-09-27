@@ -57,7 +57,7 @@ var Portal = new Phaser.Class({
     },
     onOver: function(scene) {
         scene.gState = GState.PORTAL;
-        scene.snake.lastPortal = this.
+        scene.snake.lastPortal = this
         scene.scoreTimer.paused = true;
 
 
