@@ -6,12 +6,17 @@ var Portal = new Phaser.Class({
 
     initialize:
 
-    function Portal(scene, color, from, to, freeDir)
+    function Portal(scene, anim, color, from, to, freeDir, spawnDelay)
     /**
      * holdDir is Boolean.
      */
     {
         Phaser.GameObjects.Sprite.call(this, scene);
+
+        this.anim = anim;
+        this.playAfterDelay(anim, spawnDelay);
+
+
         //debugger
         this.setPosition(from[0], from[1]);
         this.setOrigin(.3125,.3125);
@@ -26,6 +31,8 @@ var Portal = new Phaser.Class({
         ).setDepth(52).setOrigin(0,0).setPipeline('Light2D');
         this.snakePortalingSprite.setAlpha(0.66);
         scene.snakePortalingSprites.push(this.snakePortalingSprite);
+
+        
 
 
         scene.portals.push(this);

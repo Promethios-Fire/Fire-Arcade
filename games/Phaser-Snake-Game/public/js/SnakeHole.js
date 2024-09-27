@@ -3124,12 +3124,12 @@ class GameScene extends Phaser.Scene {
             
         // #region Stage Logic
         
-        var makePair = function (scene, to, from, colorHex, freeDir) {
+        var makePair = function (scene, anim, to, from, colorHex, freeDir, spawnDelay) {
 
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
-            var p1 = new Portal(scene, color, to, from, freeDir);
-            var p2 = new Portal(scene, color, from, to, freeDir);
+            var p1 = new Portal(scene, anim, color, to, from, freeDir, spawnDelay);
+            var p2 = new Portal(scene, anim, color, from, to, freeDir, spawnDelay + 33);
 
             p1.targetObject = p2;
             p2.targetObject = p1;
@@ -3166,6 +3166,8 @@ class GameScene extends Phaser.Scene {
             //} 
         //});
         console.log(wallPortalData);
+
+        var portalSpawnDelay = 33;
         
         for (let index = PORTAL_WALL_START + 1; index < PORTAL_WALL_START + 9; index++) {
             
@@ -3188,19 +3190,21 @@ class GameScene extends Phaser.Scene {
                 var startFrom = wallPortalData[index].shift();
                 var startTo = wallPortalData[index + ROW_DELTA].shift();
 
-                makePair(this, startFrom, startTo, '#131313', false);
+                makePair(this, "portalIdle", startFrom, startTo, '#131313', false, portalSpawnDelay);
 
                 var endFrom = wallPortalData[index].pop();
                 var endTo = wallPortalData[index + ROW_DELTA].pop();
 
-                makePair(this, endFrom, endTo, '#DDDDDD', false);
+                makePair(this, "portalIdle", endFrom, endTo, '#DDDDDD', false, portalSpawnDelay);
                 console.log(wallPortalData);
 
                 wallPortalData[index].forEach(portalTo => {
                     var portalFrom = wallPortalData[index + ROW_DELTA].shift();
-                    makePair(this, portalTo, portalFrom, colorHex, false);
+                    makePair(this, "portalIdle", portalTo, portalFrom, colorHex, false, portalSpawnDelay);
                 });
             }
+
+            portalSpawnDelay += 66;
         }
 
         for (let index = PORTAL_TILE_START + 1; index < PORTAL_TILE_START + 9; index++) {
@@ -3213,7 +3217,9 @@ class GameScene extends Phaser.Scene {
                 let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
                 let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
                 console.log("Portal Base Logic: FROM TO",_from, _to, index);
-                makePair(this, _to, _from, colorHex, true);
+                makePair(this, "portalIdle", _to, _from, colorHex, true, portalSpawnDelay);
+
+                portalSpawnDelay += 66;
             }
         }
         
@@ -3331,7 +3337,9 @@ class GameScene extends Phaser.Scene {
 
 
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
-            makePair(this, fromN, toN, colorHex, true);
+            makePair(this, "portalIdle", fromN, toN, colorHex, true, portalSpawnDelay);
+
+            portalSpawnDelay += 66;
     
             portalLayerN.visible = false;
             layerIndex ++; 
@@ -3405,22 +3413,22 @@ class GameScene extends Phaser.Scene {
         });
 
         //stagger portal spawns
-        this.time.delayedCall(600, event => {
-            var interval = 225
-            this.portals.forEach(function (portal, index) { 
-                setTimeout(function () {
+        //this.time.delayedCall(600, event => {
+        //    var interval = 33
+        //    this.portals.forEach(function (portal, index) { 
+        //       setTimeout(function () {
                     
-                    portal.playAfterRepeat('portalForm');
-                    portal.chain(['portalIdle'])
-                    portal.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
-                        ourGameScene.chime01.play({volume: 0.5});
-                    })
-                        
-                    //}
-                },index * interval)
-            })
-            
-        });
+        //            portal.playAfterRepeat('portalForm');
+        //            portal.chain(['portalIdle'])
+        //            portal.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+        //               ourGameScene.chime01.play({volume: 0.5});
+        //            })
+        //                
+        //            //}
+        //        },index * interval)
+        //    })
+        //    
+        //});
 
 
 
