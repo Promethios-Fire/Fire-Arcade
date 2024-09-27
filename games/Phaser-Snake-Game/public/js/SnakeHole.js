@@ -3113,12 +3113,7 @@ class GameScene extends Phaser.Scene {
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
                     var _coin = new Coin(this, this.coinsArray, tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET );
-                    _coin.play('coin01idle');
-                    //this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
-                    //).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875);
                     _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
-
-                    debugger
                     this.interactLayer[tile.x][tile.y] = _coin;
                     
                 }
@@ -4305,16 +4300,15 @@ class GameScene extends Phaser.Scene {
             });
         }
 
-        if (this.map.getLayer('Food')) {
-            this.foodLayer.forEachTile(foodTile => {
-    
-                if (foodTile.index > 0) {
-                    
-                    testGrid[foodTile.x][foodTile.y] = 0;
-                }
-            });
-
+        // Check all active things
+        for (let x = 0; x < this.interactLayer.length; x++) {
+            for (let y = 0; y < this.interactLayer[x].length; y++) {
+                if (this.interactLayer[x][y] != "empty") {
+                    testGrid[x][y] = 0;
+                }        
+            }
         }
+
         
 
 
@@ -4338,13 +4332,13 @@ class GameScene extends Phaser.Scene {
         //    }
         //});
 
-        this.atoms.forEach(_fruit => {
+        //this.atoms.forEach(_fruit => {
 
-            var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
-            var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
-            testGrid[_x][_y] = "a";
+        //    var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
+        //    var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
+        //     testGrid[_x][_y] = "a";
             
-        });
+        //});
         
 
         // TEMP
