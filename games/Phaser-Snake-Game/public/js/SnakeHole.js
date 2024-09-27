@@ -58,7 +58,7 @@ const STAGE_TOTAL = 21
 
 
 //debug stuff
-const PORTAL_PAUSE = 2; 
+export const PORTAL_PAUSE = 2; 
 
 
 // Speed Multiplier Stats
@@ -264,7 +264,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'testingFuturistic'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 // #region SpaceBoyScene
@@ -2725,9 +2725,12 @@ class GameScene extends Phaser.Scene {
                     });
                 }
             }
+            
 
-            if (gState === GState.PORTAL) {
+            if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
                 // Update snake facing direction but do not move the snake
+                console.log(this.snake.lastPortal.freeDir === true);
+                console.log()
                 ourInputScene.updateDirection(this, e);  
             }
 
@@ -3128,17 +3131,20 @@ class GameScene extends Phaser.Scene {
         
         // #region Stage Logic
         
-        var makePair = function (scene, to, from, colorHex) {
+        var makePair = function (scene, to, from, colorHex, freeDir) {
 
             var color = new Phaser.Display.Color.HexStringToColor(colorHex);
             
-            var p1 = new Portal(scene, color, to, from);
-            var p2 = new Portal(scene, color, from, to);
+            var p1 = new Portal(scene, color, to, from, freeDir);
+            var p2 = new Portal(scene, color, from, to, freeDir);
 
             p1.targetObject = p2;
             p2.targetObject = p1;
 
             p1.flipX = true;
+
+            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p1;
+            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p2;
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
@@ -3182,24 +3188,24 @@ class GameScene extends Phaser.Scene {
                 
                 console.log(wallDir); 
 
-                // Check for if vertical or horizontal
+                // Check for if vertical or horizontal here
             
                 var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors); // May Error if more portals than colors.
                 
                 var startFrom = wallPortalData[index].shift();
                 var startTo = wallPortalData[index + ROW_DELTA].shift();
 
-                makePair(this, startFrom, startTo, '#131313');
+                makePair(this, startFrom, startTo, '#131313', false);
 
                 var endFrom = wallPortalData[index].pop();
                 var endTo = wallPortalData[index + ROW_DELTA].pop();
 
-                makePair(this, endFrom, endTo, '#DDDDDD');
+                makePair(this, endFrom, endTo, '#DDDDDD', false);
                 console.log(wallPortalData);
 
                 wallPortalData[index].forEach(portalTo => {
                     var portalFrom = wallPortalData[index + ROW_DELTA].shift();
-                    makePair(this, portalTo, portalFrom, colorHex);
+                    makePair(this, portalTo, portalFrom, colorHex, false);
                 });
             }
         }
@@ -3214,7 +3220,7 @@ class GameScene extends Phaser.Scene {
                 let _from = Phaser.Math.RND.pick(basePortalSpawnPools[index]);
                 let _to = Phaser.Math.RND.pick(basePortalSpawnPools[index + ROW_DELTA]);
                 console.log("Portal Base Logic: FROM TO",_from, _to, index);
-                makePair(this, _to, _from, colorHex);
+                makePair(this, _to, _from, colorHex, true);
             }
         }
         
@@ -3332,7 +3338,7 @@ class GameScene extends Phaser.Scene {
 
 
             var colorHex = Phaser.Utils.Array.RemoveRandomElement(this.portalColors);
-            makePair(this, fromN, toN, colorHex);
+            makePair(this, fromN, toN, colorHex, true);
     
             portalLayerN.visible = false;
             layerIndex ++; 
@@ -5161,7 +5167,7 @@ class GameScene extends Phaser.Scene {
 
                 // Move at last second
                 this.snake.move(this);
-                ourInputScene.moveHistory.push([this.snake.head.x/GRID, this.snake.head.y/GRID , this.moveInterval]);
+                ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
 
                 this.snakeCriticalState();

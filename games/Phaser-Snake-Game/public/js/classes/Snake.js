@@ -21,6 +21,7 @@ var Snake = new Phaser.Class({
         this.body.unshift(this.head);
 
         this.lastPlayedCombo = 0;
+        this.lastPortal = undefined; // Set
 
 
 
@@ -219,18 +220,8 @@ var Snake = new Phaser.Class({
         }
         // #endregion
 
-        var onGridX = (this.head.x - X_OFFSET) / GRID;
-        var onGridY = (this.head.y - Y_OFFSET) / GRID;
-
-        if (scene.interactLayer[onGridX][onGridY] != "empty") {
-            //debugger
-            scene.interactLayer[onGridX][onGridY].onOver(scene);
-        }
-        
-
-        
-
-        // Make Portal Snake body piece invisible.
+        // Make Portal Snake body piece invisible. 
+        // TODO redo this to check every move for if there is a portal using the interact layer.
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
                 scene.portals.forEach(portal => {
                     if(this.body[this.body.length -2].x === portal.x && 
@@ -248,6 +239,17 @@ var Snake = new Phaser.Class({
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
+        }
+
+        /**
+         * Interface requirement that all objects in the interative layer 
+         * need an onOver function to work properly.
+         */
+        var onGridX = (this.head.x - X_OFFSET) / GRID;
+        var onGridY = (this.head.y - Y_OFFSET) / GRID;
+
+        if (scene.interactLayer[onGridX][onGridY] != "empty") {
+            scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
         
         // Check for Warp Portals

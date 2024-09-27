@@ -1,4 +1,4 @@
-import {GRID } from "../SnakeHole.js";
+import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG } from "../SnakeHole.js";
 
 
 var Portal = new Phaser.Class({
@@ -6,14 +6,19 @@ var Portal = new Phaser.Class({
 
     initialize:
 
-    function Portal(scene, color, from, to)
+    function Portal(scene, color, from, to, freeDir)
+    /**
+     * holdDir is Boolean.
+     */
     {
         Phaser.GameObjects.Sprite.call(this, scene);
+        //debugger
         this.setPosition(from[0], from[1]);
         this.setOrigin(.3125,.3125);
         this.setDepth(47);
         //this.play("portalIdle");
 
+        this.freeDir = freeDir;
 
         this.target = { x: to[0], y: to[1]};
         this.targetObject = {};
@@ -49,6 +54,52 @@ var Portal = new Phaser.Class({
 
         this.fx.setActive(false);
 
+    },
+    onOver: function(scene) {
+        scene.gState = GState.PORTAL;
+        scene.snake.lastPortal = this.
+        scene.scoreTimer.paused = true;
+
+
+        if (DEBUG) { console.log("PORTAL"); }
+
+        // Show portal snake body after head arrives.
+        if (scene.snake.body.length > 2) {
+            this.snakePortalingSprite.visible = true;   
+        }
+
+
+        var _x = this.target.x;
+        var _y = this.target.y;
+
+        var portalSound = scene.portalSounds[0]
+        portalSound.play();
+
+        var _tween = scene.tweens.add({
+            targets: scene.snake.head, 
+            x: _x,
+            y: _y,
+            yoyo: false,
+            duration: SPEED_WALK * PORTAL_PAUSE,
+            ease: 'Linear',
+            repeat: 0,
+            //delay: 500
+        });
+        
+        _tween.on('complete',()=>{
+            scene.gState = GState.PLAY;
+            scene.scoreTimer.paused = false;
+
+            // Show portal snake body after head arrives.
+            if (scene.snake.body.length > 2) {
+                this.targetObject.snakePortalingSprite.visible = true;   
+            }
+
+            // Set last move to now. Fixes Corner Time.
+            scene.lastMoveTime = scene.time.now;
+        });
+                            
+        return ;  //Don't know why this is here but I left it -James
     },
     
 });
