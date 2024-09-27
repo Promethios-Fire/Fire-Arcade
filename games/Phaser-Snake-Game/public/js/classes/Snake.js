@@ -206,7 +206,7 @@ var Snake = new Phaser.Class({
             var portalSafe = false; // Assume not on portal
             checkBody.some(part => {
                 if (part.x === xN && part.y === yN) {
-                    scene.portals.forEach(portal => { 
+                    scene.portals.forEach(portal => {  // remove this as well TODO. Use an interactive type check.
                         if(xN === portal.x && yN === portal.y){
                             portalSafe = true; // Mark on portal
                         }
@@ -254,6 +254,9 @@ var Snake = new Phaser.Class({
         
         // Check for Warp Portals
         if (scene.winned) {
+            /**
+             * Okay to not be part of the interact layer because there is only ever 8?
+             */
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
                 //debugger
                 if (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y) {
@@ -265,25 +268,9 @@ var Snake = new Phaser.Class({
         }
 
         // #region Coin Collision
-        for (let index = 0; index < scene.coins.length; index++) {
-            var _coin = scene.coins[index];
-            if(GState.PLAY === scene.gState && this.head.x === _coin.x && this.head.y === _coin.y) {
-                console.log("Hit Coin");
-                scene.coinSound.play();
-                //this.snakeCritical = false;
-
-                ourPersistScene.coins += 1;
-                if (ourPersistScene.coins > 0) {
-                    scene.coinsUIIcon.setVisible(true)
-                }
-                scene.coinUIText.setHTML(
-                    `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
-                )
-
-                _coin.destroy();
-                scene.coins.splice(index,1);
-            }
-        }
+        //for (let index = 0; index < scene.coins.length; index++) {
+        //    
+        //}
 
         // #region Food Collision
         //scene.atoms.forEach(_atom => {  

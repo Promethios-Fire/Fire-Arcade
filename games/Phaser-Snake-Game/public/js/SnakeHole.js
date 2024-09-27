@@ -1,5 +1,6 @@
 import { Food } from './classes/Food.js';
 import { Portal } from './classes/Portal.js';
+import { Coin } from './classes/Coin.js';
 import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
@@ -3095,9 +3096,8 @@ class GameScene extends Phaser.Scene {
         //    var food = new Food(this);
         //}
 
-        // #region Coin Logic
-
-        this.coins = []
+        // #region Coin Layer Logic
+        this.coinsArray = [];
 
         var coinVarient = ''
         if (this.varientIndex) {
@@ -3112,22 +3112,21 @@ class GameScene extends Phaser.Scene {
 
             coinLayer.forEachTile(tile => {
                 if(tile.index > 0) { // -1 = empty tile
-                    //var _coin = this.add.sprite(tile.x * GRID, tile.y * GRID, 'megaAtlas', 'coinPickup01Anim.png' 
-                    //).play('coin01idle').setDepth(21).setOrigin(.125,.125);
-                    var _coin = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875);
+                    var _coin = new Coin(this, this.coinsArray, tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET );
+                    _coin.play('coin01idle');
+                    //this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'coinPickup01Anim', 'coinPickup01Anim.png' 
+                    //).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875);
                     _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
-                    this.coins.push(_coin);
+
+                    debugger
+                    this.interactLayer[tile.x][tile.y] = _coin;
+                    
                 }
             });
             coinLayer.destroy();
-        }
-
+        } 
         
-        
-        
-        
-        
+            
         // #region Stage Logic
         
         var makePair = function (scene, to, from, colorHex, freeDir) {
@@ -4166,7 +4165,7 @@ class GameScene extends Phaser.Scene {
         }
 
         this.tweens.add( {
-            targets: this.coins,
+            targets: this.coinsArray,
             originY: [0.1875 - .0466,0.1875 + .0466],
             ease: 'sine.inout',
             duration: 500, //
@@ -4508,7 +4507,7 @@ class GameScene extends Phaser.Scene {
         Phaser.Utils.Array.Shuffle(wallSprites);
         
         var allTheThings = [
-            ...this.coins,
+            ...this.coinsArray,
             ...this.portals,
             ...this.atoms,
             ...wallSprites,
@@ -5282,20 +5281,23 @@ class GameScene extends Phaser.Scene {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
-                    var pos = Phaser.Math.RND.pick(validLocations)
+                    var pos = Phaser.Math.RND.pick(validLocations);
 
-                    var _coin = this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
-                    ).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
+                    var _coin = new Coin(this, this.coinsArray, pos.x, pos.y);
+                    this.interactLayer[(pos.x - X_OFFSET)/GRID][(pos.y - Y_OFFSET)/GRID] = _coin;
+                    
+                    //this.add.sprite(pos.x, pos.y,'coinPickup01Anim.png'
+                    //).play('coin01idle').setDepth(21).setOrigin(-.08333,0.1875).setScale(1);
                     _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
 
-                    this.tweens.add( {
-                        targets: _coin,
-                        originY: [0.1875 - .0466,0.1875 + .0466],
-                        ease: 'sine.inout',
-                        duration: 500,
-                        yoyo: true,
-                        repeat: -1,
-                       })
+                    //this.tweens.add( {
+                    //    targets: _coin,
+                    //    originY: [0.1875 - .0466,0.1875 + .0466],
+                    //    ease: 'sine.inout',
+                    //    duration: 500,
+                    //    yoyo: true,
+                    //    repeat: -1,
+                    //   })
 
                     // tween code not working @holden I am not sure what I am missing -James
                     //this.tweens.add({
@@ -5307,7 +5309,7 @@ class GameScene extends Phaser.Scene {
                     //    repeat: -1
                     //});
                     
-                    this.coins.push(_coin);
+                    this.coinsArray.push(_coin);
 
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
