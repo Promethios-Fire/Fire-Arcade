@@ -91,7 +91,6 @@ var Portal = new Phaser.Class({
 
         console.log([this.x, this.y], [_x, _y]);
 
-        debugger
         var _tween = scene.tweens.add({
             targets: scene.snake.body[0], 
             x: _x,
@@ -101,16 +100,11 @@ var Portal = new Phaser.Class({
             ease: 'Linear',
             repeat: 0,
             //delay: 500
-            onStart: function () {
-                debugger;
-                _x;
-                _y;
-                
+            onStart: function () {       
             }
         });
         
         _tween.on('complete',()=>{
-            debugger
             scene.gState = GState.PLAY;
             scene.scoreTimer.paused = false;
 

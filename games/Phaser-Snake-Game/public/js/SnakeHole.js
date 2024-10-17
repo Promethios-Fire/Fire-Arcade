@@ -3354,7 +3354,7 @@ class GameScene extends Phaser.Scene {
                     return false;
                 },
                 'easy-racer': function () {
-                    return false;
+                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
                 },
                 'hello-ghosts': function () {
                     return false;
@@ -3459,7 +3459,6 @@ class GameScene extends Phaser.Scene {
                     for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
                         
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
-                            debugger
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
                             var stageName = nextStagesCopy.shift();
@@ -3481,7 +3480,6 @@ class GameScene extends Phaser.Scene {
                                     stageName;
                                     var temp = STAGE_UNLOCKS[propObj.value];
                                     var tempEval = STAGE_UNLOCKS[propObj.value].call();
-                                    debugger
                                     
                                    
                                     
@@ -7477,7 +7475,6 @@ class ScoreScene extends Phaser.Scene {
                          Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
                 }
                 //score screen starting arrows
-                debugger
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
                 if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
