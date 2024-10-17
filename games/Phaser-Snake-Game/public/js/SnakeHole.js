@@ -5859,7 +5859,6 @@ class GameScene extends Phaser.Scene {
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
-            console.log("begin Move head at:", this.snake.head.x, this.snake.head.y );
 
             // could we move this into snake.move()
             this.snakeMask.x = this.snake.head.x
@@ -5976,7 +5975,6 @@ class GameScene extends Phaser.Scene {
 
                 // Move at last second
                 this.snake.move(this);
-                console.log("head after move:", this.snake.head.x, this.snake.head.y );
                 ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
 

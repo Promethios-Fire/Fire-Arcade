@@ -5,6 +5,7 @@ import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     Y_OFFSET
 } from "../SnakeHole.js";
 import { Food } from "./Food.js";
+import { Portal } from './Portal.js';
 
 var Snake = new Phaser.Class({
     initialize:
@@ -220,7 +221,17 @@ var Snake = new Phaser.Class({
 
         // Make Portal Snake body piece invisible. 
         // TODO redo this to check every move for if there is a portal using the interact layer.
+        
+        
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
+            var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
+            var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
+
+            if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
+                var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
+                portal.snakePortalingSprite.visible = false;
+                portal.targetObject.snakePortalingSprite.visible = false;
+            }
                 scene.portals.forEach(portal => {
                     if(this.body[this.body.length -2].x === portal.x && 
                         this.body[this.body.length -2].y === portal.y)  {
@@ -228,8 +239,7 @@ var Snake = new Phaser.Class({
                          * -2 checks the second to last piece because the tail
                          *  overlaps otherwise. This looks better.
                          */
-                        portal.snakePortalingSprite.visible = false;
-                        portal.targetObject.snakePortalingSprite.visible = false;
+                        
                     }
                 });
         }
