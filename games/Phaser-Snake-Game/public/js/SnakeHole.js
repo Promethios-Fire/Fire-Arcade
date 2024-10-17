@@ -3676,8 +3676,8 @@ class GameScene extends Phaser.Scene {
 
             //p1.flipX = true;
 
-            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p1;
-            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p2;
+            scene.interactLayer[(from[0] - X_OFFSET)/GRID][(from[1] - Y_OFFSET)/GRID] = p2;
+            scene.interactLayer[(to[0] - X_OFFSET)/GRID][(to[1] - Y_OFFSET)/GRID] = p1;
             //var randomStart = Phaser.Math.Between(0,5);
             //p1.setFrame(randomStart)
             //p2.setFrame(randomStart)
