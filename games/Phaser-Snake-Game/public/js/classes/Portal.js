@@ -41,9 +41,6 @@ var Portal = new Phaser.Class({
         scene.snakePortalingSprites.push(this.snakePortalingSprite);
 
 
-
-
-
         
         
         this.tint = color.color; // Color is a Phaser Color Object
@@ -80,9 +77,9 @@ var Portal = new Phaser.Class({
         if (DEBUG) { console.log("PORTAL"); }
 
         // Show portal snake body after head arrives.
-        //if (scene.snake.body.length > 2) {
-        //    this.snakePortalingSprite.visible = true;   
-        //}
+        if (scene.snake.body.length > 2) {
+            this.snakePortalingSprite.visible = true;   
+        }
 
 
         var _x = this.target.x;

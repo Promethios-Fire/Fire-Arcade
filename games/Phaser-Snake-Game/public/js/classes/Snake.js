@@ -189,10 +189,7 @@ var Snake = new Phaser.Class({
                 }
             }
         }
-        
 
-        
-    
         // #region Intersect Self
         if (GState.PLAY === scene.gState) { //GState.PLAY
             /***
@@ -202,15 +199,15 @@ var Snake = new Phaser.Class({
             var checkBody = this.body.slice(1);
             checkBody.pop();
 
+            var nextHeadGridX = (xN - X_OFFSET) / GRID;
+            var nextHeadGridY = (yN - Y_OFFSET) / GRID;
+
             var portalSafe = false; // Assume not on portal
             checkBody.some(part => {
                 if (part.x === xN && part.y === yN) {
-                    scene.portals.forEach(portal => {  // remove this as well TODO. Use an interactive type check.
-                        if(xN === portal.x && yN === portal.y){
-                            portalSafe = true; // Mark on portal
-                        }
-                    });
-                    
+                    if(scene.interactLayer[nextHeadGridX][nextHeadGridY] instanceof Portal){
+                        portalSafe = true; // Mark on portal
+                    }
                     if (!portalSafe && scene.bonkable) {
                         this.bonk(scene);    
                     }  
@@ -232,16 +229,7 @@ var Snake = new Phaser.Class({
                 portal.snakePortalingSprite.visible = false;
                 portal.targetObject.snakePortalingSprite.visible = false;
             }
-                scene.portals.forEach(portal => {
-                    if(this.body[this.body.length -2].x === portal.x && 
-                        this.body[this.body.length -2].y === portal.y)  {
-                        /***
-                         * -2 checks the second to last piece because the tail
-                         *  overlaps otherwise. This looks better.
-                         */
-                        
-                    }
-                });
+
         }
     
         // Actually Move the Snake Head
