@@ -325,6 +325,12 @@ var Snake = new Phaser.Class({
         scene.portals.forEach ( portal => {
             portal.snakePortalingSprite.visible = false;
         });
+
+        scene.portalWalls.forEach ( portalWallSegment => {
+            portalWallSegment.snakePortalingSprite.visible = false;
+
+        });
+
         if (ourPersistScene.coins > -1) {
             scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
         }

@@ -2319,6 +2319,7 @@ class GameScene extends Phaser.Scene {
         this.foodHistory = [];
         this.walls = [];
         this.portals = [];
+        this.portalWalls = [];
         this.dreamWalls = [];
         this.nextStagePortals = [];
         this.extractHole = [];
