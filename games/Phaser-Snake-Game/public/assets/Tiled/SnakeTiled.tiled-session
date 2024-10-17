@@ -215,9 +215,9 @@
         },
         "Racing_Stage-03.json": {
             "scale": 1.6650537634408602,
-            "selectedLayer": -1,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 312.3022279625444,
+                "x": 312.60251856635455,
                 "y": 337.2263480787859
             }
         },

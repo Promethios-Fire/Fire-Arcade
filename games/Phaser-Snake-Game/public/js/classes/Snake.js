@@ -251,6 +251,7 @@ var Snake = new Phaser.Class({
         onGridY = Math.round(onGridY);
 
         if (scene.gState === GState.PLAY && scene.interactLayer[onGridX][onGridY] != "empty") {
+            debugger
             scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
 
