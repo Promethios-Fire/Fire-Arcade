@@ -3993,6 +3993,7 @@ class GameScene extends Phaser.Scene {
             sortedPortals.forEach (portal => {
                 portal.play(portal.anim);
                 portal.portalHighlight.playAfterDelay("portalHighlights", 32);
+                portal.portalHighlight.alpha = 0;
             });
             
         }

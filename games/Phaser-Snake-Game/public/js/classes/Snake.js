@@ -324,6 +324,7 @@ var Snake = new Phaser.Class({
                 this.closestPortal.flipX = false;
                 //this.closestPortal.setScale(1);
                 this.closestPortal.targetObject.setScale(1);
+                this.closestPortal.targetObject.portalHighlight.alpha = 0;
 
                 testPortal.flipX = true;
                 //testPortal.setScale(2);
@@ -335,6 +336,7 @@ var Snake = new Phaser.Class({
                     ease: 'Sine.Out',
                     });
                 this.closestPortal = testPortal;
+                this.testPortal.targetObject.portalHighlight.alpha = 1;
             }
             
             //debugger
