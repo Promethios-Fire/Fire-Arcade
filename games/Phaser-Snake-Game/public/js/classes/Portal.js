@@ -26,7 +26,7 @@ var Portal = new Phaser.Class({
         if (anim === "portalForm") {
             this.setOrigin(.3125,.3125);
             scene.portals.push(this);
-            this.portalHighlight = scene.add.sprite(from[0], from[1]).setDepth(54);
+            this.portalHighlight = scene.add.sprite(from[0], from[1]).setDepth(54).setOrigin(.3125,.3125);
             this.portalHighlight.play("portalHighlights");
 
 
