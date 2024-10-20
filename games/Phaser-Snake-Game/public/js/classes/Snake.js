@@ -336,7 +336,7 @@ var Snake = new Phaser.Class({
                     ease: 'Sine.Out',
                     });
                 this.closestPortal = testPortal;
-                this.testPortal.targetObject.portalHighlight.alpha = 1;
+                testPortal.targetObject.portalHighlight.alpha = 1;
             }
             
             //debugger
