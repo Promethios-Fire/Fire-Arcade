@@ -3982,7 +3982,7 @@ class GameScene extends Phaser.Scene {
 
         });
 
-        // #region Play Portals
+        // #region Portals Play
         if (this.portals.length > 0) {
             var sortedPortals = this.portals.toSorted(
                 (a, b) => {
@@ -3992,6 +3992,7 @@ class GameScene extends Phaser.Scene {
     
             sortedPortals.forEach (portal => {
                 portal.play(portal.anim);
+                portal.portalHighlight.play("portalFormHighlights");
             });
             
         }
@@ -8627,6 +8628,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1
     });*/
+    scene.anims.create({
+        key: 'portalFormHighlight',
+        frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 6,7,8,9]}),
+        frameRate: 8,
+        repeat: 0
+    });
     scene.anims.create({
         key: 'portalHighlights',
         frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 0, 1, 2, 3, 4, 5]}),
