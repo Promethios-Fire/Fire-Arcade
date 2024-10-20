@@ -783,6 +783,7 @@ class StartScene extends Phaser.Scene {
         //scene.textures.addSpriteSheetFromAtlas('portals', { atlas: 'megaAtlas', frame: 'portalAnim.png', frameWidth: 64, frameHeight: 64 }); 
         //debugger
         this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 32, frameHeight: 32 });
+        this.load.spritesheet('portalHighlights', 'assets/sprites/portalAnimHighlight.png', { frameWidth: 32, frameHeight: 32 });
         this.load.spritesheet('portalWalls', 'assets/sprites/portalWallAnim.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
@@ -8626,6 +8627,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1
     });*/
+    scene.anims.create({
+        key: 'portalHighlights',
+        frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 0, 1, 2, 3, 4, 5]}),
+        frameRate: 8,
+        repeat: -1
+    });
 
     scene.anims.create({
         key: 'portalIdle',

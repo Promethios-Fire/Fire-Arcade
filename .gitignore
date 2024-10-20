@@ -2,3 +2,5 @@ node_modules
 *.tiled-session
 *.tiled-session
 games/Phaser-Snake-Game/src-tauri
+.DS_Store
+games/Phaser-Snake-Game/public/assets/sprites/portalAnimHighlight.pxi
