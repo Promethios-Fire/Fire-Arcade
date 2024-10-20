@@ -329,12 +329,12 @@ var Snake = new Phaser.Class({
                 testPortal.flipX = true;
                 //testPortal.setScale(2);
                 //testPortal.targetObject.setScale(2);
-                scene.tweens.add({
-                    targets: testPortal.targetObject,
-                    scale: {from: 1, to: 2},
-                    duration: 150,
-                    ease: 'Sine.Out',
-                    });
+                //scene.tweens.add({
+                //    targets: testPortal.targetObject,
+                //    scale: {from: 1, to: 2},
+                //    duration: 150,
+                //    ease: 'Sine.Out',
+                //    });
                 this.closestPortal = testPortal;
                 testPortal.targetObject.portalHighlight.alpha = 1;
             }
