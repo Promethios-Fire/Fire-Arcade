@@ -331,8 +331,6 @@ var Snake = new Phaser.Class({
                     duration: 98,
                     ease: 'Sine.Out',
                     onStart: () =>{
-                        //oldPortal.targetObject.portalHighlight.alpha = 0;
-                        debugger;
                         scene.tweens.add({
                             targets: oldPortal.targetObject.portalHighlight,
                             alpha: {from: 1, to: 0},
