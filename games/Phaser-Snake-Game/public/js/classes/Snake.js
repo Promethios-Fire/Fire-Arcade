@@ -294,14 +294,13 @@ var Snake = new Phaser.Class({
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
                 this.closestPortal.flipX = true;
-                //this.closestPortal.setScale(2);
 
-                scene.tweens.add({
+                /*scene.tweens.add({
                     targets: this.closestPortal.targetObject,
                     scale: {from: 1, to: 2},
                     duration: 150,
                     ease: 'Sine.Out',
-                    });
+                    });*/
             }
 
             checkPortals.forEach( portal => {
@@ -322,24 +321,19 @@ var Snake = new Phaser.Class({
             if (this.closestPortal != testPortal) {
                 console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 this.closestPortal.flipX = false;
-                //this.closestPortal.setScale(1);
-                this.closestPortal.targetObject.setScale(1);
                 this.closestPortal.targetObject.portalHighlight.alpha = 0;
 
                 testPortal.flipX = true;
-                //testPortal.setScale(2);
-                //testPortal.targetObject.setScale(2);
-                //scene.tweens.add({
-                //    targets: testPortal.targetObject,
-                //    scale: {from: 1, to: 2},
-                //    duration: 150,
-                //    ease: 'Sine.Out',
-                //    });
+
+                scene.tweens.add({
+                    targets: testPortal.targetObject.portalHighlight,
+                    alpha: {from: 0, to: 1},
+                    duration: 150,
+                    ease: 'Sine.Out',
+                    });
                 this.closestPortal = testPortal;
-                testPortal.targetObject.portalHighlight.alpha = 1;
+
             }
-            
-            //debugger
             
         }
 
