@@ -210,6 +210,16 @@ export const RANKS = Object.freeze({
     PLATINUM: 4,
 });
 
+const RANK_VALUES = new Map([
+    [RANKS.WOOD, 10],
+    [RANKS.BRONZE, 10],
+    [RANKS.SILVER, 10],
+    [RANKS.GOLD, 10],
+    [RANKS.PLATINUM, function (stageName) {
+
+    }]
+]);
+
 
 // #region GLOBAL STYLES 
 const STYLE_DEFAULT = {
@@ -2681,10 +2691,10 @@ class GameScene extends Phaser.Scene {
 
         
 
-        this.tiledProperties = {};
+        this.tiledProperties = new Map();
 
         this.map.properties.forEach(prop => {
-            this.tiledProperties[prop.name] = prop.value;
+            this.tiledProperties.set(prop.name) = prop.value;
         });
         /*this.mapShadow.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
@@ -2694,7 +2704,7 @@ class GameScene extends Phaser.Scene {
         // Loading all Next Stage name to slug to grab from the cache later.
 
         // The first split and join santizes any spaces.
-        this.nextStages = this.tiledProperties.next.split(" ").join("").split(",");
+        this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
         
     
 
@@ -2718,8 +2728,8 @@ class GameScene extends Phaser.Scene {
 
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
-        this.stageUUID = this.tiledProperties.UUID; // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.tiledProperties.diffBonus; // TODO: Get them by name and throw errors.
+        this.stageUUID = this.tiledProperties.get("UUID"); // Loads the UUID from the json file directly.
+        this.stageDiffBonus = this.tiledProperties.get("diffBonus"); // TODO: Get them by name and throw errors.
 
         ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
@@ -3112,7 +3122,7 @@ class GameScene extends Phaser.Scene {
         this.lightMasksContainer = this.make.container(0, 0);
          
             this.lights.enable();
-            if (!this.tiledProperties.dark) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
+            if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
                 this.lights.setAmbientColor(0xE4E4E4);
             }
         
@@ -4042,7 +4052,7 @@ class GameScene extends Phaser.Scene {
 
         this.lightMasksContainer.add(this.lightMasks);
         this.lightMasksContainer.setVisible(false);
-        if (this.tiledProperties.dark) {
+        if (this.tiledProperties.has("dark")) {
             this.wallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
             this.snake.body[0].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
@@ -5416,7 +5426,7 @@ class GameScene extends Phaser.Scene {
     }
     
     applyMask(){ // TODO: move the if statement out of this function also move to Snake.js
-        if (this.tiledProperties.dark) {
+        if (this.tiledProperties.has("dark")) {
             this.snake.body[this.snake.body.length -1].mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
         }
     }
@@ -6220,7 +6230,7 @@ var StageData = new Phaser.Class({
         this.turnInputs = props.turnInputs;
         this.turns = props.turns;
 
-        this.medianSpeedBonus = 6000;
+        //this.medianSpeedBonus = 6000;
 
     },
 
@@ -6381,8 +6391,8 @@ class ScoreScene extends Phaser.Scene {
         }*/
 
         // For properties that may not exist.
-        if (ourGame.tiledProperties.slug != undefined) {
-            this.stageData.slug = ourGame.tiledProperties.slug;
+        if (ourGame.tiledProperties.has("slug")) {
+            this.stageData.slug = ourGame.tiledProperties.get("slug");
         }
         
         console.log(JSON.stringify(this.stageData));
