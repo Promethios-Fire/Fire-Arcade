@@ -8,8 +8,6 @@ import { Snake } from './classes/Snake.js';
 import {PORTAL_COLORS} from './const.js';
 import {STAGE_UNLOCKS} from './data/UnlockCriteria.js';
 
-debugger
-console.log(STAGE_UNLOCKS);
 
 
 //******************************************************************** */
