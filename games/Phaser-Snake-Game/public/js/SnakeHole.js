@@ -2694,7 +2694,7 @@ class GameScene extends Phaser.Scene {
         this.tiledProperties = new Map();
 
         this.map.properties.forEach(prop => {
-            this.tiledProperties.set(prop.name) = prop.value;
+            this.tiledProperties.set(prop.name, prop.value);
         });
         /*this.mapShadow.properties.forEach(prop => {
             this.tiledProperties[prop.name] = prop.value;
