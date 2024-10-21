@@ -295,12 +295,12 @@ var Snake = new Phaser.Class({
                 this.closestPortal = testPortal;
                 this.closestPortal.flipX = true;
 
-                /*scene.tweens.add({
-                    targets: this.closestPortal.targetObject,
-                    scale: {from: 1, to: 2},
-                    duration: 150,
+                scene.tweens.add({
+                    targets: this.closestPortal.targetObject.portalHighlight,
+                    alpha: {from: 1, to: 0},
+                    duration: 98,
                     ease: 'Sine.Out',
-                    });*/
+                    });
             }
 
             checkPortals.forEach( portal => {
@@ -309,7 +309,7 @@ var Snake = new Phaser.Class({
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
 
-                    if (dist > distN - 30) {
+                    if (dist > distN) {
                         dist = distN;
                         testPortal = portal;
                     }
@@ -320,16 +320,26 @@ var Snake = new Phaser.Class({
 
             if (this.closestPortal != testPortal) {
                 console.log("New Closest Portal:", testPortal.x, testPortal.y);
-                this.closestPortal.flipX = false;
-                this.closestPortal.targetObject.portalHighlight.alpha = 0;
+                var oldPortal = this.closestPortal;
+                oldPortal.flipX = false;
 
                 testPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: testPortal.targetObject.portalHighlight,
                     alpha: {from: 0, to: 1},
-                    duration: 150,
+                    duration: 98,
                     ease: 'Sine.Out',
+                    onStart: () =>{
+                        //oldPortal.targetObject.portalHighlight.alpha = 0;
+                        debugger;
+                        scene.tweens.add({
+                            targets: oldPortal.targetObject.portalHighlight,
+                            alpha: {from: 1, to: 0},
+                            duration: 300,
+                            ease: 'Sine.Out',
+                            });
+                    }
                     });
                 this.closestPortal = testPortal;
 
