@@ -63,7 +63,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank("World_4-5", RANKS.WOOD); // Should this one be harder to unlock?
     }],
     ['eye', function () {
-        return checkRank("World_4-4", RANKS.WOOD);
+        return checkRank("World_4-3", RANKS.WOOD);
     }],
     ['plus-plus', function () {
         return checkRank("World_10-3", RANKS.WOOD);
