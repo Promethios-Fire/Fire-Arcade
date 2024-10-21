@@ -158,6 +158,18 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
     return zedsLevel;
 }
 
+var checkRank = function(stageName, targetRank, scene) {
+    if (scene.bestOfStageData[stageName] != undefined ) {
+        var resultRank = scene.bestOfStageData[stageName].stageRank()
+        var bool = resultRank >= targetRank
+        return  bool;
+    } else {
+        //debugger
+        return false;
+    }
+}
+
+
 //console.log("5 Zeds =", calcZedLevel(5));
 //console.log("20 Zeds = ",calcZedLevel(20));
 //console.log("1000 Zeds =", calcZedLevel(500));
@@ -3287,115 +3299,117 @@ class GameScene extends Phaser.Scene {
         this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
-
-            // #region is unlocked?
-            const STAGE_UNLOCKS = {
-                /* Template
+            /* Template
                 '': function () {
                     return ourPersist.checkCompletedRank("", COPPER);
-                },
-                */
-               'two-wide-corridors': function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
-                },
-                'double-back-portals': function () {
+            },
+            */
+
+            // #region is unlocked?
+            const STAGE_UNLOCKS = new Map([
+                ['two-wide-corridors', function () { 
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD)}],
+                ['babies-first-wall', function () {
+                        return ourPersist.checkCompletedRank("World_1-1", WOOD)}],
+                ['two-wide-corridors', function () {
+                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);}],
+                ['double-back-portals', function () {
                     return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", WOOD);
-                },
-                'easy-wrap': function () {
+                }],
+                ['easy-wrap', function () {
                     return ourPersist.checkCompletedRank("World_1-4", SILVER);
-                },
-                'hard-wrap': function () {
+                }],
+                ['hard-wrap', function () {
                     return ourPersist.checkCompletedRank("World_3-3_Wrap", WOOD);
-                },
-                'more-blocks': function () {
+                }],
+                ['more-blocks', function () {
                     return ourPersist.checkCompletedRank("World_2-2", WOOD);
-                },
-                'wrap-and-warp': function () {
+                }],
+                ['wrap-and-warp', function () {
                     return ourPersist.checkCompletedRank("World_1-3", WOOD);
-                },
-                'learn-to-wrap': function () {
+                }],
+                ['learn-to-wrap', function () {
                     return true;
-                },
-                'these-are-coins': function () {
+                }],
+                ['these-are-coins', function () {
                     return true;
-                },
-                'welcome': function () {
+                }],
+                ['welcome', function () {
                     return true;
-                },
-                'unidirectional-portals': function () {
+                }],
+                ['unidirectional-portals', function () {
                     return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", WOOD);
-                },
-                'hardest----for-now': function () {
+                }],
+                ['hardest----for-now', function () {
                     return ourPersist.checkCompletedRank("World_4-3-ii", WOOD);
-                },
-                'swirl-swirl': function () {
+                }],
+                ['swirl-swirl', function () {
                     return ourPersist.checkCompletedRank("World_4-5", WOOD); // Should this one be harder to unlock?
-                },
-                'eye': function () {
+                }],
+                ['eye', function () {
                     return ourPersist.checkCompletedRank("World_4-4", WOOD);
-                },
-                'plus-plus': function () {
+                }],
+                ['plus-plus', function () {
                     return ourPersist.checkCompletedRank("World_10-3", WOOD);
-                },
-                'col': function () {
+                }],
+                ['col', function () {
                     return ourPersist.checkCompletedRank("World_4-3", WOOD);
-                },
-                'its-a-snek': function () {
+                }],
+                ['its-a-snek', function () {
                     return ourPersist.checkCompletedRank("World_4-2", WOOD);
-                },
-                'now-a-fourth': function () {
+                }],
+                ['now-a-fourth', function () {
                     return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
-                },
-                'horizontal-uturns': function () {
+                }],
+                ['horizontal-uturns', function () {
                     return ourPersist.checkCompletedRank("World_9-4_Final_Exams", WOOD);
-                },
-                'horizontal-gaps': function () {
+                }],
+                ['horizontal-gaps', function () {
                     return ourPersist.checkCompletedRank("World_9-3_Final_Exams", WOOD); 
-                },
-                'first-medium': function () {
+                }],
+                ['first-medium', function () {
                     return true;
-                },
-                'lights-out': function () {
+                }],
+                ['lights-out', function () {
                     return false;
-                },
-                'easy-racer': function () {
+                }],
+                ['easy-racer', function () {
                     debugger
                     return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
-                },
-                'hello-ghosts': function () {
+                }],
+                ['hello-ghosts', function () {
                     return false;
-                },
-                'medium-happy': function () {
+                }],
+                ['medium-happy', function () {
                     debugger
                     return ourPersist.checkCompletedRank("World_2-4", WOOD);
                     
-                },
-                'bidirectional-portals': function () {
+                }],
+                ['bidirectional-portals', function () {
                     return ourPersist.checkCompletedRank("World_4-4", WOOD); 
-                },
-                'start': function ( ) { 
+                }],
+                ['start', function ( ) { 
                     return true
-                },
-                'babies-first-wall': function () {
+                }],
+                ['babies-first-wall', function () {
                     return ourPersist.checkCompletedRank("World_1-1", WOOD);
-                },
-                'horz-rows': function () {
+                }],
+                ['horz-rows', function () {
                     return ourPersist.checkCompletedRank("World_1-2", WOOD);
-                },
-                'first-blocks': function () {
+                }],
+                ['first-blocks', function () {
                     return ourPersist.checkCompletedRank("World_1-4", WOOD);
-                },
-                'medium-wrap': function () {
+                }],
+                ['medium-wrap', function () {
                     return ourPersist.checkCompletedRank("World_3-2_Wrap", WOOD)
-                },
-                'dark-precision': function () {
+                }],
+                ['dark-precision', function () {
                     return true
-                },
-                'vert-rows': function () {
+                }],
+                ['vert-rows', function () {
                     return true;
-                }
-
-            }
+                }]
+            ]);
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
@@ -3477,7 +3491,7 @@ class GameScene extends Phaser.Scene {
                                 
                                 if (propObj.name === 'slug') {
 
-                                    if (STAGE_UNLOCKS[propObj.value] != undefined) {
+                                    if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
                                         tile.index = -1;
                                         // Only removes levels that have unlock slugs.
                                         // Easier to debug which levels don't have slugs formatted correctly.
@@ -3486,13 +3500,13 @@ class GameScene extends Phaser.Scene {
                                     
                                     // Easier to see when debugging with debugger in console.
                                     stageName;
-                                    var temp = STAGE_UNLOCKS[propObj.value];
-                                    var tempEval = STAGE_UNLOCKS[propObj.value].call();
+                                    var temp = STAGE_UNLOCKS.get(propObj.value);
+                                    var tempEval = STAGE_UNLOCKS.get(propObj.value).call();
                                     
                                    
                                     
 
-                                    if (STAGE_UNLOCKS[propObj.value].call()) {
+                                    if (STAGE_UNLOCKS.get(propObj.value).call()) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
                                         console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);

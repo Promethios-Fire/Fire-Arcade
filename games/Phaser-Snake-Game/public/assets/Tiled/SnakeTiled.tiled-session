@@ -2067,7 +2067,7 @@
         "rough-04.json"
     ],
     "project": "SnakeTiled.tiled-project",
-    "property.type": "bool",
+    "property.type": "string",
     "recentFiles": [
         "testingAztec.json",
         "World_1-1.json",
