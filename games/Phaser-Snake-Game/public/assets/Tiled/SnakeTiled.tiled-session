@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "template-10-24.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1943,11 +1943,11 @@
             "scaleInDock": 1
         },
         "template-10-24.json": {
-            "scale": 2.983764367816092,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.2710550392449,
-                "y": 164.3896566668272
+                "x": 476.25,
+                "y": 144
             }
         },
         "template-10-24.json#tileSheetx12": {
@@ -2502,10 +2502,12 @@
     "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
     "openFiles": [
+        "template-10-24.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "template-10-24.json",
         "Dark_Stage-02.json",
         "r07-14-2.json",
         "r07-14.json",
@@ -2516,8 +2518,7 @@
         "r07-15-02.json",
         "r07-15-03-big.json",
         "r07-15-04.json",
-        "r-07-10-4.json",
-        "r-07-10-3.json"
+        "r-07-10-4.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

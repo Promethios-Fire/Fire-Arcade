@@ -276,7 +276,8 @@ var Snake = new Phaser.Class({
             if (scene.extractHole[0]) { //check that there is an extract hole
                 if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
                     console.log('WOO')
-                    scene.finalScore();
+                    //scene.finalScore();
+                    scene.extractPrompt();
                 }
             }
 

@@ -25,7 +25,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -297,7 +297,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'r-07-10-6'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -5038,15 +5038,21 @@ class GameScene extends Phaser.Scene {
 
         
     }
+    extractPrompt(){
+        this.gState = GState.TRANSITION;
+        this.snake.head.setTexture('snakeDefault', 0);
+        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+    }
 
     finalScore(){
         const ourStartScene = this.scene.get('StartScene');
 
-        this.gState = GState.TRANSITION;
+        
 
-        this.snake.head.setTexture('snakeDefault', 0);
+        
 
-        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+        
 
         this.extractHole[0].play('extractHoleClose');
 
