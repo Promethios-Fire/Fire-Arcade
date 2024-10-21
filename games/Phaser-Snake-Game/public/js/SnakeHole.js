@@ -25,7 +25,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -210,14 +210,12 @@ export const RANKS = Object.freeze({
     PLATINUM: 4,
 });
 
-const RANK_VALUES = new Map([
-    [RANKS.WOOD, 10],
-    [RANKS.BRONZE, 10],
-    [RANKS.SILVER, 10],
-    [RANKS.GOLD, 10],
-    [RANKS.PLATINUM, function (stageName) {
-
-    }]
+const RANK_BENCHMARKS = new Map([
+    // Calibrated for use with SpeedBonus
+    [RANKS.WOOD, 0],
+    [RANKS.BRONZE, 2000],
+    [RANKS.SILVER, 5000],
+    [RANKS.GOLD, 10000],
 ]);
 
 
@@ -6221,6 +6219,7 @@ var StageData = new Phaser.Class({
         this.medals = props.medals;
         this.moveCount = props.moveCount;
         this.zedLevel = props.zedLevel;
+        this.sRank = props.sRank;
 
         this.uuid = props.uuid;
         if (this.slug) { this.slug = props.slug }
@@ -6253,16 +6252,16 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
-            case bonusScore > this.medianSpeedBonus * 2:
+            case bonusScore > this.sRank:
                 rank = RANKS.PLATINUM;
                 break;
-            case bonusScore > this.medianSpeedBonus * 1.5:
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.GOLD):
                 rank = RANKS.GOLD;
                 break;
-            case bonusScore > this.medianSpeedBonus:
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.SILVER):
                 rank = RANKS.SILVER;
                 break;
-            case bonusScore > this.medianSpeedBonus * .5:
+            case bonusScore > RANK_BENCHMARKS.get(RANKS.BRONZE):
                 rank = RANKS.BRONZE;
                 break;
             default:
@@ -6373,8 +6372,10 @@ class ScoreScene extends Phaser.Scene {
             stage:ourGame.stage,
             uuid:ourGame.stageUUID,
             zedLevel: calcZedLevel(ourPersist.zeds).level,
-            zeds: ourPersist.zeds
+            zeds: ourPersist.zeds,
+            sRank: parseInt(ourGame.tiledProperties.get("sRank"))
         }
+        debugger
 
 
         this.stageData = new StageData(stageDataJSON);
