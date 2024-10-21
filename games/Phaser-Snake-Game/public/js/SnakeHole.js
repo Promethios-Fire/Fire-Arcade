@@ -6375,7 +6375,6 @@ class ScoreScene extends Phaser.Scene {
             zeds: ourPersist.zeds,
             sRank: parseInt(ourGame.tiledProperties.get("sRank"))
         }
-        debugger
 
 
         this.stageData = new StageData(stageDataJSON);
