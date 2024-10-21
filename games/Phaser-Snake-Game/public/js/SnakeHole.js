@@ -6,6 +6,10 @@ import { Snake } from './classes/Snake.js';
 
 
 import {PORTAL_COLORS} from './const.js';
+import {STAGE_UNLOCKS} from './data/UnlockCriteria.js';
+
+debugger
+console.log(STAGE_UNLOCKS);
 
 
 //******************************************************************** */
@@ -23,7 +27,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -95,7 +99,7 @@ var updateSumOfBest = function(scene) {
     let entries = Object.entries(localStorage);
     scene.stagesComplete = 0;
     scene.sumOfBest = 0;
-    scene.bestOfStageData = {};
+    BEST_OF_STAGE_DATA = new Map();
 
     entries.forEach(log => {
         var key = log[0].split("-");
@@ -103,7 +107,7 @@ var updateSumOfBest = function(scene) {
             scene.stagesComplete += 1
 
             var levelLog = new StageData(JSON.parse(log[1]));
-            scene.bestOfStageData[levelLog.stage] = levelLog;
+            BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
 
             var _scoreTotal = levelLog.calcTotal();
             scene.sumOfBest += _scoreTotal;
@@ -111,6 +115,8 @@ var updateSumOfBest = function(scene) {
 
     })
 }
+
+export var BEST_OF_STAGE_DATA = new Map ();
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -158,18 +164,6 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
     return zedsLevel;
 }
 
-var checkRank = function(stageName, targetRank, scene) {
-    if (scene.bestOfStageData[stageName] != undefined ) {
-        var resultRank = scene.bestOfStageData[stageName].stageRank()
-        var bool = resultRank >= targetRank
-        return  bool;
-    } else {
-        //debugger
-        return false;
-    }
-}
-
-
 //console.log("5 Zeds =", calcZedLevel(5));
 //console.log("20 Zeds = ",calcZedLevel(20));
 //console.log("1000 Zeds =", calcZedLevel(500));
@@ -209,6 +203,14 @@ export const DIRS = Object.freeze({
     RIGHT: 4,
     STOP: 0, 
 }); 
+
+export const RANKS = Object.freeze({
+    WOOD: 0,
+    BRONZE: 1,
+    SILVER: 2,
+    GOLD: 3,
+    PLATINUM: 4,
+});
 
 
 // #region GLOBAL STYLES 
@@ -2070,6 +2072,9 @@ class PersistScene extends Phaser.Scene {
     
     create() {
 
+
+    
+
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
@@ -2247,17 +2252,17 @@ class PersistScene extends Phaser.Scene {
         });
     }
 
-    checkCompletedRank = function (targetStageName, rank) {
+    //checkCompletedRank = function (targetStageName, rank) {
 
-        if (this.bestOfStageData[targetStageName] != undefined ) {
-            var resultRank = this.bestOfStageData[targetStageName].stageRank()
-            var bool = resultRank >= rank
-            return  bool;
-        } else {
-            //debugger
-            return false;
-        }
-    }
+    ///    if (this.bestOfStageData[targetStageName] != undefined ) {
+    //        var resultRank = this.bestOfStageData[targetStageName].stageRank()
+    //        var bool = resultRank >= rank
+    //        return  bool;
+    //    } else {
+    //        //debugger
+    //        return false;
+    //    }
+    //}
     
     update(time, delta) {
 
@@ -3299,117 +3304,9 @@ class GameScene extends Phaser.Scene {
         this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
-            /* Template
-                '': function () {
-                    return ourPersist.checkCompletedRank("", COPPER);
-            },
-            */
+            
 
             // #region is unlocked?
-            const STAGE_UNLOCKS = new Map([
-                ['two-wide-corridors', function () { 
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD)}],
-                ['babies-first-wall', function () {
-                        return ourPersist.checkCompletedRank("World_1-1", WOOD)}],
-                ['two-wide-corridors', function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);}],
-                ['double-back-portals', function () {
-                    return ourPersist.checkCompletedRank("World_8-3_Adv_Portaling", WOOD);
-                }],
-                ['easy-wrap', function () {
-                    return ourPersist.checkCompletedRank("World_1-4", SILVER);
-                }],
-                ['hard-wrap', function () {
-                    return ourPersist.checkCompletedRank("World_3-3_Wrap", WOOD);
-                }],
-                ['more-blocks', function () {
-                    return ourPersist.checkCompletedRank("World_2-2", WOOD);
-                }],
-                ['wrap-and-warp', function () {
-                    return ourPersist.checkCompletedRank("World_1-3", WOOD);
-                }],
-                ['learn-to-wrap', function () {
-                    return true;
-                }],
-                ['these-are-coins', function () {
-                    return true;
-                }],
-                ['welcome', function () {
-                    return true;
-                }],
-                ['unidirectional-portals', function () {
-                    return ourPersist.checkCompletedRank("World_8-2_Adv_Portaling", WOOD);
-                }],
-                ['hardest----for-now', function () {
-                    return ourPersist.checkCompletedRank("World_4-3-ii", WOOD);
-                }],
-                ['swirl-swirl', function () {
-                    return ourPersist.checkCompletedRank("World_4-5", WOOD); // Should this one be harder to unlock?
-                }],
-                ['eye', function () {
-                    return ourPersist.checkCompletedRank("World_4-4", WOOD);
-                }],
-                ['plus-plus', function () {
-                    return ourPersist.checkCompletedRank("World_10-3", WOOD);
-                }],
-                ['col', function () {
-                    return ourPersist.checkCompletedRank("World_4-3", WOOD);
-                }],
-                ['its-a-snek', function () {
-                    return ourPersist.checkCompletedRank("World_4-2", WOOD);
-                }],
-                ['now-a-fourth', function () {
-                    return ourPersist.checkCompletedRank("World_8-4_Adv_Portaling", WOOD);
-                }],
-                ['horizontal-uturns', function () {
-                    return ourPersist.checkCompletedRank("World_9-4_Final_Exams", WOOD);
-                }],
-                ['horizontal-gaps', function () {
-                    return ourPersist.checkCompletedRank("World_9-3_Final_Exams", WOOD); 
-                }],
-                ['first-medium', function () {
-                    return true;
-                }],
-                ['lights-out', function () {
-                    return false;
-                }],
-                ['easy-racer', function () {
-                    debugger
-                    return ourPersist.checkCompletedRank("World_1-1", PLATINUM);
-                }],
-                ['hello-ghosts', function () {
-                    return false;
-                }],
-                ['medium-happy', function () {
-                    debugger
-                    return ourPersist.checkCompletedRank("World_2-4", WOOD);
-                    
-                }],
-                ['bidirectional-portals', function () {
-                    return ourPersist.checkCompletedRank("World_4-4", WOOD); 
-                }],
-                ['start', function ( ) { 
-                    return true
-                }],
-                ['babies-first-wall', function () {
-                    return ourPersist.checkCompletedRank("World_1-1", WOOD);
-                }],
-                ['horz-rows', function () {
-                    return ourPersist.checkCompletedRank("World_1-2", WOOD);
-                }],
-                ['first-blocks', function () {
-                    return ourPersist.checkCompletedRank("World_1-4", WOOD);
-                }],
-                ['medium-wrap', function () {
-                    return ourPersist.checkCompletedRank("World_3-2_Wrap", WOOD)
-                }],
-                ['dark-precision', function () {
-                    return true
-                }],
-                ['vert-rows', function () {
-                    return true;
-                }]
-            ]);
 
             if (this.winned) {
                 updateSumOfBest(ourPersist);
@@ -3501,12 +3398,12 @@ class GameScene extends Phaser.Scene {
                                     // Easier to see when debugging with debugger in console.
                                     stageName;
                                     var temp = STAGE_UNLOCKS.get(propObj.value);
-                                    var tempEval = STAGE_UNLOCKS.get(propObj.value).call();
+                                    var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
                                     
                                    
                                     
 
-                                    if (STAGE_UNLOCKS.get(propObj.value).call()) {
+                                    if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist)) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
                                         console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
@@ -3562,21 +3459,21 @@ class GameScene extends Phaser.Scene {
                                         //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
                                         //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
                                         
-                                        if (ourPersist.bestOfStageData[stageName] != undefined) {
-                                            switch (ourPersist.bestOfStageData[stageName].stageRank()) {
-                                                case WOOD:
+                                        if (BEST_OF_STAGE_DATA.get(stageName) != undefined) {
+                                            switch (BEST_OF_STAGE_DATA.get(stageName).stageRank()) {
+                                                case RANKS.WOOD:
                                                     blackholeImage.setTint(0xB87333);
                                                     break;
-                                                case BRONZE:
+                                                case RANKS.BRONZE:
                                                     blackholeImage.setTint(0xCD7F32);
                                                     break;
-                                                case SILVER:
+                                                case RANKS.SILVER:
                                                     blackholeImage.setTint(0xC0C0C0);
                                                     break;
-                                                case GOLD:
+                                                case RANKS.GOLD:
                                                     blackholeImage.setTint(0xDAA520);
                                                     break;
-                                                case PLATINUM:
+                                                case RANKS.PLATINUM:
                                                     blackholeImage.setTint(0xE5E4E2);
                                                     break;
                                                 default:
@@ -6295,11 +6192,8 @@ class GameScene extends Phaser.Scene {
     
 }
 
-const WOOD = 0;
-const BRONZE = 1;
-const SILVER = 2;
-const GOLD = 3;
-const PLATINUM = 4;
+
+
 
 // #region Stage Data
 var StageData = new Phaser.Class({
@@ -6352,19 +6246,19 @@ var StageData = new Phaser.Class({
 
         switch (true) {
             case bonusScore > this.medianSpeedBonus * 2:
-                rank = PLATINUM;
+                rank = RANKS.PLATINUM;
                 break;
             case bonusScore > this.medianSpeedBonus * 1.5:
-                rank = GOLD;
+                rank = RANKS.GOLD;
                 break;
             case bonusScore > this.medianSpeedBonus:
-                rank = SILVER;
+                rank = RANKS.SILVER;
                 break;
             case bonusScore > this.medianSpeedBonus * .5:
-                rank = BRONZE;
+                rank = RANKS.BRONZE;
                 break;
             default:
-                rank = WOOD;
+                rank = RANKS.WOOD;
         }
         return rank;
         
@@ -7093,7 +6987,7 @@ class ScoreScene extends Phaser.Scene {
         rank -= 1; //this needs to be set back to rank-1 from being +1'd earlier
 
         // region Particle Emitter
-        if(rank >= SILVER){
+        if(rank >= RANKS.SILVER){
             lightColor = silverLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
@@ -7105,7 +6999,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(500,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
-        if(rank === GOLD){
+        if(rank === RANKS.GOLD){
             lightColor = goldLightColor
             lightColor2 = goldLightColor
             console.log(lightColor)
@@ -7117,7 +7011,7 @@ class ScoreScene extends Phaser.Scene {
             }).setFrequency(1332,[1]).setDepth(51);
             this.ScoreContainerL.add(rankParticles)
         }
-        if(rank === PLATINUM){
+        if(rank === RANKS.PLATINUM){
             
             lightColor = platLightColor
             lightColor2 = goldLightColor
