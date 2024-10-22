@@ -1662,16 +1662,16 @@ class MainMenuScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-        if (!thisScene.pressedSpace) {
-            thisScene.pressToPlayTween.stop();
-            thisScene.pressToPlay.setAlpha(0)
-            thisScene.pressedSpace = true;
-            titleTween.resume();
-            menuFadeTween.resume();            
-        }
-        else{
-            console.log(menuOptions[menuList[cursorIndex]].call());
-        }
+            if (!thisScene.pressedSpace) {
+                thisScene.pressToPlayTween.stop();
+                thisScene.pressToPlay.setAlpha(0)
+                thisScene.pressedSpace = true;
+                titleTween.resume();
+                menuFadeTween.resume();            
+            }
+            else{
+                console.log(menuOptions[menuList[cursorIndex]].call());
+            }
 
         });
 
@@ -5039,20 +5039,131 @@ class GameScene extends Phaser.Scene {
         
     }
     extractPrompt(){
+        const ourGameScene = this.scene.get('GameScene');
+
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
         this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
 
+
+        var menuOptions = {
+            'YES': function () {
+                console.log("YES");
+                ourGameScene.scene.start('MainMenuScene');
+                return true;
+            },
+            'NO': function () {   
+                console.log("NO");
+                //thisScene.scene.launch('TutorialScene');
+                //thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+                //thisScene.scene.stop();
+                return true;
+            },
+            'LOOP TO ORIGIN': function () {
+                console.log("LOOP");
+                return true;
+            },
+        }
+
+        var menuList = Object.keys(menuOptions);
+        var cursorIndex = 1;
+        var textStart = 152;
+        var spacing = 20;
+
+        var menuElements = []
+        for (let index = 0; index < menuList.length; index++) {   
+            if (index == 1) {
+                var textElement = this.add.dom(SCREEN_WIDTH / 2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '20px',
+                    "fontWeight": 400,
+                    "color": "white",
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+            }
+            else{
+                var textElement = this.add.dom(SCREEN_WIDTH / 2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize": '20px',
+                    "fontWeight": 400,
+                    "color": "darkgrey",
+                }),
+                        `${menuList[index].toUpperCase()}`
+                ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+            }
+                menuElements.push(textElement);
+            }
+            
+
+        var selected = menuElements[cursorIndex];
+        //.node.style.color = "white";
+
+        //hide text
+        this.tweens.add({
+            targets: [...this.blackholeLabels, this.extractText],
+            yoyo: false,
+            duration: 500,
+            ease: 'Linear',
+            repeat: 0,
+            alpha: 0,
+        });
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length);
+            selected = menuElements[cursorIndex];
+            console.log(selected.node)
+
+            // Reset all menu elements to dark grey
+            menuElements.forEach((element, index) => {
+                element.node.style.color = "darkgrey";
+            });
+            // Set the selected element to white
+            selected = menuElements[cursorIndex];
+            selected.node.style.color = "white";
+        });
+
+        this.input.keyboard.on('keydown-UP', function() {
+            cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
+            selected = menuElements[cursorIndex];
+            console.log(selected.node)
+
+            // Reset all menu elements to dark grey
+            menuElements.forEach((element, index) => {
+                element.node.style.color = "darkgrey";
+            });
+            // Set the selected element to white
+            selected = menuElements[cursorIndex];
+            selected.node.style.color = "white";
+        });
+    
+        /*
+        //starting arrows
+        //this.gState = GState.WAIT_FOR_INPUT;
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
+            this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
+            this.startingArrowsAnimN2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y +1 * GRID)) {
+            this.startingArrowsAnimS2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimS2.flipY = true;
+            this.startingArrowsAnimS2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
+            this.startingArrowsAnimE2 = this.add.sprite(this.snake.head.x + GRID * 2, this.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimE2.angle = 90;
+            this.startingArrowsAnimE2.play('startArrowIdle');
+        }
+        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
+            this.startingArrowsAnimW2 = this.add.sprite(this.snake.head.x - GRID,this.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+            this.startingArrowsAnimW2.angle = 270;
+            this.startingArrowsAnimW2.play('startArrowIdle');
+        }*/
+            this.input.keyboard.on('keydown-SPACE', function() {
+                    menuOptions[menuList[cursorIndex]].call();
+                });
     }
 
     finalScore(){
         const ourStartScene = this.scene.get('StartScene');
-
-        
-
-        
-
-        
 
         this.extractHole[0].play('extractHoleClose');
 
