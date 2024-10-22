@@ -2959,6 +2959,15 @@ class GameScene extends Phaser.Scene {
         });
 
         // Extract Prompt Objects
+
+        this.extractPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${'Would you like to extract?'.toUpperCase()}`
+        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+
         this.exMenuOptions = {
             'YES': function () {
                 console.log("YES");
@@ -2970,8 +2979,9 @@ class GameScene extends Phaser.Scene {
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
+                ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.tweens.add({
-                    targets: [...ourGameScene.blackholeLabels, ourGameScene.extractText],
+                    targets: [...ourGameScene.blackholeLabels],
                     yoyo: false,
                     duration: 500,
                     ease: 'Linear',
@@ -3460,24 +3470,24 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
                         extractTile.index = -1;
 
-                        var extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        this.extractText = this.add.dom(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'div', Object.assign({}, STYLE_DEFAULT, {
                             "font-size": '8px',
                             "baselineX": 1.5,
                             })).setHTML(
                                 'EXTRACT'
                         ).setDepth(50).setAlpha(0);
                         
-                        var r2 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, extractText.width + 8, 14, 0x1a1a1a  
+                        var r2 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
                         ).setDepth(49).setAlpha(0);
                         //debugger
                         r2.postFX.addShine(1, .5, 5)
                         r2.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                         this.extractHole.push(extractImage);
-                        this.extractLables.push(extractText,r2);
+                        this.extractLables.push(this.extractText,r2);
 
                         this.tweens.add({
-                            targets: [r2,extractText],
+                            targets: [r2,this.extractText],
                             alpha: {from: 0, to: 1},
                             ease: 'Sine.easeOutIn',
                             duration: 50,
@@ -5173,13 +5183,15 @@ class GameScene extends Phaser.Scene {
             console.log(textElement)
             textElement.setAlpha(1);
         });
+        this.extractPromptText.setAlpha(1);
+        
 
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
         this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
 
         this.levelLabelHide = this.tweens.add({
-            targets: [...this.blackholeLabels, this.extractText],
+            targets: [...this.blackholeLabels],
             yoyo: false,
             duration: 500,
             ease: 'Linear',
