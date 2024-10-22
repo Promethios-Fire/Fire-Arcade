@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "template-10-24.json",
+    "activeFile": "World_1-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -801,10 +801,10 @@
         },
         "World_1-1.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 0,
+            "selectedLayer": 3,
             "viewCenter": {
-                "x": 104.7293524885954,
-                "y": 276.0400354054607
+                "x": 173.20623680806153,
+                "y": 149.2748689317083
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -2502,12 +2502,14 @@
     "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
     "openFiles": [
-        "template-10-24.json"
+        "template-10-24.json",
+        "World_1-1.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
         "template-10-24.json",
+        "World_1-1.json",
         "Dark_Stage-02.json",
         "r07-14-2.json",
         "r07-14.json",
@@ -2517,8 +2519,7 @@
         "r07-15-03.json",
         "r07-15-02.json",
         "r07-15-03-big.json",
-        "r07-15-04.json",
-        "r-07-10-4.json"
+        "r07-15-04.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

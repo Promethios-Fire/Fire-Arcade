@@ -2390,6 +2390,7 @@ class GameScene extends Phaser.Scene {
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
+        this.extractMenuOn = false; // set to true to enable extract menu functionality.
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -2957,6 +2958,73 @@ class GameScene extends Phaser.Scene {
             }
         });
 
+        // Extract Prompt Objects
+        this.exMenuOptions = {
+            'YES': function () {
+                console.log("YES");
+                ourGameScene.extractMenuOn = false;
+                ourGameScene.finalScore()
+                return true;
+            },
+            'NO': function () {  
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tweens.add({
+                    targets: [...ourGameScene.blackholeLabels, ourGameScene.extractText],
+                    yoyo: false,
+                    duration: 500,
+                    ease: 'Linear',
+                    repeat: 0,
+                    alpha: 1,
+                });
+                ourGameScene.tempStartingArrows();
+                ourGameScene.gState = GState.WAIT_FOR_INPUT;
+                ourGameScene.snake.direction = DIRS.STOP; 
+                ourGameScene.extractMenuOn = false;
+                console.log("NO");
+            },
+            'LOOP TO ORIGIN': function () {
+                console.log("LOOP");
+                ourGameScene.extractMenuOn = false;
+                return true;
+            },
+        }
+
+        this.exMenuList = Object.keys(this.exMenuOptions);
+        this.exCursorIndex = 1;
+        var _textStart = 152;
+        var _spacing = 20;
+        this._menuElements = [];
+
+        // for tomorrow: move the text elements and menu to the create function of game scene
+        if (this._menuElements.length < 1) {
+            for (let index = 0; index < this.exMenuList.length; index++) {   
+                if (index == 1) {
+                    console.log('adding')
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.exMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.exMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+    
+                this._menuElements.push(textElement);
+                
+            } 
+        }
+
         
         // TODO Move out of here
         // Reserves two rows in the tilesheet for making portal areas.
@@ -3273,6 +3341,10 @@ class GameScene extends Phaser.Scene {
                         this.boostOutlineTail = boostOutline;
                     }
                 }
+
+            }
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
             }
         });
 
@@ -3303,6 +3375,39 @@ class GameScene extends Phaser.Scene {
             ourInputScene.inputSet.push([STOP_SPRINT, this.time.now]);
 
             this.pressedSpaceDuringWait = false;
+        });
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected.node.style.color = "white";
+            }
+
+        });
+
+        this.input.keyboard.on('keydown-UP', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                //console.log(_selected.node)
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected.node.style.color = "white";
+            }
+
         });
 
         
@@ -5038,106 +5143,8 @@ class GameScene extends Phaser.Scene {
 
         
     }
-    extractPrompt(){
-        const ourGameScene = this.scene.get('GameScene');
 
-        this.gState = GState.TRANSITION;
-        this.snake.head.setTexture('snakeDefault', 0);
-        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
-
-
-        var menuOptions = {
-            'YES': function () {
-                console.log("YES");
-                ourGameScene.scene.start('MainMenuScene');
-                return true;
-            },
-            'NO': function () {   
-                console.log("NO");
-                //thisScene.scene.launch('TutorialScene');
-                //thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
-                //thisScene.scene.stop();
-                return true;
-            },
-            'LOOP TO ORIGIN': function () {
-                console.log("LOOP");
-                return true;
-            },
-        }
-
-        var menuList = Object.keys(menuOptions);
-        var cursorIndex = 1;
-        var textStart = 152;
-        var spacing = 20;
-
-        var menuElements = []
-        for (let index = 0; index < menuList.length; index++) {   
-            if (index == 1) {
-                var textElement = this.add.dom(SCREEN_WIDTH / 2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                    "fontSize": '20px',
-                    "fontWeight": 400,
-                    "color": "white",
-                }),
-                        `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-            }
-            else{
-                var textElement = this.add.dom(SCREEN_WIDTH / 2, textStart + index * spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
-                    "fontSize": '20px',
-                    "fontWeight": 400,
-                    "color": "darkgrey",
-                }),
-                        `${menuList[index].toUpperCase()}`
-                ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-            }
-                menuElements.push(textElement);
-            }
-            
-
-        var selected = menuElements[cursorIndex];
-        //.node.style.color = "white";
-
-        //hide text
-        this.tweens.add({
-            targets: [...this.blackholeLabels, this.extractText],
-            yoyo: false,
-            duration: 500,
-            ease: 'Linear',
-            repeat: 0,
-            alpha: 0,
-        });
-
-        this.input.keyboard.on('keydown-DOWN', function() {
-            cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, menuElements.length);
-            selected = menuElements[cursorIndex];
-            console.log(selected.node)
-
-            // Reset all menu elements to dark grey
-            menuElements.forEach((element, index) => {
-                element.node.style.color = "darkgrey";
-            });
-            // Set the selected element to white
-            selected = menuElements[cursorIndex];
-            selected.node.style.color = "white";
-        });
-
-        this.input.keyboard.on('keydown-UP', function() {
-            cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, menuElements.length);
-            selected = menuElements[cursorIndex];
-            console.log(selected.node)
-
-            // Reset all menu elements to dark grey
-            menuElements.forEach((element, index) => {
-                element.node.style.color = "darkgrey";
-            });
-            // Set the selected element to white
-            selected = menuElements[cursorIndex];
-            selected.node.style.color = "white";
-        });
-    
-        /*
-        //starting arrows
-        //this.gState = GState.WAIT_FOR_INPUT;
+    tempStartingArrows(){
         if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
             this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
             this.startingArrowsAnimN2.play('startArrowIdle');
@@ -5156,10 +5163,83 @@ class GameScene extends Phaser.Scene {
             this.startingArrowsAnimW2 = this.add.sprite(this.snake.head.x - GRID,this.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
             this.startingArrowsAnimW2.angle = 270;
             this.startingArrowsAnimW2.play('startArrowIdle');
-        }*/
-            this.input.keyboard.on('keydown-SPACE', function() {
-                    menuOptions[menuList[cursorIndex]].call();
+        }
+    }
+
+    extractPrompt(){
+        const ourGameScene = this.scene.get('GameScene');
+        ourGameScene.extractMenuOn = true;
+
+        ourGameScene._menuElements.forEach(textElement =>{
+            console.log(textElement)
+            textElement.setAlpha(1);
+        });
+
+        //console.log(this._menuElements.textElement)
+
+        this.gState = GState.TRANSITION;
+        this.snake.head.setTexture('snakeDefault', 0);
+        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+        this.levelLabelHide = this.tweens.add({
+            targets: [...this.blackholeLabels, this.extractText],
+            yoyo: false,
+            duration: 500,
+            ease: 'Linear',
+            repeat: 0,
+            alpha: 0,
+        });
+
+        
+        
+            
+        this._selected = this._menuElements[this.exCursorIndex];
+        console.log(this._menuElements)
+
+
+
+        /*this.input.keyboard.on('keydown-DOWN', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
+                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
                 });
+                // Set the selected element to white
+                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                _selected.node.style.color = "white";
+            }
+
+        });
+
+        this.input.keyboard.on('keydown-UP', function() {
+            if (ourGameScene.extractMenuOn) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
+                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                console.log(_selected.node)
+    
+                // Reset all menu elements to dark grey
+                ourGameScene._menuElements.forEach((element, index) => {
+                    element.node.style.color = "darkgrey";
+                });
+                // Set the selected element to white
+                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                _selected.node.style.color = "white";
+            }
+
+        });
+        this.input.keyboard.on('keydown-SPACE', function() {
+            //console.log(ourGameScene._menuElements);
+            //console.log(ourGameScene.exMenuList);
+            //console.log(ourGameScene.exCursorIndex);
+            if (ourGameScene.extractMenuOn) {
+                //menuOptions[menuList[cursorIndex]].call();
+                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
+            }
+        });*/
+
     }
 
     finalScore(){
@@ -5252,7 +5332,7 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
-                ourGameScene.warpToMenu(); 
+                ourGameScene.scene.start('MainMenuScene');
             }
             this.input.keyboard.on('keydown-SPACE', function() { 
                 onContinue();
@@ -8554,16 +8634,16 @@ class InputScene extends Phaser.Scene {
             gameScene.startingArrowsAnimW.setAlpha(0);
         }
         if (gameScene.startingArrowsAnimN2) {
-            gameScene.startingArrowsAnimN2.setAlpha(0);
+            gameScene.startingArrowsAnimN2.destroy();
         }
         if (gameScene.startingArrowsAnimE2) {
-            gameScene.startingArrowsAnimE2.setAlpha(0);
+            gameScene.startingArrowsAnimE2.destroy();
         }
         if (gameScene.startingArrowsAnimS2) {
-            gameScene.startingArrowsAnimS2.setAlpha(0);
+            gameScene.startingArrowsAnimS2.destroy();
         }
         if (gameScene.startingArrowsAnimW2) {
-            gameScene.startingArrowsAnimW2.setAlpha(0);
+            gameScene.startingArrowsAnimW2.destroy();
         }
         
         
