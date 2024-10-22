@@ -319,7 +319,7 @@ var Snake = new Phaser.Class({
             });
 
             if (this.closestPortal != testPortal) {
-                console.log("New Closest Portal:", testPortal.x, testPortal.y);
+                //console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 var oldPortal = this.closestPortal;
                 oldPortal.flipX = false;
 

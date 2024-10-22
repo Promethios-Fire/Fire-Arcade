@@ -328,7 +328,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'Bonus-Stage-x1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -2435,6 +2435,7 @@ class GameScene extends Phaser.Scene {
         this.stageStartScore = Math.trunc(score);
 
         this.length = 0;
+        this.lengthGoal = LENGTH_GOAL;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
@@ -2761,7 +2762,7 @@ class GameScene extends Phaser.Scene {
 
         // Should add a verifyer that makes sure each stage has the correctly formated json data for the stage properties.
         this.stageUUID = this.tiledProperties.get("UUID"); // Loads the UUID from the json file directly.
-        this.stageDiffBonus = this.tiledProperties.get("diffBonus"); // TODO: Get them by name and throw errors.
+        this.stageDiffBonus = this.tiledProperties.get("diffBonus") ?? 100; // TODO: Get them by name and throw errors.
 
         ourPersist.gameVersionUI.setText(`${this.stage}\n portalsnake.${GAME_VERSION}`);
         // Write helper function that checks all maps have the correct values. With a toggle to disable for the Live version.
@@ -4307,9 +4308,9 @@ class GameScene extends Phaser.Scene {
         
         
         var length = `${this.length}`;
-        if (LENGTH_GOAL != 0) {
+        if (this.lengthGoal != 0) {
             this.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
+                `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
             ).setOrigin(0,0).setAlpha(1);
             this.lengthGoalUILabel.setText(
             `LENGTH\nGOAL`
@@ -4539,7 +4540,7 @@ class GameScene extends Phaser.Scene {
             var lastHistory = this.scoreHistory.slice();
             lastHistory.pop();
             var lastScore = lastHistory.reduce((a,b) => a + b, 0) + calcBonus(lastHistory.reduce((a,b) => a + b, 0));
-            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore);
+            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore, "Length:", this.length);
 
             this.runningScore = this.score + calcBonus(baseScore);
             var deltaScore = baseScore + calcBonus(baseScore) - lastScore;
@@ -4573,7 +4574,7 @@ class GameScene extends Phaser.Scene {
 
             
              // Restart Score Timer
-            if (this.length < LENGTH_GOAL || LENGTH_GOAL === 0) {
+            if (this.length < this.lengthGoal || this.lengthGoal === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                     delay: MAX_SCORE * 100,
                     paused: false
@@ -4755,6 +4756,11 @@ class GameScene extends Phaser.Scene {
             this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
             console.log(this.interactLayer);
+
+            if (STAGE_OVERRIDES.has(this.stage)) {
+                console.log("Running postFix Override on", this.stage);
+                STAGE_OVERRIDES.get(this.stage).postFix(this);
+            }
         
     }
 
@@ -5504,12 +5510,20 @@ class GameScene extends Phaser.Scene {
     }
 
     checkWinCon() { // Returns Bool
-        return this.length >= LENGTH_GOAL
+        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
+            return this.length >= this.lengthGoal
+        }
+        
     }
 
     checkLoseCon() {
-        const ourPersist = this.scene.get("PersistScene");
-        return ourPersist.coins < 0;
+        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
+            const ourPersist = this.scene.get("PersistScene");
+            return ourPersist.coins < 0;
+        } else {
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 === 1; 
+        }
+        
     }
 
     nextStage(stageName,camDirection) {
@@ -6030,7 +6044,7 @@ class GameScene extends Phaser.Scene {
         
         
         // #region Bonus Level Code @james TODO Move to custom Check Win Condition level.
-        if (timeTick < SCORE_FLOOR && LENGTH_GOAL === 0){
+        if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
 
@@ -6387,9 +6401,10 @@ class ScoreScene extends Phaser.Scene {
         ourGame.countDown.style = style*/
         ourGame.countDown.setHTML('0FF');
 
-        this.ScoreContainerL = this.make.container(0,0)
-        this.ScoreContainerR = this.make.container(0,0)
+        this.ScoreContainerL = this.make.container(0,0);
+        this.ScoreContainerR = this.make.container(0,0);
 
+        debugger
         var stageDataJSON = {
             bonks: ourGame.bonks,
             boostFrames: ourInputScene.boostTime,
@@ -6406,7 +6421,7 @@ class ScoreScene extends Phaser.Scene {
             uuid:ourGame.stageUUID,
             zedLevel: calcZedLevel(ourPersist.zeds).level,
             zeds: ourPersist.zeds,
-            sRank: parseInt(ourGame.tiledProperties.get("sRank"))
+            sRank: parseInt(ourGame.tiledProperties.get("sRank")) // NaN if doesn't exist.
         }
 
 
@@ -6474,7 +6489,7 @@ class ScoreScene extends Phaser.Scene {
             });
 
         // Pre Calculate needed values
-        var stageAve = this.stageData.baseScore/this.stageData.foodLog.length;
+        var stageAve = this.stageData.calcBase()/this.stageData.foodLog.length;
 
         var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
         var bestLog = new StageData(bestLogJSON);
@@ -6482,6 +6497,9 @@ class ScoreScene extends Phaser.Scene {
         var bestLocal = bestLog.calcBase();
         var bestAve = bestLocal/bestLog.foodLog.length;
 
+
+        // TODO: Don't do it a bonuse level? What do we do with the stage history on bonus levels?
+        // Exclude from the Stage history?
 
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 

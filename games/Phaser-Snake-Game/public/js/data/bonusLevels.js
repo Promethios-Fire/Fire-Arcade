@@ -41,4 +41,16 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
+    ["Bonus-Stage-x1", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+
+            
+
+        },
+        postFix: function (scene) {
+            
+
+        }
+    }],
 ]);
