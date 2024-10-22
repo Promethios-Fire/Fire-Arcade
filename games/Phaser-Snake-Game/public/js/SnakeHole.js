@@ -114,6 +114,34 @@ var updateSumOfBest = function(scene) {
     })
 }
 
+// SHOULD BE READ ONLY
+const PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats"));
+
+var updatePlayerStats = function (stageData) {
+    if (JSON.parse(localStorage.getItem("playerStats"))) {
+        var stats = JSON.parse(localStorage.getItem("playerStats"));
+    } else {
+        var stats = {};
+    }
+     
+    var bonks = stats.bonks ?? 0;
+    var atomsEaten = stats.atomsEaten ?? 0;
+    var turns = stats.turns ?? 0;
+
+    var updatedStats = {
+        bonks: bonks + stageData.bonks,
+        atomsEaten: atomsEaten + stageData.foodLog.length,
+        turns: turns + stageData.turns,
+        stagesFinished: Math.floor((atomsEaten + stageData.foodLog.length) / 28)
+    }
+
+    localStorage.setItem("playerStats", JSON.stringify(updatedStats));
+
+    // JSON.stringify(this.stageData)
+
+}
+
+
 export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
 
 export var commaInt = function(int) {
@@ -297,7 +325,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'r-07-10-6'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -6207,8 +6235,7 @@ var StageData = new Phaser.Class({
 
     initialize:
 
-    function StageData(props)
-    {
+    function StageData(props) {
         // this is the order you'll see printed in the console.
         this.stage = props.stage;
 
@@ -6380,8 +6407,8 @@ class ScoreScene extends Phaser.Scene {
 
         this.stageData = new StageData(stageDataJSON);
 
-    
-
+        // Update Stage Data
+        updatePlayerStats(this.stageData);
         
 
         /*for (let index = 0; index < this.stageData.foodLog.length; index++) {
