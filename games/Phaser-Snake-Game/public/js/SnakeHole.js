@@ -2996,8 +2996,7 @@ class GameScene extends Phaser.Scene {
         var _textStart = 152;
         var _spacing = 20;
         this._menuElements = [];
-
-        // for tomorrow: move the text elements and menu to the create function of game scene
+        
         if (this._menuElements.length < 1) {
             for (let index = 0; index < this.exMenuList.length; index++) {   
                 if (index == 1) {
@@ -5175,8 +5174,6 @@ class GameScene extends Phaser.Scene {
             textElement.setAlpha(1);
         });
 
-        //console.log(this._menuElements.textElement)
-
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
         this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
@@ -5189,57 +5186,9 @@ class GameScene extends Phaser.Scene {
             repeat: 0,
             alpha: 0,
         });
-
-        
-        
-            
+ 
         this._selected = this._menuElements[this.exCursorIndex];
         console.log(this._menuElements)
-
-
-
-        /*this.input.keyboard.on('keydown-DOWN', function() {
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
-                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
-    
-                // Reset all menu elements to dark grey
-                ourGameScene._menuElements.forEach((element, index) => {
-                    element.node.style.color = "darkgrey";
-                });
-                // Set the selected element to white
-                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
-                _selected.node.style.color = "white";
-            }
-
-        });
-
-        this.input.keyboard.on('keydown-UP', function() {
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
-                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
-                console.log(_selected.node)
-    
-                // Reset all menu elements to dark grey
-                ourGameScene._menuElements.forEach((element, index) => {
-                    element.node.style.color = "darkgrey";
-                });
-                // Set the selected element to white
-                _selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
-                _selected.node.style.color = "white";
-            }
-
-        });
-        this.input.keyboard.on('keydown-SPACE', function() {
-            //console.log(ourGameScene._menuElements);
-            //console.log(ourGameScene.exMenuList);
-            //console.log(ourGameScene.exCursorIndex);
-            if (ourGameScene.extractMenuOn) {
-                //menuOptions[menuList[cursorIndex]].call();
-                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
-            }
-        });*/
-
     }
 
     finalScore(){
