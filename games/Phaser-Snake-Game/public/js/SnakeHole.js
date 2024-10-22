@@ -115,27 +115,29 @@ var updateSumOfBest = function(scene) {
 }
 
 // SHOULD BE READ ONLY
-const PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats"));
+var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
+    if (!JSON.parse(localStorage.getItem("playerStats"))) {
+        PLAYER_STATS = {}
+    }
+    var bonks = PLAYER_STATS.bonks ?? 0;
+    var atomsEaten = PLAYER_STATS.atomsEaten ?? 0;
+    var turns = PLAYER_STATS.turns ?? 0;
+
+    PLAYER_STATS.bonks = bonks;
+    PLAYER_STATS.atomsEaten = atomsEaten;
+    PLAYER_STATS.turns = turns;
+
+    PLAYER_STATS.stagesFinished = Math.floor(atomsEaten / 28);
+}
 
 var updatePlayerStats = function (stageData) {
-    if (JSON.parse(localStorage.getItem("playerStats"))) {
-        var stats = JSON.parse(localStorage.getItem("playerStats"));
-    } else {
-        var stats = {};
-    }
-     
-    var bonks = stats.bonks ?? 0;
-    var atomsEaten = stats.atomsEaten ?? 0;
-    var turns = stats.turns ?? 0;
 
-    var updatedStats = {
-        bonks: bonks + stageData.bonks,
-        atomsEaten: atomsEaten + stageData.foodLog.length,
-        turns: turns + stageData.turns,
-        stagesFinished: Math.floor((atomsEaten + stageData.foodLog.length) / 28)
-    }
+    PLAYER_STATS.bonks += stageData.bonks;
+    PLAYER_STATS.atomsEaten += stageData.foodLog.length;
+    PLAYER_STATS.turns += stageData.turns;
+    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 
-    localStorage.setItem("playerStats", JSON.stringify(updatedStats));
+    localStorage.setItem("playerStats", JSON.stringify(PLAYER_STATS));
 
     // JSON.stringify(this.stageData)
 
