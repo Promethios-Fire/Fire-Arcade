@@ -5,8 +5,9 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import {PORTAL_COLORS} from './const.js';
-import {STAGE_UNLOCKS} from './data/UnlockCriteria.js';
+import { PORTAL_COLORS } from './const.js';
+import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
+import { STAGE_OVERRIDES } from './data/bonusLevels.js';
 
 
 
@@ -2420,6 +2421,7 @@ class GameScene extends Phaser.Scene {
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
+        this.spawnCoins = true;
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -2453,8 +2455,7 @@ class GameScene extends Phaser.Scene {
 
         this.coinSpawnCounter = 100;
 
-
-         
+          
     }
     
     
@@ -2475,6 +2476,11 @@ class GameScene extends Phaser.Scene {
     }
 
     create () {
+        if (STAGE_OVERRIDES.has(this.stage)) {
+            console.log("Running preFix Override on", this.stage);
+            STAGE_OVERRIDES.get(this.stage).preFix(this);
+        }
+
         const ourInputScene = this.scene.get('InputScene');
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
@@ -2488,12 +2494,9 @@ class GameScene extends Phaser.Scene {
         ourPersist.comboCover.setVisible(false);
 
 
-        if (this.stage == 'Tutorial_2') {
-            this.time.delayedCall(5000, () => {
-                this.tutorialPrompt(X_OFFSET + this.helpPanel.width/2 + GRID,
-                     Y_OFFSET + this.helpPanel.height/2 + GRID,2,)
-            })
-        }
+        //if (this.stage == 'Tutorial_2') {
+        //    
+        //}
         if (this.stage == 'Tutorial_3') {
             this.time.delayedCall(5000, () => {
                 this.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - this.helpPanel.width/2 - GRID,
@@ -2525,14 +2528,14 @@ class GameScene extends Phaser.Scene {
         });
 
         //testing game creation logic
-        if (/^Tutorial_[1-2]$/.test(this.stage)) { //checks for Tutorial_1-2
-            this.tutorialState = true;
-            ourPersist.coins = 99;
-        }
-        else if (this.stage == 'Tutorial_3'){
-            this.tutorialState = true;
-            ourPersist.coins = 30;
-        }
+        //if (/^Tutorial_[2]$/.test(this.stage)) { //checks for Tutorial_1-2
+        //    this.tutorialState = true;
+        //    ourPersist.coins = 99;
+        //}
+        //else if (this.stage == 'Tutorial_3'){
+        //    this.tutorialState = true;
+        //    ourPersist.coins = 30;
+        //}
         //test portal walls
         if (this.stage == 'testingFuturistic_x' ) {
             var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
@@ -6062,7 +6065,7 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1 && !this.tutorialState) {
+                if (this.coinSpawnCounter < 1 && this.spawnCoins) {
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();

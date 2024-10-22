@@ -1,7 +1,7 @@
 
 import { RANKS } from "../SnakeHole.js";
 
-import { BEST_OF_STAGE_DATA } from "../SnakeHole.js"
+import { BEST_OF_STAGE_DATA} from "../SnakeHole.js"
 
 
 var checkRank = function(stageName, targetRank) {
