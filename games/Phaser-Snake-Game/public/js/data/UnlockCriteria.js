@@ -1,5 +1,5 @@
 
-import { RANKS } from "../SnakeHole.js";
+import { PLAYER_STATS, RANKS } from "../SnakeHole.js";
 
 import { BEST_OF_STAGE_DATA} from "../SnakeHole.js"
 
@@ -37,7 +37,7 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank("World_10-5", RANKS.WOOD);
     }],
     ['easy-wrap', function () {
-        return checkRank("World_1-4", RANKS.SILVER);
+        return PLAYER_STATS.wraps > 24;
     }],
     ['hard-wrap', function () {
         return checkRank("World_3-3_Wrap", RANKS.WOOD);

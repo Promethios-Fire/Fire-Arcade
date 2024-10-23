@@ -6424,7 +6424,6 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL = this.make.container(0,0);
         this.ScoreContainerR = this.make.container(0,0);
 
-        debugger
         var stageDataJSON = {
             bonks: ourGame.bonks,
             boostFrames: ourInputScene.boostTime,
