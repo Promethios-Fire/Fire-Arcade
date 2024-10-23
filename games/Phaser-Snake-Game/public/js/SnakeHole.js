@@ -2989,6 +2989,15 @@ class GameScene extends Phaser.Scene {
                 return true;
             },
             'NO': function () {  
+                // stop vortex tween if it's playing
+                if (ourGameScene.vortexTween.isPlaying()) {
+                    ourGameScene.vortexTween.stop()
+                }
+                // reset snake body segments so it can move immediately
+                ourGameScene.snake.body.forEach(segment => {
+                    segment.x = ourGameScene.snake.head.x;
+                    segment.y = ourGameScene.snake.head.y;
+                });
                 // hide the extract prompt
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
@@ -3011,6 +3020,7 @@ class GameScene extends Phaser.Scene {
                 console.log("NO");
             },
             'LOOP TO ORIGIN': function () {
+                // TODO: send to origin
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
                 return true;
@@ -5607,7 +5617,7 @@ class GameScene extends Phaser.Scene {
 
     vortexIn(target, x, y){
 
-        var vortexTween = this.tweens.add({
+        this.vortexTween = this.tweens.add({
             targets: target, 
             x: x, //this.pathRegroup.vec.x,
             y: y, //this.pathRegroup.vec.y,
@@ -5618,7 +5628,7 @@ class GameScene extends Phaser.Scene {
             delay: this.tweens.stagger(30)
         });
 
-        return vortexTween
+        return this.vortexTween
     }
 
     snakeEating(){
