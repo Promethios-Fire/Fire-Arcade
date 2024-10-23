@@ -2968,20 +2968,36 @@ class GameScene extends Phaser.Scene {
             `${'Would you like to extract?'.toUpperCase()}`
         ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
+        //nineSlice
+        this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
+            'uiPanelL', 'Glass', 
+            GRID * 16, GRID * 8, 
+            8, 8, 8, 8);
+        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+
         this.exMenuOptions = {
             'YES': function () {
+                // hide the extract prompt
+                ourGameScene._menuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
                 console.log("YES");
                 ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore()
                 return true;
             },
             'NO': function () {  
+                // hide the extract prompt
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
+                ourGameScene.extractPanel.setAlpha(0);
+                // show the level labels again
                 ourGameScene.tweens.add({
-                    targets: [...ourGameScene.blackholeLabels],
+                    targets: [...ourGameScene.blackholeLabels, ourGameScene.r3,ourGameScene.extractText],
                     yoyo: false,
                     duration: 500,
                     ease: 'Linear',
@@ -3477,17 +3493,17 @@ class GameScene extends Phaser.Scene {
                                 'EXTRACT'
                         ).setDepth(50).setAlpha(0);
                         
-                        var r2 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
+                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 12 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 14, 0x1a1a1a  
                         ).setDepth(49).setAlpha(0);
                         //debugger
-                        r2.postFX.addShine(1, .5, 5)
-                        r2.setStrokeStyle(2, 0x4d9be6, 0.75);
+                        this.r3.postFX.addShine(1, .5, 5)
+                        this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
 
                         this.extractHole.push(extractImage);
-                        this.extractLables.push(this.extractText,r2);
+                        this.extractLables.push(this.extractText,this.r3);
 
                         this.tweens.add({
-                            targets: [r2,this.extractText],
+                            targets: [this.r3,this.extractText],
                             alpha: {from: 0, to: 1},
                             ease: 'Sine.easeOutIn',
                             duration: 50,
@@ -5179,19 +5195,21 @@ class GameScene extends Phaser.Scene {
         const ourGameScene = this.scene.get('GameScene');
         ourGameScene.extractMenuOn = true;
 
+        // set menu alpha back to 1
         ourGameScene._menuElements.forEach(textElement =>{
             console.log(textElement)
             textElement.setAlpha(1);
         });
         this.extractPromptText.setAlpha(1);
-        
+        this.extractPanel.setAlpha(1);
 
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
         this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
 
+        // hide the level labels
         this.levelLabelHide = this.tweens.add({
-            targets: [...this.blackholeLabels],
+            targets: [...this.blackholeLabels,ourGameScene.r3,ourGameScene.extractText],
             yoyo: false,
             duration: 500,
             ease: 'Linear',
@@ -5200,7 +5218,6 @@ class GameScene extends Phaser.Scene {
         });
  
         this._selected = this._menuElements[this.exCursorIndex];
-        console.log(this._menuElements)
     }
 
     finalScore(){
