@@ -116,23 +116,26 @@ var updateSumOfBest = function(scene) {
 }
 
 // SHOULD BE READ ONLY
-var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
+export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     if (!JSON.parse(localStorage.getItem("playerStats"))) {
         PLAYER_STATS = {}
     }
     var bonks = PLAYER_STATS.bonks ?? 0;
     var atomsEaten = PLAYER_STATS.atomsEaten ?? 0;
     var turns = PLAYER_STATS.turns ?? 0;
+    var wraps = PLAYER_STATS.wraps ?? 0;
 
     PLAYER_STATS.bonks = bonks;
     PLAYER_STATS.atomsEaten = atomsEaten;
     PLAYER_STATS.turns = turns;
+    PLAYER_STATS.wraps = wraps;
 
     PLAYER_STATS.stagesFinished = Math.floor(atomsEaten / 28);
 }
 
 var updatePlayerStats = function (stageData) {
 
+    
     PLAYER_STATS.bonks += stageData.bonks;
     PLAYER_STATS.atomsEaten += stageData.foodLog.length;
     PLAYER_STATS.turns += stageData.turns;
@@ -328,7 +331,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'Bonus-Stage-x3'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;

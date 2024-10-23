@@ -1,6 +1,6 @@
 import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
     DIRS, DEBUG, commaInt,
-    LENGTH_GOAL, SPEED_WALK, SPEED_SPRINT, COMBO_ADD_FLOOR,
+    LENGTH_GOAL, PLAYER_STATS, SPEED_SPRINT, COMBO_ADD_FLOOR,
     X_OFFSET,
     Y_OFFSET
 } from "../SnakeHole.js";
@@ -145,25 +145,45 @@ var Snake = new Phaser.Class({
         var yN = this.head.y;
 
         
-    if (this.direction === DIRS.LEFT)
-        {
-            xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
-            ourPersistScene.bgCoords.x -= .25;
-        }
-        else if (this.direction === DIRS.RIGHT)
-        {
-            xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
-            ourPersistScene.bgCoords.x += .25;
-        }
-        else if (this.direction === DIRS.UP)
-        {
-            yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
-            ourPersistScene.bgCoords.y -= .25;
-        }
-        else if (this.direction === DIRS.DOWN)
-        {
-            yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
-            ourPersistScene.bgCoords.y += .25;
+        switch (this.direction) {
+            case DIRS.LEFT:
+                xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                ourPersistScene.bgCoords.x -= .25;
+                if (xN > this.head.x) {
+                    //console.log("I AM WRAPPING LEFT");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+
+            case DIRS.RIGHT:
+                xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                ourPersistScene.bgCoords.x += .25;
+                if (xN < this.head.x) {
+                    //console.log("I AM WRAPPING RIGHT");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+
+            case DIRS.UP:
+                yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                ourPersistScene.bgCoords.y -= .25;
+                if (yN > this.head.y) {
+                    //console.log("I AM WRAPPING UP");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+
+            case DIRS.DOWN:
+                yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                ourPersistScene.bgCoords.y += .25;
+                if (yN < this.head.y) {
+                    //console.log("I AM WRAPPING DOWN");
+                    PLAYER_STATS.wraps += 1;
+                }
+                break;
+                
+            default:
+                break;
         }
 
         
@@ -238,6 +258,7 @@ var Snake = new Phaser.Class({
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
+                 //this.body includes the head I think
                 Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
         }
 
@@ -395,7 +416,7 @@ var Snake = new Phaser.Class({
         } else {
             this.gState = GState.WAIT_FOR_INPUT;
         }
-        
+
         scene.bonks += 1; 
         
     }
