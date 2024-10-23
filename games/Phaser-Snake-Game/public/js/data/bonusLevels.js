@@ -1,4 +1,4 @@
-import { X_OFFSET, Y_OFFSET, GRID } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, commaInt } from "../SnakeHole.js";
 
 export var STAGE_OVERRIDES = new Map([
     ["Tutorial_1", {
@@ -49,8 +49,25 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
-            
 
+            // Override
+            scene.onBonk = this.onBonk
+
+        },
+        onBonk: function () { // .this = GameScene
+            var ourPersist = this.scene.get("PersistScene");
+            this.coinsUIIcon.setVisible(false);
+            ourPersist.coins = Math.max(ourPersist.coins -1, 1);
+
+            if (ourPersist.coins != 1) {
+                ourPersist.loseCoin();
+            }
+            this.coinUIText.setHTML(
+            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+            );
+
+            this.maxScore = Math.max(this.maxScore - 10, 1);
+            
         }
     }],
 ]);

@@ -2248,6 +2248,14 @@ class PersistScene extends Phaser.Scene {
 
     this.graphics = this.add.graphics();
     }
+    loseCoin(){ // 
+        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
+        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        this.coinsUICopy.setGravity(0,400)
+        //TODO add coin flip here
+        //TODO trigger UI coin loader animation here
+    }
 
    /* openingTween(tweenValue){
         this.tweens.addCounter({
@@ -2436,6 +2444,7 @@ class GameScene extends Phaser.Scene {
 
         this.length = 0;
         this.lengthGoal = LENGTH_GOAL;
+        this.maxScore = MAX_SCORE;
 
         this.scoreMulti = 0;
         this.globalFruitCount = 0;
@@ -3250,7 +3259,7 @@ class GameScene extends Phaser.Scene {
 
                 
  
-                if (this.currentScoreTimer() === MAX_SCORE) {
+                if (this.currentScoreTimer() === this.maxScore) {
                     /**
                      * This code is duplicated here to make sure that the electron 
                      * animation is played as soon as you move from the start and wait state.
@@ -4336,9 +4345,9 @@ class GameScene extends Phaser.Scene {
         if (DEBUG) { console.log("STARTING SCORE TIMER"); }
 
         this.scoreTimer = this.time.addEvent({
-            delay: MAX_SCORE *100,
+            delay: this.maxScore * 100,
             paused: true
-         });
+         }, this);
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         
@@ -4576,9 +4585,9 @@ class GameScene extends Phaser.Scene {
              // Restart Score Timer
             if (this.length < this.lengthGoal || this.lengthGoal === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
-                    delay: MAX_SCORE * 100,
+                    delay: this.maxScore * 100,
                     paused: false
-                 });   
+                 }, this);   
             }
             
         }, this);
@@ -5499,16 +5508,15 @@ class GameScene extends Phaser.Scene {
 
         return snakeEating
     }
-    loseCoin(){
-        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-        ourSpaceBoy.coinsUICopy = ourSpaceBoy.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        ourSpaceBoy.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        ourSpaceBoy.coinsUICopy.setGravity(0,400)
-        //TODO add coin flip here
-        //TODO trigger UI coin loader animation here
+    onBonk() {
+        var ourPersist = this.scene.get("PersistScene");
+        ourPersist.loseCoin();
+        this.coinsUIIcon.setVisible(false);
+        ourPersist.coins += -1;
+        this.coinUIText.setHTML(
+            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+        );
     }
-
     checkWinCon() { // Returns Bool
         if (this.lengthGoal > 0) { // Placeholder check for bonus level.
             return this.length >= this.lengthGoal
@@ -6120,7 +6128,7 @@ class GameScene extends Phaser.Scene {
             // Update Atom Animation.
             if (GState.PLAY === this.gState && !this.winned) {
                 switch (timeTick) {
-                    case MAX_SCORE:  // 120 {}
+                    case this.maxScore:  // 120 {}
                     this.atoms.forEach(atom => {
                         if (atom.anims.currentAnim.key !== 'atom01idle' ||atom.anims.currentAnim.key !== 'atom05spawn') {
                             atom.play("atom01idle");
