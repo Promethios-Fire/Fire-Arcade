@@ -3014,34 +3014,41 @@ class GameScene extends Phaser.Scene {
 
         // #region TAB Menu
 
-        this.tabPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var tabMenuTop = SCREEN_HEIGHT/2 - GRID * 2.5
+
+        this.tabPromptText = this.add.dom(SCREEN_WIDTH / 2, tabMenuTop + GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
             "fontWeight": 400,
             "color": "white",
         }),
-            `${'Where would you like to extract?'.toUpperCase()}`
-        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+            `${this.stage}`
+        ).setOrigin(0.5,0).setScale(0.5).setAlpha(0);
 
         //nineSlice
-        this.tabPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
+        this.tabPanel = this.add.nineslice(SCREEN_WIDTH/2, tabMenuTop, 
             'uiPanelL', 'Glass', 
-            GRID * 19 + 1, GRID * 8, 
+            GRID * 19 + 1, GRID * 10, 
             8, 8, 8, 8);
-        this.tabPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setVisible(false);
+        this.tabPanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0).setVisible(false);
 
         this.tabMenuOptions = new Map([
-            ['MAIN MENU', function () {
+            ['BACK TO MAIN MENU', function () {
                 // hide the extract prompt
                 ourGameScene.tabMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.tabPromptText.setAlpha(0);
                 ourGameScene.tabPanel.setVisible(false);
-                console.log("YES");
-                ourGameScene.finalScore("MainMenuScene", {});
+                console.log("BACK TO MAIN MENU");
+
+                // Clear for reseting game
+                ourGame.events.off('addScore');
+                ourGame.events.off('spawnBlackholes');
+                
+                ourGameScene.scene.start("MainMenuScene");
                 return true;
             }],
-            [`CANCEL`, function () {  
+            [`RETURN TO STAGE`, function () {  
                 // hide the extract prompt
                 ourGameScene.tabMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
@@ -3049,19 +3056,48 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.tabPromptText.setAlpha(0);
                 ourGameScene.tabPanel.setVisible(false);
                 // show the level labels again 
-                console.log("NO");
+                console.log("RETURN TO STAGE");
             }],
-            ['DIRECT TO ADVENTURE', function () {
+            ['REDO STAGE (- 1 Coin)', function () {
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+
+                if (ourGameScene.scene.get("PersistScene").coins > 0) {
+
+                    ourGameScene.scene.get("PersistScene").coins -= 1;
+                    ourGameScene.scene.get("PersistScene").loseCoin();
+                    
+                    // Clear for reseting game
+                    ourGame.events.off('addScore');
+                    ourGame.events.off('spawnBlackholes');
+
+                    ourGameScene.scene.restart( {
+                        stage: ourGameScene.stage, 
+                        score: ourGameScene.stageStartScore, 
+                        //lives: this.lives 
+                });
+                }
+
+                
+
+            }],
+            ['RESTART ADVENTURE', function () {
                 // TODO: send to origin
                 ourGameScene.tabMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
-                ourGameScene.tabtractPromptText.setAlpha(0);
-                ourGameScene.tabtractPanel.setVisible(false);
-                console.log("LOOP");
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
 
-                // Clear for reseting game   
-                ourGameScene.finalScore("GameScene", {
+                // Clear for reseting game
+                ourGame.events.off('addScore');
+                ourGame.events.off('spawnBlackholes');
+                
+                // Restart  
+                ourGameScene.scene.start("GameScene", {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
@@ -3076,7 +3112,7 @@ class GameScene extends Phaser.Scene {
         
         this.tabMenuList = [...this.tabMenuOptions.keys()];
         this.tabCursorIndex = 1;
-        var _textStart = 152;
+        var _textStart = tabMenuTop + GRID * 3;
         var _spacing = 20;
         this.tabMenuElements = [];
 
@@ -3434,7 +3470,8 @@ class GameScene extends Phaser.Scene {
             
             let gState = this.gState;
 
-            if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
+            if ((gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) 
+            && !this.tabPanel.visible) {
                 if(gState === GState.START_WAIT || gState === GState.WAIT_FOR_INPUT){
                     this.lastMoveTime = this.time.now;
                 }
@@ -3534,6 +3571,11 @@ class GameScene extends Phaser.Scene {
                 var option = ourGameScene.exMenuList[ourGameScene.exCursorIndex];
                 this.exMenuOptions.get(option).call();
             }
+
+            if (this.tabPanel.visible) {
+                var option = ourGameScene.tabMenuList[ourGameScene.tabCursorIndex];
+                this.tabMenuOptions.get(option).call();
+            }
         }, this);
 
         this.input.keyboard.on('keyup-SPACE', e => { 
@@ -3566,41 +3608,66 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            if (ourGameScene.extractPanel.visible) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene.exMenuElements.length);
-                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
+            if (this.extractPanel.visible) {
+                this.exCursorIndex = Phaser.Math.Wrap(this.exCursorIndex + 1, 0, this.exMenuElements.length);
+                var _selected = this.exMenuElements[this.exCursorIndex];
     
                 // Reset all menu elements to dark grey
-                ourGameScene.exMenuElements.forEach((element, index) => {
+                this.exMenuElements.forEach((element, index) => {
                     element.node.style.color = "darkgrey";
                 });
                 // Set the selected element to white
-                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
-                this._selected.node.style.color = "white";
+                _selected = this.exMenuElements[this.exCursorIndex];
+                _selected.node.style.color = "white";
+            } else if (this.tabPanel.visible) {
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "darkgrey";
+
+                this.tabCursorIndex = Phaser.Math.Wrap(this.tabCursorIndex + 1, 0, this.tabMenuElements.length)
+
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "white";
             }
 
-        });
+        }, this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            if (ourGameScene.extractPanel.visible) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene.exMenuElements.length);
-                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
+            if (this.extractPanel.visible) {
+                this.exCursorIndex = Phaser.Math.Wrap(this.exCursorIndex - 1, 0, this.exMenuElements.length);
+                var _selected = this.exMenuElements[this.exCursorIndex];
                 //console.log(_selected.node)
     
                 // Reset all menu elements to dark grey
-                ourGameScene.exMenuElements.forEach((element, index) => {
+                this.exMenuElements.forEach((element, index) => {
                     element.node.style.color = "darkgrey";
                 });
                 // Set the selected element to white
-                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
-                this._selected.node.style.color = "white";
+                _selected = this.exMenuElements[this.exCursorIndex];
+                _selected.node.style.color = "white";
+            } else if (this.tabPanel.visible) {
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "darkgrey";
+
+                this.tabCursorIndex = Phaser.Math.Wrap(this.tabCursorIndex - 1, 0, this.tabMenuElements.length)
+
+                this.tabMenuElements[this.tabCursorIndex].node.style.color = "white";
             }
 
-        });
+        }, this);
 
-        this.input.keyboard.on('TAB', function () {
+        this.input.keyboard.on('keydown-TAB', function () {
 
-        });
+            if (!this.extractPanel.visible){
+                this.tabMenuElements.forEach(textElement =>{
+                    console.log(textElement)
+                    textElement.setAlpha(1);
+                });
+        
+                this.tabPromptText.setAlpha(1);
+                
+                this.tabPanel.setVisible(true);
+
+            }
+            
+
+        }, this);
 
         
         this.blackholes = [];
