@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1981,6 +1981,7 @@ class MainMenuScene extends Phaser.Scene {
     }
 }
 
+
 // #region Galaxy Map
 class GalaxyMapScene extends Phaser.Scene {
     constructor () {
@@ -2439,7 +2440,6 @@ class GameScene extends Phaser.Scene {
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
         this.stepMode = false; // Stops auto moving, only pressing moves.
-        this.extractMenuOn = false; // set to true to enable extract menu functionality.
         this.spawnCoins = true;
         
         this.lightMasks = [];
@@ -3012,37 +3012,136 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        // Extract Prompt Objects
+        // #region TAB Menu
+
+        this.tabPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${'Where would you like to extract?'.toUpperCase()}`
+        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+
+        //nineSlice
+        this.tabPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
+            'uiPanelL', 'Glass', 
+            GRID * 19 + 1, GRID * 8, 
+            8, 8, 8, 8);
+        this.tabPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setVisible(false);
+
+        this.tabMenuOptions = new Map([
+            ['MAIN MENU', function () {
+                // hide the extract prompt
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+                console.log("YES");
+                ourGameScene.finalScore("MainMenuScene", {});
+                return true;
+            }],
+            [`CANCEL`, function () {  
+                // hide the extract prompt
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabPromptText.setAlpha(0);
+                ourGameScene.tabPanel.setVisible(false);
+                // show the level labels again 
+                console.log("NO");
+            }],
+            ['DIRECT TO ADVENTURE', function () {
+                // TODO: send to origin
+                ourGameScene.tabMenuElements.forEach(textElement =>{
+                    textElement.setAlpha(0);
+                });
+                ourGameScene.tabtractPromptText.setAlpha(0);
+                ourGameScene.tabtractPanel.setVisible(false);
+                console.log("LOOP");
+
+                // Clear for reseting game   
+                ourGameScene.finalScore("GameScene", {
+                    stage: START_STAGE,
+                    score: 0,
+                    startupAnim: true,
+                });
+                return true;
+            }],
+        ]);
+
+        var createMenuList = function(scene) {
+
+        };
+        
+        this.tabMenuList = [...this.tabMenuOptions.keys()];
+        this.tabCursorIndex = 1;
+        var _textStart = 152;
+        var _spacing = 20;
+        this.tabMenuElements = [];
+
+        
+        if (this.tabMenuElements.length < 1) {
+            for (let index = 0; index < this.tabMenuList.length; index++) {   
+                if (index === this.tabCursorIndex) {
+                    console.log('adding');
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.tabMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.tabMenuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+    
+                
+                this.tabMenuElements.push(textElement);
+                
+                
+            } 
+        }
+
+        // #endregion
+        
+        // #region Extract Prompt
 
         this.extractPromptText = this.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2 - GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
             "fontWeight": 400,
             "color": "white",
         }),
-            `${'Would you like to extract?'.toUpperCase()}`
+            `${'Where would you like to extract?'.toUpperCase()}`
         ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
         //nineSlice
         this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
             'uiPanelL', 'Glass', 
-            GRID * 16, GRID * 8, 
+            GRID * 19 + 1, GRID * 8, 
             8, 8, 8, 8);
-        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
+        this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setVisible(false);
 
-        this.exMenuOptions = {
-            'YES': function () {
+        this.exMenuOptions = new Map([
+            ['MAIN MENU', function () {
                 // hide the extract prompt
-                ourGameScene._menuElements.forEach(textElement =>{
+                ourGameScene.exMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
-                ourGameScene.extractPanel.setAlpha(0);
+                ourGameScene.extractPanel.setVisible(false);
                 console.log("YES");
-                ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore("MainMenuScene", {});
                 return true;
-            },
-            'NO': function () {  
+            }],
+            [`CANCEL`, function () {  
                 // stop vortex tween if it's playing
                 if (ourGameScene.vortexTween.isPlaying()) {
                     ourGameScene.vortexTween.stop()
@@ -3053,11 +3152,11 @@ class GameScene extends Phaser.Scene {
                     segment.y = ourGameScene.snake.head.y;
                 });
                 // hide the extract prompt
-                ourGameScene._menuElements.forEach(textElement =>{
+                ourGameScene.exMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
-                ourGameScene.extractPanel.setAlpha(0);
+                ourGameScene.extractPanel.setVisible(false);
                 // show the level labels again
                 ourGameScene.tweens.add({
                     targets: [...ourGameScene.blackholeLabels, ourGameScene.r3,ourGameScene.extractText],
@@ -3070,18 +3169,16 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.tempStartingArrows();
                 ourGameScene.gState = GState.WAIT_FOR_INPUT;
                 ourGameScene.snake.direction = DIRS.STOP; 
-                ourGameScene.extractMenuOn = false;
                 console.log("NO");
-            },
-            'LOOP TO ORIGIN': function () {
+            }],
+            ['DIRECT TO ADVENTURE', function () {
                 // TODO: send to origin
-                ourGameScene._menuElements.forEach(textElement =>{
+                ourGameScene.exMenuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
-                ourGameScene.extractPanel.setAlpha(0);
+                ourGameScene.extractPanel.setVisible(false);
                 console.log("LOOP");
-                ourGameScene.extractMenuOn = false;
 
                 // Clear for reseting game   
                 ourGameScene.finalScore("GameScene", {
@@ -3090,19 +3187,24 @@ class GameScene extends Phaser.Scene {
                     startupAnim: true,
                 });
                 return true;
-            },
-        }
+            }],
+        ]);
 
-        this.exMenuList = Object.keys(this.exMenuOptions);
+        var createMenuList = function(scene) {
+
+        };
+        
+        this.exMenuList = [...this.exMenuOptions.keys()];
         this.exCursorIndex = 1;
         var _textStart = 152;
         var _spacing = 20;
-        this._menuElements = [];
+        this.exMenuElements = [];
+
         
-        if (this._menuElements.length < 1) {
+        if (this.exMenuElements.length < 1) {
             for (let index = 0; index < this.exMenuList.length; index++) {   
-                if (index == 1) {
-                    console.log('adding')
+                if (index === this.exCursorIndex) {
+                    console.log('adding');
                     var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '20px',
                         "fontWeight": 400,
@@ -3121,10 +3223,14 @@ class GameScene extends Phaser.Scene {
                     ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
                 }
     
-                this._menuElements.push(textElement);
+                
+                this.exMenuElements.push(textElement);
+                
                 
             } 
         }
+
+        // #endregion
 
         
         // TODO Move out of here
@@ -3295,26 +3401,6 @@ class GameScene extends Phaser.Scene {
             }
         
 
-
-
-        // Dream wall corners 
-        
-        // Dream walls for Horizontal Wrap
-        for (let index = 2; index < END_Y - 1; index++) {
-            if (!DREAMWALLSKIP.includes(index)) {
-                
-                
-                
-            }
-        }
-
-        // Dream walls for Vertical Wrap
-        for (let index = 1; index < END_X; index++) {
-            
-                
-            
-        
-        }
         
         // Audio
         this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
@@ -3444,10 +3530,11 @@ class GameScene extends Phaser.Scene {
                 }
 
             }
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exMenuOptions[ourGameScene.exMenuList[ourGameScene.exCursorIndex]].call();
+            if (this.extractPanel.visible) {
+                var option = ourGameScene.exMenuList[ourGameScene.exCursorIndex];
+                this.exMenuOptions.get(option).call();
             }
-        });
+        }, this);
 
         this.input.keyboard.on('keyup-SPACE', e => { 
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
@@ -3479,35 +3566,39 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene._menuElements.length);
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+            if (ourGameScene.extractPanel.visible) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex + 1, 0, ourGameScene.exMenuElements.length);
+                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
     
                 // Reset all menu elements to dark grey
-                ourGameScene._menuElements.forEach((element, index) => {
+                ourGameScene.exMenuElements.forEach((element, index) => {
                     element.node.style.color = "darkgrey";
                 });
                 // Set the selected element to white
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
                 this._selected.node.style.color = "white";
             }
 
         });
 
         this.input.keyboard.on('keydown-UP', function() {
-            if (ourGameScene.extractMenuOn) {
-                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene._menuElements.length);
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+            if (ourGameScene.extractPanel.visible) {
+                ourGameScene.exCursorIndex = Phaser.Math.Wrap(ourGameScene.exCursorIndex - 1, 0, ourGameScene.exMenuElements.length);
+                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
                 //console.log(_selected.node)
     
                 // Reset all menu elements to dark grey
-                ourGameScene._menuElements.forEach((element, index) => {
+                ourGameScene.exMenuElements.forEach((element, index) => {
                     element.node.style.color = "darkgrey";
                 });
                 // Set the selected element to white
-                this._selected = ourGameScene._menuElements[ourGameScene.exCursorIndex];
+                this._selected = ourGameScene.exMenuElements[ourGameScene.exCursorIndex];
                 this._selected.node.style.color = "white";
             }
+
+        });
+
+        this.input.keyboard.on('TAB', function () {
 
         });
 
@@ -5271,15 +5362,15 @@ class GameScene extends Phaser.Scene {
 
     extractPrompt(){
         const ourGameScene = this.scene.get('GameScene');
-        ourGameScene.extractMenuOn = true;
-
+        
         // set menu alpha back to 1
-        ourGameScene._menuElements.forEach(textElement =>{
+        ourGameScene.exMenuElements.forEach(textElement =>{
             console.log(textElement)
             textElement.setAlpha(1);
         });
+
         this.extractPromptText.setAlpha(1);
-        this.extractPanel.setAlpha(1);
+        this.extractPanel.setVisible(true);
 
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
@@ -5295,7 +5386,7 @@ class GameScene extends Phaser.Scene {
             alpha: 0,
         });
  
-        this._selected = this._menuElements[this.exCursorIndex];
+        this._selected = this.exMenuElements[this.exCursorIndex];
     }
 
     finalScore(nextScene, args){
@@ -7765,7 +7856,6 @@ class ScoreScene extends Phaser.Scene {
                 if (!gameOver) {
                     // Go Back Playing To Select New Stage
                     ourScoreScene.scene.stop();
-                    debugger
                     ourGame.gState = GState.START_WAIT;
                     ourGame.bgTween = ourGame.tweens.add({
                         targets: [ourGame.stageBackGround, ourGame.continueBanner],
