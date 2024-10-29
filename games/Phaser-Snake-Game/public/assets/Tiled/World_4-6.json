@@ -95,7 +95,7 @@
         {
          "name":"next",
          "type":"string",
-         "value":""
+         "value":"end"
         }, 
         {
          "name":"slug",

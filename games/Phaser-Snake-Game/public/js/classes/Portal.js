@@ -1,4 +1,4 @@
-import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG } from "../SnakeHole.js";
+import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG, PLAYER_STATS } from "../SnakeHole.js";
 
 
 var Portal = new Phaser.Class({
@@ -122,6 +122,8 @@ var Portal = new Phaser.Class({
 
             // Set last move to now. Fixes Corner Time.
             scene.lastMoveTime = scene.time.now;
+
+            PLAYER_STATS.portals += 1;
         });
                         
     },

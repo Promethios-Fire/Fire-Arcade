@@ -1,5 +1,5 @@
 import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT, X_OFFSET, Y_OFFSET, 
-    COMBO_ADD_FLOOR, SPEED_WALK, SPEED_SPRINT, GState} from "../SnakeHole.js";
+    COMBO_ADD_FLOOR, SPEED_WALK, SPEED_SPRINT, GState, PLAYER_STATS} from "../SnakeHole.js";
 
 var Food = new Phaser.Class({
 
@@ -76,6 +76,8 @@ var Food = new Phaser.Class({
             scene.snake.lastPlayedCombo = 0;
             scene.comboCounter = 0;
         }
+
+        PLAYER_STATS.globalStore += timeSinceFruit;
 
         scene.events.emit('addScore', this); 
         scene.snake.grow(scene);
