@@ -42,25 +42,6 @@ var Food = new Phaser.Class({
     onOver: function(scene) {
         scene.snakeEating();
         var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        if (scene.length === scene.lengthGoal -1) {
-            
-            scene.snake.head.x = scene.snake.previous[0];
-            scene.snake.head.y = scene.snake.previous[1];
-            //scene.gState = GState.TRANSITION;
-            var _x = this.x;
-            var _y = this.y;
-            //debugger;
-            // start slowmo here
-            scene.tweens.add({
-                targets: scene.snake.head,
-                x: _x,
-                y: _y,
-                duration: 1000,
-                onStart: () =>{
-                    debugger;
-                }
-            })
-        }
 
         if(timeSinceFruit > COMBO_ADD_FLOOR){
             if (scene.snake.lastPlayedCombo > 0) {
@@ -97,9 +78,8 @@ var Food = new Phaser.Class({
         }
 
         // Moves the eaten atom after a delay including the electron.
-        this.delayTimer = scene.time.delayedCall(0, function () { //USED to have delayed call:200
+        this.delayTimer = scene.time.delayedCall(200, function () {
             if (scene.gState != GState.TRANSITION) {
-                
                 this.move(scene);
                 this.visible = true;
             }
@@ -129,7 +109,7 @@ var Food = new Phaser.Class({
         
         var pos = Phaser.Math.RND.pick(validLocations);
 
-        this.setPosition(pos.x, pos.y );
+        this.setPosition(pos.x, pos.y ); // This seems to magically reset the fruit timers
         scene.foodHistory.push([(pos.x - X_OFFSET) / GRID, (pos.y - Y_OFFSET) / GRID, ourInputScene.moveCount]);
         //console.log(this.x,this.y)
         this.electrons.setPosition(pos.x, pos.y);
