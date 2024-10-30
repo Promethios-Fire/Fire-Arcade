@@ -40,7 +40,9 @@ var Food = new Phaser.Class({
     },
 
     onOver: function(scene) {
-        scene.snakeEating();
+        if (scene.length < scene.lengthGoal -1) {
+            scene.snakeEating();
+        }
         var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         if (scene.length === scene.lengthGoal -1) {
             

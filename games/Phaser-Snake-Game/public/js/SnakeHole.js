@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -5316,17 +5316,17 @@ class GameScene extends Phaser.Scene {
                     this.gState = GState.PLAY;
                 }
             });
-            this.snakeEatingTween = this.tweens.add({
+            this.tweens.add({ //slower custom one-off snakeEating tween
                 targets: this.snake.body, 
                 scale: [1.25,1],
                 yoyo: false,
-                duration: 64,
+                duration: 128,
                 ease: 'Linear',
                 repeat: 0,
                 timeScale: slowMoValCopy,
                 delay: this.tweens.stagger(this.speedSprint),
                 onUpdate: (tween) => {
-                    this.timeScale = slowMoValCopy;
+                    this.timeScale = slowMoValCopy /2;
                 }
             });
 
