@@ -58,6 +58,10 @@ var Food = new Phaser.Class({
                 duration: 1000,
                 onStart: () =>{
                     debugger;
+                },
+                onComplete: () =>{
+                    scene.victoryFanfare();
+                    console.log('tween finished, start electrons')
                 }
             })
         }
