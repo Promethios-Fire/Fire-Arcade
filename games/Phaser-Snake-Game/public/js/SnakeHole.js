@@ -5193,7 +5193,7 @@ class GameScene extends Phaser.Scene {
         const ourSpaceBoy= this.scene.get("SpaceBoyScene");
 
         //victory stars emitter
-        this.electronFanfare = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+        this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
         .setDepth(100);
         this.electronFanfare.play('electronFanfareForm');
 
@@ -5287,15 +5287,35 @@ class GameScene extends Phaser.Scene {
                 },
                 onComplete: () => {
                     console.log('Slow motion effect completed');
+                    
+                    this.hsv = Phaser.Display.Color.HSVColorWheel();
+                    const spectrum = Phaser.Display.Color.ColorSpectrum(360);
+                    var colorIndex = 0;
+                    var color = spectrum[colorIndex];
 
                     this.fxBoost = this.boostBar.preFX.addColorMatrix();
+
                     this.tweens.addCounter({
                         from: 0,
                         to: 360,
                         duration: 3000,
                         loop: -1,
-                        onUpdate: (tween) => { // Add 'tween' as a parameter here
-                            this.fxBoost.hue(tween.getValue()); // Now 'getValue' should be accessible
+                        onUpdate: (tween) => {
+                            let hueValue = tween.getValue();
+                            this.fxBoost.hue(hueValue);
+                    
+                            // Update each segment's tint with an offset and apply pastel effect
+                            this.snake.body.forEach((part, index) => {
+                                // Add an offset to the hue for each segment
+                                let partHueValue = (hueValue + index * 12.41) % 360;
+                    
+                                // Reduce saturation and increase lightness
+                                let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+                    
+                                if (color) {// only update color when it's not null
+                                    part.setTint(color.color);
+                                }
+                            });
                         }
                     });
                     /*this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
