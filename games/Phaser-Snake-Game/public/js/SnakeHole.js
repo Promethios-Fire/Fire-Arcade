@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 5; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -382,7 +382,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -5192,19 +5192,6 @@ class GameScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoy= this.scene.get("SpaceBoyScene");
 
-        //victory stars emitter
-        this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-        .setDepth(100);
-        this.electronFanfare.play('electronFanfareForm');
-
-        this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
-            speed: { min: -20, max: 20 },
-            angle: { min: 0, max: 360 },
-            alpha: { start: 1, end: 0 },
-            anim: 'starIdle',
-            lifespan: 1000,
-            follow: this.electronFanfare,
-        }).setFrequency(150,[1]).setDepth(1);
         
         // Store speed values
         let _walkSpeed = this.speedWalk
@@ -5214,27 +5201,45 @@ class GameScene extends Phaser.Scene {
         let initialCameraX = this.cameras.main.scrollX;
         let initialCameraY = this.cameras.main.scrollY
 
-        
-
-        // Get all game objects in the scene
-        this.children.list.forEach((child) => {
-            // Check if the child object has a scroll factor property set to 0
-            if (child.scrollFactorX === 0 && child.scrollFactorY === 0) {
+        if (this.stage === "World_1-4") { //check if we're on last stage -- using placeholder code
+            // Set scrollFactor to 1 for all game objects
+            // Get all game objects in the scene
+            this.children.list.forEach((child) => {
+                // Check if the child object has a scroll factor property set to 0
+                if (child.scrollFactorX === 0 && child.scrollFactorY === 0) {
+                    child.setScrollFactor(1);
+                    this.UIScoreContainer.setScrollFactor(1);
+                }
+            });
+            // Iterate over each child in the container and set the scroll factor to 1
+            this.UIScoreContainer.each((child) => {
                 child.setScrollFactor(1);
-                this.UIScoreContainer.setScrollFactor(1);
-            }
-        });
-        // Iterate over each child in the container and set the scroll factor to 1
-        this.UIScoreContainer.each((child) => {
-            child.setScrollFactor(1);
-        });
-        //ourGame.countDown.setScrollFactor(1);
-        ourGame.countDown.setAlpha(0);
+            });
 
-        
+            // rainbow electronFanfare
+            this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            .setDepth(100);
+            this.electronFanfare.play('electronFanfareForm');
+
+            // emit stars from electronFanfare
+            this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
+                speed: { min: -20, max: 20 },
+                angle: { min: 0, max: 360 },
+                alpha: { start: 1, end: 0 },
+                anim: 'starIdle',
+                lifespan: 1000,
+                follow: this.electronFanfare,
+            }).setFrequency(150,[1]).setDepth(1);
+
+            ourGame.countDown.setAlpha(0);
+
+        }
+            
+       
+        // Start slowMoValCopy at 1 (default time scale). It's copied to preserve its value outside the tween
         var slowMoValCopy = 1;
         
-        // Slow Motion Tween
+        // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
         this.tweens.add({
             targets: { value: 1 },
             value: 0.2,
@@ -5243,28 +5248,37 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.easeInOut',
             repeat: 0,
                 onUpdate: (tween) => {
-                    this.cameras.main.setBounds(0, 0, 240, 320);
-                    ourSpaceBoy.cameras.main.setBounds(0, 0, 240, 320);
-                    ourPersist.cameras.main.setBounds(0, 0, 240, 320);
+                    // Camera Restraints/Bounds -- isn't needed if not zooming
+                    //this.cameras.main.setBounds(0, 0, 240, 320);
+                    //ourSpaceBoy.cameras.main.setBounds(0, 0, 240, 320);
+                    //ourPersist.cameras.main.setBounds(0, 0, 240, 320);
 
                     let slowMoValue = tween.getValue();
+                    if (this.starEmitterFinal){
+                        slowMoValCopy = slowMoValue;
+                    }
+                    else{
+                        slowMoValCopy = slowMoValue * 2;
+                    }
 
-                    slowMoValCopy = slowMoValue;
-
-                    // Apply the interpolated value to properties
+                    // Apply the interpolated slowMoValue to all the timeScales
                     this.tweens.timeScale = slowMoValue;
                     this.anims.globalTimeScale = slowMoValue;
-                    this.starEmitterFinal.timeScale = slowMoValue;
                     this.speedWalk = _walkSpeed  / slowMoValue;
                     this.speedSprint = _sprintSpeed / slowMoValue;
+                    if (this.starEmitterFinal) {
+                        this.starEmitterFinal.timeScale = slowMoValue;
+                    }
+                    // Camera Zoom
                     //this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
                     //ourSpaceBoy.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
                     //ourPersist.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
                     
-                    // Continuously interpolate the camera's position to the snake's head
-                    let targetX = this.snake.head.x - this.cameras.main.width / 2;
-                    let targetY = this.snake.head.y - this.cameras.main.height / 2;
-                    if (slowMoValue <= 0.5) {
+                    // Continuously interpolate the camera's position to the snake's head -- not needed
+                    //let targetX = this.snake.head.x - this.cameras.main.width / 2;
+                    //let targetY = this.snake.head.y - this.cameras.main.height / 2;
+
+                    /*if (slowMoValue <= 0.5) {
                         this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
                         this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
 
@@ -5283,41 +5297,43 @@ class GameScene extends Phaser.Scene {
                         
                         ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
                         ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
-                    }
+                    }*/
                 },
                 onComplete: () => {
                     console.log('Slow motion effect completed');
-                    
-                    this.hsv = Phaser.Display.Color.HSVColorWheel();
-                    const spectrum = Phaser.Display.Color.ColorSpectrum(360);
-                    var colorIndex = 0;
-                    var color = spectrum[colorIndex];
 
-                    this.fxBoost = this.boostBar.preFX.addColorMatrix();
+                    if (this.starEmitterFinal) {
+                        this.hsv = Phaser.Display.Color.HSVColorWheel();
+                        const spectrum = Phaser.Display.Color.ColorSpectrum(360);
+                        var colorIndex = 0;
+                        var color = spectrum[colorIndex];
 
-                    this.tweens.addCounter({
-                        from: 0,
-                        to: 360,
-                        duration: 3000,
-                        loop: -1,
-                        onUpdate: (tween) => {
-                            let hueValue = tween.getValue();
-                            this.fxBoost.hue(hueValue);
+                        this.fxBoost = this.boostBar.preFX.addColorMatrix();
+
+                        this.tweens.addCounter({
+                            from: 0,
+                            to: 360,
+                            duration: 3000,
+                            loop: -1,
+                            onUpdate: (tween) => {
+                                let hueValue = tween.getValue();
+                                this.fxBoost.hue(hueValue);
+                        
+                                // Update each segment's tint with an offset and apply pastel effect
+                                this.snake.body.forEach((part, index) => {
+                                    // Add an offset to the hue for each segment
+                                    let partHueValue = (hueValue + index * 12.41) % 360;
+                        
+                                    // Reduce saturation and increase lightness
+                                    let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+                        
+                                    if (color) {// only update color when it's not null
+                                        part.setTint(color.color);
+                                    }
+                                });
+                            }
+                        });
                     
-                            // Update each segment's tint with an offset and apply pastel effect
-                            this.snake.body.forEach((part, index) => {
-                                // Add an offset to the hue for each segment
-                                let partHueValue = (hueValue + index * 12.41) % 360;
-                    
-                                // Reduce saturation and increase lightness
-                                let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
-                    
-                                if (color) {// only update color when it's not null
-                                    part.setTint(color.color);
-                                }
-                            });
-                        }
-                    });
                     /*this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
                         .setDepth(100);
                     this.electronFanfare.play('electronFanfareIdle');*/
@@ -5332,11 +5348,11 @@ class GameScene extends Phaser.Scene {
                     ourPersist.cameras.main.scrollY = 0;*/
                     this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                     .setDepth(100);
-
+                    }
                     this.gState = GState.PLAY;
                 }
             });
-            this.tweens.add({ //slower custom one-off snakeEating tween
+            this.tweens.add({ //slower one-off snakeEating tween
                 targets: this.snake.body, 
                 scale: [1.25,1],
                 yoyo: false,
@@ -5350,31 +5366,31 @@ class GameScene extends Phaser.Scene {
                 }
             });
 
-
-        this.electronFanfare.on('animationcomplete', (animation, frame) => {
-            if (animation.key === 'electronFanfareForm') {
-                this.tweens.add({
-                    targets: this.electronFanfare,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -3,
-                    y: ourSpaceBoy.scoreFrame.getCenter().y,
-                    ease: 'Sine.easeIn',
-                    duration: 1250,
-                    delay: 0,
-                    onComplete: () => {
-                        ourGame.countDown.setAlpha(1);
-                        ourGame.countDown.x = X_OFFSET + GRID * 4 - 3;
-                        ourGame.countDown.y = 3;
+        if (this.electronFanfare) {
+            this.electronFanfare.on('animationcomplete', (animation, frame) => {
+                if (animation.key === 'electronFanfareForm') {
+                    this.tweens.add({
+                        targets: this.electronFanfare,
+                        x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                        y: ourSpaceBoy.scoreFrame.getCenter().y,
+                        ease: 'Sine.easeIn',
+                        duration: 1250,
+                        delay: 0,
+                        onComplete: () => {
+                            ourGame.countDown.setAlpha(1);
+                            ourGame.countDown.x = X_OFFSET + GRID * 4 - 3;
+                            ourGame.countDown.y = 3;
+                        }
+                    });
+                    
+                            ourGame.countDown.setHTML('W1N');
+                            ourGame.countDown.x += 4
                     }
-                });
-                
-                        ourGame.countDown.setHTML('W1N');
-                        ourGame.countDown.x += 4
-                }
-                
-        });
+                    
+            });
 
-        this.electronFanfare.chain(['electronFanfareIdle']);
-
+            this.electronFanfare.chain(['electronFanfareIdle']);
+        }
         
 
         /*this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
@@ -5563,6 +5579,7 @@ class GameScene extends Phaser.Scene {
             8, 8, 8, 8);
         this.finalScorePanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0);
 
+
         //FINAL SCORE LABEL
         const finalScoreLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 12.5, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
@@ -5693,6 +5710,8 @@ class GameScene extends Phaser.Scene {
                 duration: 500,
                 });
         }
+
+
 
         //dim UI
         this.time.delayedCall(1000, event => {
@@ -6260,6 +6279,8 @@ class GameScene extends Phaser.Scene {
             this.events.off('addScore');
             this.events.off('spawnBlackholes');
             this.gameOver();
+
+            
 
             /*var coinUIText = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'div', Object.assign({}, STYLE_DEFAULT,
                 {
