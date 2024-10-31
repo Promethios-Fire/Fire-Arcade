@@ -5240,7 +5240,7 @@ class GameScene extends Phaser.Scene {
         var slowMoValCopy = 1;
         
         // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
-        this.tweens.add({
+        this.slowMoTween = this.tweens.add({
             targets: { value: 1 },
             value: 0.2,
             duration: 500,
@@ -5254,12 +5254,7 @@ class GameScene extends Phaser.Scene {
                     //ourPersist.cameras.main.setBounds(0, 0, 240, 320);
 
                     let slowMoValue = tween.getValue();
-                    if (this.starEmitterFinal){
-                        slowMoValCopy = slowMoValue;
-                    }
-                    else{
-                        slowMoValCopy = slowMoValue * 2;
-                    }
+                    slowMoValCopy = slowMoValue;
 
                     // Apply the interpolated slowMoValue to all the timeScales
                     this.tweens.timeScale = slowMoValue;
@@ -5365,7 +5360,7 @@ class GameScene extends Phaser.Scene {
                     this.timeScale = slowMoValCopy /2;
                 }
             });
-
+        
         if (this.electronFanfare) {
             this.electronFanfare.on('animationcomplete', (animation, frame) => {
                 if (animation.key === 'electronFanfareForm') {
@@ -5382,7 +5377,6 @@ class GameScene extends Phaser.Scene {
                             ourGame.countDown.y = 3;
                         }
                     });
-                    
                             ourGame.countDown.setHTML('W1N');
                             ourGame.countDown.x += 4
                     }
