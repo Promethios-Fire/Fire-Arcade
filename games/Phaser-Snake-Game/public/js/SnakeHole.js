@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -119,17 +119,24 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     if (!JSON.parse(localStorage.getItem("playerStats"))) {
         PLAYER_STATS = {}
     }
-    var bonks = PLAYER_STATS.bonks ?? 0;
-    var atomsEaten = PLAYER_STATS.atomsEaten ?? 0;
-    var turns = PLAYER_STATS.turns ?? 0;
-    var wraps = PLAYER_STATS.wraps ?? 0;
+    
+    var statsWithDefaults = new Map([
+        ["bonks", PLAYER_STATS.bonks ?? 0],
+        ["atomsEaten", PLAYER_STATS.atomsEaten ?? 0],
+        ["turns", PLAYER_STATS.turns ?? 0],
+        ["wraps", PLAYER_STATS.wraps ?? 0],
+        ["portals", PLAYER_STATS.portals ?? 0],
+        ["globalScore", PLAYER_STATS.globalScore ?? 0],
+        ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
+    ]);
 
-    PLAYER_STATS.bonks = bonks;
-    PLAYER_STATS.atomsEaten = atomsEaten;
-    PLAYER_STATS.turns = turns;
-    PLAYER_STATS.wraps = wraps;
+    // Add Saved Values
+    statsWithDefaults.keys().forEach( key => {
+        PLAYER_STATS[key] = statsWithDefaults.get(key);
+    });
 
-    PLAYER_STATS.stagesFinished = Math.floor(atomsEaten / 28);
+    // Calculate Values
+    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 }
 
 var updatePlayerStats = function (stageData) {
@@ -140,6 +147,9 @@ var updatePlayerStats = function (stageData) {
     PLAYER_STATS.turns += stageData.turns;
     PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 
+    // This also saves changes not listed here that
+    // are made directly to PLAYER_STATS object.
+    // Like Wrapping and Portaling etc...
     localStorage.setItem("playerStats", JSON.stringify(PLAYER_STATS));
 
     // JSON.stringify(this.stageData)
@@ -6822,22 +6832,20 @@ var StageData = new Phaser.Class({
             return 0;
         }
     },
-
     comboBonus() {
         var bestCombo = 0;
         var comboCounter = 1;
         this.foodLog.forEach( score => {
-            //debugger
             if (score > COMBO_ADD_FLOOR) {
                 comboCounter += 1;
-            } else {
                 if (comboCounter > bestCombo) {
                     bestCombo = comboCounter;
-                    comboCounter = 1;
                 }
+            } else {
                 comboCounter = 1;
             }
         });
+    
         return bestCombo * 100;
     },
     
@@ -6917,6 +6925,30 @@ class ScoreScene extends Phaser.Scene {
 
 
         this.stageData = new StageData(stageDataJSON);
+
+        // #region Save Stats
+        var _comboCounter = 0;
+        this.stageData.foodLog.forEach( score => {
+            if (score > COMBO_ADD_FLOOR) {
+                _comboCounter += 1;
+            } else {
+                // Convert from 1 index to zero index.
+                debugger
+
+                if (_comboCounter > 0) {
+                    // Signpost problem. You always start with zero combo before you get the first atom
+                    PLAYER_STATS.comboHistory[_comboCounter - 1] += 1;
+                }
+                _comboCounter = 1;
+            }
+        });
+
+        if (_comboCounter != 1) {
+            debugger
+            // Not Triggered the save in the else clause above.
+            // Happens when the last atom is part of a combo.
+            PLAYER_STATS.comboHistory[_comboCounter - 1] += 1;
+        }
 
         // Update Stage Data
         updatePlayerStats(this.stageData);
