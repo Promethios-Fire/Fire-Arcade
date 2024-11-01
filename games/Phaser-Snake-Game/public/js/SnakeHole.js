@@ -26,7 +26,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 5; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -392,7 +392,7 @@ export const GState = Object.freeze({
 const DREAMWALLSKIP = [0,1,2];
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -963,6 +963,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('atomicPickupComet', 'assets/sprites/atomicPickupComet.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
@@ -5230,6 +5231,10 @@ class GameScene extends Phaser.Scene {
             this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
             this.electronFanfare.play('electronFanfareForm');
+            /*this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            .setDepth(100);
+            this.atomComet.play('atomCometSpawn');*/
+            
 
             // emit stars from electronFanfare
             this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
@@ -5394,6 +5399,21 @@ class GameScene extends Phaser.Scene {
             });
 
             this.electronFanfare.chain(['electronFanfareIdle']);
+        }
+        if (this.atomComet) {
+            this.atomComet.on('animationcomplete', (animation, frame) => {
+                console.log('COMET')
+                if (animation.key === 'atomCometSpawn') {
+                    this.tweens.add({
+                        targets: this.atomComet,
+                        x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                        y: ourSpaceBoy.scoreFrame.getCenter().y,
+                        ease: 'Sine.easeIn',
+                        duration: 1000,
+                    });
+                }
+            });
+            
         }
         
 
@@ -6449,7 +6469,7 @@ class GameScene extends Phaser.Scene {
                 this.snake.move(this);
                 ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
-                console.log(ourInputScene.moveCount)
+                //console.log(ourInputScene.moveCount)
 
                 this.snakeCriticalState();
                 
@@ -9322,6 +9342,19 @@ function loadSpriteSheetsAndAnims(scene) {
       frameRate: 12,
       delay: 200,
       repeat: 0, // How long is the duration of this animation in milliseconds @ hodlen?
+    });
+
+    scene.anims.create({
+        key: 'atomCometSpawn',
+        frames: scene.anims.generateFrameNumbers('atomicPickupComet',{ frames: [ 0,1,2,3,4,5,6,7,8,9]}),
+        frameRate: 12,
+        repeat: 0,
+      });
+    scene.anims.create({
+        key: 'atomCometIdle',
+        frames: scene.anims.generateFrameNumbers('atomicPickupComet',{ frames: [ 10,11]}),
+        frameRate: 8,
+        repeat: -1,
     });
 
     // score scene atoms

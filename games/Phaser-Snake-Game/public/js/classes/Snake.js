@@ -281,7 +281,7 @@ var Snake = new Phaser.Class({
                         console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
 
                     }
-                    console.log('SHIFT POSITION')
+                    //console.log('SHIFT POSITION')
                     Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);
                  }
                 

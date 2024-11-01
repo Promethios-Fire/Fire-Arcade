@@ -40,18 +40,39 @@ var Food = new Phaser.Class({
     },
 
     onOver: function(scene) {
+        const ourSpaceBoyScene = scene.scene.get("SpaceBoyScene");
         if (scene.length < scene.lengthGoal -1) {
             scene.snakeEating();
         }
         var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        if (scene.length === scene.lengthGoal -1) {
-            
+        
+        if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup
+
+            scene.atomComet = ourSpaceBoyScene.add.sprite(scene.snake.head.x + 6,scene.snake.head.y + 6)
+            .setDepth(100);
+            scene.atomComet.play('atomCometSpawn');
+            scene.atomComet.chain(['atomCometIdle']);
+
+
+            scene.tweens.add({
+                targets: scene.atomComet,
+                x: ourSpaceBoyScene.scoreFrame.getCenter().x -3,
+                y: ourSpaceBoyScene.scoreFrame.getCenter().y,
+                ease: 'Sine.easeIn',
+                duration: 1250,
+                delay: 1250,
+                onComplete: function () {
+                    scene.atomComet.destroy();
+                },
+            });
+
             scene.snake.head.x = scene.snake.previous[0];
             scene.snake.head.y = scene.snake.previous[1];
+            
             //scene.gState = GState.TRANSITION;
             var _x = this.x;
             var _y = this.y;
-            //debugger;
+
             // start slowmo here
             scene.tweens.add({
                 targets: scene.snake.head,
