@@ -412,6 +412,10 @@ class SpaceBoyScene extends Phaser.Scene {
     constructor () {
         super({key: 'SpaceBoyScene', active: true});
     }
+    init() {
+        this.stageHistory = [];
+        this.globalFoodLog = [];
+    }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
@@ -522,21 +526,20 @@ class TutorialScene extends Phaser.Scene {
             
             this.input.keyboard.on('keydown-RIGHT', e => {
                 const ourPersist = this.scene.get('PersistScene');
-                if (this.selectedPanel < 4) {
+                if (this.selectedPanel < 4) { // @holden this needs to be changed
                     this.pop02.play();
                     this.selectedPanel += 1
                 }
 
                 var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
 
-
                 this.containorToX = Math.max(this.containorToX - hOffSet, endX);
                 
                 switch (this.containorToX) {
-                    case 0: // Start Panel
-                        this.panelArrowL.setVisible(false);
-                        ourPersist.bgCoords.x += 20;
-                        break
+                    //case 0: // Start Panel
+                    //    this.panelArrowL.setVisible(false);
+                    //    ourPersist.bgCoords.x += 20;
+                    //    break
                     case endX: // End Panel
                         this.panelArrowR.setVisible(false);
                         
@@ -568,65 +571,50 @@ class TutorialScene extends Phaser.Scene {
                     duration: 500,
                 });   
             }, this);
-        }
-    
-        
 
-
-        
-        this.input.keyboard.on('keydown-LEFT', e => {
-            const ourTutorialScene = this.scene.get('TutorialScene');
-            const ourPersist = this.scene.get('PersistScene');
-            if (this.selectedPanel > 1) {
-                this.selectedPanel -= 1
-                this.pop02.play();
-            }
-            this.panelContainerX = 0
-            switch (this.selectedPanel){
-                case 1:
-                    ourPersist.bgCoords.x = 0;
-                    this.panelContainerX = hOffSet * -0;
-                    this.panelArrowL.setVisible(false)
-                    this.panelArrowR.setVisible(true)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = hOffSet * -1;
-                    this.panelArrowR.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = hOffSet * -2;
-                    this.panelArrowR.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = hOffSet * -3;
-                    this.panelArrowR.setVisible(true)
-                    break;
-            }
-
-            
-            
-            this.tweens.add({
-                targets: this.panelsContainer,
-                x: this.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: function () {
-                    
-                    if (ourTutorialScene.selectedPanel < 4) {
-                        //debugger //@holden why are these debuggers here?
-                        ourTutorialScene.panelArrowR.setVisible(true);
-                    }
-                    else{
-                        //debugger
-                        ourTutorialScene.panelArrowR.setVisible(false);
-                    }
-                    
+            this.input.keyboard.on('keydown-LEFT', e => {
+                const ourPersist = this.scene.get('PersistScene');
+                if (this.selectedPanel > 1) {
+                    this.selectedPanel -= 1
+                    this.pop02.play();
                 }
-            }, this);   
-        }, this)
+
+                debugger
+                this.containorToX = Math.min(this.containorToX + hOffSet, 0);
+
+                // All the way left
+                if (this.containorToX === 0) {
+                    this.panelArrowL.setVisible(false); 
+
+                } else { // Middle Pannel
+                    this.panelArrowL.setVisible(true);
+                    this.panelArrowR.setVisible(true);
+                    ourPersist.bgCoords.x -= 20; 
+
+                }
+    
+                
+                this.tweens.add({
+                    targets: this.panelsContainer,
+                    x: this.containorToX,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                    onComplete: function () {
+                        
+                        //if (ourTutorialScene.selectedPanel < 4) {
+                            //debugger //@holden why are these debuggers here?
+                            //ourTutorialScene.panelArrowR.setVisible(true);
+                        //}
+                        //else{
+                            //debugger
+                            //ourTutorialScene.panelArrowR.setVisible(false);
+                        //}
+                        
+                    }
+                }, this);   
+            }, this)
+
+        }
 
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
@@ -637,12 +625,9 @@ class TutorialScene extends Phaser.Scene {
                     startupAnim: true,
                 });
 
-
-
                 // Clear for reseting game
-                scene.scene.get("StartScene").stageHistory = [];
+                scene.scene.get("SpaceBoyScene").stageHistory = [];
                 scene.scene.get("PersistScene").coins = START_COINS;
-
                 
             }
 
@@ -708,8 +693,8 @@ class StartScene extends Phaser.Scene {
     }
     init() {
         // #region StartScene()
-        this.stageHistory = [];
-        this.globalFoodLog = [];
+        
+        
         
     }
 
@@ -1056,32 +1041,6 @@ class StartScene extends Phaser.Scene {
 
             var ourGame = this.scene.get("GameScene");
             var ourInput = this.scene.get("InputScene");
-        
-
-            ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
-            ourGame.stageDiffBonus = 140;
-            ourGame.stage = END_STAGE;
-            //END_STAGE = "Stage-01";
-
-            this.score = 12345;
-            this.bonks = 3;
-            this.length = 28;
-            this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
-            this.zedLevel = 77;
-            this.medals = {
-                "fast":'silver',
-                "Rank":'gold'
-            }
-
-            ourInput.turns = 79;
-            ourInput.cornerTime = 190;
-            ourInput.boostTime = 400;
-
-            var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
-            var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
-            var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
-
-            this.stageHistory = [stage01, stage02, stage03];
             this.scene.start('ScoreScene');
         }
         else {
@@ -4364,6 +4323,7 @@ class GameScene extends Phaser.Scene {
         this.events.on('saveScore', function () {
             const ourScoreScene = this.scene.get('ScoreScene');
             const ourStartScene = this.scene.get('StartScene');
+            const ourSpaceboy = this.scene.get('StartScene');
 
 
             // Building StageData for Savin
@@ -4379,8 +4339,8 @@ class GameScene extends Phaser.Scene {
             // #region Do Unlock Calculation of all Best Logs
             
             var historicalLog = [];
-            if (ourStartScene.stageHistory.length > 1) {
-                ourStartScene.stageHistory.forEach( _stage => {
+            if (ourSpaceboy.stageHistory.length > 1) {
+                ourSpaceboy.stageHistory.forEach( _stage => {
                     var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestStageData`));
                     if (stageBestLog) {
                         historicalLog = [...historicalLog, ...stageBestLog];
@@ -4965,7 +4925,7 @@ class GameScene extends Phaser.Scene {
         
         var _totalScore = 0
 
-        ourStartScene.stageHistory.forEach( stageData => {
+        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
             _totalScore += stageData.calcTotal();
         });
         _totalScore = Math.floor(_totalScore); //rounds down to whole number
@@ -5002,7 +4962,7 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
-                ourGameScene.scene.get("StartScene").stageHistory = [];
+                ourGameScene.scene.get("SpaceBoyScene").stageHistory = [];
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
             }
@@ -6215,7 +6175,7 @@ class ScoreScene extends Phaser.Scene {
         
         console.log(JSON.stringify(this.stageData));
 
-        ourStartScene.stageHistory.push(this.stageData);
+        this.scene.get("SpaceBoyScene").stageHistory.push(this.stageData);
     
 
         // #region Save Best To Local.
@@ -7110,7 +7070,7 @@ class ScoreScene extends Phaser.Scene {
 
         var totalScore = 0;
 
-        ourStartScene.stageHistory.forEach( stageData => {
+        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
             totalScore += stageData.calcTotal();
         });
 
@@ -7129,14 +7089,14 @@ class ScoreScene extends Phaser.Scene {
         var sumOfBase = 0;
         var _histLog = [];
         
-        ourStartScene.stageHistory.forEach( _stage => {
+        this.scene.get("SpaceBoyScene").stageHistory.forEach( _stage => {
             _histLog = [ ..._histLog, ..._stage.foodLog];
             sumOfBase += _stage.calcBase();
             ourGame.nextScore += _stage.calcTotal();
 
         });
 
-        ourStartScene.globalFoodLog = _histLog;
+        this.scene.get("SpaceBoyScene").globalFoodLog = _histLog;
 
         if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
             localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
