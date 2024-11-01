@@ -457,7 +457,7 @@ class TutorialScene extends Phaser.Scene {
 
 
             _map.forEach( array => {
-                panelContents.push(...array)
+                panelContents.push(...array.reverse())
             })
         }
         
@@ -473,65 +473,6 @@ class TutorialScene extends Phaser.Scene {
 
         var hOffSet = 570;
 
-
-        
-         // Sets the origin to the middle top.
-        
-         // Sets the origin to the middle top.
-         // Sets the origin to the middle top.
-         // Sets the origin to the middle top.
-        
-
-
-        
-
-
-
-
-        
-
-        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) - GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomSmall.play('atom04idle');
-        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomMedium.play('atom03idle');
-        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomLarge.play('atom02idle');
-        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomCharged.play('atom01idle');
-        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomElectrons.play('electronIdle');
-
-
-
-        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) - GRID * 2,
-            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal1.play('portalIdle');
-        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) + GRID * 2,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal2.play('portalIdle');
-
-        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) - GRID * 1.5,
-        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
-        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) + GRID * 1.5,
-        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
-
-        
-
-        this.tutSPACE = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 3) - GRID * 5.25,
-             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutSPACE.play('tutSpace');
-
-        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 3),
-        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
-
-        panelContents.push( this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
-         this.tutSPACE,this.tutSnake4,
-        );
         
         this.panelsContainer = this.make.container(0, 0);
         debugger
@@ -555,10 +496,6 @@ class TutorialScene extends Phaser.Scene {
         // -james note. Start of create should be here.
         
 
-        tutorialPanels.forEach( key => {
-            //
-        })
-
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
 
@@ -578,15 +515,9 @@ class TutorialScene extends Phaser.Scene {
         
         // make this run at the last part.
         this.continueText.setVisible(false)
-        if (!this.hasPlayedBefore) {
-            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        if (tutorialPanels.length === 1) {
+            this.continueText.setVisible(true) //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
         }
-        else {
-            this.continueText.setVisible(true)        
-        }
-
-        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
-        this.continueText.setVisible(true)
         
         this.tweens.add({
             targets: this.continueText,

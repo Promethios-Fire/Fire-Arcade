@@ -160,8 +160,13 @@ export var TUTORIAL_PANELS = new Map([
             SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
         tutPortal2.play('portalIdle');
 
+        var tutSnake2 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) - GRID * 1.5,
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
+        var tutSnake3 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) + GRID * 1.5,
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
+
         _map.get("text").push(tutText3);
-        _map.get("images").push(tutPortal1, tutPortal1);
+        _map.get("images").push(tutPortal1, tutPortal1, tutSnake2, tutSnake3);
         _map.get("panels").push(panel3);
 
         return _map
@@ -178,8 +183,15 @@ export var TUTORIAL_PANELS = new Map([
                 'Hold space to sprint.',
         ).setOrigin(0.5,0).setScale(.5);
 
+        var tutSPACE = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 3) - GRID * 5.25,
+        GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
+        tutSPACE.play('tutSpace');
+
+        var tutSnake4 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 3),
+        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
+
         _map.get("text").push(tutText4);
-        _map.get("images").push();
+        _map.get("images").push(tutSPACE,tutSnake4);
         _map.get("panels").push(panel4);
 
         return _map
