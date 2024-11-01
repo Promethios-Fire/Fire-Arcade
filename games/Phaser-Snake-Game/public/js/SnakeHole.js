@@ -365,7 +365,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -3173,6 +3173,7 @@ class GameScene extends Phaser.Scene {
         this.blackholesContainer = this.make.container(0, 0);
 
         this.events.on('spawnBlackholes', function (thingWePass) {
+            console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
 
@@ -5804,14 +5805,13 @@ class GameScene extends Phaser.Scene {
 
             //this.scoreUI.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
             this.gState = GState.TRANSITION;
-            //this.snake.direction = DIRS.STOP;
+            this.snake.direction = DIRS.STOP;
             //slowmo comment
             //this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
 
 
             this.events.off('addScore');
 
-            
             this.scene.launch('ScoreScene');
             this.setWallsPermeable();
         }
@@ -5826,9 +5826,6 @@ class GameScene extends Phaser.Scene {
             this.events.off('spawnBlackholes');
             this.gameOver();
 
-            
-
-            
         }
 
 
@@ -6329,7 +6326,7 @@ class ScoreScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
         //bypass scorescene temporarily for slowmo
-        ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+        //ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
 
      
@@ -7223,7 +7220,6 @@ class ScoreScene extends Phaser.Scene {
         })
         this.input.keyboard.on('keydown-DOWN', function() {
             stageStats.node.scrollTop += 36;
-            //debugger
         })
         this.input.keyboard.on('keydown-UP', function() {
             stageStats.node.scrollTop -= 36;
@@ -7335,8 +7331,6 @@ class ScoreScene extends Phaser.Scene {
             //scoreAtomsTween.timeScale = 1 //doesn't do anything
         });*/
 
-        //TEMP CODE TO BYPASS
-
         var extraFields = {
             startingScore: ourScoreScene.stageData.calcTotal(),
             rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
@@ -7352,13 +7346,13 @@ class ScoreScene extends Phaser.Scene {
             extraFields.toString(),
             );
         
-            // Event listeners need to be removed manually
+        // Event listeners need to be removed manually
         // Better if possible to do this as part of UIScene clean up
         // As the event is defined there, but this works and its' here. - James
         ourGame.events.off('addScore');
-        ourGame.events.off('spawnBlackholes');
+        //ourGame.events.off('spawnBlackholes');
         
-        this.scene.stop();
+        //this.scene.stop();
 
 
 
@@ -7397,6 +7391,7 @@ class ScoreScene extends Phaser.Scene {
               });
 
             const onContinue = function (scene) {
+                console.log('pressing space inside score scene')
 
                 if (ourGame.stage == 'Tutorial_1') {
                     ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
@@ -7452,7 +7447,7 @@ class ScoreScene extends Phaser.Scene {
                 ourGame.events.off('addScore');
                 ourGame.events.off('spawnBlackholes');
                 
-                this.scene.stop();
+                ourScoreScene.scene.stop();
 
                     
                 if (!gameOver) {
