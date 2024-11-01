@@ -8,6 +8,7 @@ import { Snake } from './classes/Snake.js';
 import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
 import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
+import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 
 
 
@@ -291,7 +292,7 @@ const RANK_BENCHMARKS = new Map([
 
 
 // #region GLOBAL STYLES 
-const STYLE_DEFAULT = {
+export const STYLE_DEFAULT = {
     color: 'white',
     'font-size': '14px',
     'font-family': 'Oxanium',
@@ -432,47 +433,114 @@ class TutorialScene extends Phaser.Scene {
     constructor () {
         super({key: 'TutorialScene', active: false});
     }
-    create() {
+    create(tutorialPanels) {
 
         
         // AUDIO
         this.pop02 = this.sound.add('pop02');
 
+        var panelSpacing = 625;
 
 
-
-
-        // Tutorial Panels
-
+        // delete this
         var tutStyle = {
             "fontSize":'24px',
         }
 
+        var panelContents = [];
+
+
+
+        for (let index = 0; index < tutorialPanels.length; index++) {
+
+            var _map = TUTORIAL_PANELS.get(tutorialPanels[index]).call(this, index);
+
+
+            _map.forEach( array => {
+                panelContents.push(...array)
+            })
+        }
+        
+
+        //var moveFunc = TUTORIAL_PANELS.get("move").bind(this);
+        //var moveMap = moveFunc(0);
+
+        //var moveMap = TUTORIAL_PANELS.get("move").call(1);
+
+        // Tutorial Panels
+
         this.selectedPanel = 1;
 
+        var hOffSet = 570;
 
-        this.tutText1 = this.add.dom(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-             'Press arrow keys to move.',
-        ).setOrigin(0.5,0).setScale(.5).setAlpha(0); // Sets the origin to the middle top.
-        this.tutText2 = this.add.dom(SCREEN_WIDTH + 250, GRID * 9.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-            'Collect atoms to grow longer.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        this.tutText3 = this.add.dom(SCREEN_WIDTH + 250 * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-            'Use portals to bend spacetime.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        this.tutText4 = this.add.dom((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-                'Hold space to sprint.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+
         
-        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
-             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutAll').setAlpha(0);
+         // Sets the origin to the middle top.
+        
+         // Sets the origin to the middle top.
+         // Sets the origin to the middle top.
+         // Sets the origin to the middle top.
+        
 
-        this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
-             SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
+
+        
+
+
+
+
+        
+
+        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) - GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomSmall.play('atom04idle');
+        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) - GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomMedium.play('atom03idle');
+        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) + GRID * 1,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomLarge.play('atom02idle');
+        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomCharged.play('atom01idle');
+        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 1) + GRID * 3,
+            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
+        this.tutAtomElectrons.play('electronIdle');
+
+
+
+        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) - GRID * 2,
+            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal1.play('portalIdle');
+        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) + GRID * 2,
+            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
+        this.tutPortal2.play('portalIdle');
+
+        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) - GRID * 1.5,
+        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
+        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 2) + GRID * 1.5,
+        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
+
+        
+
+        this.tutSPACE = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 3) - GRID * 5.25,
+             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
+        this.tutSPACE.play('tutSpace');
+
+        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * 3),
+        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
+
+        panelContents.push( this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
+         this.tutSPACE,this.tutSnake4,
+        );
+        
+        this.panelsContainer = this.make.container(0, 0);
+        debugger
+        this.panelsContainer.add(panelContents);
+        debugger
+
         this.time.delayedCall(600, event => {
             this.tweens.add({
-                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
+                targets: [...panelContents, this.panelArrowR, this.panelArrowL],
                 alpha: {from: 0, to: 1},
                 duration: 300,
                 ease: 'sine.inout',
@@ -481,92 +549,16 @@ class TutorialScene extends Phaser.Scene {
             });
         });
 
-        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel1.setDepth(100);
-        panel1.setScale(0);
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel1,
-                scale: 1,
-                width: 240,
-                height: 160,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel2.setDepth(100);
-        panel2.setScale(0);
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel2,
-                scale: 1,
-                width: 200,
-                height: 140,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomSmall.play('atom04idle');
-        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomMedium.play('atom03idle');
-        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomLarge.play('atom02idle');
-        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomCharged.play('atom01idle');
-        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomElectrons.play('electronIdle');
-
-        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
-        panel3.setDepth(100);
-
-        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
-            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal1.play('portalIdle');
-        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal2.play('portalIdle');
-
-        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
-        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
-        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
-        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
-
-        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
-        panel4.setDepth(100);
-
-        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
-             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutSPACE.play('tutSpace');
-
-        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
-        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
-
-        this.panels = [];
-        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
-            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
-            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
-            panel4, this.tutText4,this.tutSPACE,this.tutSnake4);
-
-        this.panelsContainer = this.make.container(0, 0);
-        this.panelsContainer.add(this.panels);
-
 
 
         
+        // -james note. Start of create should be here.
         
+
+        tutorialPanels.forEach( key => {
+            //
+        })
+
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
 
@@ -584,6 +576,7 @@ class TutorialScene extends Phaser.Scene {
         
         
         
+        // make this run at the last part.
         this.continueText.setVisible(false)
         if (!this.hasPlayedBefore) {
             //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
@@ -622,24 +615,25 @@ class TutorialScene extends Phaser.Scene {
                 this.selectedPanel += 1
             }
             this.panelContainerX = 0
+            // go to panel center.
             switch (this.selectedPanel){
                 case 1:
-                    this.panelContainerX = 0;
+                    this.panelContainerX = hOffSet * -0;
                     this.panelArrowL.setVisible(false)
                     break;
                 case 2:
                     ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -570;
+                    this.panelContainerX = hOffSet * -1;
                     this.panelArrowL.setVisible(true)
                     break;
                 case 3:
                     ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -1195;
+                    this.panelContainerX = hOffSet * -2;
                     this.panelArrowL.setVisible(true)
                     break;
                 case 4:
                     ourPersist.bgCoords.x = 60;
-                    this.panelContainerX = -1820;
+                    this.panelContainerX = hOffSet * -3;
                     this.panelArrowL.setVisible(true)
                     this.panelArrowR.setVisible(false)
                     this.continueText.setVisible(true)
@@ -664,23 +658,23 @@ class TutorialScene extends Phaser.Scene {
             switch (this.selectedPanel){
                 case 1:
                     ourPersist.bgCoords.x = 0;
-                    this.panelContainerX = 0;
+                    this.panelContainerX = hOffSet * -0;
                     this.panelArrowL.setVisible(false)
                     this.panelArrowR.setVisible(true)
                     break;
                 case 2:
                     ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -570;
+                    this.panelContainerX = hOffSet * -1;
                     this.panelArrowR.setVisible(true)
                     break;
                 case 3:
                     ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1195;
+                    this.panelContainerX = hOffSet * -2;
                     this.panelArrowR.setVisible(true)
                     break;
                 case 4:
                     ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1820;
+                    this.panelContainerX = hOffSet * -3;
                     this.panelArrowR.setVisible(true)
                     break;
             }
@@ -695,11 +689,11 @@ class TutorialScene extends Phaser.Scene {
                 onComplete: function () {
                     
                     if (ourTutorialScene.selectedPanel < 4) {
-                        debugger
+                        //debugger //@holden why are these debuggers here?
                         ourTutorialScene.panelArrowR.setVisible(true);
                     }
                     else{
-                        debugger
+                        //debugger
                         ourTutorialScene.panelArrowR.setVisible(false);
                     }
                     
@@ -1068,18 +1062,17 @@ class StartScene extends Phaser.Scene {
         });
 
 
-        const onInput = function (scene) {
+        const onInput = function (scene) { // @james - something is not right here
             if (scene.continueText.visible === true) {
                 const ourPersist = scene.scene.get('PersistScene');
-        //continueText.on('pointerdown', e =>
-        //{
-        //    this.onInput();
-        //    //ourInput.moveUp(ourGame, "upUI")
-    
-        //});
+                //continueText.on('pointerdown', e =>
+                //{
+                //    this.onInput();
+                //    //ourInput.moveUp(ourGame, "upUI")
             
-            /*
-            }
+                //});
+            
+            /** 
             else {
                                                 
 
@@ -1115,10 +1108,10 @@ class StartScene extends Phaser.Scene {
                     //var ourGameScene = this.scene.get("GameScene");
                     //console.log(e)
                 }
-            });*/
-
+            });
+            */
+            }
         }
-    }
         
         // Shows Local Storage Sizes for Debugging.
 
@@ -1176,7 +1169,6 @@ class StartScene extends Phaser.Scene {
         }
         this.scene.stop();
     }
-    
     end() {
 
     }
@@ -1271,8 +1263,12 @@ class MainMenuScene extends Phaser.Scene {
                 console.log("Practice");
                 return true;
             },
-            'adventure': function () {   
-                thisScene.scene.launch('TutorialScene');
+            'adventure': function () {
+                // Check if played before here. Maybe check for world 0-1 level stage data?
+                thisScene.scene.launch('TutorialScene', ["move", "atoms", "portals", "boost"]);
+
+                //thisScene.scene.launch('TutorialScene', [tutorials.getRandom()]);
+                // now this is expert
                 thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
                 thisScene.scene.stop();
                 return true;
@@ -8436,7 +8432,7 @@ var config = {
     //pixelArt: false, // if not commented out and set to false, will still override scale settings.
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
-        //mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.FIT,
     },
     //parent: 'phaser-example',
     physics: {
