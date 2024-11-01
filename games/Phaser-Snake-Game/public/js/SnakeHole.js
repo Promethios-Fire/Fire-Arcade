@@ -451,23 +451,41 @@ class TutorialScene extends Phaser.Scene {
             "fontSize":'24px',
         }
 
+        this.panelsContainer = this.make.container(0, 0);
         var panelContents = [];
-
-
 
         for (let index = 0; index < tutorialPanels.length; index++) {
 
             var _map = TUTORIAL_PANELS.get(tutorialPanels[index]).call(this, index);
 
-
+            
+            
             _map.forEach( array => {
-                panelContents.push(...array.reverse())
+                panelContents.push(...array)
             })
+
+            //debugger
+            //panelContents.push(containerBuffer);
+            //this.panelsContainer.add(containerBuffer);
+
+            // Manage container depth independantly.
+            //_map.get("panels").forEach( panel => {
+            //    debugger
+            //    index
+            //    this.panelsContainer.sendToBack(panel);
+            //})
+
         }
 
-        this.panelsContainer = this.make.container(0, 0);
         this.panelsContainer.add(panelContents);
 
+        
+        this.panelsContainer.iterate( child=> {
+            if (child.type === "NineSlice") {
+                debugger
+                this.panelsContainer.sendToBack(child)
+            }
+        })
 
         this.selectedPanel = 1;
 

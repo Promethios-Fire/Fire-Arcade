@@ -56,7 +56,7 @@ export var TUTORIAL_PANELS = new Map([
 
 
         let panel1 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel1.setDepth(80);
+        panel1.setDepth(10);
         panel1.setScale(0);
         this.time.delayedCall(500, event => {
             this.tweens.add({
