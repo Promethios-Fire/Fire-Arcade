@@ -16,6 +16,9 @@ var Snake = new Phaser.Class({
         this.body = [];
 
         this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
+        
+        //set snake invisible so it can appear from blackhole
+        this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
 
         this.previous = [];
@@ -272,13 +275,13 @@ var Snake = new Phaser.Class({
                     && scene.length === scene.lengthGoal -1
                  ) {
                     debugger;
-                    console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
+                    //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
 
                  }
                  else{
                     
                     if (scene.interactLayer[__x][__y] instanceof Food) {
-                        console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
+                        //console.log('current length', scene.length, 'length GOAL', scene.lengthGoal)
 
                     }
                     //console.log('SHIFT POSITION')
@@ -326,7 +329,6 @@ var Snake = new Phaser.Class({
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
                 
                 if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
-                    debugger
                     console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
                     scene.warpToNext(index);
                 }
@@ -428,6 +430,7 @@ var Snake = new Phaser.Class({
         if (!scene.stopOnBonk) {
 
             scene.gState = GState.BONK;
+            scene.scene.get("InputScene").moveHistory.push(["BONK"]);
             //console.log(scene.gState, "BONK" , this.direction);
 
             if (!scene.winned) {

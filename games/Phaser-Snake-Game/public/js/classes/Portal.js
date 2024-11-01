@@ -1,4 +1,4 @@
-import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG, PLAYER_STATS } from "../SnakeHole.js";
+import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG, PLAYER_STATS, X_OFFSET, Y_OFFSET } from "../SnakeHole.js";
 
 
 var Portal = new Phaser.Class({
@@ -93,10 +93,10 @@ var Portal = new Phaser.Class({
         var _x = this.target.x;
         var _y = this.target.y;
 
+        
+
         var portalSound = scene.portalSounds[0];
         portalSound.play();
-
-        console.log([this.x, this.y], [_x, _y]);
 
         var _tween = scene.tweens.add({
             targets: scene.snake.body[0], 
@@ -119,6 +119,14 @@ var Portal = new Phaser.Class({
             if (scene.snake.body.length > 2) {
                 this.targetObject.snakePortalingSprite.visible = true;   
             }
+
+
+            scene.scene.get("InputScene").moveHistory.push([
+                [(this.x - X_OFFSET)/GRID, (this.y - Y_OFFSET)/GRID], 
+                [(_x - X_OFFSET)/GRID, (_y - Y_OFFSET)/GRID], 
+                scene.snake.direction
+            ]);
+
 
             // Set last move to now. Fixes Corner Time.
             scene.lastMoveTime = scene.time.now;
