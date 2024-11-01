@@ -460,24 +460,15 @@ class TutorialScene extends Phaser.Scene {
                 panelContents.push(...array.reverse())
             })
         }
-        
 
-        //var moveFunc = TUTORIAL_PANELS.get("move").bind(this);
-        //var moveMap = moveFunc(0);
+        this.panelsContainer = this.make.container(0, 0);
+        this.panelsContainer.add(panelContents);
 
-        //var moveMap = TUTORIAL_PANELS.get("move").call(1);
-
-        // Tutorial Panels
 
         this.selectedPanel = 1;
 
         var hOffSet = 570;
-
         
-        this.panelsContainer = this.make.container(0, 0);
-        debugger
-        this.panelsContainer.add(panelContents);
-        debugger
 
         this.time.delayedCall(600, event => {
             this.tweens.add({
@@ -511,73 +502,78 @@ class TutorialScene extends Phaser.Scene {
                 '[PRESS SPACE TO CONTINUE]',
         ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
         
-        
-        
-        // make this run at the last part.
-        this.continueText.setVisible(false)
-        if (tutorialPanels.length === 1) {
-            this.continueText.setVisible(true) //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
-        }
-        
-        this.tweens.add({
-            targets: this.continueText,
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 1000,
-            repeat: -1,
-            yoyo: true
-        });
-        
-        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowR.play('startArrowIdle').setAlpha(0);
-        this.panelArrowR.angle = 90;
-        
-        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowL.play('startArrowIdle');
-        this.panelArrowL.angle = 270;
-        this.panelArrowL.setVisible(false).setAlpha(0);
+        this.continueText.setVisible(false);
 
-        this.input.keyboard.on('keydown-RIGHT', e => {
+        if (tutorialPanels.length === 1) {
+            // Change this to a tween. That works a bit like a loading bar.
+            this.continueText.setVisible(true) //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+        } else {
+            this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+            this.panelArrowR.play('startArrowIdle');
+            this.panelArrowR.angle = 90;
+            this.panelArrowR.setAlpha(0);
             
-            const ourTutorialScene = this.scene.get('TutorialScene');
-            const ourPersist = this.scene.get('PersistScene');
-            if (this.selectedPanel < 4) {
-                this.pop02.play();
-                this.selectedPanel += 1
-            }
-            this.panelContainerX = 0
-            // go to panel center.
-            switch (this.selectedPanel){
-                case 1:
-                    this.panelContainerX = hOffSet * -0;
-                    this.panelArrowL.setVisible(false)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = hOffSet * -1;
-                    this.panelArrowL.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = hOffSet * -2;
-                    this.panelArrowL.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x = 60;
-                    this.panelContainerX = hOffSet * -3;
-                    this.panelArrowL.setVisible(true)
-                    this.panelArrowR.setVisible(false)
-                    this.continueText.setVisible(true)
-                    break;
-            }
+            this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+            this.panelArrowL.play('startArrowIdle');
+            this.panelArrowL.angle = 270;
+            this.panelArrowL.setVisible(false).setAlpha(0);
+
+            this.containorToX = 0;
             
-            this.tweens.add({
-                targets: this.panelsContainer,
-                x: this.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-            });   
-        }, this)
+            this.input.keyboard.on('keydown-RIGHT', e => {
+                const ourPersist = this.scene.get('PersistScene');
+                if (this.selectedPanel < 4) {
+                    this.pop02.play();
+                    this.selectedPanel += 1
+                }
+
+                var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
+
+
+                this.containorToX = Math.max(this.containorToX - hOffSet, endX);
+                
+                switch (this.containorToX) {
+                    case 0: // Start Panel
+                        this.panelArrowL.setVisible(false);
+                        ourPersist.bgCoords.x += 20;
+                        break
+                    case endX: // End Panel
+                        this.panelArrowR.setVisible(false);
+                        
+                        if (!this.continueText.visible) {
+                            this.tweens.add({
+                                targets: this.continueText,
+                                alpha: { from: 0, to: 1 },
+                                ease: 'Sine.InOut',
+                                duration: 1000,
+                                repeat: -1,
+                                yoyo: true
+                            });   
+                        }
+
+                        this.continueText.setVisible(true);
+                        
+                        break
+                    default: // Middle Panel
+                        this.panelArrowL.setVisible(true);
+                        this.panelArrowR.setVisible(true);
+                        ourPersist.bgCoords.x += 20;
+                        break
+                }
+                
+                this.tweens.add({
+                    targets: this.panelsContainer,
+                    x: this.containorToX,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                });   
+            }, this);
+        }
+    
+        
+
+
+        
         this.input.keyboard.on('keydown-LEFT', e => {
             const ourTutorialScene = this.scene.get('TutorialScene');
             const ourPersist = this.scene.get('PersistScene');

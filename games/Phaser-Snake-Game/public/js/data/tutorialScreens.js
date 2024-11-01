@@ -32,8 +32,6 @@ export var TUTORIAL_PANELS = new Map([
         // 640
         
         var _map = structuredClone(defaultMap);
-
-        debugger
         
 
         var Text1 = this.add.dom(
@@ -91,7 +89,6 @@ export var TUTORIAL_PANELS = new Map([
         var _map = structuredClone(defaultMap);
 
 
-        debugger
         const panel2 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
         panel2.setDepth(80);
         panel2.setScale(0);
@@ -144,7 +141,6 @@ export var TUTORIAL_PANELS = new Map([
     ["portals", function (panelNumber) {
         var _map = structuredClone(defaultMap);
 
-        debugger
         const panel3 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
         panel3.setDepth(80);
         
@@ -175,7 +171,6 @@ export var TUTORIAL_PANELS = new Map([
     ["boost", function (panelNumber) {
         var _map = structuredClone(defaultMap);
 
-        debugger
         const panel4 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
         panel4.setDepth(80);
 
