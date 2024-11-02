@@ -33,7 +33,6 @@ export var QUICK_MENUS = new Map([
     ])],
     ["tab-menu", new Map([
         ['REDO STAGE (- 1 Coin)', function () {
-            debugger
             const ourGameScene = this.scene.get("GameScene");
 
 

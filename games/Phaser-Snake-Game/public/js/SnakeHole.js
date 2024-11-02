@@ -1249,6 +1249,11 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuElements[this.cursorIndex].node.style.color = "white";
         }, this);
 
+
+        this.input.keyboard.on('keydown-TAB', function() {
+            this.scene.sleep("QuickMenuScene");
+        }, this);
+
         
 
         // #endregion
