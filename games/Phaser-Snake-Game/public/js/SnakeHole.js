@@ -464,8 +464,6 @@ class TutorialScene extends Phaser.Scene {
 
             // make different sections addressible later.
             panelsArray[index] = _map;
-
-            // Squish everything into the container
             
             panelContents.push(
                 ..._map.get("text"), 
@@ -486,7 +484,6 @@ class TutorialScene extends Phaser.Scene {
         })
 
         panelsArray.forEach( map => {
-            debugger
             var growTarget = map.get("growPanelTo")
             this.tweens.add({
                 targets: map.get("panels"),
@@ -506,18 +503,8 @@ class TutorialScene extends Phaser.Scene {
         panelContents.forEach( item => {
             item.alpha = 0;
         })
-        
-        this.tweens.add({
-            targets: [...panelContents, this.panelArrowR, this.panelArrowL],
-            alpha: {from: 0, to: 1},
-            duration: 500,
-            ease: 'sine.inout',
-            yoyo: false,
-            delay: 300,
-            repeat: 0,
-        });
-        
 
+        
 
 
         
@@ -539,11 +526,26 @@ class TutorialScene extends Phaser.Scene {
                 '[PRESS SPACE TO CONTINUE]',
         ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
         
-        this.continueText.setVisible(false);
+        this.continueText.setVisible(false).setAlpha(0);
 
         if (tutorialPanels.length === 1) {
             // Change this to a tween. That works a bit like a loading bar.
-            this.continueText.setVisible(true) //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
+            //this.continueText.setVisible(true);
+            //if (!this.continueText.visible) {
+                this.tweens.add({
+                    targets: this.continueText,
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    delay: 1000,
+                    repeat: -1,
+                    yoyo: true,
+                    onStart: () =>  {
+                        debugger
+                        this.continueText.setVisible(true);
+                    }
+                });   
+            //}
         } else {
             this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
             this.panelArrowR.play('startArrowIdle');
@@ -659,7 +661,6 @@ class TutorialScene extends Phaser.Scene {
                     });
                 }
 
-                debugger
                 this.containorToX = Math.min(this.containorToX + hOffSet, 0);
 
                 // All the way left
@@ -695,6 +696,18 @@ class TutorialScene extends Phaser.Scene {
             }, this)
 
         }
+
+        // Fade Everything In
+
+        this.tweens.add({
+            targets: [...panelContents, this.panelArrowR, this.panelArrowL],
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'sine.inout',
+            yoyo: false,
+            delay: 300,
+            repeat: 0,
+        });
 
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
@@ -1231,7 +1244,7 @@ class MainMenuScene extends Phaser.Scene {
             },
             'adventure': function () {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
-                thisScene.scene.launch('TutorialScene', [ "move", "atoms"]); // ["move", "atoms", "portals" , "boost"]
+                thisScene.scene.launch('TutorialScene', ["move"]); // ["move", "atoms", "portals" , "boost"]
 
                 //thisScene.scene.launch('TutorialScene', [tutorials.getRandom()]);
                 // now this is expert
