@@ -541,7 +541,6 @@ class TutorialScene extends Phaser.Scene {
                     repeat: -1,
                     yoyo: true,
                     onStart: () =>  {
-                        debugger
                         this.continueText.setVisible(true);
                     }
                 });   
@@ -1244,7 +1243,16 @@ class MainMenuScene extends Phaser.Scene {
             },
             'adventure': function () {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
-                thisScene.scene.launch('TutorialScene', ["move"]); // ["move", "atoms", "portals" , "boost"]
+
+                if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+                    var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+                    thisScene.scene.launch('TutorialScene', [randomHowTo]);
+                } else {
+                    thisScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
+                }
+
+                
+                 // 
 
                 //thisScene.scene.launch('TutorialScene', [tutorials.getRandom()]);
                 // now this is expert
