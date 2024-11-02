@@ -439,41 +439,36 @@ class TutorialScene extends Phaser.Scene {
     }
     create(tutorialPanels) {
 
-        
         // AUDIO
         this.pop02 = this.sound.add('pop02');
-
-        var panelSpacing = 625;
-
 
         // delete this
         var tutStyle = {
             "fontSize":'24px',
         }
 
-        this.panelsContainer = this.make.container(0, 0);
+        var panelsArray = [];
+        this.selectedPanel = 0;
+
+        var hOffSet = 570;
+        var fadeOut = 150;
+        var fadeInDelay = 250;
+        var fadeIn = 400;
+
+        this.panelsContainer = this.make.container(0, 0).setDepth(200);
         var panelContents = [];
 
         for (let index = 0; index < tutorialPanels.length; index++) {
 
             var _map = TUTORIAL_PANELS.get(tutorialPanels[index]).call(this, index);
 
-            
-            
+            // make different sections addressible later.
+            panelsArray[index] = _map;
+
+            // Squish everything into the container
             _map.forEach( array => {
                 panelContents.push(...array)
             })
-
-            //debugger
-            //panelContents.push(containerBuffer);
-            //this.panelsContainer.add(containerBuffer);
-
-            // Manage container depth independantly.
-            //_map.get("panels").forEach( panel => {
-            //    debugger
-            //    index
-            //    this.panelsContainer.sendToBack(panel);
-            //})
 
         }
 
@@ -482,14 +477,13 @@ class TutorialScene extends Phaser.Scene {
         
         this.panelsContainer.iterate( child=> {
             if (child.type === "NineSlice") {
-                debugger
                 this.panelsContainer.sendToBack(child)
             }
         })
 
-        this.selectedPanel = 1;
 
-        var hOffSet = 570;
+        
+        
         
 
         this.time.delayedCall(600, event => {
@@ -544,9 +538,32 @@ class TutorialScene extends Phaser.Scene {
             
             this.input.keyboard.on('keydown-RIGHT', e => {
                 const ourPersist = this.scene.get('PersistScene');
-                if (this.selectedPanel < 4) { // @holden this needs to be changed
+                if (this.selectedPanel < tutorialPanels.length - 1) { // @holden this needs to be changed
+                    
+                    // Fade Out Old Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 1, to: 0 },
+                        ease: 'Sine.InOut',
+                        //delay: 500,
+                        duration: fadeOut,
+                        
+                    });
+                    
                     this.pop02.play();
-                    this.selectedPanel += 1
+                    this.selectedPanel += 1;
+
+                    panelsArray[this.selectedPanel].get("text").forEach( text => {
+                        text.alpha = 0;
+                    })
+                    // Fade In New Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        delay: fadeInDelay,
+                        duration: fadeIn,
+                    });
                 }
 
                 var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
@@ -592,9 +609,33 @@ class TutorialScene extends Phaser.Scene {
 
             this.input.keyboard.on('keydown-LEFT', e => {
                 const ourPersist = this.scene.get('PersistScene');
-                if (this.selectedPanel > 1) {
+                if (this.selectedPanel > 0) {
+
+                    // Fade Out Current Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 1, to: 0 },
+                        ease: 'Sine.InOut',
+                        //delay: 500,
+                        duration: fadeOut,
+                        
+                    });
+
                     this.selectedPanel -= 1
                     this.pop02.play();
+
+                    // Fade In Current Text
+                    panelsArray[this.selectedPanel].get("text").forEach( text => {
+                        text.alpha = 0;
+                    })
+                    // Fade In New Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        delay: fadeInDelay,
+                        duration: fadeIn,
+                    });
                 }
 
                 debugger
