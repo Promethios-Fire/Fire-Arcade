@@ -367,7 +367,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -1161,34 +1161,34 @@ class QuickMenuScene extends Phaser.Scene {
     preload(){
 
     }
-    create(menuOptions, qmPrompt){
+    create(qMenuArgs){
 
         // #region Quick Menu
+        this.menuOptions = qMenuArgs.menuOptions;
 
         var menuTop = SCREEN_HEIGHT/2 - GRID * 2.5;
+        this.menuList = [...this.menuOptions.keys()];
+        this.cursorIndex = qMenuArgs.cursorIndex;
+        var _textStart = menuTop + GRID * 3;
+        var _spacing = 20;
+        this.menuElements = [];
 
         this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuTop + GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
             "fontWeight": 400,
             "color": "white",
         }),
-            `${qmPrompt}`
-        ).setOrigin(0.5,0).setScale(0.5).setAlpha(0);
+            `${qMenuArgs.textPrompt}`
+        ).setOrigin(0.5,0).setScale(0.5).setAlpha(1);
+
+        var panelHeight = (2 * _spacing * (this.menuList.length - 1)) + _spacing * 0.75;
 
         //nineSlice
         this.qPanel = this.add.nineslice(SCREEN_WIDTH/2, menuTop, 
             'uiPanelL', 'Glass', 
-            GRID * 19 + 1, GRID * 10, 
+            GRID * 19 + 1, panelHeight , 
             8, 8, 8, 8);
-        this.qPanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0).setVisible(false);
-
-        this.menuOptions = menuOptions;
-        
-        this.menuList = [...this.menuOptions.keys()];
-        this.cursorIndex = 1;
-        var _textStart = menuTop + GRID * 3;
-        var _spacing = 20;
-        this.menuElements = [];
+        this.qPanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0).setVisible(true);
 
         
         if (this.menuElements.length < 1) {
@@ -1201,7 +1201,7 @@ class QuickMenuScene extends Phaser.Scene {
                         "color": "white",
                     }),
                         `${this.menuList[index].toUpperCase()}`
-                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
                 }
                 else{
                     var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1210,7 +1210,7 @@ class QuickMenuScene extends Phaser.Scene {
                         "color": "darkgrey",
                     }),
                             `${this.menuList[index].toUpperCase()}`
-                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
                 }
     
                 
@@ -1219,6 +1219,37 @@ class QuickMenuScene extends Phaser.Scene {
                 
             } 
         }
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            var option = this.menuList[this.cursorIndex];
+                this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
+        }, this);
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            // Reset all menu elements to dark grey
+            //this.menuElements.forEach((element, index) => {
+            //    element.node.style.color = "darkgrey";
+            //});
+
+            //var _selected = this.menuElements[this.cursorIndex];
+            //_selected.node.style.color = "white";
+        
+            this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
+            this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex + 1, 0, this.menuElements.length)
+            this.menuElements[this.cursorIndex].node.style.color = "white";
+            
+
+            
+            // Set the selected element to white
+        }, this);
+
+        this.input.keyboard.on('keydown-UP', function() {
+            this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
+            this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex - 1, 0, this.menuElements.length)
+            this.menuElements[this.cursorIndex].node.style.color = "white";
+        }, this);
+
+        
 
         // #endregion
 
@@ -1272,7 +1303,7 @@ class MainMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
-        const thisScene = this.scene.get('MainMenuScene');
+        const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
@@ -1318,27 +1349,28 @@ class MainMenuScene extends Phaser.Scene {
             ['adventure', function () {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
+                
+
                 var qMenu = QUICK_MENUS.get("adventure-mode");
 
+                
+                mainMenuScene.scene.launch("QuickMenuScene", {
+                    menuOptions: qMenu, 
+                    textPrompt: "MODE SELECTOR",
+                    fromScene: mainMenuScene,
+                    cursorIndex: 0
+                });
+                mainMenuScene.scene.bringToTop("QuickMenuScene");
 
-                console.log("I DID IT")
+                mainMenuScene.scene.sleep('MainMenuScene');
 
 
-
+                console.log("I DID IT");
 
 
 
                 /*
-                if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
-                    var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-                    thisScene.scene.launch('TutorialScene', [randomHowTo]);
-                } else {
-                    thisScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
-                }
 
-
-                thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
-                thisScene.scene.stop();
                 */
                 return true;
             }],
@@ -1465,7 +1497,7 @@ class MainMenuScene extends Phaser.Scene {
             if (this.pressedSpace && this.menuState == 0) {
                 this.cameras.main.scrollX -= SCREEN_WIDTH
                 ourMap.cameras.main.scrollX -= SCREEN_WIDTH
-                thisScene.scene.sleep('MainMenuScene');
+                mainMenuScene.scene.sleep('MainMenuScene');
                 this.menuState = 1;
             }
         });
@@ -1473,14 +1505,14 @@ class MainMenuScene extends Phaser.Scene {
             if (this.pressedSpace && this.menuState == 1) {
                 this.cameras.main.scrollX += SCREEN_WIDTH
                 ourMap.cameras.main.scrollX += SCREEN_WIDTH
-                thisScene.scene.wake('MainMenuScene');
+                mainMenuScene.scene.wake('MainMenuScene');
                 this.menuState = 0;
             }
         });
     
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            if (thisScene.pressedSpace) {
+            if (mainMenuScene.pressedSpace) {
                 
 
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
@@ -1495,9 +1527,9 @@ class MainMenuScene extends Phaser.Scene {
                 if (cursorIndex == 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
-                    thisScene.exitButton.setFrame(1);
+                    mainMenuScene.exitButton.setFrame(1);
                 } else {
-                    thisScene.exitButton.setFrame(0);
+                    mainMenuScene.exitButton.setFrame(0);
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = selected.y + 7
                 }
@@ -1517,7 +1549,7 @@ class MainMenuScene extends Phaser.Scene {
                 
                 ourPersist.bgCoords.y += 5;
                 
-                thisScene.changeMenuSprite(cursorIndex);
+                mainMenuScene.changeMenuSprite(cursorIndex);
                 //upArrow.y = selected.y - 42;
                 //downArrow.y = selected.y + 32;
 
@@ -1527,7 +1559,7 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            if (thisScene.pressedSpace) {
+            if (mainMenuScene.pressedSpace) {
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
                     selected.node.style.color = 'darkgrey';
                 }
@@ -1540,9 +1572,9 @@ class MainMenuScene extends Phaser.Scene {
                 if (cursorIndex == 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
-                    thisScene.exitButton.setFrame(1);
+                    mainMenuScene.exitButton.setFrame(1);
                 } else {
-                    thisScene.exitButton.setFrame(0);
+                    mainMenuScene.exitButton.setFrame(0);
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = selected.y + 7
                 }
@@ -1561,7 +1593,7 @@ class MainMenuScene extends Phaser.Scene {
     
                 ourPersist.bgCoords.y -= 5;
     
-                thisScene.changeMenuSprite(cursorIndex);
+                mainMenuScene.changeMenuSprite(cursorIndex);
             }
         }, [], this);
 
@@ -1608,10 +1640,10 @@ class MainMenuScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-            if (!thisScene.pressedSpace) {
-                thisScene.pressToPlayTween.stop();
-                thisScene.pressToPlay.setAlpha(0)
-                thisScene.pressedSpace = true;
+            if (!mainMenuScene.pressedSpace) {
+                mainMenuScene.pressToPlayTween.stop();
+                mainMenuScene.pressToPlay.setAlpha(0)
+                mainMenuScene.pressedSpace = true;
                 titleTween.resume();
                 menuFadeTween.resume();            
             }
@@ -3230,6 +3262,15 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+
+        this.input.keyboard.on('keydown-TAB', function() {
+            this.scene.launch("QuickMenuScene", {
+                menuOptions: QUICK_MENUS.get("tab-menu"), 
+                textPrompt: "Quick Menu",
+                fromScene: this,
+                cursorIndex: 1
+            });
+        }, this);
 
         
         this.blackholes = [];

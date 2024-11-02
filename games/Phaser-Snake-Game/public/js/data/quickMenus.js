@@ -1,5 +1,5 @@
-import { PLAYER_STATS, RANKS } from "../SnakeHole.js";
-
+import { PLAYER_STATS, RANKS, START_STAGE } from "../SnakeHole.js";
+import { TUTORIAL_PANELS } from "./tutorialScreens.js";
 
 export var QUICK_MENUS = new Map([
     /*
@@ -9,43 +9,33 @@ export var QUICK_MENUS = new Map([
     ])]
     */
     ["adventure-mode", new Map([
+        ["Back to Menu", function () {
+            this.scene.wake('MainMenuScene');
+            this.scene.stop("QuickMenuScene");
+
+        }],
         ["Adventure", function () {
+            const mainMenuScene = this.scene.get("MainMenuScene");
+
+            if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+                var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+                mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+            } else {
+                mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
+            }
+
+            mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+            this.scene.stop();
+        }],
+        ["Expert", function () {
             // Do Stuff
         }],
     ])],
     ["tab-menu", new Map([
-        ['BACK TO MAIN MENU', function () {
-            // hide the extract prompt
-            ourGameScene.menuElements.forEach(textElement =>{
-                textElement.setAlpha(0);
-            });
-            ourGameScene.promptText.setAlpha(0);
-            ourGameScene.qPanel.setVisible(false);
-            console.log("BACK TO MAIN MENU");
-
-            // Clear for reseting game
-            ourGame.events.off('addScore');
-            ourGame.events.off('spawnBlackholes');
-            
-            ourGameScene.scene.start("MainMenuScene");
-            return true;
-        }],
-        [`RETURN TO STAGE`, function () {  
-            // hide the extract prompt
-            ourGameScene.menuElements.forEach(textElement =>{
-                textElement.setAlpha(0);
-            });
-            ourGameScene.promptText.setAlpha(0);
-            ourGameScene.qPanel.setVisible(false);
-            // show the level labels again 
-            console.log("RETURN TO STAGE");
-        }],
         ['REDO STAGE (- 1 Coin)', function () {
-            ourGameScene.menuElements.forEach(textElement =>{
-                textElement.setAlpha(0);
-            });
-            ourGameScene.promptText.setAlpha(0);
-            ourGameScene.qPanel.setVisible(false);
+            debugger
+            const ourGameScene = this.scene.get("GameScene");
+
 
             if (ourGameScene.scene.get("PersistScene").coins > 0) {
 
@@ -53,30 +43,30 @@ export var QUICK_MENUS = new Map([
                 ourGameScene.scene.get("PersistScene").loseCoin();
                 
                 // Clear for reseting game
-                ourGame.events.off('addScore');
-                ourGame.events.off('spawnBlackholes');
+                ourGameScene.events.off('addScore');
+                ourGameScene.events.off('spawnBlackholes');
 
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
                     //lives: this.lives 
-            });
+                });
             }
-
-            
+            this.scene.stop();  
 
         }],
+        [`RETURN TO STAGE`, function () {  
+            console.log("RETURN TO STAGE");
+            this.scene.stop(); 
+        }],
         ['RESTART ADVENTURE', function () {
+            const ourGameScene = this.scene.get("GameScene");
             // TODO: send to origin
-            ourGameScene.menuElements.forEach(textElement =>{
-                textElement.setAlpha(0);
-            });
-            ourGameScene.promptText.setAlpha(0);
-            ourGameScene.qPanel.setVisible(false);
+
 
             // Clear for reseting game
-            ourGame.events.off('addScore');
-            ourGame.events.off('spawnBlackholes');
+            ourGameScene.events.off('addScore');
+            ourGameScene.events.off('spawnBlackholes');
             
             // Restart  
             ourGameScene.scene.start("GameScene", {
@@ -84,6 +74,21 @@ export var QUICK_MENUS = new Map([
                 score: 0,
                 startupAnim: true,
             });
+
+            this.scene.stop(); 
+            return true;
+        }],
+        ['BACK TO MAIN MENU', function () {
+            const ourGameScene = this.scene.get("GameScene");
+
+            console.log("BACK TO MAIN MENU");
+
+            // Clear for reseting game
+            ourGameScene.events.off('addScore');
+            ourGameScene.events.off('spawnBlackholes');
+            
+            ourGameScene.scene.start("MainMenuScene");
+            this.scene.stop(); 
             return true;
         }],
     ])],
