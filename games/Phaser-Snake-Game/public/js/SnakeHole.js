@@ -9,6 +9,7 @@ import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
 import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
+import { QUICK_MENUS } from './data/quickMenus.js';
 
 
 
@@ -1152,6 +1153,79 @@ class StartScene extends Phaser.Scene {
     }
 }
 
+
+class QuickMenuScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'QuickMenuScene', active: false});
+    }
+    preload(){
+
+    }
+    create(menuOptions, qmPrompt){
+
+        // #region Quick Menu
+
+        var menuTop = SCREEN_HEIGHT/2 - GRID * 2.5;
+
+        this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuTop + GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${qmPrompt}`
+        ).setOrigin(0.5,0).setScale(0.5).setAlpha(0);
+
+        //nineSlice
+        this.qPanel = this.add.nineslice(SCREEN_WIDTH/2, menuTop, 
+            'uiPanelL', 'Glass', 
+            GRID * 19 + 1, GRID * 10, 
+            8, 8, 8, 8);
+        this.qPanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0).setVisible(false);
+
+        this.menuOptions = menuOptions;
+        
+        this.menuList = [...this.menuOptions.keys()];
+        this.cursorIndex = 1;
+        var _textStart = menuTop + GRID * 3;
+        var _spacing = 20;
+        this.menuElements = [];
+
+        
+        if (this.menuElements.length < 1) {
+            for (let index = 0; index < this.menuList.length; index++) {   
+                if (index === this.cursorIndex) {
+                    console.log('adding');
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.menuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.menuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+                }
+    
+                
+                this.menuElements.push(textElement);
+                
+                
+            } 
+        }
+
+        // #endregion
+
+
+    }
+}
+
 // #region MainMenuScene
 class MainMenuScene extends Phaser.Scene {
     constructor () {
@@ -1236,14 +1310,25 @@ class MainMenuScene extends Phaser.Scene {
 
 
 
-        var menuOptions = {
-            'practice': function () {
+        var menuOptions = new Map([
+            ['practice', function () {
                 console.log("Practice");
                 return true;
-            },
-            'adventure': function () {
+            }],
+            ['adventure', function () {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
+                var qMenu = QUICK_MENUS.get("adventure-mode");
+
+
+                console.log("I DID IT")
+
+
+
+
+
+
+                /*
                 if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
                     var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                     thisScene.scene.launch('TutorialScene', [randomHowTo]);
@@ -1251,39 +1336,36 @@ class MainMenuScene extends Phaser.Scene {
                     thisScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
                 }
 
-                
-                 // 
 
-                //thisScene.scene.launch('TutorialScene', [tutorials.getRandom()]);
-                // now this is expert
                 thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
                 thisScene.scene.stop();
+                */
                 return true;
-            },
-            'extraction': function () {
+            }],
+            ['extraction', function () {
                 return true;
-            },
-            'championship': function () {
+            }],
+            ['championship', function () {
                 return true;
-            },
-            'gauntlet': function () {
+            }],
+            ['gauntlet', function () {
                 return true;
-            },
-            'endless': function () {
+            }],
+            ['endless', function () {
                 return true;
-            },
-            'extras': function () {
+            }],
+            ['extras', function () {
                 return true;
-            },
-            'options': function () {
+            }],
+            ['options', function () {
                 return true;
-            },
-            'exit': function () {
+            }],
+            ['exit', function () {
                 return true;
-            },
-        }
+            }]
+        ]);
 
-        var menuList = Object.keys(menuOptions);
+        var menuList = [...menuOptions.keys()];
         var cursorIndex = 1;
         var textStart = 152;
         var spacing = 24;
@@ -1534,7 +1616,7 @@ class MainMenuScene extends Phaser.Scene {
                 menuFadeTween.resume();            
             }
             else{
-                console.log(menuOptions[menuList[cursorIndex]].call());
+                menuOptions.get(menuList[cursorIndex]).call();
             }
 
         });
@@ -8447,7 +8529,7 @@ var config = {
     },
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
-    scene: [ StartScene, MainMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TutorialScene]
+    scene: [ StartScene, MainMenuScene, QuickMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TutorialScene]
 };
 
 // #region Screen Settings
