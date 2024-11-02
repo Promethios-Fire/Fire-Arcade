@@ -466,9 +466,13 @@ class TutorialScene extends Phaser.Scene {
             panelsArray[index] = _map;
 
             // Squish everything into the container
-            _map.forEach( array => {
-                panelContents.push(...array)
-            })
+            
+            panelContents.push(
+                ..._map.get("text"), 
+                ..._map.get("images"), 
+                ..._map.get("panels") 
+            );
+            
 
         }
 
@@ -481,21 +485,38 @@ class TutorialScene extends Phaser.Scene {
             }
         })
 
-
-        
-        
-        
-
-        this.time.delayedCall(600, event => {
+        panelsArray.forEach( map => {
+            debugger
+            var growTarget = map.get("growPanelTo")
             this.tweens.add({
-                targets: [...panelContents, this.panelArrowR, this.panelArrowL],
-                alpha: {from: 0, to: 1},
+                targets: map.get("panels"),
+                scale: 1,
+                width: growTarget.w,
+                height: growTarget.h,
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
+                delay:200,
                 repeat: 0,
             });
+        })
+
+
+        // Defaults everything to invisible so you don't need to remember to set in TUTORIAL_PANELS .
+        panelContents.forEach( item => {
+            item.alpha = 0;
+        })
+        
+        this.tweens.add({
+            targets: [...panelContents, this.panelArrowR, this.panelArrowL],
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'sine.inout',
+            yoyo: false,
+            delay: 300,
+            repeat: 0,
         });
+        
 
 
 
@@ -1210,7 +1231,7 @@ class MainMenuScene extends Phaser.Scene {
             },
             'adventure': function () {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
-                thisScene.scene.launch('TutorialScene', ["move", "atoms", "portals", "boost"]);
+                thisScene.scene.launch('TutorialScene', [ "move", "atoms"]); // ["move", "atoms", "portals" , "boost"]
 
                 //thisScene.scene.launch('TutorialScene', [tutorials.getRandom()]);
                 // now this is expert
