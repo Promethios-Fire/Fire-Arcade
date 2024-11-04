@@ -365,7 +365,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -4754,13 +4754,18 @@ class GameScene extends Phaser.Scene {
                 child.setScrollFactor(1);
             });
 
+            this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            .setDepth(100);
+            this.atomComet.play('atomCometSpawn');
+            this.atomComet.chain(['atomCometIdle']);
+
+
+            
+
             // rainbow electronFanfare
             this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
             this.electronFanfare.play('electronFanfareForm');
-            /*this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            this.atomComet.play('atomCometSpawn');*/
             
 
             // emit stars from electronFanfare
@@ -4889,34 +4894,37 @@ class GameScene extends Phaser.Scene {
                     this.gState = GState.PLAY;
                 }
             });
-            this.tweens.add({ //slower one-off snakeEating tween
-                targets: this.snake.body, 
-                scale: [1.25,1],
-                yoyo: false,
-                duration: 128,
-                ease: 'Linear',
-                repeat: 0,
-                timeScale: slowMoValCopy,
-                delay: this.tweens.stagger(this.speedSprint),
-                onUpdate: (tween) => {
-                    this.timeScale = slowMoValCopy /2;
-                }
-            });
+        this.tweens.add({ //slower one-off snakeEating tween
+            targets: this.snake.body, 
+            scale: [1.25,1],
+            yoyo: false,
+            duration: 128,
+            ease: 'Linear',
+            repeat: 0,
+            timeScale: slowMoValCopy,
+            delay: this.tweens.stagger(this.speedSprint),
+            onUpdate: (tween) => {
+                this.timeScale = slowMoValCopy /2;
+            }
+        });
+
+        // Atomic Comet and Electron Fanfare
+        
         
         if (this.electronFanfare) {
             this.electronFanfare.on('animationcomplete', (animation, frame) => {
                 if (animation.key === 'electronFanfareForm') {
                     this.tweens.add({
-                        targets: this.electronFanfare,
+                        targets: [this.electronFanfare,this.atomComet],
                         x: ourSpaceBoy.scoreFrame.getCenter().x -3,
                         y: ourSpaceBoy.scoreFrame.getCenter().y,
                         ease: 'Sine.easeIn',
                         duration: 1250,
-                        delay: 0,
                         onComplete: () => {
                             ourGame.countDown.setAlpha(1);
                             ourGame.countDown.x = X_OFFSET + GRID * 4 - 3;
                             ourGame.countDown.y = 3;
+                            this.atomComet.destroy();
                         }
                     });
                             ourGame.countDown.setHTML('W1N');
@@ -4926,21 +4934,6 @@ class GameScene extends Phaser.Scene {
             });
 
             this.electronFanfare.chain(['electronFanfareIdle']);
-        }
-        if (this.atomComet) {
-            this.atomComet.on('animationcomplete', (animation, frame) => {
-                console.log('COMET')
-                if (animation.key === 'atomCometSpawn') {
-                    this.tweens.add({
-                        targets: this.atomComet,
-                        x: ourSpaceBoy.scoreFrame.getCenter().x -3,
-                        y: ourSpaceBoy.scoreFrame.getCenter().y,
-                        ease: 'Sine.easeIn',
-                        duration: 1000,
-                    });
-                }
-            });
-            
         }
         
 
