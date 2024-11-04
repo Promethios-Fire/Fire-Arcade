@@ -365,7 +365,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-const START_STAGE = 'World_1-4'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -2486,7 +2486,9 @@ class GameScene extends Phaser.Scene {
        
         //this.shadowFX = this.snake.head.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
-        
+        // #region Next Layer
+        this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
+        this.nextStagePortalLayer.visible = false;
 
         this.tiledProperties = new Map();
 
@@ -3192,10 +3194,7 @@ class GameScene extends Phaser.Scene {
 
                 // #region Layer: Next
                 if (this.map.getLayer('Next')) {
-
-                    
-                    this.nextStagePortalLayer = this.map.createLayer('Next', [this.tileset], X_OFFSET, Y_OFFSET);
-                    
+                    this.nextStagePortalLayer.visible = true;
                     
                     var blackholeTileIndex = 641; // Starting First column in the row.
                     this.extractLables = [];
@@ -4739,7 +4738,13 @@ class GameScene extends Phaser.Scene {
         let initialCameraX = this.cameras.main.scrollX;
         let initialCameraY = this.cameras.main.scrollY
 
-        if (this.stage === "World_1-4") { //check if we're on last stage -- using placeholder code
+        debugger;
+        if (!this.nextStagePortalLayer.findByIndex(641)){ //check if we're on last stage -- using placeholder code, right now always defaults to true
+            //normal ending
+
+        }
+        else{
+            //fanfare ending
             // Set scrollFactor to 1 for all game objects
             // Get all game objects in the scene
             this.children.list.forEach((child) => {
@@ -4754,13 +4759,12 @@ class GameScene extends Phaser.Scene {
                 child.setScrollFactor(1);
             });
 
+            // atomic comet
             this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
             this.atomComet.play('atomCometSpawn');
             this.atomComet.chain(['atomCometIdle']);
 
-
-            
 
             // rainbow electronFanfare
             this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
@@ -4779,7 +4783,6 @@ class GameScene extends Phaser.Scene {
             }).setFrequency(150,[1]).setDepth(1);
 
             ourGame.countDown.setAlpha(0);
-
         }
             
        
@@ -4843,7 +4846,9 @@ class GameScene extends Phaser.Scene {
                 },
                 onComplete: () => {
                     console.log('Slow motion effect completed');
-
+                    /*if (this.extractHole.length > 0) {
+                        
+                    }*/
                     if (this.starEmitterFinal) {
                         this.hsv = Phaser.Display.Color.HSVColorWheel();
                         const spectrum = Phaser.Display.Color.ColorSpectrum(360);
@@ -4908,9 +4913,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        // Atomic Comet and Electron Fanfare
-        
-        
+        // Atomic Comet and Electron Fanfare Tween
         if (this.electronFanfare) {
             this.electronFanfare.on('animationcomplete', (animation, frame) => {
                 if (animation.key === 'electronFanfareForm') {

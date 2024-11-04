@@ -40,15 +40,12 @@ var Food = new Phaser.Class({
     },
 
     onOver: function(scene) {
-        
         if (scene.length < scene.lengthGoal -1) {
             scene.snakeEating();
         }
         var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         
         if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup
-
-            
 
             scene.snake.head.x = scene.snake.previous[0];
             scene.snake.head.y = scene.snake.previous[1];
@@ -63,12 +60,10 @@ var Food = new Phaser.Class({
                 x: _x,
                 y: _y,
                 duration: 1000,
-                onStart: () =>{
-                    debugger;
-                },
                 onComplete: () =>{
                     scene.victoryFanfare();
                     console.log('tween finished, start electrons')
+                    scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
                 }
             })
         }
