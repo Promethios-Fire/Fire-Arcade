@@ -8,6 +8,8 @@ import { Snake } from './classes/Snake.js';
 import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
 import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
+import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
+import { QUICK_MENUS } from './data/quickMenus.js';
 
 
 
@@ -291,7 +293,7 @@ const RANK_BENCHMARKS = new Map([
 
 
 // #region GLOBAL STYLES 
-const STYLE_DEFAULT = {
+export const STYLE_DEFAULT = {
     color: 'white',
     'font-size': '14px',
     'font-family': 'Oxanium',
@@ -365,7 +367,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-1'; // Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -411,6 +413,10 @@ class SpaceBoyScene extends Phaser.Scene {
     constructor () {
         super({key: 'SpaceBoyScene', active: true});
     }
+    init() {
+        this.stageHistory = [];
+        this.globalFoodLog = [];
+    }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
@@ -432,141 +438,80 @@ class TutorialScene extends Phaser.Scene {
     constructor () {
         super({key: 'TutorialScene', active: false});
     }
-    create() {
+    create(tutorialPanels) {
 
-        
         // AUDIO
         this.pop02 = this.sound.add('pop02');
 
-
-
-
-
-        // Tutorial Panels
-
+        // delete this
         var tutStyle = {
             "fontSize":'24px',
         }
 
-        this.selectedPanel = 1;
+        var panelsArray = [];
+        this.selectedPanel = 0;
 
+        var hOffSet = 570;
+        var fadeOut = 150;
+        var fadeInDelay = 250;
+        var fadeIn = 400;
 
-        this.tutText1 = this.add.dom(SCREEN_WIDTH/2 - GRID * 2.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-             'Press arrow keys to move.',
-        ).setOrigin(0.5,0).setScale(.5).setAlpha(0); // Sets the origin to the middle top.
-        this.tutText2 = this.add.dom(SCREEN_WIDTH + 250, GRID * 9.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-            'Collect atoms to grow longer.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        this.tutText3 = this.add.dom(SCREEN_WIDTH + 250 * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-            'Use portals to bend spacetime.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
-        this.tutText4 = this.add.dom((SCREEN_WIDTH + 250 * 6) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-                'Hold space to sprint.',
-        ).setOrigin(0.5,0).setScale(.5); // Sets the origin to the middle top.
+        this.panelsContainer = this.make.container(0, 0).setDepth(200);
+        var panelContents = [];
+
+        for (let index = 0; index < tutorialPanels.length; index++) {
+
+            var _map = TUTORIAL_PANELS.get(tutorialPanels[index]).call(this, index);
+
+            // make different sections addressible later.
+            panelsArray[index] = _map;
+            
+            panelContents.push(
+                ..._map.get("text"), 
+                ..._map.get("images"), 
+                ..._map.get("panels") 
+            );
+            
+
+        }
+
+        this.panelsContainer.add(panelContents);
+
         
-        this.tutWASD = this.add.sprite(SCREEN_WIDTH/2 + GRID * 6.5,
-             SCREEN_HEIGHT/2 + GRID  * 4.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutWASD.play('tutAll').setAlpha(0);
+        this.panelsContainer.iterate( child=> {
+            if (child.type === "NineSlice") {
+                this.panelsContainer.sendToBack(child)
+            }
+        })
 
-        this.tutSnake = this.add.sprite(SCREEN_WIDTH/2,
-             SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeWASD').setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
-        this.time.delayedCall(600, event => {
+        panelsArray.forEach( map => {
+            var growTarget = map.get("growPanelTo")
             this.tweens.add({
-                targets: [this.tutText1, this.tutSnake, this.tutWASD, this.panelArrowR, this.panelArrowL],
-                alpha: {from: 0, to: 1},
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
-
-        const panel1 = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel1.setDepth(100);
-        panel1.setScale(0);
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel1,
+                targets: map.get("panels"),
                 scale: 1,
-                width: 240,
-                height: 160,
+                width: growTarget.w,
+                height: growTarget.h,
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
+                delay:200,
                 repeat: 0,
             });
-        });
+        })
 
-        const panel2 = this.add.nineslice(SCREEN_WIDTH + 250, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
-        panel2.setDepth(100);
-        panel2.setScale(0);
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel2,
-                scale: 1,
-                width: 200,
-                height: 140,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            });
-        });
 
-        this.tutAtomSmall = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomSmall.play('atom04idle');
-        this.tutAtomMedium = this.add.sprite((SCREEN_WIDTH + 250) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomMedium.play('atom03idle');
-        this.tutAtomLarge = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomLarge.play('atom02idle');
-        this.tutAtomCharged = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomCharged.play('atom01idle');
-        this.tutAtomElectrons = this.add.sprite((SCREEN_WIDTH + 250) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        this.tutAtomElectrons.play('electronIdle');
+        // Defaults everything to invisible so you don't need to remember to set in TUTORIAL_PANELS .
+        panelContents.forEach( item => {
+            item.alpha = 0;
+        })
 
-        const panel3 = this.add.nineslice(SCREEN_WIDTH + 250 * 3.5, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
-        panel3.setDepth(100);
-
-        this.tutPortal1 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 2,
-            SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal1.play('portalIdle');
-        this.tutPortal2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 2,
-            SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        this.tutPortal2.play('portalIdle');
-
-        this.tutSnake2 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) - GRID * 1.5,
-        SCREEN_HEIGHT/2 - GRID  * 1,'tutSnakePortal2').setDepth(103).setOrigin(1,0.5).setScale(1);
-        this.tutSnake3 = this.add.sprite((SCREEN_WIDTH + 250 * 3.5) + GRID * 1.5,
-        SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
-
-        const panel4 = this.add.nineslice(SCREEN_WIDTH + 250 * 6, SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 240, 160, 36,36,36,36);
-        panel4.setDepth(100);
-
-        this.tutSPACE = this.add.sprite((SCREEN_WIDTH + 250 * 6) - GRID * 5.25,
-             GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);
-        this.tutSPACE.play('tutSpace');
-
-        this.tutSnake4 = this.add.sprite((SCREEN_WIDTH + 250 * 6),
-        SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
-
-        this.panels = [];
-        this.panels.push(panel1, this.tutWASD, this.tutSnake, this.tutText1,
-            panel2, this.tutText2, this.tutAtomSmall,this.tutAtomMedium,this.tutAtomLarge,this.tutAtomCharged,this.tutAtomElectrons,
-            panel3, this.tutText3, this.tutPortal1,this.tutPortal2,this.tutSnake2,this.tutSnake3,
-            panel4, this.tutText4,this.tutSPACE,this.tutSnake4);
-
-        this.panelsContainer = this.make.container(0, 0);
-        this.panelsContainer.add(this.panels);
-
+        
 
 
         
+        // -james note. Start of create should be here.
         
+
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
 
@@ -582,130 +527,187 @@ class TutorialScene extends Phaser.Scene {
                 '[PRESS SPACE TO CONTINUE]',
         ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
         
-        
-        
-        this.continueText.setVisible(false)
-        if (!this.hasPlayedBefore) {
-            //continueText = this.add.text(SCREEN_WIDTH/2, GRID*26, '[PRESS TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0);
-        }
-        else {
-            this.continueText.setVisible(true)        
-        }
+        this.continueText.setVisible(false).setAlpha(0);
 
-        // TEMPORARY UNTIL WE GET THE CAROUSEL WORKING WITH THE ON SCREEN INPUTS
-        this.continueText.setVisible(true)
-        
-        this.tweens.add({
-            targets: this.continueText,
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 1000,
-            repeat: -1,
-            yoyo: true
-        });
-        
-        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowR.play('startArrowIdle').setAlpha(0);
-        this.panelArrowR.angle = 90;
-        
-        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-        this.panelArrowL.play('startArrowIdle');
-        this.panelArrowL.angle = 270;
-        this.panelArrowL.setVisible(false).setAlpha(0);
-
-        this.input.keyboard.on('keydown-RIGHT', e => {
-            
-            const ourTutorialScene = this.scene.get('TutorialScene');
-            const ourPersist = this.scene.get('PersistScene');
-            if (this.selectedPanel < 4) {
-                this.pop02.play();
-                this.selectedPanel += 1
-            }
-            this.panelContainerX = 0
-            switch (this.selectedPanel){
-                case 1:
-                    this.panelContainerX = 0;
-                    this.panelArrowL.setVisible(false)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -570;
-                    this.panelArrowL.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x += 20;
-                    this.panelContainerX = -1195;
-                    this.panelArrowL.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x = 60;
-                    this.panelContainerX = -1820;
-                    this.panelArrowL.setVisible(true)
-                    this.panelArrowR.setVisible(false)
-                    this.continueText.setVisible(true)
-                    break;
-            }
-            
-            this.tweens.add({
-                targets: this.panelsContainer,
-                x: this.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-            });   
-        }, this)
-        this.input.keyboard.on('keydown-LEFT', e => {
-            const ourTutorialScene = this.scene.get('TutorialScene');
-            const ourPersist = this.scene.get('PersistScene');
-            if (this.selectedPanel > 1) {
-                this.selectedPanel -= 1
-                this.pop02.play();
-            }
-            this.panelContainerX = 0
-            switch (this.selectedPanel){
-                case 1:
-                    ourPersist.bgCoords.x = 0;
-                    this.panelContainerX = 0;
-                    this.panelArrowL.setVisible(false)
-                    this.panelArrowR.setVisible(true)
-                    break;
-                case 2:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -570;
-                    this.panelArrowR.setVisible(true)
-                    break;
-                case 3:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1195;
-                    this.panelArrowR.setVisible(true)
-                    break;
-                case 4:
-                    ourPersist.bgCoords.x -= 20;
-                    this.panelContainerX = -1820;
-                    this.panelArrowR.setVisible(true)
-                    break;
-            }
-
-            
-            
-            this.tweens.add({
-                targets: this.panelsContainer,
-                x: this.panelContainerX,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: function () {
-                    
-                    if (ourTutorialScene.selectedPanel < 4) {
-                        debugger
-                        ourTutorialScene.panelArrowR.setVisible(true);
+        if (tutorialPanels.length === 1) {
+            // Change this to a tween. That works a bit like a loading bar.
+            //this.continueText.setVisible(true);
+            //if (!this.continueText.visible) {
+                this.tweens.add({
+                    targets: this.continueText,
+                    alpha: { from: 0, to: 1 },
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    delay: 1000,
+                    repeat: -1,
+                    yoyo: true,
+                    onStart: () =>  {
+                        this.continueText.setVisible(true);
                     }
-                    else{
-                        debugger
-                        ourTutorialScene.panelArrowR.setVisible(false);
-                    }
+                });   
+            //}
+        } else {
+            this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+            this.panelArrowR.play('startArrowIdle');
+            this.panelArrowR.angle = 90;
+            this.panelArrowR.setAlpha(0);
+            
+            this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
+            this.panelArrowL.play('startArrowIdle');
+            this.panelArrowL.angle = 270;
+            this.panelArrowL.setVisible(false).setAlpha(0);
+
+            this.containorToX = 0;
+            
+            this.input.keyboard.on('keydown-RIGHT', e => {
+                const ourPersist = this.scene.get('PersistScene');
+                if (this.selectedPanel < tutorialPanels.length - 1) { // @holden this needs to be changed
                     
+                    // Fade Out Old Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 1, to: 0 },
+                        ease: 'Sine.InOut',
+                        //delay: 500,
+                        duration: fadeOut,
+                        
+                    });
+                    
+                    this.pop02.play();
+                    this.selectedPanel += 1;
+
+                    panelsArray[this.selectedPanel].get("text").forEach( text => {
+                        text.alpha = 0;
+                    })
+                    // Fade In New Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        delay: fadeInDelay,
+                        duration: fadeIn,
+                    });
                 }
-            }, this);   
-        }, this)
+
+                var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
+
+                this.containorToX = Math.max(this.containorToX - hOffSet, endX);
+                
+                switch (this.containorToX) {
+                    //case 0: // Start Panel
+                    //    this.panelArrowL.setVisible(false);
+                    //    ourPersist.bgCoords.x += 20;
+                    //    break
+                    case endX: // End Panel
+                        this.panelArrowR.setVisible(false);
+                        
+                        if (!this.continueText.visible) {
+                            this.tweens.add({
+                                targets: this.continueText,
+                                alpha: { from: 0, to: 1 },
+                                ease: 'Sine.InOut',
+                                duration: 1000,
+                                repeat: -1,
+                                yoyo: true
+                            });   
+                        }
+
+                        this.continueText.setVisible(true);
+                        
+                        break
+                    default: // Middle Panel
+                        this.panelArrowL.setVisible(true);
+                        this.panelArrowR.setVisible(true);
+                        ourPersist.bgCoords.x += 20;
+                        break
+                }
+                
+                this.tweens.add({
+                    targets: this.panelsContainer,
+                    x: this.containorToX,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                });   
+            }, this);
+
+            this.input.keyboard.on('keydown-LEFT', e => {
+                const ourPersist = this.scene.get('PersistScene');
+                if (this.selectedPanel > 0) {
+
+                    // Fade Out Current Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 1, to: 0 },
+                        ease: 'Sine.InOut',
+                        //delay: 500,
+                        duration: fadeOut,
+                        
+                    });
+
+                    this.selectedPanel -= 1
+                    this.pop02.play();
+
+                    // Fade In Current Text
+                    panelsArray[this.selectedPanel].get("text").forEach( text => {
+                        text.alpha = 0;
+                    })
+                    // Fade In New Text
+                    this.tweens.add({
+                        targets: panelsArray[this.selectedPanel].get("text"),
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        delay: fadeInDelay,
+                        duration: fadeIn,
+                    });
+                }
+
+                this.containorToX = Math.min(this.containorToX + hOffSet, 0);
+
+                // All the way left
+                if (this.containorToX === 0) {
+                    this.panelArrowL.setVisible(false); 
+
+                } else { // Middle Pannel
+                    this.panelArrowL.setVisible(true);
+                    this.panelArrowR.setVisible(true);
+                    ourPersist.bgCoords.x -= 20; 
+
+                }
+    
+                
+                this.tweens.add({
+                    targets: this.panelsContainer,
+                    x: this.containorToX,
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                    onComplete: function () {
+                        
+                        //if (ourTutorialScene.selectedPanel < 4) {
+                            //debugger //@holden why are these debuggers here?
+                            //ourTutorialScene.panelArrowR.setVisible(true);
+                        //}
+                        //else{
+                            //debugger
+                            //ourTutorialScene.panelArrowR.setVisible(false);
+                        //}
+                        
+                    }
+                }, this);   
+            }, this)
+
+        }
+
+        // Fade Everything In
+
+        this.tweens.add({
+            targets: [...panelContents, this.panelArrowR, this.panelArrowL],
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'sine.inout',
+            yoyo: false,
+            delay: 300,
+            repeat: 0,
+        });
 
         const onInput = function (scene) {
             if (scene.continueText.visible === true) {
@@ -716,12 +718,9 @@ class TutorialScene extends Phaser.Scene {
                     startupAnim: true,
                 });
 
-
-
                 // Clear for reseting game
-                scene.scene.get("StartScene").stageHistory = [];
+                scene.scene.get("SpaceBoyScene").stageHistory = [];
                 scene.scene.get("PersistScene").coins = START_COINS;
-
                 
             }
 
@@ -787,8 +786,8 @@ class StartScene extends Phaser.Scene {
     }
     init() {
         // #region StartScene()
-        this.stageHistory = [];
-        this.globalFoodLog = [];
+        
+        
         
     }
 
@@ -1069,18 +1068,17 @@ class StartScene extends Phaser.Scene {
         });
 
 
-        const onInput = function (scene) {
+        const onInput = function (scene) { // @james - something is not right here
             if (scene.continueText.visible === true) {
                 const ourPersist = scene.scene.get('PersistScene');
-        //continueText.on('pointerdown', e =>
-        //{
-        //    this.onInput();
-        //    //ourInput.moveUp(ourGame, "upUI")
-    
-        //});
+                //continueText.on('pointerdown', e =>
+                //{
+                //    this.onInput();
+                //    //ourInput.moveUp(ourGame, "upUI")
             
-            /*
-            }
+                //});
+            
+            /** 
             else {
                                                 
 
@@ -1116,10 +1114,10 @@ class StartScene extends Phaser.Scene {
                     //var ourGameScene = this.scene.get("GameScene");
                     //console.log(e)
                 }
-            });*/
-
+            });
+            */
+            }
         }
-    }
         
         // Shows Local Storage Sizes for Debugging.
 
@@ -1137,32 +1135,6 @@ class StartScene extends Phaser.Scene {
 
             var ourGame = this.scene.get("GameScene");
             var ourInput = this.scene.get("InputScene");
-        
-
-            ourGame.stageUUID = "3026c8f1-2b04-479c-b474-ab4c05039999";
-            ourGame.stageDiffBonus = 140;
-            ourGame.stage = END_STAGE;
-            //END_STAGE = "Stage-01";
-
-            this.score = 12345;
-            this.bonks = 3;
-            this.length = 28;
-            this.scoreHistory = [87,98,82,92,94,91,85,86,95,95,83,93,86,96,91,92,95,75,90,98,92,96,93,66,86,91,80,90];
-            this.zedLevel = 77;
-            this.medals = {
-                "fast":'silver',
-                "Rank":'gold'
-            }
-
-            ourInput.turns = 79;
-            ourInput.cornerTime = 190;
-            ourInput.boostTime = 400;
-
-            var stage01 = new StageData("Stage-01", [82, 98, 95, 89, 85, 96, 98, 85, 91, 91, 87, 88, 89, 93, 90, 97, 95, 81, 88, 80, 90, 97, 82, 91, 97, 88, 89, 85], "3026c8f1-2b04-479c-b474-ab4c05039999", false);
-            var stage02 = new StageData("Stage-02a", [92, 90, 87, 90, 78, 88, 95, 99, 97, 80, 96, 87, 91, 87, 85, 91, 90, 94, 66, 84, 87, 70, 85, 92, 90, 86, 99, 94], "2a704e17-f70e-45f9-8007-708100e9f592", true);
-            var stage03 = new StageData("Stage-03a", [88, 87, 90, 84, 97, 93, 79, 77, 95, 92, 96, 99, 89, 86, 80, 97, 97, 83, 96, 79, 89, 97, 63, 83, 97, 98, 91, 97], "51cf859f-21b1-44b3-8664-11e9fd80b307", true);
-
-            this.stageHistory = [stage01, stage02, stage03];
             this.scene.start('ScoreScene');
         }
         else {
@@ -1177,8 +1149,116 @@ class StartScene extends Phaser.Scene {
         }
         this.scene.stop();
     }
-    
     end() {
+
+    }
+}
+
+
+class QuickMenuScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'QuickMenuScene', active: false});
+    }
+    preload(){
+
+    }
+    create(qMenuArgs){
+
+        // #region Quick Menu
+        this.menuOptions = qMenuArgs.menuOptions;
+
+        var menuTop = SCREEN_HEIGHT/2 - GRID * 2.5;
+        this.menuList = [...this.menuOptions.keys()];
+        this.cursorIndex = qMenuArgs.cursorIndex;
+        var _textStart = menuTop + GRID * 3;
+        var _spacing = 20;
+        this.menuElements = [];
+
+        this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuTop + GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '20px',
+            "fontWeight": 400,
+            "color": "white",
+        }),
+            `${qMenuArgs.textPrompt}`
+        ).setOrigin(0.5,0).setScale(0.5).setAlpha(1);
+
+        var panelHeight = (2 * _spacing * (this.menuList.length - 1)) + _spacing * 0.75;
+
+        //nineSlice
+        this.qPanel = this.add.nineslice(SCREEN_WIDTH/2, menuTop, 
+            'uiPanelL', 'Glass', 
+            GRID * 19 + 1, panelHeight , 
+            8, 8, 8, 8);
+        this.qPanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0).setVisible(true);
+
+        
+        if (this.menuElements.length < 1) {
+            for (let index = 0; index < this.menuList.length; index++) {   
+                if (index === this.cursorIndex) {
+                    console.log('adding');
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.menuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+                }
+                else{
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '20px',
+                        "fontWeight": 400,
+                        "color": "darkgrey",
+                    }),
+                            `${this.menuList[index].toUpperCase()}`
+                    ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+                }
+    
+                
+                this.menuElements.push(textElement);
+                
+                
+            } 
+        }
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            var option = this.menuList[this.cursorIndex];
+                this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
+        }, this);
+
+        this.input.keyboard.on('keydown-DOWN', function() {
+            // Reset all menu elements to dark grey
+            //this.menuElements.forEach((element, index) => {
+            //    element.node.style.color = "darkgrey";
+            //});
+
+            //var _selected = this.menuElements[this.cursorIndex];
+            //_selected.node.style.color = "white";
+        
+            this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
+            this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex + 1, 0, this.menuElements.length)
+            this.menuElements[this.cursorIndex].node.style.color = "white";
+            
+
+            
+            // Set the selected element to white
+        }, this);
+
+        this.input.keyboard.on('keydown-UP', function() {
+            this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
+            this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex - 1, 0, this.menuElements.length)
+            this.menuElements[this.cursorIndex].node.style.color = "white";
+        }, this);
+
+
+        this.input.keyboard.on('keydown-TAB', function() {
+            this.scene.sleep("QuickMenuScene");
+        }, this);
+
+        
+
+        // #endregion
+
 
     }
 }
@@ -1229,7 +1309,7 @@ class MainMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
-        const thisScene = this.scene.get('MainMenuScene');
+        const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
@@ -1267,41 +1347,63 @@ class MainMenuScene extends Phaser.Scene {
 
 
 
-        var menuOptions = {
-            'practice': function () {
+        var menuOptions = new Map([
+            ['practice', function () {
                 console.log("Practice");
                 return true;
-            },
-            'adventure': function () {   
-                thisScene.scene.launch('TutorialScene');
-                thisScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
-                thisScene.scene.stop();
-                return true;
-            },
-            'extraction': function () {
-                return true;
-            },
-            'championship': function () {
-                return true;
-            },
-            'gauntlet': function () {
-                return true;
-            },
-            'endless': function () {
-                return true;
-            },
-            'extras': function () {
-                return true;
-            },
-            'options': function () {
-                return true;
-            },
-            'exit': function () {
-                return true;
-            },
-        }
+            }],
+            ['adventure', function () {
+                // Check if played before here. Maybe check for world 0-1 level stage data?
 
-        var menuList = Object.keys(menuOptions);
+                
+
+                var qMenu = QUICK_MENUS.get("adventure-mode");
+
+                
+                mainMenuScene.scene.launch("QuickMenuScene", {
+                    menuOptions: qMenu, 
+                    textPrompt: "MODE SELECTOR",
+                    fromScene: mainMenuScene,
+                    cursorIndex: 0
+                });
+                mainMenuScene.scene.bringToTop("QuickMenuScene");
+
+                mainMenuScene.scene.sleep('MainMenuScene');
+
+
+                console.log("I DID IT");
+
+
+
+                /*
+
+                */
+                return true;
+            }],
+            ['extraction', function () {
+                return true;
+            }],
+            ['championship', function () {
+                return true;
+            }],
+            ['gauntlet', function () {
+                return true;
+            }],
+            ['endless', function () {
+                return true;
+            }],
+            ['extras', function () {
+                return true;
+            }],
+            ['options', function () {
+                return true;
+            }],
+            ['exit', function () {
+                return true;
+            }]
+        ]);
+
+        var menuList = [...menuOptions.keys()];
         var cursorIndex = 1;
         var textStart = 152;
         var spacing = 24;
@@ -1401,7 +1503,7 @@ class MainMenuScene extends Phaser.Scene {
             if (this.pressedSpace && this.menuState == 0) {
                 this.cameras.main.scrollX -= SCREEN_WIDTH
                 ourMap.cameras.main.scrollX -= SCREEN_WIDTH
-                thisScene.scene.sleep('MainMenuScene');
+                mainMenuScene.scene.sleep('MainMenuScene');
                 this.menuState = 1;
             }
         });
@@ -1409,14 +1511,14 @@ class MainMenuScene extends Phaser.Scene {
             if (this.pressedSpace && this.menuState == 1) {
                 this.cameras.main.scrollX += SCREEN_WIDTH
                 ourMap.cameras.main.scrollX += SCREEN_WIDTH
-                thisScene.scene.wake('MainMenuScene');
+                mainMenuScene.scene.wake('MainMenuScene');
                 this.menuState = 0;
             }
         });
     
 
         this.input.keyboard.on('keydown-DOWN', function() {
-            if (thisScene.pressedSpace) {
+            if (mainMenuScene.pressedSpace) {
                 
 
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
@@ -1431,9 +1533,9 @@ class MainMenuScene extends Phaser.Scene {
                 if (cursorIndex == 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
-                    thisScene.exitButton.setFrame(1);
+                    mainMenuScene.exitButton.setFrame(1);
                 } else {
-                    thisScene.exitButton.setFrame(0);
+                    mainMenuScene.exitButton.setFrame(0);
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = selected.y + 7
                 }
@@ -1453,7 +1555,7 @@ class MainMenuScene extends Phaser.Scene {
                 
                 ourPersist.bgCoords.y += 5;
                 
-                thisScene.changeMenuSprite(cursorIndex);
+                mainMenuScene.changeMenuSprite(cursorIndex);
                 //upArrow.y = selected.y - 42;
                 //downArrow.y = selected.y + 32;
 
@@ -1463,7 +1565,7 @@ class MainMenuScene extends Phaser.Scene {
         }, [], this);
 
         this.input.keyboard.on('keydown-UP', function() {
-            if (thisScene.pressedSpace) {
+            if (mainMenuScene.pressedSpace) {
                 if (cursorIndex == 2 || cursorIndex == 3 || cursorIndex == 5) {
                     selected.node.style.color = 'darkgrey';
                 }
@@ -1476,9 +1578,9 @@ class MainMenuScene extends Phaser.Scene {
                 if (cursorIndex == 8) {
                     menuSelector.x = menuSelector.x - GRID * 1.75
                     menuSelector.y = selected.y + GRID * 2.25
-                    thisScene.exitButton.setFrame(1);
+                    mainMenuScene.exitButton.setFrame(1);
                 } else {
-                    thisScene.exitButton.setFrame(0);
+                    mainMenuScene.exitButton.setFrame(0);
                     menuSelector.x = SCREEN_WIDTH / 2 - GRID * 11.5
                     menuSelector.y = selected.y + 7
                 }
@@ -1497,7 +1599,7 @@ class MainMenuScene extends Phaser.Scene {
     
                 ourPersist.bgCoords.y -= 5;
     
-                thisScene.changeMenuSprite(cursorIndex);
+                mainMenuScene.changeMenuSprite(cursorIndex);
             }
         }, [], this);
 
@@ -1544,15 +1646,15 @@ class MainMenuScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-            if (!thisScene.pressedSpace) {
-                thisScene.pressToPlayTween.stop();
-                thisScene.pressToPlay.setAlpha(0)
-                thisScene.pressedSpace = true;
+            if (!mainMenuScene.pressedSpace) {
+                mainMenuScene.pressToPlayTween.stop();
+                mainMenuScene.pressToPlay.setAlpha(0)
+                mainMenuScene.pressedSpace = true;
                 titleTween.resume();
                 menuFadeTween.resume();            
             }
             else{
-                console.log(menuOptions[menuList[cursorIndex]].call());
+                menuOptions.get(menuList[cursorIndex]).call();
             }
 
         });
@@ -3167,6 +3269,15 @@ class GameScene extends Phaser.Scene {
 
         });
 
+        this.input.keyboard.on('keydown-TAB', function() {
+            this.scene.launch("QuickMenuScene", {
+                menuOptions: QUICK_MENUS.get("tab-menu"), 
+                textPrompt: "Quick Menu",
+                fromScene: this,
+                cursorIndex: 1
+            });
+        }, this);
+
         
         this.blackholes = [];
         this.blackholeLabels = [];
@@ -4297,6 +4408,7 @@ class GameScene extends Phaser.Scene {
         this.events.on('saveScore', function () {
             const ourScoreScene = this.scene.get('ScoreScene');
             const ourStartScene = this.scene.get('StartScene');
+            const ourSpaceboy = this.scene.get('StartScene');
 
 
             // Building StageData for Savin
@@ -4312,8 +4424,8 @@ class GameScene extends Phaser.Scene {
             // #region Do Unlock Calculation of all Best Logs
             
             var historicalLog = [];
-            if (ourStartScene.stageHistory.length > 1) {
-                ourStartScene.stageHistory.forEach( _stage => {
+            if (ourSpaceboy.stageHistory.length > 1) {
+                ourSpaceboy.stageHistory.forEach( _stage => {
                     var stageBestLog = JSON.parse(localStorage.getItem(`${_stage.uuid}-bestStageData`));
                     if (stageBestLog) {
                         historicalLog = [...historicalLog, ...stageBestLog];
@@ -5178,7 +5290,7 @@ class GameScene extends Phaser.Scene {
         
         var _totalScore = 0
 
-        ourStartScene.stageHistory.forEach( stageData => {
+        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
             _totalScore += stageData.calcTotal();
         });
         _totalScore = Math.floor(_totalScore); //rounds down to whole number
@@ -5221,7 +5333,7 @@ class GameScene extends Phaser.Scene {
                 if (ourGameScene.CapSparkFinale) {
                     ourGameScene.CapSparkFinale.setAlpha(0);
                 }
-                ourGameScene.scene.get("StartScene").stageHistory = [];
+                ourGameScene.scene.get("SpaceBoyScene").stageHistory = [];
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
             }
@@ -6433,7 +6545,7 @@ class ScoreScene extends Phaser.Scene {
         
         console.log(JSON.stringify(this.stageData));
 
-        ourStartScene.stageHistory.push(this.stageData);
+        this.scene.get("SpaceBoyScene").stageHistory.push(this.stageData);
     
 
         // #region Save Best To Local.
@@ -7327,7 +7439,7 @@ class ScoreScene extends Phaser.Scene {
 
         var totalScore = 0;
 
-        ourStartScene.stageHistory.forEach( stageData => {
+        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
             totalScore += stageData.calcTotal();
         });
 
@@ -7346,14 +7458,14 @@ class ScoreScene extends Phaser.Scene {
         var sumOfBase = 0;
         var _histLog = [];
         
-        ourStartScene.stageHistory.forEach( _stage => {
+        this.scene.get("SpaceBoyScene").stageHistory.forEach( _stage => {
             _histLog = [ ..._histLog, ..._stage.foodLog];
             sumOfBase += _stage.calcBase();
             ourGame.nextScore += _stage.calcTotal();
 
         });
 
-        ourStartScene.globalFoodLog = _histLog;
+        this.scene.get("SpaceBoyScene").globalFoodLog = _histLog;
 
         if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
             localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
@@ -8628,7 +8740,7 @@ var config = {
     },
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
-    scene: [ StartScene, MainMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TutorialScene]
+    scene: [ StartScene, MainMenuScene, QuickMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TutorialScene]
 };
 
 // #region Screen Settings
