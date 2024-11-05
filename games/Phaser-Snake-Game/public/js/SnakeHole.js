@@ -2314,8 +2314,6 @@ class GameScene extends Phaser.Scene {
         }
 
 
-
-
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
@@ -5205,6 +5203,12 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
+                if (ourGameScene.electronFanfare) {
+                    ourGameScene.electronFanfare.setAlpha(0);
+                }
+                if (ourGameScene.CapSparkFinale) {
+                    ourGameScene.CapSparkFinale.setAlpha(0);
+                }
                 ourGameScene.scene.get("StartScene").stageHistory = [];
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
@@ -7469,6 +7473,8 @@ class ScoreScene extends Phaser.Scene {
                 // As the event is defined there, but this works and its' here. - James
                 ourGame.events.off('addScore');
                 ourGame.events.off('spawnBlackholes');
+
+
                 
                 ourScoreScene.scene.stop();
 
