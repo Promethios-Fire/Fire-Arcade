@@ -7514,7 +7514,7 @@ class ScoreScene extends Phaser.Scene {
 
             var gameOver = false;
 
-            if (this.scene.get("StartScene").stageHistory.length >= GAME_LENGTH) {
+            if (this.scene.get("SpaceBoyScene").stageHistory.length >= GAME_LENGTH) {
                 //debugger
                 //continue_text = '[RESTART AND FIND NEW WORLD PATHS]';
                 //gameOver = true;
