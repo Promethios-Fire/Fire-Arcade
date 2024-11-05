@@ -293,12 +293,17 @@ var Snake = new Phaser.Class({
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
             var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
             var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;
-
-            if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
-                var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
-                portal.snakePortalingSprite.visible = false;
-                portal.targetObject.snakePortalingSprite.visible = false;
+            if (scene.vortexTween) { //check that vortex tween exists so it doesn't return null
+                if (!scene.vortexTween.isPlaying()) { //check that it's not progress so errors aren't thrown below
+                    if (scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY] instanceof Portal) {
+                        var portal = scene.interactLayer[lastBodyNotTailGridX][lastBodyNotTailGridY];
+                        portal.snakePortalingSprite.visible = false;
+                        portal.targetObject.snakePortalingSprite.visible = false;
+                    }
+                }
+                
             }
+            
 
         }
         /**

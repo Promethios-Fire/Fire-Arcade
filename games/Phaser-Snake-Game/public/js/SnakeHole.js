@@ -4765,6 +4765,13 @@ class GameScene extends Phaser.Scene {
                     },
                     onComplete: () => {
                         console.log('Slow motion effect completed');
+                        this.tweens.timeScale = 1;
+                        this.anims.globalTimeScale = 1;
+                        this.speedWalk = _walkSpeed;
+                        this.speedSprint = _sprintSpeed;
+                        if (this.starEmitterFinal) {
+                            this.starEmitterFinal.timeScale = 1;
+                        }
                     }
                     
                 });
@@ -4844,9 +4851,14 @@ class GameScene extends Phaser.Scene {
                     },
                     onComplete: () => {
                         console.log('Slow motion effect completed');
-                        /*if (this.extractHole.length > 0) {
-                            
-                        }*/
+                        
+                        this.tweens.timeScale = 1;
+                        this.anims.globalTimeScale = 1;
+                        this.speedWalk = _walkSpeed;
+                        this.speedSprint = _sprintSpeed;
+                        if (this.starEmitterFinal) {
+                            this.starEmitterFinal.timeScale = 1;
+                        }
                         
                         this.hsv = Phaser.Display.Color.HSVColorWheel();
                         const spectrum = Phaser.Display.Color.ColorSpectrum(360);
@@ -7419,6 +7431,17 @@ class ScoreScene extends Phaser.Scene {
 
             const onContinue = function (scene) {
                 console.log('pressing space inside score scene')
+
+                if (ourGame.slowMoTween && ourGame.slowMoTween.isPlaying()){
+                    ourGame.slowMoTween.complete(); //this returns timescale values to 1 so players don't need to wait
+                    // reset snake body segments so it can move immediately
+                    ourGame.snake.body.forEach(segment => {
+                        segment.x = ourGame.snake.head.x;
+                        segment.y = ourGame.snake.head.y;
+                    });
+                }
+
+                
 
                 if (ourGame.stage == 'Tutorial_1') {
                     ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
