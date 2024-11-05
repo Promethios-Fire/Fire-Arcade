@@ -4738,118 +4738,118 @@ class GameScene extends Phaser.Scene {
         let initialCameraX = this.cameras.main.scrollX;
         let initialCameraY = this.cameras.main.scrollY
 
-        debugger;
-        if (!this.nextStagePortalLayer.findByIndex(641)){ //check if we're on last stage -- using placeholder code, right now always defaults to true
-            //normal ending
-
-        }
-        else{
-            //fanfare ending
-            // Set scrollFactor to 1 for all game objects
-            // Get all game objects in the scene
-            this.children.list.forEach((child) => {
-                // Check if the child object has a scroll factor property set to 0
-                if (child.scrollFactorX === 0 && child.scrollFactorY === 0) {
-                    child.setScrollFactor(1);
-                    this.UIScoreContainer.setScrollFactor(1);
-                }
-            });
-            // Iterate over each child in the container and set the scroll factor to 1
-            this.UIScoreContainer.each((child) => {
-                child.setScrollFactor(1);
-            });
-
-            // atomic comet
-            this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            this.atomComet.play('atomCometSpawn');
-            this.atomComet.chain(['atomCometIdle']);
-
-
-            // rainbow electronFanfare
-            this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            this.electronFanfare.play('electronFanfareForm');
-            
-
-            // emit stars from electronFanfare
-            this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
-                speed: { min: -20, max: 20 },
-                angle: { min: 0, max: 360 },
-                alpha: { start: 1, end: 0 },
-                anim: 'starIdle',
-                lifespan: 1000,
-                follow: this.electronFanfare,
-            }).setFrequency(150,[1]).setDepth(1);
-
-            ourGame.countDown.setAlpha(0);
-        }
-            
-       
         // Start slowMoValCopy at 1 (default time scale). It's copied to preserve its value outside the tween
         var slowMoValCopy = 1;
-        
-        // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
-        this.slowMoTween = this.tweens.add({
-            targets: { value: 1 },
-            value: 0.2,
-            duration: 500,
-            yoyo: true,
-            ease: 'Sine.easeInOut',
-            repeat: 0,
-                onUpdate: (tween) => {
-                    // Camera Restraints/Bounds -- isn't needed if not zooming
-                    //this.cameras.main.setBounds(0, 0, 240, 320);
-                    //ourSpaceBoy.cameras.main.setBounds(0, 0, 240, 320);
-                    //ourPersist.cameras.main.setBounds(0, 0, 240, 320);
 
-                    let slowMoValue = tween.getValue();
-                    slowMoValCopy = slowMoValue;
 
-                    // Apply the interpolated slowMoValue to all the timeScales
-                    this.tweens.timeScale = slowMoValue;
-                    this.anims.globalTimeScale = slowMoValue;
-                    this.speedWalk = _walkSpeed  / slowMoValue;
-                    this.speedSprint = _sprintSpeed / slowMoValue;
-                    if (this.starEmitterFinal) {
-                        this.starEmitterFinal.timeScale = slowMoValue;
+        if (!this.nextStagePortalLayer.findByIndex(616)){ //check if we're on last stage -- using placeholder code, right now always defaults to true
+            //normal ending
+            // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
+            this.slowMoTween = this.tweens.add({
+                targets: { value: 1 },
+                value: 0.2,
+                duration: 500,
+                yoyo: true,
+                ease: 'Sine.easeInOut',
+                repeat: 0,
+                    onUpdate: (tween) => {
+                        let slowMoValue = tween.getValue();
+                        slowMoValCopy = slowMoValue;
+
+                        // Apply the interpolated slowMoValue to all the timeScales
+                        this.tweens.timeScale = slowMoValue;
+                        this.anims.globalTimeScale = slowMoValue;
+                        this.speedWalk = _walkSpeed  / slowMoValue;
+                        this.speedSprint = _sprintSpeed / slowMoValue;
+                        if (this.starEmitterFinal) {
+                            this.starEmitterFinal.timeScale = slowMoValue;
+                        }
+                    },
+                    onComplete: () => {
+                        console.log('Slow motion effect completed');
                     }
-                    // Camera Zoom
-                    //this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
-                    //ourSpaceBoy.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
-                    //ourPersist.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
                     
-                    // Continuously interpolate the camera's position to the snake's head -- not needed
-                    //let targetX = this.snake.head.x - this.cameras.main.width / 2;
-                    //let targetY = this.snake.head.y - this.cameras.main.height / 2;
+                });
+                //this.gState = GState.PLAY;
 
-                    /*if (slowMoValue <= 0.5) {
-                        this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
-                        this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+            }
+        else{
+            //fanfare ending
+            // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
+            console.log('should rainbow right now fr')
+            this.slowMoTween = this.tweens.add({
+                targets: { value: 1 },
+                value: 0.2,
+                duration: 500,
+                yoyo: true,
+                ease: 'Sine.easeInOut',
+                repeat: 0,
+                    onUpdate: (tween) => {
+                        // Camera Restraints/Bounds -- isn't needed if not zooming
+                        //this.cameras.main.setBounds(0, 0, 240, 320);
+                        //ourSpaceBoy.cameras.main.setBounds(0, 0, 240, 320);
+                        //ourPersist.cameras.main.setBounds(0, 0, 240, 320);
 
-                        ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
-                        ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+                        let slowMoValue = tween.getValue();
+                        slowMoValCopy = slowMoValue;
 
-                        ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
-                        ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
-                    } 
-                    else {
-                        this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
-                        this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
-
-                        ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
-                        ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
+                        // Apply the interpolated slowMoValue to all the timeScales
+                        this.tweens.timeScale = slowMoValue;
+                        this.anims.globalTimeScale = slowMoValue;
+                        this.speedWalk = _walkSpeed  / slowMoValue;
+                        this.speedSprint = _sprintSpeed / slowMoValue;
+                        if (this.starEmitterFinal) {
+                            this.starEmitterFinal.timeScale = slowMoValue;
+                        }
+                        // Camera Zoom
+                        //this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
+                        //ourSpaceBoy.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
+                        //ourPersist.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
                         
-                        ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
-                        ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
-                    }*/
-                },
-                onComplete: () => {
-                    console.log('Slow motion effect completed');
-                    /*if (this.extractHole.length > 0) {
+                        // Continuously interpolate the camera's position to the snake's head -- not needed
+                        //let targetX = this.snake.head.x - this.cameras.main.width / 2;
+                        //let targetY = this.snake.head.y - this.cameras.main.height / 2;
+
+                        /*if (slowMoValue <= 0.5) {
+                            this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
+                            this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+
+                            ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
+                            ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+
+                            ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
+                            ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
+                        } 
+                        else {
+                            this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
+                            this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
+
+                            ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
+                            ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
+                            
+                            ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
+                            ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
+                        }*/
+                    // Set scrollFactor to 1 for all game objects if using zoom-in
+                        // Get all game objects in the scene
+                        /*this.children.list.forEach((child) => {
+                            // Check if the child object has a scroll factor property set to 0
+                            if (child.scrollFactorX === 0 && child.scrollFactorY === 0) {
+                                child.setScrollFactor(1);
+                                this.UIScoreContainer.setScrollFactor(1);
+                                }
+                            });
+                            // Iterate over each child in the container and set the scroll factor to 1
+                            this.UIScoreContainer.each((child) => {
+                                child.setScrollFactor(1);
+                        });*/
+                    },
+                    onComplete: () => {
+                        console.log('Slow motion effect completed');
+                        /*if (this.extractHole.length > 0) {
+                            
+                        }*/
                         
-                    }*/
-                    if (this.starEmitterFinal) {
                         this.hsv = Phaser.Display.Color.HSVColorWheel();
                         const spectrum = Phaser.Display.Color.ColorSpectrum(360);
                         var colorIndex = 0;
@@ -4880,25 +4880,51 @@ class GameScene extends Phaser.Scene {
                                 });
                             }
                         });
-                    
-                    /*this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
+                        
+                        /*this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
+                            .setDepth(100);
+                        this.electronFanfare.play('electronFanfareIdle');*/
+
+                        /*this.cameras.main.scrollX = 0;
+                        this.cameras.main.scrollY = 0;
+
+                        ourSpaceBoy.cameras.main.scrollX = 0;
+                        ourSpaceBoy.cameras.main.scrollY = 0;
+
+                        ourPersist.cameras.main.scrollX = 0;
+                        ourPersist.cameras.main.scrollY = 0;*/
+                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                         .setDepth(100);
-                    this.electronFanfare.play('electronFanfareIdle');*/
-
-                    /*this.cameras.main.scrollX = 0;
-                    this.cameras.main.scrollY = 0;
-
-                    ourSpaceBoy.cameras.main.scrollX = 0;
-                    ourSpaceBoy.cameras.main.scrollY = 0;
-
-                    ourPersist.cameras.main.scrollX = 0;
-                    ourPersist.cameras.main.scrollY = 0;*/
-                    this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
-                    .setDepth(100);
-                    }
-                    this.gState = GState.PLAY;
+                        
+                        this.gState = GState.PLAY;
                 }
             });
+            // atomic comet
+            this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            .setDepth(100);
+            this.atomComet.play('atomCometSpawn');
+            this.atomComet.chain(['atomCometIdle']);
+
+
+            // rainbow electronFanfare
+            this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            .setDepth(100);
+            this.electronFanfare.play('electronFanfareForm');
+            
+
+            // emit stars from electronFanfare
+            this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
+                speed: { min: -20, max: 20 },
+                angle: { min: 0, max: 360 },
+                alpha: { start: 1, end: 0 },
+                anim: 'starIdle',
+                lifespan: 1000,
+                follow: this.electronFanfare,
+            }).setFrequency(150,[1]).setDepth(1);
+
+            ourGame.countDown.setAlpha(0);
+        }
+
         this.tweens.add({ //slower one-off snakeEating tween
             targets: this.snake.body, 
             scale: [1.25,1],
@@ -4938,6 +4964,7 @@ class GameScene extends Phaser.Scene {
 
             this.electronFanfare.chain(['electronFanfareIdle']);
         }
+
         
 
         /*this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
@@ -8545,7 +8572,7 @@ var config = {
     //pixelArt: false, // if not commented out and set to false, will still override scale settings.
     scale: {
         zoom: Phaser.Scale.MAX_ZOOM,
-        //mode: Phaser.Scale.FIT,
+        mode: Phaser.Scale.FIT,
     },
     //parent: 'phaser-example',
     physics: {
