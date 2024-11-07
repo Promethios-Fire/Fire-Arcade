@@ -28,7 +28,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = '';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -841,6 +841,7 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelL', 'assets/sprites/UI_Panel_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
+        this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('boostMeterBG', 'assets/sprites/UI_boostMeterBG.png');
@@ -1163,18 +1164,18 @@ class QuickMenuScene extends Phaser.Scene {
 
     }
     create(qMenuArgs){
-
+        const ourPersist = this.scene.get('PersistScene');
         // #region Quick Menu
         this.menuOptions = qMenuArgs.menuOptions;
 
-        var menuTop = SCREEN_HEIGHT/2 - GRID * 2.5;
         this.menuList = [...this.menuOptions.keys()];
+        var menuCenter = SCREEN_HEIGHT/2 - GRID * (this.menuList.length - 1);
         this.cursorIndex = qMenuArgs.cursorIndex;
-        var _textStart = menuTop + GRID * 3;
+        var _textStart = menuCenter + GRID * 3;
         var _spacing = 20;
         this.menuElements = [];
 
-        this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuTop + GRID, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuCenter - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
             "fontWeight": 400,
             "color": "white",
@@ -1182,10 +1183,10 @@ class QuickMenuScene extends Phaser.Scene {
             `${qMenuArgs.textPrompt}`
         ).setOrigin(0.5,0).setScale(0.5).setAlpha(1);
 
-        var panelHeight = (2 * _spacing * (this.menuList.length - 1)) + _spacing * 0.75;
+        var panelHeight = 16 + (_spacing * (this.menuList.length - 1)) + _spacing * 0.75;
 
         //nineSlice
-        this.qPanel = this.add.nineslice(SCREEN_WIDTH/2, menuTop, 
+        this.qPanel = this.add.nineslice(SCREEN_WIDTH/2, menuCenter, 
             'uiPanelL', 'Glass', 
             GRID * 19 + 1, panelHeight , 
             8, 8, 8, 8);
@@ -1194,9 +1195,33 @@ class QuickMenuScene extends Phaser.Scene {
         
         if (this.menuElements.length < 1) {
             for (let index = 0; index < this.menuList.length; index++) {   
-                if (index === this.cursorIndex) {
+                if (index === 0) { //always make option 1 'tab to menu' and off-center
+                    if (index === this.cursorIndex) {
+                        console.log('adding');
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 7.5, _textStart - GRID * 1.75, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '16px',
+                        "fontWeight": 400,
+                        "color": "white",
+                    }),
+                        `${this.menuList[index].toUpperCase()}`
+                    ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+                    this.backButton = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 8.25, _textStart - GRID * 1.75, 'uiBackButton',1).setDepth(100);
+                    }
+                    else{
+                        var textElement = this.add.dom(SCREEN_WIDTH / 2 - GRID * 7.5, _textStart - GRID * 1.75, 'div', Object.assign({}, STYLE_DEFAULT, {
+                            "fontSize": '16px',
+                            "fontWeight": 400,
+                            "color": "darkgrey",
+                        }),
+                            `${this.menuList[index].toUpperCase()}`
+                        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+                        this.backButton = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 8.25, _textStart - GRID * 1.75, 'uiBackButton').setDepth(100);
+                    }
+                    
+                }
+                else if (index === this.cursorIndex) {
                     console.log('adding');
-                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing - GRID * 1.75, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '20px',
                         "fontWeight": 400,
                         "color": "white",
@@ -1205,7 +1230,7 @@ class QuickMenuScene extends Phaser.Scene {
                     ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
                 }
                 else{
-                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    var textElement = this.add.dom(SCREEN_WIDTH / 2, _textStart + index * _spacing - GRID * 1.75, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '20px',
                         "fontWeight": 400,
                         "color": "darkgrey",
@@ -1238,6 +1263,16 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
             this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex + 1, 0, this.menuElements.length)
             this.menuElements[this.cursorIndex].node.style.color = "white";
+            if (this.cursorIndex === 0) { //check if back button is selected
+                if (this.backButton) {
+                    this.backButton.setFrame(1)
+                }   
+            }
+            else{
+                if (this.backButton) {
+                    this.backButton.setFrame(0)
+                }
+            }
             
 
             
@@ -1248,11 +1283,24 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
             this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex - 1, 0, this.menuElements.length)
             this.menuElements[this.cursorIndex].node.style.color = "white";
+
+            if (this.cursorIndex === 0) {
+                if (this.backButton) {
+                    this.backButton.setFrame(1)
+                }   
+            }
+            else{
+                if (this.backButton) {
+                    this.backButton.setFrame(0)
+                }
+            }
         }, this);
 
 
         this.input.keyboard.on('keydown-TAB', function() {
-            this.scene.sleep("QuickMenuScene");
+            //this.scene.sleep("QuickMenuScene");
+            var option = this.menuList[0]; //tab calls option 1 every time
+            this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
         }, this);
 
         
@@ -1362,9 +1410,9 @@ class MainMenuScene extends Phaser.Scene {
                 
                 mainMenuScene.scene.launch("QuickMenuScene", {
                     menuOptions: qMenu, 
-                    textPrompt: "MODE SELECTOR",
+                    textPrompt: "SELECT DIFFICULTY",
                     fromScene: mainMenuScene,
-                    cursorIndex: 0
+                    cursorIndex: 1
                 });
                 mainMenuScene.scene.bringToTop("QuickMenuScene");
 
@@ -3274,7 +3322,7 @@ class GameScene extends Phaser.Scene {
                 menuOptions: QUICK_MENUS.get("tab-menu"), 
                 textPrompt: "Quick Menu",
                 fromScene: this,
-                cursorIndex: 1
+                cursorIndex: 0
             });
         }, this);
 
@@ -8431,6 +8479,7 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1,
     });
+    
 
     // score scene atoms
     scene.anims.create({

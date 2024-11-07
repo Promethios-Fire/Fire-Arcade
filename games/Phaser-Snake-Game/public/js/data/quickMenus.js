@@ -9,12 +9,12 @@ export var QUICK_MENUS = new Map([
     ])]
     */
     ["adventure-mode", new Map([
-        ["Back to Menu", function () {
+        ["Tab to Menu", function () {
             this.scene.wake('MainMenuScene');
             this.scene.stop("QuickMenuScene");
 
         }],
-        ["Adventure", function () {
+        ["Classic", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
 
             if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
@@ -32,6 +32,10 @@ export var QUICK_MENUS = new Map([
         }],
     ])],
     ["tab-menu", new Map([
+        [`RETURN TO STAGE`, function () {  
+            console.log("RETURN TO STAGE");
+            this.scene.stop(); 
+        }],
         ['REDO STAGE (- 1 Coin)', function () {
             const ourGameScene = this.scene.get("GameScene");
 
@@ -54,9 +58,17 @@ export var QUICK_MENUS = new Map([
             this.scene.stop();  
 
         }],
-        [`RETURN TO STAGE`, function () {  
-            console.log("RETURN TO STAGE");
+        ['BACK TO MAIN MENU', function () {
+            const ourGameScene = this.scene.get("GameScene");
+
+            console.log("BACK TO MAIN MENU");
+            // Clear for reseting game
+            ourGameScene.events.off('addScore');
+            ourGameScene.events.off('spawnBlackholes');
+            
+            ourGameScene.scene.start("MainMenuScene");
             this.scene.stop(); 
+            return true;
         }],
         ['RESTART ADVENTURE', function () {
             const ourGameScene = this.scene.get("GameScene");
@@ -74,19 +86,6 @@ export var QUICK_MENUS = new Map([
                 startupAnim: true,
             });
 
-            this.scene.stop(); 
-            return true;
-        }],
-        ['BACK TO MAIN MENU', function () {
-            const ourGameScene = this.scene.get("GameScene");
-
-            console.log("BACK TO MAIN MENU");
-
-            // Clear for reseting game
-            ourGameScene.events.off('addScore');
-            ourGameScene.events.off('spawnBlackholes');
-            
-            ourGameScene.scene.start("MainMenuScene");
             this.scene.stop(); 
             return true;
         }],
