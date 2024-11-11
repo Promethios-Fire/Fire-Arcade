@@ -9,7 +9,7 @@
     ],
     "fileStates": {
         "": {
-            "scaleInDock": 2,
+            "scaleInDock": 1,
             "scaleInEditor": 2
         },
         ":/automap-tiles.tsx": {
@@ -637,7 +637,7 @@
             "scale": 2.804032258064516,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 186.160483175151,
+                "x": 186.33879781420768,
                 "y": 185.98216853609432
             }
         },
@@ -649,7 +649,7 @@
             "scale": 2.804032258064516,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 186.160483175151,
+                "x": 186.33879781420768,
                 "y": 185.98216853609432
             }
         },
@@ -851,7 +851,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.6801252808606,
                 "y": 135.76904745693471
             }
         },
@@ -867,7 +867,7 @@
             "scale": 2.983764367816092,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 173.9413492560312,
+                "x": 174.10892281022774,
                 "y": 161.7084797996822
             }
         },
@@ -903,9 +903,9 @@
         },
         "World_1-4.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 2,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": -55.91883979029075,
+                "x": 57.340505208687965,
                 "y": 161.3590249880847
             }
         },
@@ -985,7 +985,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 18.66666666666663,
+                "x": 18.33333333333337,
                 "y": 299
             }
         },
@@ -1000,7 +1000,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 173.25,
                 "y": 161.25
             }
         },
@@ -1008,7 +1008,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.99999999999997,
+                "x": 173.83333333333334,
                 "y": 162.16666666666666
             }
         },
@@ -1027,7 +1027,7 @@
             "scale": 2.997413793103448,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174.15012942191544,
+                "x": 174.3169398907104,
                 "y": 161.97296519988492
             }
         },
@@ -1042,7 +1042,7 @@
             "scale": 2.997413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.15012942191544,
+                "x": 159.6376186367558,
                 "y": 161.97296519988492
             }
         },
@@ -1058,7 +1058,7 @@
             "scale": 2.997413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.15012942191544,
+                "x": 175.81823410986482,
                 "y": 154.96692551049753
             }
         },
@@ -1199,7 +1199,7 @@
             "scale": 1.9733024691358025,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 174.07366856964106,
+                "x": 174.07366856964103,
                 "y": 161.4045514976147
             }
         },
@@ -1211,7 +1211,7 @@
         },
         "World_4-5.json": {
             "scale": 2.688936781609195,
-            "selectedLayer": 0,
+            "selectedLayer": -1,
             "viewCenter": {
                 "x": 173.86053967405826,
                 "y": 161.95992519369491
@@ -1339,7 +1339,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.68012528086064,
+                "x": 135.7690474569347,
                 "y": 229.59896507115135
             }
         },
@@ -1350,7 +1350,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.68012528086064,
+                "x": 135.7690474569347,
                 "y": 162.30680193368286
             }
         },
@@ -1386,7 +1386,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.68012528086064,
+                "x": 173.2062368080616,
                 "y": 162.30680193368286
             }
         },
@@ -1422,7 +1422,7 @@
             "scale": 2.997413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 85.2401495542134,
+                "x": 85.24014955421339,
                 "y": 161.97296519988492
             }
         },
@@ -1444,7 +1444,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.44318104446114,
+                "x": 173.68012528086064,
                 "y": 161.3590249880847
             }
         },
@@ -1455,7 +1455,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 247.8436712739157,
+                "x": 248.08061551031528,
                 "y": 217.27786477837543
             }
         },
@@ -1611,6 +1611,17 @@
             }
         },
         "r-10-17.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-07-1.json": {
+            "scale": 2,
+            "selectedLayer": 4,
+            "viewCenter": {
+                "x": 213.75,
+                "y": 166.25
+            }
+        },
+        "r-11-07-1.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "r07-14-2.json": {
@@ -2000,9 +2011,9 @@
         },
         "template-10-24.json": {
             "scale": 2.983764367816092,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.2710550392449,
+                "x": 173.10348148504838,
                 "y": 164.3896566668272
             }
         },
@@ -2562,18 +2573,18 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "World_1-1.json",
+        "World_1-4.json",
+        "World_2-2.json",
+        "World_2-3-new.json",
+        "World_2-3-new2.json",
+        "World_4-2.json",
+        "World_4-4.json",
         "World_4-5.json",
         "World_4-6.json",
-        "World_4-4.json",
-        "World_8-2_Adv_Portaling.json",
-        "World_8-3_Adv_Portaling.json",
-        "World_8-5_Adv_Portaling.json",
+        "Stage-09.json",
         "World_2-3.json",
-        "World_2-4.json",
-        "World_2-5.json",
-        "World_3-2_Wrap.json",
-        "World_3-3_Wrap.json"
+        "World_1-3.json",
+        "World_1-2.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

@@ -318,9 +318,8 @@ var Snake = new Phaser.Class({
         onGridY = Math.round(onGridY);
         
 
-        if (scene.gState === GState.PLAY && scene.interactLayer[onGridX][onGridY] != "empty") {
-            //debugger;
-            //console.log(scene.interactLayer[onGridX][onGridY] instanceof Food)
+        if (scene.gState === GState.PLAY && typeof scene.interactLayer[onGridX][onGridY].onOver === 'function') {
+            // Only call if whatever is there has an onOver
             scene.interactLayer[onGridX][onGridY].onOver(scene);
         }
 

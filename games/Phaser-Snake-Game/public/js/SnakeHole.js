@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
-import { STAGE_UNLOCKS } from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGE_FILE} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -25,7 +25,7 @@ const DEV_BRANCH = "dev";
 const ANALYTICS_ON = false;
 
 
-const GAME_VERSION = '';
+const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
 export const LENGTH_GOAL = 28; //28..................... Win Condition
@@ -39,6 +39,8 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
+
+const NO_EXPERT_MODE = true;
 
 
 // 1 frame is 16.666 milliseconds
@@ -64,8 +66,7 @@ const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset d
 
 const NO_BONK_BASE = 1200;
 
-const STAGE_TOTAL = 27;
-
+const STAGE_TOTAL = STAGE_FILE.size;
 
 
 
@@ -78,8 +79,29 @@ const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
+const RANK_NUM_1 = 412505;
+/* Rank 1 History
+412505 - James 11/9
+*/
+const RANK_AMOUNT = 1000;
+const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
 
 // #region Utils Functions
+
+var calcSumOfBestRank = function (sumOfBest) {
+    var testVal = 0;
+    var counter = 0;
+    // Later use actual distribution data.
+    // The best player is number one until we have more than 10,000 people playing.
+    // We could do 1000 instead of 100 in the meantime.
+    do {
+        testVal += RANK_STEP;
+        counter += 1;
+    } while (testVal < sumOfBest);
+
+    return Math.max(RANK_AMOUNT - counter, 1) 
+}
+
 
 var calcBonus = function (scoreInput) {
     
@@ -99,22 +121,26 @@ var updateSumOfBest = function(scene) {
 
     var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
-    entries.forEach(log => {
-        var key = log[0].split("-");
-        if (key[key.length - 1] === "bestStageData") {
+    scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
+        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}-bestStageData`));
 
-            var levelLog = new StageData(JSON.parse(log[1]))
-            if (!ignoreSet.has(levelLog.stage)) {
-                scene.stagesComplete += 1
-                BEST_OF_STAGE_DATA.set(levelLog.stage, levelLog);
+        if (tempJSON) { // False if not played stage before.
+            var _stageData = new StageData(tempJSON);
+            scene.stagesComplete += 1;
 
-                var _scoreTotal = levelLog.calcTotal();
-                scene.sumOfBest += _scoreTotal;
-                
-            }   
+            BEST_OF_STAGE_DATA.set(_stageData.stage, _stageData);
+
+            var _scoreTotal = _stageData.calcTotal();
+            scene.sumOfBest += _scoreTotal;
+        }
+        else {
+            var unplayed = scene.scene.get("StartScene").UUID_MAP.get(uuid);
+            
         }
     })
 }
+
+
 
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
@@ -261,6 +287,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 
 const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
     113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,241,242,243];
+const NO_FOOD_TILE = 481;
 
 //  Direction consts
 const START_SPRINT = 5;
@@ -538,7 +565,7 @@ class TutorialScene extends Phaser.Scene {
                     alpha: { from: 0, to: 1 },
                     ease: 'Sine.InOut',
                     duration: 1000,
-                    delay: 1000,
+                    delay: 700,
                     repeat: -1,
                     yoyo: true,
                     onStart: () =>  {
@@ -786,6 +813,7 @@ class StartScene extends Phaser.Scene {
     }
     init() {
         // #region StartScene()
+        this.UUID_MAP = new Map();
         
         
         
@@ -884,6 +912,19 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
 
 
+        // Loads All Stage Properties
+        STAGE_FILE.forEach( stageName => {
+            /***
+             * ${stageName}data is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}data
+             * exclusivley loads the Tiled properties into the global cache.
+             */
+            var cacheName = `${stageName}.properties`;
+            this.load.json(cacheName, `/assets/Tiled/${stageName}.json`, 'properties');
+            //debugger
+
+        });
+
         // Audio
         this.load.setPath('assets/audio');
 
@@ -919,8 +960,6 @@ class StartScene extends Phaser.Scene {
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
-
-
 
         // #region Preloading Events
         this.load.on('progress', function (value) {
@@ -1016,6 +1055,60 @@ class StartScene extends Phaser.Scene {
             this.hasPlayedBefore = true;
             console.log("Testing LOCAL STORAGE => Has played.", );
         }
+
+
+        // Get the Map of UUIDs
+
+        STAGE_FILE.forEach( stageName => {
+            
+            var cacheName = `${stageName}.properties`;
+            var stageCache = this.cache.json.get(cacheName);
+
+            stageCache.forEach( probObj => {
+                if (probObj.name === "UUID") {
+                    this.UUID_MAP.set(probObj.value, stageName )
+                }
+            });
+        });
+
+
+
+        // Syncing UUIDs with real stage names
+        // Keeps unlock chain working when we change stage names.
+        // and lets users keep their high score.
+
+        let entries = Object.entries(localStorage);
+
+        entries.forEach(log => {
+            var key = log[0].split("-");
+            if (key[key.length - 1] === "bestStageData") {
+
+                var uuidString = log[0].slice(0, -14);
+                var correctStage = this.UUID_MAP.get(uuidString);
+                var localJSON = JSON.parse(log[1]);
+
+                if (correctStage === undefined) {
+                    // Stage in History is not currently playable.
+                    console.log(`Unused Stage: ${localJSON.stage} in Local Storage with UUID ${localJSON.uuid} is not in game.`)
+                    
+                } else {
+                
+                console.log();
+                    if (localJSON.stage != correctStage) {
+                        var logJSON = JSON.parse(localStorage.getItem(`${uuidString}-bestStageData`));
+                        var stageDataLog = new StageData(logJSON);
+                        
+                        // Update Stage Name
+                        stageDataLog.stage = correctStage;
+                        
+                        // Save New 
+                        localStorage.setItem(`${uuidString}-bestStageData`, JSON.stringify(stageDataLog));
+                    }
+                }                       
+            }
+        });
+    
+    
 
 
 
@@ -1404,22 +1497,35 @@ class MainMenuScene extends Phaser.Scene {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
                 
+                if (NO_EXPERT_MODE) {
+                    const mainMenuScene = this.scene.get("MainMenuScene");
 
-                var qMenu = QUICK_MENUS.get("adventure-mode");
+                    if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+                        var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+                        mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+                    } else {
+                        mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
+                    }
 
+                    mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+                    this.scene.stop();
+        
+                } else {
+                    var qMenu = QUICK_MENUS.get("adventure-mode");
+
+                    
+                    mainMenuScene.scene.launch("QuickMenuScene", {
+                        menuOptions: qMenu, 
+                        textPrompt: "MODE SELECTOR",
+                        fromScene: mainMenuScene,
+                        cursorIndex: 0
+                    });
+                    mainMenuScene.scene.bringToTop("QuickMenuScene");
+
+                    mainMenuScene.scene.sleep('MainMenuScene');
+
+                }
                 
-                mainMenuScene.scene.launch("QuickMenuScene", {
-                    menuOptions: qMenu, 
-                    textPrompt: "SELECT DIFFICULTY",
-                    fromScene: mainMenuScene,
-                    cursorIndex: 1
-                });
-                mainMenuScene.scene.bringToTop("QuickMenuScene");
-
-                mainMenuScene.scene.sleep('MainMenuScene');
-
-
-                console.log("I DID IT");
 
 
 
@@ -1702,10 +1808,10 @@ class MainMenuScene extends Phaser.Scene {
                 menuFadeTween.resume();            
             }
             else{
-                menuOptions.get(menuList[cursorIndex]).call();
+                menuOptions.get(menuList[cursorIndex]).call(this);
             }
 
-        });
+        }, this);
 
         
         
@@ -2652,6 +2758,7 @@ class GameScene extends Phaser.Scene {
         
     
 
+        // TODO: CAN BE REMOVED ONCE ALL IS LOADED IN THE BEGINNING
         this.nextStages.forEach( stageName => {
             /***
              * ${stageName}data is to avoid overloading the json object storage that already
@@ -2661,6 +2768,7 @@ class GameScene extends Phaser.Scene {
             this.load.json(`${stageName}data`, `assets/Tiled/${stageName}.json`, 'properties');
 
         });
+        
 
         
 
@@ -2712,7 +2820,7 @@ class GameScene extends Phaser.Scene {
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         
         this.wallLayer.forEachTile(tile => {
-            if (tile.index === 481) { // No Food Spawn Tile
+            if (tile.index === NO_FOOD_TILE) { // No Food Spawn Tile
                 tile.alpha = 0; // Set the alpha to 0 to make the tile invisible
             }
         });
@@ -2745,11 +2853,19 @@ class GameScene extends Phaser.Scene {
             this.foodLayer.visible = false;
 
             this.foodLayer.forEachTile(_tile => {
-                if(11 === _tile.index) {
-                    var food = new Food(this, {
-                        x: _tile.x*GRID + X_OFFSET, 
-                        y:_tile.y*GRID + Y_OFFSET
-                    });
+
+                switch (_tile.index) {
+                    case 11:
+                        var food = new Food(this, {
+                            x: _tile.x*GRID + X_OFFSET, 
+                            y:_tile.y*GRID + Y_OFFSET
+                        });
+                        break;
+                    case NO_FOOD_TILE:
+                        this.interactLayer[_tile.x][_tile.y] = _tile.index;
+                
+                    default:
+                        break;
                 }
             })
             this.foodLayer.destroy();
@@ -2881,18 +2997,18 @@ class GameScene extends Phaser.Scene {
             "fontWeight": 400,
             "color": "white",
         }),
-            `${'Would you like to extract?'.toUpperCase()}`
+            `${'Where would you like to extract?'.toUpperCase()}`
         ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
         //nineSlice
         this.extractPanel = this.add.nineslice(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 - GRID * 1.5, 
             'uiPanelL', 'Glass', 
-            GRID * 16, GRID * 8, 
+            GRID * 18.5, GRID * 8, 
             8, 8, 8, 8);
         this.extractPanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
 
         this.exMenuOptions = {
-            'YES': function () {
+            'MAIN MENU': function () {
                 // hide the extract prompt
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
@@ -2904,7 +3020,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.finalScore("MainMenuScene", {});
                 return true;
             },
-            'NO': function () {  
+            'CANCEL': function () {  
                 // stop vortex tween if it's playing
                 if (ourGameScene.vortexTween.isPlaying()) {
                     ourGameScene.vortexTween.stop()
@@ -2935,7 +3051,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.extractMenuOn = false;
                 console.log("NO");
             },
-            'LOOP TO ORIGIN': function () {
+            'DIRECT TO ADVENTURE (WORLD 1-1)': function () {
                 // TODO: send to origin
                 ourGameScene._menuElements.forEach(textElement =>{
                     textElement.setAlpha(0);
@@ -6444,7 +6560,7 @@ var StageData = new Phaser.Class({
     },
 
     zedLevelBonus() {
-        return this.zedLevel / 200;
+        return Math.min(this.zedLevel / 1000, 0.099);
     },
 
     medalBonus() {
@@ -6615,8 +6731,11 @@ class ScoreScene extends Phaser.Scene {
             var bestScoreValue = this.stageData.calcBase()
 
             this.stageData.newBest = true;
+
             
-            localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+            if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
+                localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+            }
             
         }
         else{
@@ -6633,14 +6752,22 @@ class ScoreScene extends Phaser.Scene {
             });
 
         // Pre Calculate needed values
-        var stageAve = this.stageData.calcBase()/this.stageData.foodLog.length;
+        var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        debugger
+
+        if (localStorage.getItem(`${ourGame.stageUUID}-bestStageData`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+
+        } else {
+            // If a test level. Use World 1_1 as a filler to not break UI stuff.
+            var bestLogJSON = JSON.parse(localStorage.getItem(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`))
+        }
+
         var bestLog = new StageData(bestLogJSON);
-
+    
         var bestLocal = bestLog.calcBase();
         var bestAve = bestLocal/bestLog.foodLog.length;
-
 
         // TODO: Don't do it a bonuse level? What do we do with the stage history on bonus levels?
         // Exclude from the Stage history?
@@ -6883,13 +7010,13 @@ class ScoreScene extends Phaser.Scene {
         });
         this.tweens.addCounter({
             from: 0,
-            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(1),
+            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(2),
             duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
             delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
             onUpdate: tween =>
             {
-                const value2 = Math.round(tween.getValue());
+                const value2 = tween.getValue().toFixed(1);
                 multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
                     `
                     ZED LVL +${value2}%
@@ -6942,7 +7069,7 @@ class ScoreScene extends Phaser.Scene {
             delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
             onUpdate: tween =>
             {
-                const value = Math.round(tween.getValue());
+                const value = tween.getValue().toFixed(1);
                 multValuesUI1.setHTML(
                     `x ${value}%
                     `
@@ -7057,8 +7184,9 @@ class ScoreScene extends Phaser.Scene {
                 letterRank.setAlpha(1)
                 //stageScoreUI.setAlpha(1)
                 //this.scorePanelLRank.setAlpha(1)
-                this.sumOfBestUI.setAlpha(1)
-                this.stagesCompleteUI.setAlpha(1)
+                this.sumOfBestUI.setAlpha(1);
+                this.stagesCompleteUI.setAlpha(1);
+                this.playerRankUI.setAlpha(1);
                 },
             onUpdate: tween =>
             {
@@ -7478,6 +7606,16 @@ class ScoreScene extends Phaser.Scene {
             //"font-weight": 'bold',
             })).setHTML(
                 `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
+
+        this.playerRankUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 23.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-weight": '400',
+            "text-shadow": '#000000 1px 0 6px',
+            //"font-style": 'italic',
+            //"font-weight": 'bold',
+            })).setHTML(
+                `BEST OF RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${calcSumOfBestRank(ourPersist.sumOfBest)}</span>`
         ).setOrigin(0,0).setScale(0.5).setAlpha(0);
 
         // #region Help Card
