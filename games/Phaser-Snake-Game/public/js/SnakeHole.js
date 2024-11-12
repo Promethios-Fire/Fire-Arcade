@@ -1258,6 +1258,7 @@ class QuickMenuScene extends Phaser.Scene {
     }
     create(qMenuArgs){
         const ourPersist = this.scene.get('PersistScene');
+        const ourGame = this.scene.get('GameScene');
         // #region Quick Menu
         this.menuOptions = qMenuArgs.menuOptions;
 
@@ -1338,6 +1339,8 @@ class QuickMenuScene extends Phaser.Scene {
                 
             } 
         }
+
+
 
         this.input.keyboard.on('keydown-SPACE', e => {
             var option = this.menuList[this.cursorIndex];
@@ -2522,8 +2525,6 @@ class GameScene extends Phaser.Scene {
 
 
         this.coinSpawnCounter = 100;
-
-          
     }
     
     
@@ -2639,6 +2640,8 @@ class GameScene extends Phaser.Scene {
         else{
             ourPersist.fx.hue(0)
         }
+
+
 
         /*if (this.startupAnim) { // @holden should we save this?
             var tween = this.tweens.addCounter({
@@ -3434,12 +3437,21 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-TAB', function() {
+            let ourQuickMenu = this.scene.get('QuickMenuScene');
             this.scene.launch("QuickMenuScene", {
                 menuOptions: QUICK_MENUS.get("tab-menu"), 
                 textPrompt: "Quick Menu",
                 fromScene: this,
                 cursorIndex: 0
             });
+            this.scene.bringToTop("QuickMenuScene");
+            if (!this.scene.isActive(ourQuickMenu)) {
+                this.backgroundBlur(true);
+            }
+            else{
+                this.backgroundBlur(false);
+            }
+            
         }, this);
 
         
@@ -4996,6 +5008,30 @@ class GameScene extends Phaser.Scene {
 
     }
 
+    backgroundBlur(isBlurring){
+        const ourPersist = this.scene.get('PersistScene');
+        if (isBlurring) {
+            // not needed anymore, but handy for referencing if pixelation is true: if (this.renderer.pipelines.FX_PIPELINE.pixelate = false) {
+            this.fxbgFront = ourPersist.bgFront.postFX.addPixelate(1);
+            this.fxbgMid = ourPersist.bgMid.postFX.addPixelate(1);
+            this.fxbgBack = ourPersist.bgBack.postFX.addPixelate(1);
+            this.fxbgFurthest = ourPersist.bgFurthest.postFX.addPixelate(1);
+            //console.log(ourQuickMenu.renderer.pipelines.FX_PIPELINE.pixelate)
+        }
+        else{
+            // we remove the postFX pixelate pipeline to disable it as setting to 0 does nothing
+            // setting the object to null ensures garbage collection
+            ourPersist.bgFront.postFX.remove(this.fxbgFront)
+            this.fxbgFront = null;
+            ourPersist.bgMid.postFX.remove(this.fxbgMid)
+            this.fxbgMid = null;
+            ourPersist.bgBack.postFX.remove(this.fxbgBack)
+            this.fxbgBack = null;
+            ourPersist.bgFurthest.postFX.remove(this.fxbgFurthest)
+            this.fxbgFurthest = null;
+        }
+    }
+
     victoryFanfare(){
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
@@ -6128,6 +6164,7 @@ class GameScene extends Phaser.Scene {
             this.events.off('addScore');
 
             this.scene.launch('ScoreScene');
+            this.backgroundBlur(true);
             this.setWallsPermeable();
         }
 
@@ -7796,7 +7833,7 @@ class ScoreScene extends Phaser.Scene {
                 ourGame.events.off('spawnBlackholes');
 
 
-                
+                ourGame.backgroundBlur(false);
                 ourScoreScene.scene.stop();
 
                     
