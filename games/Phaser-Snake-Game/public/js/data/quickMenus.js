@@ -58,7 +58,7 @@ export var QUICK_MENUS = new Map([
                 } else {
                     // Leave it out so you can run it again.
                 }
-
+                ourGameScene.backgroundBlur(false);
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
@@ -77,6 +77,7 @@ export var QUICK_MENUS = new Map([
             ourGameScene.events.off('spawnBlackholes');
             
             ourGameScene.scene.start("MainMenuScene");
+            ourGameScene.backgroundBlur(false);
             this.scene.stop(); 
             return true;
         }],
@@ -89,6 +90,7 @@ export var QUICK_MENUS = new Map([
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
             
+            ourGameScene.backgroundBlur(false);
             // Restart  
             ourGameScene.scene.start("GameScene", {
                 stage: START_STAGE,

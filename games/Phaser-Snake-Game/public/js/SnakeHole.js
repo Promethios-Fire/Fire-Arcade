@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 5; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3423,20 +3423,20 @@ class GameScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-TAB', function() {
             const ourQuickMenu = this.scene.get('QuickMenuScene');
-            this.scene.launch("QuickMenuScene", {
-                menuOptions: QUICK_MENUS.get("tab-menu"), 
-                textPrompt: "Quick Menu",
-                fromScene: this,
-                cursorIndex: 0
-            });
-            this.scene.bringToTop("QuickMenuScene");
-            if (!this.scene.isActive(ourQuickMenu)) {
-                this.backgroundBlur(true);
+            const ourScoreScene = this.scene.get('ScoreScene');
+            if (!this.scene.isActive(ourScoreScene)){
+                this.scene.launch("QuickMenuScene", {
+                    menuOptions: QUICK_MENUS.get("tab-menu"), 
+                    textPrompt: "Quick Menu",
+                    fromScene: this,
+                    cursorIndex: 0
+                });
+                this.scene.bringToTop("QuickMenuScene");
+                // make sure tab only blurs background if quick menu is NOT up
+                if (!this.scene.isActive(ourQuickMenu)) {
+                    this.backgroundBlur(true);
+                }
             }
-            //else{
-            //    this.backgroundBlur(false);
-            //}
-            
         }, this);
 
         
@@ -4968,8 +4968,8 @@ class GameScene extends Phaser.Scene {
             //console.log(ourQuickMenu.renderer.pipelines.FX_PIPELINE.pixelate)
         }
         else{
-            // we remove the postFX pixelate pipeline to disable it as setting to 0 does nothing
-            // setting the object to null ensures garbage collection
+            // we remove the postFX pixelate pipeline to disable it as setting to 0 or -1 does nothing
+            // setting the object to null ensures garbage collection -- works now, but errors from desync if holding tab down
             ourPersist.bgFront.postFX.remove(this.fxbgFront)
             this.fxbgFront = null;
             ourPersist.bgMid.postFX.remove(this.fxbgMid)
