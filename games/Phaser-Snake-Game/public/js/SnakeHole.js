@@ -3255,66 +3255,70 @@ class GameScene extends Phaser.Scene {
             
             let gState = this.gState;
 
-            if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
-                if(gState === GState.START_WAIT || gState === GState.WAIT_FOR_INPUT){
-                    this.lastMoveTime = this.time.now;
-                }
+            if (!this.scene.isActive("QuickMenuScene")) {
 
-                ourInputScene.moveDirection(this, e);
-                //this.panelTweenCollapse.resume();
-                
-                this.tweens.add({//SHOULD BE MOVED to not be added every input
-                    targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
-                    x: + SCREEN_WIDTH * 2,
-                    ease: 'Sine.easeOutIn',
-                    duration: 300,
-                    delay: 125,
-                    alpha: 0,
-                });
-                
-                if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
+
+                if (gState === GState.START_WAIT || gState === GState.PLAY || gState === GState.WAIT_FOR_INPUT) {
+                    if(gState === GState.START_WAIT || gState === GState.WAIT_FOR_INPUT){
+                        this.lastMoveTime = this.time.now;
+                    }
+
+                    ourInputScene.moveDirection(this, e);
+                    //this.panelTweenCollapse.resume();
                     
-                    var lastElement = this.boostOutlinesBody.shift();
-                    lastElement.destroy();
-    
-                    // Make the new one
-                    var boostOutline = this.add.sprite(
-                        this.snake.head.x, 
-                        this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(8);
-                    
-                    boostOutline.play("snakeOutlineAnim");
-                    this.boostOutlinesBody.push(boostOutline);
-
-                    this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
-                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
-                }
-
-                
- 
-                if (this.currentScoreTimer() === this.maxScore) {
-                    /**
-                     * This code is duplicated here to make sure that the electron 
-                     * animation is played as soon as you move from the start and wait state.
-                     * Removes varience with slower machines.  It is after the move state to 
-                     * have the input be more responsive.  - James
-                     */
-                    this.atoms.forEach( atom => {
-                        atom.electrons.visible = true;
+                    this.tweens.add({//SHOULD BE MOVED to not be added every input
+                        targets: [this.openingGoalText, this.openingGoalPanel,this.stageText,this.r2],
+                        x: + SCREEN_WIDTH * 2,
+                        ease: 'Sine.easeOutIn',
+                        duration: 300,
+                        delay: 125,
+                        alpha: 0,
                     });
+                    
+                    if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
+                        
+                        var lastElement = this.boostOutlinesBody.shift();
+                        lastElement.destroy();
+        
+                        // Make the new one
+                        var boostOutline = this.add.sprite(
+                            this.snake.head.x, 
+                            this.snake.head.y
+                        ).setOrigin(.083333,.083333).setDepth(8);
+                        
+                        boostOutline.play("snakeOutlineAnim");
+                        this.boostOutlinesBody.push(boostOutline);
+
+                        this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
+                        this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+                    }
+
+                    
+    
+                    if (this.currentScoreTimer() === this.maxScore) {
+                        /**
+                         * This code is duplicated here to make sure that the electron 
+                         * animation is played as soon as you move from the start and wait state.
+                         * Removes varience with slower machines.  It is after the move state to 
+                         * have the input be more responsive.  - James
+                         */
+                        this.atoms.forEach( atom => {
+                            atom.electrons.visible = true;
+                        });
+                    }
                 }
-            }
-            
+                
 
-            if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
-                // Update snake facing direction but do not move the snake
-                //console.log("Moving Freely");
-                ourInputScene.updateDirection(this, e);  
-            }
+                if (gState === GState.PORTAL && this.snake.lastPortal.freeDir === true) {
+                    // Update snake facing direction but do not move the snake
+                    //console.log("Moving Freely");
+                    ourInputScene.updateDirection(this, e);  
+                }
 
-            if (gState === GState.WAIT_FOR_INPUT) {
-                // For GState Bonk and  SceneTransition hold move inputs
-                this.pressedSpaceDuringWait = true;
+                if (gState === GState.WAIT_FOR_INPUT) {
+                    // For GState Bonk and  SceneTransition hold move inputs
+                    this.pressedSpaceDuringWait = true;
+                }
             }
 
 
