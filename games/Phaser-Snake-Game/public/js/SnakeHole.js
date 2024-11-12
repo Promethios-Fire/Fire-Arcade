@@ -28,7 +28,7 @@ const ANALYTICS_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 4; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -5369,9 +5369,9 @@ class GameScene extends Phaser.Scene {
 
         for (let index = 0; index < spaceBoy.stageHistory.length; index++) {
             var id = spaceBoy.stageHistory[index].getID();
-            var rank = spaceBoy.stageHistory[index].stageRank();
+            var _rank = spaceBoy.stageHistory[index].stageRank();
             scoreCount += spaceBoy.stageHistory[index].calcTotal();
-            extractRankSum += rank;
+            extractRankSum += _rank;
             if (extractCode.length === 0) {
                 extractCode = id
             } else {
@@ -5379,7 +5379,7 @@ class GameScene extends Phaser.Scene {
             }
 
             var record = [
-                rank,
+                _rank,
                 id,
                 Math.round(scoreCount)];
 
@@ -5387,7 +5387,7 @@ class GameScene extends Phaser.Scene {
 
             var _x = SCREEN_WIDTH/2 - GRID * 6.5 + index * xOffset;
 
-            const stageRank = this.add.sprite(_x ,GRID * 14.0, "ranksSpriteSheet", rank -1
+            const stageRank = this.add.sprite(_x ,GRID * 14.0, "ranksSpriteSheet", _rank
             ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
 
             var stageID = this.add.dom(_x, GRID * 17, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -5403,7 +5403,7 @@ class GameScene extends Phaser.Scene {
 
         var extractRank = extractRankSum / spaceBoy.stageHistory.length; 
 
-        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 14.0, "ranksSpriteSheet", Math.floor(extractRank) -1
+        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 14.0, "ranksSpriteSheet", Math.floor(extractRank)
         ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
 
         var finalText = this.add.dom(_x + GRID * .5, GRID * 17, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -5412,7 +5412,6 @@ class GameScene extends Phaser.Scene {
                 `RANK`
         ).setOrigin(0.5,0).setScale(0.5);
 
-        debugger
         if (!localStorage.getItem("extractRanks")) {
             // if There is none
             var bestExtractions = new Map()
@@ -5446,8 +5445,28 @@ class GameScene extends Phaser.Scene {
 
         // Stringify the array
         localStorage.setItem("extractRanks", jsonString);
-        
 
+
+        // Show Best Ranks
+        var bestExtract = bestExtractions.get(extractCode);
+        var bestSum = 0;
+
+        for (let index = 0; index < bestExtract.length; index++) {
+
+            bestSum += bestExtract[index][0];
+
+            var _x = SCREEN_WIDTH/2 - GRID * 6.5 + index * xOffset;
+            
+            const bestRank = this.add.sprite(_x ,GRID * 18.0, "ranksSpriteSheet", bestExtract[index][0]
+            ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
+            
+        }
+        var _x = SCREEN_WIDTH/2 - GRID * 6.5 + (bestExtract.length) * xOffset;
+
+        var bestExtractRank = bestSum / bestExtract.length; 
+
+        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.0, "ranksSpriteSheet", Math.floor(bestExtractRank)
+        ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D');
 
 
 
@@ -5480,11 +5499,11 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(0.5, 0).setScale(.5).setScrollFactor(0);
 
         //nineSlice
-        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, Y_OFFSET + GRID * 13.5, 
+        this.finalScorePanel = this.add.nineslice(SCREEN_WIDTH/2, Y_OFFSET + GRID * 8.5, 
             'uiPanelL', 'Glass', 
-            GRID * 17, GRID * 10, 
+            GRID * 17, GRID * 12, 
             8, 8, 8, 8);
-        this.finalScorePanel.setDepth(60).setOrigin(0.5,0.5).setScrollFactor(0);
+        this.finalScorePanel.setDepth(60).setOrigin(0.5,0).setScrollFactor(0);
 
 
         //FINAL SCORE LABEL
@@ -5493,6 +5512,12 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 `FINAL SCORE:`
         ).setOrigin(1,0).setScale(0.5);
+
+        const bestRanksLableUI = this.add.dom(SCREEN_WIDTH/2 - GRID * 0.5, GRID * 21.5, 'div', Object.assign({}, STYLE_DEFAULT,
+            finalScoreStyle, {
+            })).setHTML(
+                `BEST EXTRACTION`
+        ).setOrigin(0.5,0).setScale(0.5);
         
         var _totalScore = 0
 
