@@ -3422,7 +3422,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.input.keyboard.on('keydown-TAB', function() {
-            let ourQuickMenu = this.scene.get('QuickMenuScene');
+            const ourQuickMenu = this.scene.get('QuickMenuScene');
             this.scene.launch("QuickMenuScene", {
                 menuOptions: QUICK_MENUS.get("tab-menu"), 
                 textPrompt: "Quick Menu",
@@ -3433,9 +3433,9 @@ class GameScene extends Phaser.Scene {
             if (!this.scene.isActive(ourQuickMenu)) {
                 this.backgroundBlur(true);
             }
-            else{
-                this.backgroundBlur(false);
-            }
+            //else{
+            //    this.backgroundBlur(false);
+            //}
             
         }, this);
 

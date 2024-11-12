@@ -33,9 +33,9 @@ export var QUICK_MENUS = new Map([
     ])],
     ["tab-menu", new Map([
         [`RETURN TO STAGE`, function () {  
+            const ourGameScene = this.scene.get("GameScene");
             console.log("RETURN TO STAGE");
-            //console.log(this)
-            //this.renderer.pipelines.FX_PIPELINE.pixelate = false;
+            ourGameScene.backgroundBlur(false);
             this.scene.stop(); 
         }],
         ['REDO STAGE (- 1 Coin)', function () {
