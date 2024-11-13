@@ -448,6 +448,11 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
+        
+        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 30 + 2, Y_OFFSET + GRID * 6, 'shiftLight',2).setOrigin(0,0).setDepth(53);
+        this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -1, Y_OFFSET + GRID * 6, 'shiftLight',1).setOrigin(0,0).setDepth(53);
+        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 32 + 8, Y_OFFSET + GRID * 6, 'shiftLight',0).setOrigin(0,0).setDepth(53);
+        
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
         setOrigin(0,0).setDepth(51).setAlpha(0);
 
@@ -904,6 +909,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('shiftLight', 'assets/sprites/spaceBoyShiftLight.png', { frameWidth: 12, frameHeight: 12 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
