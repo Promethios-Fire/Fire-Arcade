@@ -40,6 +40,7 @@ export var QUICK_MENUS = new Map([
         }],
         ['REDO STAGE (- 1 Coin)', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
 
             if (ourGameScene.scene.get("PersistScene").coins > 0) {
@@ -67,12 +68,16 @@ export var QUICK_MENUS = new Map([
                     score: ourGameScene.stageStartScore, 
                     //lives: this.lives 
                 });
+                ourSpaceBoy.shiftLight1.setAlpha(0);
+                ourSpaceBoy.shiftLight2.setAlpha(0);
+                ourSpaceBoy.shiftLight3.setAlpha(0);
             }
             this.scene.stop();  
 
         }],
         ['BACK TO MAIN MENU', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
             console.log("BACK TO MAIN MENU");
             // Clear for reseting game
@@ -81,11 +86,15 @@ export var QUICK_MENUS = new Map([
             
             ourGameScene.scene.start("MainMenuScene");
             ourGameScene.backgroundBlur(false);
+            ourSpaceBoy.shiftLight1.setAlpha(0);
+            ourSpaceBoy.shiftLight2.setAlpha(0);
+            ourSpaceBoy.shiftLight3.setAlpha(0);
             this.scene.stop(); 
             return true;
         }],
         ['RESTART ADVENTURE', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             // TODO: send to origin
 
 
@@ -100,6 +109,10 @@ export var QUICK_MENUS = new Map([
                 score: 0,
                 startupAnim: true,
             });
+
+            ourSpaceBoy.shiftLight1.setAlpha(0);
+            ourSpaceBoy.shiftLight2.setAlpha(0);
+            ourSpaceBoy.shiftLight3.setAlpha(0);
 
             this.scene.stop(); 
             return true;
