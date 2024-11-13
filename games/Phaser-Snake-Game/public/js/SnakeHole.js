@@ -4577,15 +4577,21 @@ class GameScene extends Phaser.Scene {
                     paused: false
                  }, this);   
             }
-            if (this.length > this.lengthGoal - 4){
-                ourSpaceBoy.shiftLight1.setAlpha(1);
-                if (this.length > this.lengthGoal - 3){
+
+            switch (this.length) {
+                case this.lengthGoal - 3:
+                    ourSpaceBoy.shiftLight1.setAlpha(1);
+                    break;
+                case this.lengthGoal - 2:
                     ourSpaceBoy.shiftLight2.setAlpha(1);
-                }
-                if (this.length === this.lengthGoal -1){
+                    break;
+                case this.lengthGoal - 1:
                     ourSpaceBoy.shiftLight3.setAlpha(1);
-                }
+                    break;
+                default:
+                    break;
             }
+
             
         }, this);
 
