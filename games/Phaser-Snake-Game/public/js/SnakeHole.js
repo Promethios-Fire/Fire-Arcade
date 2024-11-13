@@ -449,9 +449,9 @@ class SpaceBoyScene extends Phaser.Scene {
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
         
-        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 30 + 2, Y_OFFSET + GRID * 6, 'shiftLight',2).setOrigin(0,0).setDepth(53);
-        this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -1, Y_OFFSET + GRID * 6, 'shiftLight',1).setOrigin(0,0).setDepth(53);
-        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 32 + 8, Y_OFFSET + GRID * 6, 'shiftLight',0).setOrigin(0,0).setDepth(53);
+        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 30 + 2, Y_OFFSET + GRID * 6, 'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -1, Y_OFFSET + GRID * 6, 'shiftLight',1).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 32 + 8, Y_OFFSET + GRID * 6, 'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
         
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
         setOrigin(0,0).setDepth(51).setAlpha(0);
@@ -463,7 +463,6 @@ class SpaceBoyScene extends Phaser.Scene {
             ease: 'Sine.Out',
             delay: 500,
             });
-
     }
 }
 
