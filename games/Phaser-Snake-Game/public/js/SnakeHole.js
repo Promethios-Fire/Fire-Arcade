@@ -5,7 +5,7 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import { PORTAL_COLORS, PORTAL_TILE_RULES } from './const.js';
+import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
 import { STAGE_UNLOCKS, STAGES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
@@ -79,10 +79,11 @@ const a = 1400; // Average Score
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
-const RANK_NUM_1 = 534888;
+const RANK_NUM_1 = 617749;
 /* Rank 1 History
 412505 - James 11/9
 534,888 = James 11/12
+617,749 = James 11/12
 */
 const RANK_AMOUNT = 100;
 const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
@@ -440,7 +441,7 @@ class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
 // #region SpaceBoyScene
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
-        super({key: 'SpaceBoyScene', active: true});
+        super({key: 'SpaceBoyScene', active: false});
     }
     init() {
         this.stageHistory = [];
@@ -466,6 +467,85 @@ class SpaceBoyScene extends Phaser.Scene {
             ease: 'Sine.Out',
             delay: 500,
             });
+
+        var columnX = X_OFFSET - GRID * 7;
+
+        this.trackID = this.add.bitmapText(columnX - GRID - 6, GRID * 7, 'mainFont', `000`, 16
+        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTint(0xF0F0F0);
+        this.trackID.setDepth(80);
+
+        const playButton = this.add.sprite(columnX , GRID * 7, 'mediaButtons', 2
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        playButton.setTint(0xFFFFFF);
+        
+        playButton.on('pointerdown', () => {
+            this.music.play();
+        }, this);
+    
+        const stopButton = this.add.sprite(columnX , GRID * 8.5, 'mediaButtons', 3
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        
+        stopButton.on('pointerdown', () => {
+            this.music.stop();
+        }, this);
+
+        const nextButton = this.add.sprite(columnX , GRID * 10, 'mediaButtons', 1
+        ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+        nextButton.on('pointerdown', () => {
+            if (this.music != undefined) {
+                this.music.stop();
+                this.nextSong();  
+            }
+            
+        }, this);
+
+        
+
+        
+
+    }
+    startMusic () {
+
+        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        var track = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${track}`,{
+            volume: 0.33
+        });
+
+        this.trackID.setText(track);
+
+        
+        
+        //music.on('complete', listener);
+        
+        //music.play();
+        this.music.play();
+        this.music.on('complete', () => {
+            this.nextSong();
+        }, this);
+
+    }
+    nextSong () {
+
+        if (this.shuffledTracks.length != 0) {
+        } else {
+            this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        }
+
+        var track = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${track}`,{
+            volume: 0.33
+        });
+
+        this.music.play();
+        this.music.on('complete', () => {
+            this.nextSong();
+        }, this); 
+        
+        this.trackID.setText(track);
+
     }
 }
 
@@ -815,7 +895,6 @@ class TutorialScene extends Phaser.Scene {
     }
 }
 
-// #region StartScene
 class StartScene extends Phaser.Scene {
     constructor () {
         super({key: 'StartScene', active: true});
@@ -851,8 +930,9 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('stars', 'assets/sprites/starSheet.png', { frameWidth: 17, frameHeight: 17 });
         this.load.spritesheet('electronParticleFanfare', 'assets/sprites/electronParticleFanfare.png', { frameWidth: 24, frameHeight: 24 });
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
-        this.load.image('titleLogo','assets/sprites/UI_titleLogo.png')
+        this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -868,7 +948,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png'], { frameWidth: GRID, frameHeight: GRID });
 
 
-        this.load.spritesheet('blackholeAnim', '/assets/sprites/blackholeAnim.png',{ frameWidth: 64, frameHeight: 64 });
+        this.load.spritesheet('blackholeAnim', '/assets/sprites/blackHoleAnim.png',{ frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('extractHole', '/assets/sprites/extractHole.png',{ frameWidth: 64, frameHeight: 64 });
 
         // GameUI
@@ -935,7 +1015,7 @@ class StartScene extends Phaser.Scene {
 
         });
 
-        // Audio
+        // #region Load Audio
         this.load.setPath('assets/audio');
 
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
@@ -970,6 +1050,23 @@ class StartScene extends Phaser.Scene {
             {
                 this.load.audio(soundID[0], soundID[1]);
             });
+
+        // #region Load Music
+        this.load.setPath('assets/music/project-files');
+
+        TRACKS.keys().forEach( trackID => {
+            var track = `track_${trackID}`;
+            var path = TRACKS.get(trackID);
+            this.load.audio(track, [path]);
+        })
+
+        // Game Over Song
+        this.load.audio(`track_${149}`, "let-149-game-over_11-10.m4a");
+
+        // Red Alert Song
+        this.load.audio(`track_${175}`, "let-175_11-10.m4a");
+
+        
 
         // #region Preloading Events
         this.load.on('progress', function (value) {
@@ -1235,6 +1332,9 @@ class StartScene extends Phaser.Scene {
 
     onInput() {
         // #region SCORE DEBUG
+
+
+
         if (SCORE_SCENE_DEBUG) {
                 
 
@@ -1815,6 +1915,9 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
+                this.scene.get("SpaceBoyScene").startMusic();
+
+
                 mainMenuScene.pressToPlayTween.stop();
                 mainMenuScene.pressToPlay.setAlpha(0)
                 mainMenuScene.pressedSpace = true;
@@ -2541,7 +2644,7 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
-        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_1-1') {
+        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_0-1') {
             
             this.stage = 'Tutorial_1';
             console.log('Tutorial Time!', this.stage);
@@ -2651,6 +2754,8 @@ class GameScene extends Phaser.Scene {
         else{
             ourPersist.fx.hue(0)
         }
+
+
 
 
 
@@ -2769,6 +2874,26 @@ class GameScene extends Phaser.Scene {
 
         // The first split and join santizes any spaces.
         this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
+        
+        // TODO: This is kept in for loading the tutorial levels.
+        this.nextStages.forEach( stageName => {
+            /***
+             * ${stageName}data is to avoid overloading the json object storage that already
+             * has the Stage Name in it from loading the level. ${stageName}data
+             * exclusivley loads the Tiled properties into the global cache.
+             */
+            this.load.json(`${stageName}.properties`, `assets/Tiled/${stageName}.json`, 'properties');
+
+        });
+        
+
+        
+
+        
+        this.load.start(); // Loader doesn't start on its own outside of the preload function.
+        this.load.on('complete', function () {
+            console.log('Loaded all the json properties for NextStages');
+        });
         
 
 
@@ -3528,9 +3653,13 @@ class GameScene extends Phaser.Scene {
                         if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
                             var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
 
+                        
                             
-
-                            var stageName = STAGES.get(nextStagesCopy.shift()); 
+                            var stageRaw = nextStagesCopy.shift();
+                            var stageName = STAGES.get(stageRaw);
+                            if (stageName === undefined) { // Catches levels that are not in STAGES
+                                stageName = stageRaw;
+                            } 
                             var dataName = `${stageName}.properties`;
                             var data = this.cache.json.get(dataName);
                         
@@ -4266,14 +4395,14 @@ class GameScene extends Phaser.Scene {
 
         // Score Text SET INVISIBLE
         this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
-            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,16)
-            .setOrigin(0,0).setScale(.5).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setScrollFactor(0).setTint(0x1f211b);
 
         this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,16)
-            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
         this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,16)
-            .setOrigin(0,0).setScale(.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
 
@@ -5858,7 +5987,15 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.In',
                     delay: 500,
                     onComplete: () =>{
-                        this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                        var nextStageRaw = this.nextStages[nextStageIndex];
+                        if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
+
+                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                            
+                        } else {
+                            this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                        }
+                        
                     }
                 });
             }
