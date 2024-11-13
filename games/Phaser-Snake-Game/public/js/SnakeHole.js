@@ -440,7 +440,7 @@ class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
 // #region SpaceBoyScene
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
-        super({key: 'SpaceBoyScene', active: true});
+        super({key: 'SpaceBoyScene', active: false});
     }
     init() {
         this.stageHistory = [];
@@ -448,8 +448,8 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
-        setOrigin(0,0).setDepth(51).setAlpha(0);
+        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight'
+        ).setOrigin(0,0).setDepth(51).setAlpha(0);
 
         this.tweens.add({
             targets: this.spaceBoyLight,
@@ -459,12 +459,53 @@ class SpaceBoyScene extends Phaser.Scene {
             delay: 500,
             });
 
+        debugger
+        const playButton = this.add.sprite(X_OFFSET - GRID * 3.5, GRID * 4 - 2, 'snakeDefault').setOrigin(0,0).setDepth(60).setPipeline('Light2D');
+
+        playButton.setInteractive();
+
+        playButton.on('pointerdown', () => {
+            this.music.play();
+        }, this);
+
     }
     startMusic () {
-        this.music = this.sound.add(`track_${149}`);
+
+        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        var track = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${track}`,{
+            volume: 0.5
+        });
+
+        
+        
         //music.on('complete', listener);
+        
         //music.play();
         this.music.play();
+        this.music.on('complete', () => {
+            this.nextSong();
+        }, this);
+
+    }
+    nextSong () {
+
+        if (this.shuffledTracks.length != 0) {
+        } else {
+            this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+        }
+
+        var track = this.shuffledTracks.pop();
+
+        this.music = this.sound.add(`track_${track}`,{
+            volume: 0.5
+        });
+
+        this.music.play();
+        this.music.on('complete', () => {
+            this.nextSong();
+        }, this);      
 
     }
 }
