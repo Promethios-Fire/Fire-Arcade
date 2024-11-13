@@ -3133,7 +3133,11 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
+                ourSpaceBoy.shiftLight1.setAlpha(0);
+                ourSpaceBoy.shiftLight2.setAlpha(0);
+                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("YES");
+                
                 ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore("MainMenuScene", {});
                 return true;
@@ -3176,6 +3180,9 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
+                ourSpaceBoy.shiftLight1.setAlpha(0);
+                ourSpaceBoy.shiftLight2.setAlpha(0);
+                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
 
