@@ -3208,7 +3208,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
@@ -4336,7 +4336,7 @@ class GameScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 4, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 1, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -4471,7 +4471,7 @@ class GameScene extends Phaser.Scene {
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -6,
                     y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 0,
@@ -4483,7 +4483,7 @@ class GameScene extends Phaser.Scene {
                 });
                 var movingElectronTween2 = this.tweens.add( {
                     targets: electronToCapacitor2,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -10,
                     y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 33.3,
@@ -4495,7 +4495,7 @@ class GameScene extends Phaser.Scene {
                 });
                 var movingElectronTween3 = this.tweens.add( {
                     targets: electronToCapacitor3,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -10,
                     y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 66.7,
@@ -5174,7 +5174,7 @@ class GameScene extends Phaser.Scene {
 
                         ourPersist.cameras.main.scrollX = 0;
                         ourPersist.cameras.main.scrollY = 0;*/
-                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
+                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                         .setDepth(100);
                         
                         this.gState = GState.PLAY;
@@ -5226,19 +5226,19 @@ class GameScene extends Phaser.Scene {
                 if (animation.key === 'electronFanfareForm') {
                     this.tweens.add({
                         targets: [this.electronFanfare,this.atomComet],
-                        x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                        x: ourSpaceBoy.scoreFrame.getCenter().x -6,
                         y: ourSpaceBoy.scoreFrame.getCenter().y,
                         ease: 'Sine.easeIn',
                         duration: 1250,
                         onComplete: () => {
                             ourGame.countDown.setAlpha(1);
-                            ourGame.countDown.x = X_OFFSET + GRID * 4 - 3;
+                            ourGame.countDown.x = X_OFFSET + GRID * 4 - 6;
                             ourGame.countDown.y = 3;
                             this.atomComet.destroy();
                         }
                     });
                             ourGame.countDown.setHTML('W1N');
-                            ourGame.countDown.x += 4
+                            ourGame.countDown.x += 3
                     }
                     
             });
