@@ -449,9 +449,9 @@ class SpaceBoyScene extends Phaser.Scene {
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
         
-        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 30 + 2, Y_OFFSET + GRID * 6, 'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 2, Y_OFFSET + GRID * 6, 'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
         this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -1, Y_OFFSET + GRID * 6, 'shiftLight',1).setOrigin(0,0).setDepth(53).setAlpha(0);
-        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 32 + 8, Y_OFFSET + GRID * 6, 'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 32 + 8, Y_OFFSET + GRID * 6, 'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
         
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
         setOrigin(0,0).setDepth(51).setAlpha(0);
@@ -4432,6 +4432,7 @@ class GameScene extends Phaser.Scene {
         this.events.on('addScore', function (fruit) {
 
             const ourGameScene = this.scene.get('GameScene');
+            const ourScoreScene = this.scene.get('ScoreScene');
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
@@ -4575,6 +4576,15 @@ class GameScene extends Phaser.Scene {
                     delay: this.maxScore * 100,
                     paused: false
                  }, this);   
+            }
+            if (this.length > this.lengthGoal - 4){
+                ourSpaceBoy.shiftLight1.setAlpha(1);
+                if (this.length > this.lengthGoal - 3){
+                    ourSpaceBoy.shiftLight2.setAlpha(1);
+                }
+                if (this.length === this.lengthGoal -1){
+                    ourSpaceBoy.shiftLight3.setAlpha(1);
+                }
             }
             
         }, this);
