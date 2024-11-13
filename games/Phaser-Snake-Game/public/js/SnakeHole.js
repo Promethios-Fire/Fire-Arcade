@@ -483,8 +483,11 @@ class SpaceBoyScene extends Phaser.Scene {
         const nextButton = this.add.sprite(columnX , GRID * 10, 'mediaButtons', 1
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         nextButton.on('pointerdown', () => {
-            this.music.stop();
-            this.nextSong();
+            if (this.music != undefined) {
+                this.music.stop();
+                this.nextSong();  
+            }
+            
         }, this);
 
         
