@@ -460,6 +460,13 @@ class SpaceBoyScene extends Phaser.Scene {
             });
 
     }
+    startMusic () {
+        this.music = this.sound.add(`track_${149}`);
+        //music.on('complete', listener);
+        //music.play();
+        this.music.play();
+
+    }
 }
 
 // #region TutorialScene
@@ -1824,12 +1831,8 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-SPACE', function() {
             if (!mainMenuScene.pressedSpace) {
                 
-                var ourSpaceBoy = this.scene.get("SpaceBoyScene");
-        
-                ourSpaceBoy.music = this.sound.add(`track_${149}`);
-                //music.on('complete', listener);
-                //music.play();
-                ourSpaceBoy.music.play();
+                this.scene.get("SpaceBoyScene").startMusic();
+
 
 
                 mainMenuScene.pressToPlayTween.stop();
