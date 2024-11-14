@@ -1559,7 +1559,7 @@ class StageCodex extends Phaser.Scene {
         var topLeft = X_OFFSET + GRID * 1.5;
         var rowY = Y_OFFSET + GRID * 5;
         var stageNumber = 0;
-        var nextRow = 54;
+        var nextRow = 56;
 
         var codexContainer = this.make.container(0, 0);
 
