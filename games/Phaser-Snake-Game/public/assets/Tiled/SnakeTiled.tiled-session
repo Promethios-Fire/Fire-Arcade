@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "",
+    "activeFile": "Tutorial_3.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -738,7 +738,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 174,
-                "y": 161.66666666666669
+                "y": 161.66666666666663
             }
         },
         "Tutorial_3.json#tileSheetx12": {
@@ -2737,10 +2737,16 @@
     "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
     "openFiles": [
+        "Tutorial_1.json",
+        "Tutorial_2.json",
+        "Tutorial_3.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "Tutorial_1.json",
+        "Tutorial_2.json",
+        "Tutorial_3.json",
         "World_10-4.json",
         "World_0-1.json",
         "archive-World_1-1-max-combo-record.json",
@@ -2749,10 +2755,7 @@
         "World_9-4_Final_Exams.json",
         "World_9-3_Final_Exams.json",
         "World_9-2_Final_Exams.json",
-        "World_8-4_Adv_Portaling.json",
-        "r09-16-4.json",
-        "r09-16-3.json",
-        "r09-16-2b.json"
+        "World_8-4_Adv_Portaling.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

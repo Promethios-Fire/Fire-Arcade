@@ -1275,6 +1275,7 @@ class StartScene extends Phaser.Scene {
         // TEMP TAG
 
         this.scene.start("StageCodex");
+        // END TEMP TAG
         
         /*
         this.scene.start('MainMenuScene', {
@@ -1553,38 +1554,127 @@ class StageCodex extends Phaser.Scene {
 
     }
     create () {
-        var textStart = 152;
-        var rowY = Y_OFFSET + 152;
+        var ourPersist = this.scene.get("PersistScene");
+        this.scene.moveBelow("StageCodex", "SpaceBoyScene");
+        var topLeft = X_OFFSET + GRID * 1.5;
+        var rowY = Y_OFFSET + GRID * 5;
         var stageNumber = 0;
-        var nextRow = 24;
+        var nextRow = 54;
 
-        var titleText = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var codexContainer = this.make.container(0, 0);
+
+        var bestText = `Best of Codex - Sum of Best = ${commaInt(ourPersist.sumOfBest.toFixed(0))}`;
+
+        var titleText = this.add.dom(topLeft, Y_OFFSET + GRID * 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
-            `Best of Codex`
-        ).setOrigin(0,0).setScale(0.5).setAlpha(1);
+            bestText
+        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+
+        var playerRank = this.add.dom(topLeft, Y_OFFSET + GRID * 3 + 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+        }),
+            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBest)}%`
+        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+
+        var stages = this.add.dom(X_OFFSET + GRID * 27.5, Y_OFFSET + GRID * 3 + 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+        }),
+            `STAGES: ${ourPersist.stagesComplete}`
+        ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+
+        codexContainer.add([titleText, playerRank, stages]);
         
-        var freshAtom = this.add.sprite(SCREEN_WIDTH / 2 + GRID, textStart - GRID * 1.75
-        ).setDepth(70).setScale(1);
-        freshAtom.play('atom01idle');
-
-        var freshAtom = this.add.sprite(SCREEN_WIDTH / 2 + GRID * 2.5, textStart - GRID * 1.75
-        ).setDepth(70).setScale(.75);
-        freshAtom.play('atom01idle');
-
-        var freshAtom = this.add.sprite(SCREEN_WIDTH / 2 + GRID * 4, textStart - GRID * 1.75
-        ).setDepth(70).setScale(.5);
-        freshAtom.play('atom01idle');
 
         BEST_OF_STAGE_DATA.values().forEach( bestOf => {
-            debugger
-            var stageTitle = this.add.bitmapText(X_OFFSET + GRID * 8, rowY + nextRow * stageNumber, 'mainFont',`${bestOf.stage}`,16
-
+            //debugger
+            const stageTitle = this.add.bitmapText(topLeft, rowY + nextRow * stageNumber, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
             ).setOrigin(0,0);
+
+            const score = this.add.bitmapText(topLeft , rowY + nextRow * stageNumber + 21, 'mainFont',`SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
+            ).setOrigin(0,0).setScale(0.5);
+
+            const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, rowY + nextRow * stageNumber + 21, 'mainFont',`SPEED BONUS: ${commaInt(bestOf.calcBonus())} =>`,16
+            ).setOrigin(1,0).setScale(0.5);
+
+            const rankTitle = this.add.bitmapText(topLeft + GRID * 24, rowY + nextRow * stageNumber + 21, 'mainFont',`RANK:`,16
+            ).setOrigin(1,0).setScale(0.5);
+
+            const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , rowY + nextRow * stageNumber - 4, "ranksSpriteSheet", bestOf.stageRank()
+            ).setDepth(80).setOrigin(0,0).setScale(1);
+
+            codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
+
+
+            var foodIndex = 0;
+            var foodSpace = 11;
+            bestOf.foodLog.forEach( foodScore => {
+                var _y;
+                if (foodIndex < 28 ) { // Wraps Food Under
+                    _y = rowY + 34 + (nextRow * stageNumber);
+                } else {
+                    _y = rowY + 34 + (nextRow * stageNumber);
+                }
+                var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
+                ).setOrigin(0,0).setDepth(70).setScale(.75);
+
+                switch (true) {
+                    case foodScore > BOOST_ADD_FLOOR:
+                        _atom.play('atom01idle');
+                        break;
+
+                    case foodScore > 60:
+                        _atom.play('atom02idle');
+                        break;
+                    
+                    case foodScore > 1:
+                        _atom.play('atom03idle');
+                        break;
+                    
+                    case foodScore > 60:
+                        break;
+                
+                    default:
+                        _atom.play("atom04idle");
+                        break;
+                }
+
+                codexContainer.add(_atom);
+                
+                foodIndex += 1;
+            })
 
             stageNumber += 1;
         })
+
+        var containerToY = 0;
+
+        this.input.keyboard.on('keydown-UP', e => {
+            
+            containerToY += nextRow * 3;
+            codexContainer.y ;
+            this.tweens.add({
+                targets: codexContainer,
+                y: containerToY,
+                ease: 'Sine.InOut',
+                duration: 500,
+            }, this);
+        }, this);
+
+        this.input.keyboard.on('keydown-DOWN', e => {
+            containerToY -= nextRow * 3;
+            codexContainer.y ;
+            this.tweens.add({
+                targets: codexContainer,
+                y: containerToY,
+                ease: 'Sine.InOut',
+                duration: 500,
+            }, this);
+        }, this);
+
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             //this.cameras.main.scrollX += SCREEN_WIDTH;
