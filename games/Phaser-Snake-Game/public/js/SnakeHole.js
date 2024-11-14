@@ -39,10 +39,10 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
-const DEBUG_SKIP_TO_SCENE = true;
+const DEBUG_SKIP_TO_SCENE = false;
 const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
-    stage:"World_2-4"
+    stage:"World_0-1"
 }
 const NO_EXPERT_MODE = true;
 
@@ -1407,7 +1407,7 @@ class QuickMenuScene extends Phaser.Scene {
         var _spacing = 20;
         this.menuElements = [];
 
-        /*
+        
 
         this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuCenter - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
@@ -1478,7 +1478,7 @@ class QuickMenuScene extends Phaser.Scene {
                 
                 
             } 
-        }*/
+        }
 
 
 
@@ -1540,15 +1540,36 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
         this.input.keyboard.on('keydown-LEFT', e => {
-                //this.cameras.main.scrollX -= SCREEN_WIDTH;
-                //this.cameras.main.scrollX -= SCREEN_WIDTH;
-                debugger
+
+            const ourGame = this.scene.get("GameScene");
+            //const ourStageCodex = this.scene.get("StageCodex");
+            //this.cameras.main.scrollX -= SCREEN_WIDTH;
+            //this.cameras.main.scrollX -= SCREEN_WIDTH;
+
+            if (!this.scene.isSleeping("StageCodex")) {
+                this.scene.sleep("QuickMenuScene");
                 this.scene.launch('StageCodex', {
                     stage: this.scene.get("GameScene").stage
                 });
-                //this.scene.sleep('QuickMenuScene');
-                //this.scene.stop();
-                //this.scene.sleep('GameScene');
+            } else {
+                this.scene.wake("StageCodex");
+                this.scene.sleep("QuickMenuScene");
+            }
+
+            
+
+            ourGame.scene.pause();
+            ourGame.scene.setVisible(false);
+            debugger
+            //this.scene.sleep("QuickMenuScene");
+            //this.scene.sleep();
+            
+            
+            /***
+             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+             * DON't USE UNLESS YOU FIGURE THAT OUT
+             * //this.scene.sleep('GameScene');
+             */
         }, this);
 
         
@@ -1751,9 +1772,13 @@ class StageCodex extends Phaser.Scene {
         this.input.keyboard.on('keydown-RIGHT', e => {
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
-            this.scene.sleep('StageCodex');
+            const game = this.scene.get("GameScene");
+            game.scene.resume();
+            game.scene.setVisible(true);
+
             this.scene.wake('QuickMenuScene');
-            this.scene.wake('GameScene');
+            this.scene.sleep('StageCodex');
+            
         }, this);
 
     }
@@ -3818,7 +3843,7 @@ class GameScene extends Phaser.Scene {
                 this.tabDown = true;
                 const ourQuickMenu = this.scene.get('QuickMenuScene');
                 const ourScoreScene = this.scene.get('ScoreScene');
-                if (!this.scene.isActive(ourScoreScene)){
+                if (!this.scene.isActive('ScoreScene') || !this.scene.isActive('StageCodex')){
                     this.scene.launch("QuickMenuScene", {
                         menuOptions: QUICK_MENUS.get("tab-menu"), 
                         textPrompt: "Quick Menu",
