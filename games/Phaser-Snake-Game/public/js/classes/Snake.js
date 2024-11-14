@@ -67,11 +67,11 @@ var Snake = new Phaser.Class({
         // Exception for Bonus Levels when the Length Goal = 0
         if (LENGTH_GOAL != 0) {
             scene.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
+                ``
             )
         }
         else {
-            scene.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+            scene.lengthGoalUI.setText(``);
         }
 
         //scene.scale.gameSize.height += 24;

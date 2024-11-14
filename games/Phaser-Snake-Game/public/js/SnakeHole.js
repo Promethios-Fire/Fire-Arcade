@@ -4420,14 +4420,14 @@ class GameScene extends Phaser.Scene {
         
 
         // Score Text SET INVISIBLE
-        this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',`STAGE`,16)
+        this.scoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 1.25, 'mainFont',``,16)
             .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',`0`,16)
+        this.scoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 1.25, 'mainFont',``,16)
             .setOrigin(0,0).setScale(0.5).setScrollFactor(0).setTint(0x1f211b);
 
-        this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',`BEST`,16)
+        this.bestScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 0.325 , 'mainFont',``,16)
             .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',`${this.bestBase}`,16)
+        this.bestScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 0.325 , 'mainFont',``,16)
             .setOrigin(0,0).setScale(0.5).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
@@ -4465,17 +4465,17 @@ class GameScene extends Phaser.Scene {
         var length = `${this.length}`;
         if (this.lengthGoal != 0) {
             this.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
+                ``
             ).setOrigin(0,0).setAlpha(1);
             this.lengthGoalUILabel.setText(
-            `LENGTH\nGOAL`
+            ``
             ).setOrigin(0,0).setAlpha(1);
             this.lengthGoalUILabel.setLineSpacing(3)
             this.lengthGoalUI.setLineSpacing(3)
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
+            this.lengthGoalUI.setText(``).setOrigin(0,0)
             .setAlpha(0);
             this.lengthGoalUI.x = GRID * 27
         }
@@ -4564,15 +4564,15 @@ class GameScene extends Phaser.Scene {
         /*this.runningScoreUI = this.add.dom(X_OFFSET + GRID * 23.75, GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE, { color: '0x1f211b' })).setText(
             `Score`
         ).setOrigin(0,1).setScale(.5).setAlpha(1).setScrollFactor(0);*/
-        this.runningScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 - 2, 'mainFont', 'SCORE', 16)
+        this.runningScoreUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 - 2, 'mainFont', "" , 16)
             .setOrigin(0, 1)
             .setScale(0.5)
             .setAlpha(1)
             .setScrollFactor(0)
             .setTint(0x1f211b)
             .setDepth(100);
-        this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3 -2, 'mainFont', `${commaInt(this.score.toString())}`, 16)
-            .setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
+        this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 3 -2, 'mainFont', `${commaInt(this.score.toString())}`, 16)
+            .setOrigin(0,1).setScale(1).setTint(0x1f211b).setScrollFactor(0);
 
         
         if (DEBUG) {
@@ -4719,13 +4719,14 @@ class GameScene extends Phaser.Scene {
 
             // Update UI
 
-            this.scoreUI.setText(`STAGE`);
-            this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
+            //this.scoreUI.setText(`STAGE`);
+            //this.scoreUI.setText(`STAGE`);
+            //this.scoreLabelUI.setText(`${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
             
 
 
-            this.bestScoreUI.setText(`BEST`).setAlpha(1).setScrollFactor(0);
-            this.bestScoreLabelUI.setText(this.bestBase).setAlpha(1).setScrollFactor(0);
+            //this.bestScoreUI.setText(`BEST`).setAlpha(1).setScrollFactor(0);
+            //this.bestScoreLabelUI.setText(this.bestBase).setAlpha(1).setScrollFactor(0);
 
             
              // Restart Score Timer
