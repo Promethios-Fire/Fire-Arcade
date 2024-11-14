@@ -1272,12 +1272,12 @@ class StartScene extends Phaser.Scene {
             repeat: -1,
         });
 
-        // TEMP TAG
+        // START HERE IF YOU WANT TO SKIP TO SCENE
 
-        this.scene.start("StageCodex");
-        // END TEMP TAG
+        //this.scene.start("StageCodex");
         
-        /*
+        
+        
         this.scene.start('MainMenuScene', {
             portalTint: intColor,
             portalFrame: Phaser.Math.Wrap(
@@ -1285,7 +1285,7 @@ class StartScene extends Phaser.Scene {
                 0, 
                 titlePortal.anims.getTotalFrames() - 1
                 )
-        });*/
+        });
 
 
         const onInput = function (scene) { // @james - something is not right here
