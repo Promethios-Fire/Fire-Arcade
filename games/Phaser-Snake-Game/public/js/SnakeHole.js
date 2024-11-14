@@ -1572,7 +1572,7 @@ class StageCodex extends Phaser.Scene {
             bestText
         ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
-        var playerRank = this.add.dom(topLeft, Y_OFFSET + GRID * 3 + 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var playerRank = this.add.dom(topLeft, Y_OFFSET + GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
