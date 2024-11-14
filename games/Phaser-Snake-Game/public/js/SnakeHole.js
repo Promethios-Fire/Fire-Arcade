@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -39,7 +39,11 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
-
+const DEBUG_SKIP_TO_SCENE = true;
+const DEBUG_SCENE = "StageCodex"
+const DEBUG_ARGS = {
+    stage:"World_2-4"
+}
 const NO_EXPERT_MODE = true;
 
 
@@ -343,6 +347,7 @@ const UISTYLE = {
 
 const COLOR_SCORE = "yellow";
 const COLOR_FOCUS = "fuchsia";
+const COLOR_FOCUS_HEX = 0xFF00FF;
 const COLOR_BONUS = "limegreen";
 const COLOR_TERTIARY = "goldenrod";
 
@@ -1272,20 +1277,24 @@ class StartScene extends Phaser.Scene {
             repeat: -1,
         });
 
-        // TEMP TAG
+        // SHORTCUT SCENE START HERE TO GO DIRECTLY
+        //this.scene.start("StageCodex");
 
-        this.scene.start("StageCodex");
-        // END TEMP TAG
+        if (DEBUG_SKIP_TO_SCENE) {
+            this.scene.start(DEBUG_SCENE, DEBUG_ARGS);
+        } else {
+            this.scene.start('MainMenuScene', {
+                portalTint: intColor,
+                portalFrame: Phaser.Math.Wrap(
+                    titlePortal.anims.currentFrame.index + 1, 
+                    0, 
+                    titlePortal.anims.getTotalFrames() - 1
+                    )
+            });
+        }
         
-        /*
-        this.scene.start('MainMenuScene', {
-            portalTint: intColor,
-            portalFrame: Phaser.Math.Wrap(
-                titlePortal.anims.currentFrame.index + 1, 
-                0, 
-                titlePortal.anims.getTotalFrames() - 1
-                )
-        });*/
+        
+
 
 
         const onInput = function (scene) { // @james - something is not right here
@@ -1398,6 +1407,8 @@ class QuickMenuScene extends Phaser.Scene {
         var _spacing = 20;
         this.menuElements = [];
 
+        /*
+
         this.promptText = this.add.dom(SCREEN_WIDTH / 2, menuCenter - GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '20px',
             "fontWeight": 400,
@@ -1467,7 +1478,7 @@ class QuickMenuScene extends Phaser.Scene {
                 
                 
             } 
-        }
+        }*/
 
 
 
@@ -1529,11 +1540,15 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
         this.input.keyboard.on('keydown-LEFT', e => {
-                this.cameras.main.scrollX -= SCREEN_WIDTH;
-                this.cameras.main.scrollX -= SCREEN_WIDTH;
-                this.scene.launch('StageCodex');
-                this.scene.sleep('QuickMenuScene');
-                this.scene.sleep('GameScene');
+                //this.cameras.main.scrollX -= SCREEN_WIDTH;
+                //this.cameras.main.scrollX -= SCREEN_WIDTH;
+                debugger
+                this.scene.launch('StageCodex', {
+                    stage: this.scene.get("GameScene").stage
+                });
+                //this.scene.sleep('QuickMenuScene');
+                //this.scene.stop();
+                //this.scene.sleep('GameScene');
         }, this);
 
         
@@ -1551,9 +1566,11 @@ class StageCodex extends Phaser.Scene {
         super({key: 'StageCodex', active: false});
     }
     init () {
+        this.yMap = new Map();
+        this.selected = {};
 
     }
-    create () {
+    create (args) {
         var ourPersist = this.scene.get("PersistScene");
         this.scene.moveBelow("StageCodex", "SpaceBoyScene");
         var topLeft = X_OFFSET + GRID * 1.5;
@@ -1563,50 +1580,67 @@ class StageCodex extends Phaser.Scene {
 
         var codexContainer = this.make.container(0, 0);
 
+        var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY, 
+            'uiPanelL', 'Glass', 
+            GRID * 27.5, GRID * 4, 
+            8, 8, 8, 8);
+        topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+
         var bestText = `Best of Codex - Sum of Best = ${commaInt(ourPersist.sumOfBest.toFixed(0))}`;
 
-        var titleText = this.add.dom(topLeft, Y_OFFSET + GRID * 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var titleText = this.add.dom(topLeft, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
             bestText
         ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
-        var playerRank = this.add.dom(topLeft, Y_OFFSET + GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var playerRank = this.add.dom(topLeft, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
             `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBest)}%`
         ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
-        var stages = this.add.dom(X_OFFSET + GRID * 27.5, Y_OFFSET + GRID * 3 + 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+        var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
             `STAGES: ${ourPersist.stagesComplete}`
         ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-        codexContainer.add([titleText, playerRank, stages]);
+        //codexContainer.add([titleText, playerRank, stages]);
         
 
+        var _index = 0;
+        
         BEST_OF_STAGE_DATA.values().forEach( bestOf => {
             //debugger
-            const stageTitle = this.add.bitmapText(topLeft, rowY + nextRow * stageNumber, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
+            var topY = rowY + nextRow * stageNumber;
+            const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
             ).setOrigin(0,0);
 
-            const score = this.add.bitmapText(topLeft , rowY + nextRow * stageNumber + 21, 'mainFont',`SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
+            const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
             ).setOrigin(0,0).setScale(0.5);
 
-            const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, rowY + nextRow * stageNumber + 21, 'mainFont',`SPEED BONUS: ${commaInt(bestOf.calcBonus())} =>`,16
+            const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, topY + 21, 'mainFont',`SPEED BONUS: ${commaInt(bestOf.calcBonus())} =>`,16
             ).setOrigin(1,0).setScale(0.5);
 
-            const rankTitle = this.add.bitmapText(topLeft + GRID * 24, rowY + nextRow * stageNumber + 21, 'mainFont',`RANK:`,16
+            const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
             ).setOrigin(1,0).setScale(0.5);
 
-            const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , rowY + nextRow * stageNumber - 4, "ranksSpriteSheet", bestOf.stageRank()
+            const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
             ).setDepth(80).setOrigin(0,0).setScale(1);
 
             codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
+
+            this.yMap.set(bestOf.stage, {
+                stageTitle:bestOf.stage, 
+                x: topLeft,
+                conY: nextRow * stageNumber,
+                index: _index,
+                title: stageTitle
+            })
 
 
             var foodIndex = 0;
@@ -1644,34 +1678,72 @@ class StageCodex extends Phaser.Scene {
 
                 codexContainer.add(_atom);
                 
+                
                 foodIndex += 1;
             })
 
+            _index += 1;
             stageNumber += 1;
         })
 
-        var containerToY = 0;
+
+        var selected = this.yMap.get(args.stage);
+
+        
+        
+        var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+        
+
+        this.tweens.add({
+            targets: codexContainer,
+            y: containerToY,
+            ease: 'Sine.InOut',
+            duration: 500,
+            onComplete: () => {
+                //debugger
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+            }
+        }, this);
 
         this.input.keyboard.on('keydown-UP', e => {
+
+            selected.title.clearTint()
             
-            containerToY += nextRow * 3;
-            codexContainer.y ;
+            var safeIndex = Math.max(selected.index - 1, 0);
+            
+            var nextSelect = ([...this.yMap.keys()][safeIndex]);
+            selected = this.yMap.get(nextSelect);
+            
+            containerToY = selected.conY * -1 + nextRow;
             this.tweens.add({
                 targets: codexContainer,
                 y: containerToY,
                 ease: 'Sine.InOut',
                 duration: 500,
+                onComplete: () => {
+                    selected.title.setTintFill(COLOR_FOCUS_HEX);
+                }
             }, this);
         }, this);
 
         this.input.keyboard.on('keydown-DOWN', e => {
-            containerToY -= nextRow * 3;
-            codexContainer.y ;
+
+            selected.title.clearTint()
+
+            var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
+            
+            var nextSelect = ([...this.yMap.keys()][safeIndex]);
+            selected = this.yMap.get(nextSelect);
+            
+            containerToY = selected.conY * -1 + nextRow;
             this.tweens.add({
                 targets: codexContainer,
                 y: containerToY,
                 ease: 'Sine.InOut',
                 duration: 500,
+                onComplete: () => {
+                    selected.title.setTintFill(COLOR_FOCUS_HEX);
+                }
             }, this);
         }, this);
 
