@@ -1272,6 +1272,11 @@ class StartScene extends Phaser.Scene {
             repeat: -1,
         });
 
+        // TEMP TAG
+
+        this.scene.start("StageCodex");
+        
+        /*
         this.scene.start('MainMenuScene', {
             portalTint: intColor,
             portalFrame: Phaser.Math.Wrap(
@@ -1279,7 +1284,7 @@ class StartScene extends Phaser.Scene {
                 0, 
                 titlePortal.anims.getTotalFrames() - 1
                 )
-        });
+        });*/
 
 
         const onInput = function (scene) { // @james - something is not right here
@@ -1522,10 +1527,72 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
         }, this);
 
+        this.input.keyboard.on('keydown-LEFT', e => {
+                this.cameras.main.scrollX -= SCREEN_WIDTH;
+                this.cameras.main.scrollX -= SCREEN_WIDTH;
+                this.scene.launch('StageCodex');
+                this.scene.sleep('QuickMenuScene');
+                this.scene.sleep('GameScene');
+        }, this);
+
         
 
         // #endregion
 
+
+    }
+}
+
+// #region World Codex
+class StageCodex extends Phaser.Scene {
+    
+    constructor () {
+        super({key: 'StageCodex', active: false});
+    }
+    init () {
+
+    }
+    create () {
+        var textStart = 152;
+        var rowY = Y_OFFSET + 152;
+        var stageNumber = 0;
+        var nextRow = 24;
+
+        var titleText = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 3, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+        }),
+            `Best of Codex`
+        ).setOrigin(0,0).setScale(0.5).setAlpha(1);
+        
+        var freshAtom = this.add.sprite(SCREEN_WIDTH / 2 + GRID, textStart - GRID * 1.75
+        ).setDepth(70).setScale(1);
+        freshAtom.play('atom01idle');
+
+        var freshAtom = this.add.sprite(SCREEN_WIDTH / 2 + GRID * 2.5, textStart - GRID * 1.75
+        ).setDepth(70).setScale(.75);
+        freshAtom.play('atom01idle');
+
+        var freshAtom = this.add.sprite(SCREEN_WIDTH / 2 + GRID * 4, textStart - GRID * 1.75
+        ).setDepth(70).setScale(.5);
+        freshAtom.play('atom01idle');
+
+        BEST_OF_STAGE_DATA.values().forEach( bestOf => {
+            debugger
+            var stageTitle = this.add.bitmapText(X_OFFSET + GRID * 8, rowY + nextRow * stageNumber, 'mainFont',`${bestOf.stage}`,16
+
+            ).setOrigin(0,0);
+
+            stageNumber += 1;
+        })
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            //this.cameras.main.scrollX += SCREEN_WIDTH;
+            //this.cameras.main.scrollX += SCREEN_WIDTH;
+            this.scene.sleep('StageCodex');
+            this.scene.wake('QuickMenuScene');
+            this.scene.wake('GameScene');
+        }, this);
 
     }
 }
@@ -3607,7 +3674,6 @@ class GameScene extends Phaser.Scene {
         
         this.input.keyboard.on('keyup-TAB', e => {
             this.tabDown = false; 
-            debugger
         }, this);
 
         
@@ -9238,7 +9304,11 @@ var config = {
     },
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
-    scene: [ StartScene, MainMenuScene, QuickMenuScene, GalaxyMapScene, PersistScene, SpaceBoyScene, GameScene, InputScene, ScoreScene, TutorialScene]
+    scene: [ StartScene, 
+        MainMenuScene, QuickMenuScene, GalaxyMapScene, 
+        PersistScene, SpaceBoyScene, GameScene, 
+        InputScene, ScoreScene, TutorialScene,
+        StageCodex]
 };
 
 // #region Screen Settings
