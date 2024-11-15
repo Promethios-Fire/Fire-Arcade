@@ -6,6 +6,23 @@ import { BEST_OF_ALL} from "../SnakeHole.js"
 
 
 var checkRank = function(stageName, targetRank) {
+    // Only unlock on expert if you unlocked in classic.
+    // But progress Expert just like you progress classic.
+    switch (this.scene.get("GameScene").mode) {
+        case "Classic":
+            debugger 
+            
+            break;
+
+        case "Expert":
+            debugger
+            
+            break;
+    
+        default:
+            break;
+    }
+    
     
         if (BEST_OF_ALL.get(stageName) != undefined ) {
             var resultRank = BEST_OF_ALL.get(stageName).stageRank()
@@ -88,8 +105,6 @@ export const STAGE_UNLOCKS = new Map([
         return checkRank(STAGES.get("4-3"), RANKS.WOOD)}],
     ['two-wide-corridors', function () { 
         return checkRank(STAGES.get("8-3"), RANKS.WOOD)}],
-    ['babies-first-wall', function () {
-        return checkRank(STAGES.get("0-1"), RANKS.WOOD)}],
     ['two-wide-corridors', function () {
         return checkRank(STAGES.get("8-3"), RANKS.WOOD);}],
     ['double-back-portals', function () {
@@ -159,7 +174,8 @@ export const STAGE_UNLOCKS = new Map([
         return false;
     }],
     ['medium-happy', function () {
-        return checkRank(STAGES.get("2-3"), RANKS.WOOD);
+        debugger
+        return checkRank.call(this, [STAGES.get("2-3"), RANKS.WOOD]);
     }],
     ['bidirectional-portals', function () {
         return checkRank(STAGES.get("8-1"), RANKS.WOOD); 
@@ -168,6 +184,7 @@ export const STAGE_UNLOCKS = new Map([
         return true
     }],
     ['babies-first-wall', function () {
+        debugger
         return checkRank(STAGES.get("0-1"), RANKS.WOOD);
     }],
     ['horz-rows', function () {

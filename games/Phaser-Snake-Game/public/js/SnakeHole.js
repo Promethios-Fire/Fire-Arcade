@@ -44,7 +44,7 @@ const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
     stage:"World_0-1"
 }
-const DEBUG_FORCE_EXPERT = true;
+const DEBUG_FORCE_EXPERT = false;
 const NO_EXPERT_CHOICE = true;
 
 
@@ -4048,13 +4048,15 @@ class GameScene extends Phaser.Scene {
 
                                     
                                     // Easier to see when debugging with debugger in console.
+                                    debugger
                                     stageName;
                                     var temp = STAGE_UNLOCKS.get(propObj.value);
-                                    var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
+                                    //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
                                     
                                    
                                     
 
+                                    //debugger
                                     if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist)) {
                                         // Now we know the Stage is unlocked, so make the black hole tile.
                                         
