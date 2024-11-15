@@ -1692,7 +1692,7 @@ class StageCodex extends Phaser.Scene {
             8, 8, 8, 8);
         topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
 
-        var bestText = `Best of Codex - Sum of Best = ${commaInt(ourPersist.sumOfBest.toFixed(0))}`;
+        var bestText = `Best of Codex - Sum of Best = ${commaInt(ourPersist.sumOfBestAll.toFixed(0))}`;
 
         var titleText = this.add.dom(topLeft, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
@@ -1705,14 +1705,14 @@ class StageCodex extends Phaser.Scene {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
-            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBest)}%`
+            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
         ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
         var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize": '24px',
             "fontWeight": 400,
         }),
-            `STAGES: ${ourPersist.stagesComplete}`
+            `STAGES: ${ourPersist.stagesCompleteAll}`
         ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
         //codexContainer.add([titleText, playerRank, stages]);
@@ -7169,7 +7169,7 @@ var StageData = new Phaser.Class({
         let bonusScore = this.calcBonus();
 
         switch (true) {
-            case bonusScore > this.sRank:
+            case this.sRank != null && bonusScore > this.sRank:
                 rank = RANKS.PLATINUM;
                 break;
             case bonusScore > RANK_BENCHMARKS.get(RANKS.GOLD):
