@@ -44,7 +44,7 @@ const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
     stage:"World_0-1"
 }
-const DEBUG_FORCE_EXPERT = false;
+const DEBUG_FORCE_EXPERT = true;
 const NO_EXPERT_CHOICE = true;
 
 
@@ -1248,11 +1248,11 @@ class StartScene extends Phaser.Scene {
         let entries = Object.entries(localStorage);
 
         entries.forEach(log => {
-            var key = log[0].split("_");
-            var keyCheck = key[key.length - 1];
+            var logKeySplit = log[0].split("_");
+            var keyCheck = logKeySplit[1];
             if (keyCheck === "best-Classic" || keyCheck === "best-Expert") {
 
-                var uuidString = log[0].slice(0, -14);
+                var uuidString = logKeySplit[0];
                 var correctStage = this.UUID_MAP.get(uuidString);
                 var localJSON = JSON.parse(log[1]);
 
@@ -2673,13 +2673,7 @@ class PersistScene extends Phaser.Scene {
 
     init() {
         this.zeds = 0;
-        this.sumOfBest = 0;
-        this.stagesComplete = 0;
         this.coins = START_COINS;
-
-        this.prevSumOfBest = 0;
-        this.prevStagesComplete = 0;
-        this.prevPlayerRank = 0;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -2783,9 +2777,13 @@ class PersistScene extends Phaser.Scene {
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
 
-    this.prevSumOfBest = this.sumOfBest;
-    this.prevStagesComplete = this.stagesComplete;
-    this.prevPlayerRank = calcSumOfBestRank(this.sumOfBest);
+    this.prevSumOfBestClassic = this.sumOfBestClassic;
+    this.prevStagesCompleteClassic = this.stagesCompleteClassic;
+    this.prevPlayerRankClassic = calcSumOfBestRank(this.sumOfBestClassic);
+
+    this.prevSumOfBestExpert = this.sumOfBestExpert;
+    this.prevStagesCompleteExpert = this.stagesCompleteExpert;
+    this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
 
 
     const styleBottomText = {
@@ -7364,7 +7362,6 @@ class ScoreScene extends Phaser.Scene {
         if (currentLocal > bestLocal) {
             console.log(`NEW BEST YAY! ${currentLocal} (needs more screen juice)`);
             bestLocal = currentLocal;
-            var bestScoreValue = this.stageData.calcBase()
 
             this.stageData.newBest = true;
 
@@ -7373,9 +7370,6 @@ class ScoreScene extends Phaser.Scene {
                 localStorage.setItem(`${ourGame.stageUUID}_best-${ourGame.mode}`, JSON.stringify(this.stageData));
             }
             
-        }
-        else{
-            bestScoreValue = 0;
         }
 
         // #endregion
@@ -7827,6 +7821,7 @@ class ScoreScene extends Phaser.Scene {
                 letterRank.setAlpha(1)
                 //stageScoreUI.setAlpha(1)
                 //this.scorePanelLRank.setAlpha(1)
+                this.bestOfModeUI.setAlpha(1);
                 this.sumOfBestUI.setAlpha(1);
                 this.stagesCompleteUI.setAlpha(1);
                 this.playerRankUI.setAlpha(1);
@@ -8158,9 +8153,11 @@ class ScoreScene extends Phaser.Scene {
                 <span style ="text-transform: uppercase">${ourGame.stage} BEST STATS</span>
                 <hr/>
 
+                MODE: <span style = "float: right">${bestLog.mode}</span>
                 BASE SCORE: <span style = "float: right">${_baseScore}</span>
                 SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
                 </br>
+
 
                 BEST SCORE: <span style = "float: right">${bestLog.calcTotal()}</span>
                 </br>
@@ -8228,30 +8225,83 @@ class ScoreScene extends Phaser.Scene {
 
     
         updateSumOfBest(ourPersist);
-        var totalLevels = Math.min(ourPersist.stagesComplete + Math.ceil(ourPersist.stagesComplete / 4), STAGE_TOTAL);
-        var newRank = calcSumOfBestRank(ourPersist.sumOfBest)
+        var prevStagesComplete;
+        var prevSumOfBest;
+        var prevPlayerRank;
+
+        var totalLevels;
+        var newRank;
+        var stagesComplete;
+        var sumOfBest;
+
+        switch (ourGame.mode) {
+            case "Classic":
+                prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                prevPlayerRank = ourPersist.prevPlayerRankClassic;
+
+                totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+                stagesComplete = ourPersist.stagesCompleteClassic;
+                sumOfBest = ourPersist.sumOfBestClassic;
+                
+                break;
+            case "Expert":
+                prevStagesComplete = ourPersist.prevStagesCompleteExpert;
+                prevSumOfBest = ourPersist.prevSumOfBestExpert;
+                prevPlayerRank = ourPersist.prevPlayerRankExpert;
+
+                totalLevels = Math.min(ourPersist.stagesCompleteExpert + Math.ceil(ourPersist.stagesCompleteExpert / 4), STAGE_TOTAL);
+                newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
+                stagesComplete = ourPersist.stagesCompleteExpert;
+                sumOfBest = ourPersist.sumOfBestExpert;
+                
+                break;
         
-        if (ourPersist.prevStagesComplete < ourPersist.stagesComplete) {
-            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
-        } else {
-            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(ourPersist.stagesComplete)} / ${totalLevels}`
+            default:
+                // Leave this one. Something is wrong if this triggers.
+                debugger 
+                break;
         }
 
-        if (ourPersist.prevSumOfBest < ourPersist.sumOfBest) {
-            var bestIncrease = ourPersist.sumOfBest - ourPersist.prevSumOfBest;
-            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
+        
+        var bestOfTitle;
+        if (ourGame.mode === "Expert") {
+            bestOfTitle = `Best of ${ourGame.mode}`
         } else {
-            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(ourPersist.sumOfBest.toFixed(0))}</span>`
+            bestOfTitle = ``;
+        }
+        
+        if (prevStagesComplete < stagesComplete) {
+            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
+        } else {
+            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels}`
         }
 
-        if (ourPersist.prevPlayerRank > newRank) {
+        if (prevSumOfBest < sumOfBest) {
+            var bestIncrease = sumOfBest - prevSumOfBest;
+            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
+        } else {
+            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span>`
+        }
 
-            var rankIncrease = ourPersist.prevPlayerRank - newRank;
+        if (prevPlayerRank > newRank) {
+
+            var rankIncrease = prevPlayerRank - newRank;
             var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
         } else {
             var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
         }
 
+        this.bestOfModeUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'20px',
+            "font-weight": '400',
+            "text-shadow": '#000000 1px 0 6px',
+            //"font-style": 'italic',
+            //"font-weight": 'bold',
+            })).setHTML(
+                bestOfTitle
+        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
         
         this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'20px',
@@ -8356,9 +8406,13 @@ class ScoreScene extends Phaser.Scene {
         
         //this.scene.stop();
 
-        ourPersist.prevSumOfBest = ourPersist.sumOfBest;
-        ourPersist.prevStagesComplete = ourPersist.stagesComplete;
-        ourPersist.prevPlayerRank = calcSumOfBestRank(ourPersist.sumOfBest);
+        ourPersist.prevSumOfBestClassic = ourPersist.sumOfBestClassic;
+        ourPersist.prevStagesCompleteClassic = ourPersist.stagesCompleteClassic;
+        ourPersist.prevPlayerRankClassic = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+
+        ourPersist.prevSumOfBestExpert = ourPersist.sumOfBestExpert;
+        ourPersist.prevStagesCompleteExpert = ourPersist.stagesCompleteExpert;
+        ourPersist.prevPlayerRankExpert = calcSumOfBestRank(ourPersist.sumOfBestExpert);
 
 
 
