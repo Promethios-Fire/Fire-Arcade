@@ -64,6 +64,7 @@ export const STAGES = new Map([
     ["8-2", "World_8-2_Adv_Portaling"],
     ["8-3", "World_8-3_Adv_Portaling"],
     ["8-4", "World_8-4_Adv_Portaling"],
+    ["8-5", "World_8-5_Adv_Portaling"],
     ["9-2", "World_9-2_Final_Exams"],
     ["9-3", "World_9-3_Final_Exams"],
     ["9-4", "World_9-4_Final_Exams"],
@@ -88,11 +89,22 @@ export const EXTRACT_CODES = [
 
 /* Template
         ['', function () { 
-        return checkRank.call(this,["", RANKS.WOOD)}],
+        return checkRank.call(this,"", RANKS.WOOD)}],
 */
 
 
 export const STAGE_UNLOCKS = new Map([
+    ['you-portal-turn-now', function () { 
+        var checkLevels = [
+            STAGES.get("8-1"),
+            STAGES.get("8-2"),
+            STAGES.get("8-4"),
+        ];
+        var pass = checkLevels.every(stage => {
+            return checkRank.call(this,stage, RANKS.SILVER);
+        });
+
+        return pass}],
     ['dino-tess', function () { checkRank.bind(this);
         return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
     ['og-plus', function () { 

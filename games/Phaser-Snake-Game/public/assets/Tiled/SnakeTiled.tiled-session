@@ -1414,7 +1414,7 @@
         },
         "World_8-1_Adv_Portaling.json": {
             "scale": 2.451436781609195,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 174.1835658187786,
                 "y": 162.14980658773885
@@ -1510,7 +1510,7 @@
             "scale": 2.997413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 85.07333908541844,
+                "x": 85.07333908541845,
                 "y": 161.97296519988492
             }
         },
@@ -2744,6 +2744,7 @@
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "r-11-07-1.json",
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
@@ -2754,8 +2755,7 @@
         "World_8-2_Adv_Portaling.json",
         "World_9-4_Final_Exams.json",
         "World_9-3_Final_Exams.json",
-        "World_9-2_Final_Exams.json",
-        "World_8-4_Adv_Portaling.json"
+        "World_9-2_Final_Exams.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
