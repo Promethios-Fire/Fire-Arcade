@@ -22,7 +22,6 @@ var checkRank = function(stageName, targetRank) {
             break;
 
         case "Expert":
-            debugger
             if (BEST_OF_CLASSIC.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
                 var resultRank = BEST_OF_EXPERT.get(stageName).stageRank()
                 var bool = resultRank >= targetRank

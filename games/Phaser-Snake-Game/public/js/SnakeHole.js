@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -6989,7 +6989,8 @@ class GameScene extends Phaser.Scene {
             if(!this.scoreTimer.paused) {
                 this.coinSpawnCounter -= 1;
 
-                if (this.coinSpawnCounter < 1 && this.spawnCoins) {
+                if (this.coinSpawnCounter < 1 && this.spawnCoins && this.mode === "Classic") {
+                    debugger
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
@@ -7817,8 +7818,7 @@ class ScoreScene extends Phaser.Scene {
             duration: 0,
             ease: 'linear',
             delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
-            onComplete: () =>
-                {
+            onComplete: () => {
                 letterRank.setAlpha(1)
                 //stageScoreUI.setAlpha(1)
                 //this.scorePanelLRank.setAlpha(1)
@@ -7826,7 +7826,14 @@ class ScoreScene extends Phaser.Scene {
                 this.sumOfBestUI.setAlpha(1);
                 this.stagesCompleteUI.setAlpha(1);
                 this.playerRankUI.setAlpha(1);
-                },
+
+                if(ourGame.mode === "Expert") {
+                    ourPersist.coins += this.stageData.stageRank();
+                    ourGame.coinUIText.setHTML(
+                        `${commaInt(ourPersist.coins).padStart(2, '0')}`
+                    )
+                }
+            },
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
