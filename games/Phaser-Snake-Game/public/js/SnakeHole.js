@@ -44,7 +44,8 @@ const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
     stage:"World_0-1"
 }
-const NO_EXPERT_MODE = true;
+const DEBUG_FORCE_EXPERT = false;
+const NO_EXPERT_CHOICE = true;
 
 
 // 1 frame is 16.666 milliseconds
@@ -121,31 +122,73 @@ var updateSumOfBest = function(scene) {
      *  That is used to check if a black hole should be spawned to a new level.
      */
     let entries = Object.entries(localStorage);
-    scene.stagesComplete = 0;
-    scene.sumOfBest = 0;
-    BEST_OF_STAGE_DATA = new Map();
+    scene.stagesCompleteClassic = 0;
+    scene.stagesCompleteExpert = 0;
+    scene.stagesCompleteAll = 0;
+
+    scene.sumOfBestClassic = 0;
+    scene.sumOfBestExpert = 0;
+    scene.sumOfBestAll = 0;
+
+    BEST_OF_ALL = new Map();
+    BEST_OF_CLASSIC = new Map ();
+    BEST_OF_EXPERT = new Map ();
 
     var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
     scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
-        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}-bestStageData`));
+        var tempJSONClassic = JSON.parse(localStorage.getItem(`${uuid}_best-Classic`));
+        var tempJSONExpert = JSON.parse(localStorage.getItem(`${uuid}_best-Expert`));
 
-        if (tempJSON) { // False if not played stage before.
-            var _stageData = new StageData(tempJSON);
-            scene.stagesComplete += 1;
+        // TODO: Check both and take the highest value.
+        // TODO: Make Sure the codex pulls from this data, but score screen best and unlock best do not pull from here.
+        var _scoreTotalClassic;
+        if (tempJSONClassic) { // False if not played stage before.
+            var _stageDataClassic = new StageData(tempJSONClassic);
+            scene.stagesCompleteClassic += 1;
 
-            BEST_OF_STAGE_DATA.set(_stageData.stage, _stageData);
+            BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
 
-            var _scoreTotal = _stageData.calcTotal();
-            scene.sumOfBest += _scoreTotal;
+            _scoreTotalClassic = _stageDataClassic.calcTotal();
+            scene.sumOfBestClassic += _scoreTotalClassic;
         }
         else {
-            var unplayed = scene.scene.get("StartScene").UUID_MAP.get(uuid);
+            _scoreTotalClassic = 0;
             
         }
-    })
 
-    scene.lastSumofBest
+        var _scoreTotalExpert;
+        if (tempJSONExpert) {
+            var _stageDataExpert = new StageData(tempJSONExpert);
+            scene.stagesCompleteExpert += 1;
+
+            BEST_OF_EXPERT.set(_stageDataExpert.stage, _stageDataExpert);
+
+            _scoreTotalExpert = _stageDataExpert.calcTotal();
+            scene.sumOfBestExpert += _scoreTotalExpert;
+        } else {
+            _scoreTotalExpert = 0
+        }
+        
+        switch (true) {
+            case _scoreTotalClassic - _scoreTotalExpert === 0:
+                // Never played in both modes
+                // Do Nothing
+                break;
+            case _scoreTotalExpert > _scoreTotalClassic:
+                scene.sumOfBestAll += _scoreTotalExpert;
+                scene.stagesCompleteAll += 1;
+                BEST_OF_ALL.set(_stageDataExpert.stage, _stageDataExpert);
+                break;
+        
+            default:
+                scene.sumOfBestAll += _scoreTotalClassic;
+                scene.stagesCompleteAll += 1;
+                BEST_OF_ALL.set(_stageDataClassic.stage, _stageDataClassic);
+                break;
+        }
+
+    })
 }
 
 
@@ -238,13 +281,13 @@ var rollZeds = function(score) {
         ["bestZeros", mostZerosYet],
         ["zedsEarned", xpFromZeds(mostZerosYet)] 
     ])
-
     return zedRollResultsMap;
-
 }
 
 
-export var BEST_OF_STAGE_DATA = new Map (); // STAGE DATA TYPE
+export var BEST_OF_ALL = new Map (); // STAGE DATA TYPE
+export var BEST_OF_CLASSIC = new Map ();
+export var BEST_OF_EXPERT = new Map ();
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -1205,8 +1248,9 @@ class StartScene extends Phaser.Scene {
         let entries = Object.entries(localStorage);
 
         entries.forEach(log => {
-            var key = log[0].split("-");
-            if (key[key.length - 1] === "bestStageData") {
+            var key = log[0].split("_");
+            var keyCheck = key[key.length - 1];
+            if (keyCheck === "best-Classic" || keyCheck === "best-Expert") {
 
                 var uuidString = log[0].slice(0, -14);
                 var correctStage = this.UUID_MAP.get(uuidString);
@@ -1220,14 +1264,14 @@ class StartScene extends Phaser.Scene {
                 
                 console.log();
                     if (localJSON.stage != correctStage) {
-                        var logJSON = JSON.parse(localStorage.getItem(`${uuidString}-bestStageData`));
+                        var logJSON = JSON.parse(localStorage.getItem(`${uuidString}_${keyCheck}`));
                         var stageDataLog = new StageData(logJSON);
                         
                         // Update Stage Name
                         stageDataLog.stage = correctStage;
                         
                         // Save New 
-                        localStorage.setItem(`${uuidString}-bestStageData`, JSON.stringify(stageDataLog));
+                        localStorage.setItem(`${uuidString}_${keyCheck}`, JSON.stringify(stageDataLog));
                     }
                 }                       
             }
@@ -1676,7 +1720,7 @@ class StageCodex extends Phaser.Scene {
 
         var _index = 0;
         
-        BEST_OF_STAGE_DATA.values().forEach( bestOf => {
+        BEST_OF_ALL.values().forEach( bestOf => {
             //debugger
             var topY = rowY + nextRow * stageNumber;
             const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFont',`${bestOf.stage.toUpperCase()}`,16
@@ -1918,10 +1962,10 @@ class MainMenuScene extends Phaser.Scene {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
                 
-                if (NO_EXPERT_MODE) {
+                if (NO_EXPERT_CHOICE) {
                     const mainMenuScene = this.scene.get("MainMenuScene");
 
-                    if (localStorage.hasOwnProperty(`${START_UUID}-bestStageData`)) {
+                    if (localStorage.hasOwnProperty(`${START_UUID}_best-Classic`)) {
                         var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                         mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
                     } else {
@@ -2867,6 +2911,14 @@ class GameScene extends Phaser.Scene {
 
         // Game State Bools
         this.tutorialState = false;
+
+        if (!DEBUG_FORCE_EXPERT) {
+            const { mode = "Classic" } = props; // "Expert"
+            this.mode = mode;
+            
+        } else {
+            this.mode = "Expert";
+        }
 
         // Arrays for collision detection
         this.atoms = new Set();
@@ -4058,8 +4110,8 @@ class GameScene extends Phaser.Scene {
                                         //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
                                         //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
                                         
-                                        if (BEST_OF_STAGE_DATA.get(stageName) != undefined) {
-                                            switch (BEST_OF_STAGE_DATA.get(stageName).stageRank()) {
+                                        if (BEST_OF_ALL.get(stageName) != undefined) {
+                                            switch (BEST_OF_ALL.get(stageName).stageRank()) {
                                                 case RANKS.WOOD:
                                                     blackholeImage.setTint(0xB87333);
                                                     break;
@@ -4474,7 +4526,7 @@ class GameScene extends Phaser.Scene {
 
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}-bestStageData`));       
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${this.mode}`));       
 
         if (bestLogJSON) {
             // is false if best log has never existed
@@ -7071,6 +7123,7 @@ var StageData = new Phaser.Class({
     function StageData(props) {
         // this is the order you'll see printed in the console.
         this.stage = props.stage;
+        this.mode = props.mode;
 
         this.bonks = props.bonks;
         this.boostFrames = props.boostFrames;
@@ -7250,6 +7303,7 @@ class ScoreScene extends Phaser.Scene {
             turnInputs: ourInputScene.turnInputs,
             turns: ourInputScene.turns,
             stage:ourGame.stage,
+            mode:ourGame.mode,
             uuid:ourGame.stageUUID,
             zedLevel: calcZedLevel(ourPersist.zeds).level,
             zeds: ourPersist.zeds,
@@ -7296,7 +7350,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Save Best To Local.
 
-        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`));
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
@@ -7316,7 +7370,7 @@ class ScoreScene extends Phaser.Scene {
 
             
             if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
-                localStorage.setItem(`${ourGame.stageUUID}-bestStageData`, JSON.stringify(this.stageData));
+                localStorage.setItem(`${ourGame.stageUUID}_best-${ourGame.mode}`, JSON.stringify(this.stageData));
             }
             
         }
@@ -7336,12 +7390,12 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        if (localStorage.getItem(`${ourGame.stageUUID}-bestStageData`)) {
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}-bestStageData`));
+        if (localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${ourGame.mode}`));
 
         } else {
             // If a test level. Use World 0_1 as a filler to not break UI stuff.
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${START_UUID}-bestStageData`))
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${START_UUID}_best-Classic`))
         }
 
         var bestLog = new StageData(bestLogJSON);

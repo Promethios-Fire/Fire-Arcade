@@ -18,7 +18,7 @@ export var QUICK_MENUS = new Map([
             const mainMenuScene = this.scene.get("MainMenuScene");
             ourGameScene.scene.get("InputScene").restart();
 
-            if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+            if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999_best-Classic`)) {
                 var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                 mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
             } else {

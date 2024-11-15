@@ -1,14 +1,14 @@
 
 import { PLAYER_STATS, RANKS } from "../SnakeHole.js";
 
-import { BEST_OF_STAGE_DATA} from "../SnakeHole.js"
+import { BEST_OF_ALL} from "../SnakeHole.js"
 
 
 
 var checkRank = function(stageName, targetRank) {
     
-        if (BEST_OF_STAGE_DATA.get(stageName) != undefined ) {
-            var resultRank = BEST_OF_STAGE_DATA.get(stageName).stageRank()
+        if (BEST_OF_ALL.get(stageName) != undefined ) {
+            var resultRank = BEST_OF_ALL.get(stageName).stageRank()
             var bool = resultRank >= targetRank
             return  bool;
         } else {
