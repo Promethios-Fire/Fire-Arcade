@@ -1,4 +1,4 @@
-import { PLAYER_STATS, RANKS, START_STAGE } from "../SnakeHole.js";
+import { PLAYER_STATS, RANKS, START_STAGE, START_UUID } from "../SnakeHole.js";
 import { TUTORIAL_PANELS } from "./tutorialScreens.js";
 
 export var QUICK_MENUS = new Map([
@@ -16,9 +16,14 @@ export var QUICK_MENUS = new Map([
         }],
         ["Classic", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
-            ourGameScene.scene.get("InputScene").restart();
+            const ourGame = this.scene.get("GameScene");
 
-            if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999_best-Classic`)) {
+            const ourPersist = this.scene.get("PersistScene");
+            ourPersist.mode = "Classic";
+
+            this.scene.get("InputScene").scene.restart();
+
+            if (localStorage.hasOwnProperty(`${START_UUID}_best-Classic`)) {
                 var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                 mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
             } else {
@@ -26,9 +31,23 @@ export var QUICK_MENUS = new Map([
             }
 
             mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+            mainMenuScene.scene.stop();
             this.scene.stop();
         }],
         ["Expert", function () {
+            const mainMenuScene = this.scene.get("MainMenuScene");
+            const ourGame = this.scene.get("GameScene");
+
+            const ourPersist = this.scene.get("PersistScene");
+            ourPersist.mode = "Expert";
+
+            this.scene.get("InputScene").scene.restart();
+
+            var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+            mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+            mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+            
+            this.scene.stop();
             // Do Stuff
         }],
     ])],
@@ -41,12 +60,13 @@ export var QUICK_MENUS = new Map([
         }],
         ['REDO STAGE (- 1 Coin)', function () {
             const ourGameScene = this.scene.get("GameScene");
+            const ourPersist = this.scene.get("PersistScene");
 
 
-            if (ourGameScene.scene.get("PersistScene").coins > 0) {
+            if (ourPersist.coins > 0) {
 
-                ourGameScene.scene.get("PersistScene").coins -= 1;
-                ourGameScene.scene.get("PersistScene").loseCoin();
+                ourPersist.coins -= 1;
+                ourPersist.loseCoin();
                 
                 // Clear for reseting game
                 ourGameScene.events.off('addScore');
@@ -67,6 +87,7 @@ export var QUICK_MENUS = new Map([
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
+                    mode: ourPersist.mode
                     //lives: this.lives 
                 });
             }

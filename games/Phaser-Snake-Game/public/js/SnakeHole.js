@@ -44,8 +44,8 @@ const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
     stage:"World_0-1"
 }
-const DEBUG_FORCE_EXPERT = true;
-const NO_EXPERT_CHOICE = true;
+const DEBUG_FORCE_EXPERT = false;
+const EXPERT_CHOICE = true;
 
 
 // 1 frame is 16.666 milliseconds
@@ -447,7 +447,7 @@ export const GState = Object.freeze({
 
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
-const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
+export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -892,6 +892,8 @@ class TutorialScene extends Phaser.Scene {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
+                    mode: scene.scene.get("PersistScene").mode
+
                 });
 
                 // Clear for reseting game
@@ -1403,27 +1405,6 @@ class StartScene extends Phaser.Scene {
 
     onInput() {
         // #region SCORE DEBUG
-
-
-
-        if (SCORE_SCENE_DEBUG) {
-                
-
-            var ourGame = this.scene.get("GameScene");
-            var ourInput = this.scene.get("InputScene");
-            this.scene.start('ScoreScene');
-        }
-        else {
-                                            
-            this.scene.setVisible(false);
-            //this.scene.get("UIScene").setVisible(false);
-            
-            //this.scene.launch('UIScene');
-            this.scene.launch('GameScene');
-            //var ourGameScene = this.scene.get("GameScene");
-            //console.log(e)
-        }
-        this.scene.stop();
     }
     end() {
 
@@ -1962,23 +1943,11 @@ class MainMenuScene extends Phaser.Scene {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
                 
-                if (NO_EXPERT_CHOICE) {
-                    const mainMenuScene = this.scene.get("MainMenuScene");
-
-                    if (localStorage.hasOwnProperty(`${START_UUID}_best-Classic`)) {
-                        var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-                        mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
-                    } else {
-                        mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
-                    }
-
-                    mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
-                    this.scene.stop();
-        
-                } else {
+                
+                this.scene.get("StartScene").UUID_MAP.size;
+                if (BEST_OF_CLASSIC.size > 25 && EXPERT_CHOICE) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get("adventure-mode");
 
-                    
                     mainMenuScene.scene.launch("QuickMenuScene", {
                         menuOptions: qMenu, 
                         textPrompt: "MODE SELECTOR",
@@ -1988,7 +1957,8 @@ class MainMenuScene extends Phaser.Scene {
                     mainMenuScene.scene.bringToTop("QuickMenuScene");
 
                     mainMenuScene.scene.sleep('MainMenuScene');
-
+                } else {
+                    QUICK_MENUS.get("adventure-mode").get("Classic").call(this);
                 }
                 
 
@@ -2911,9 +2881,7 @@ class GameScene extends Phaser.Scene {
         this.tutorialState = false;
 
         if (!DEBUG_FORCE_EXPERT) {
-            const { mode = "Classic" } = props; // "Expert"
-            this.mode = mode;
-            
+            this.mode = props.mode; // This forces a fail if you forget to call. It is safer that way.
         } else {
             this.mode = "Expert";
         }
@@ -3557,6 +3525,7 @@ class GameScene extends Phaser.Scene {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
+                    mode: ourPersist.mode,
                 });
                 return true;
             },
@@ -5970,62 +5939,64 @@ class GameScene extends Phaser.Scene {
                 `RANK`
         ).setOrigin(0.5,0).setScale(0.5);
 
-        if (!localStorage.getItem("extractRanks")) {
-            // if There is none
-            var bestExtractions = new Map()
-            bestExtractions.set(extractCode, [...extractHistory])
-
-        } else {
-            var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
-
-            if (bestExtractions.has(extractCode)) {
-                var prevBest = bestExtractions.get(extractCode);
-                var prevSum = 0;
-
-                prevBest.forEach( record => {
-                    prevSum += record[0];
-                })
-
-                if (prevSum < extractRankSum) {
-                    debugger
-                    console.log("NEW EXRACT RANKING");
-                    
-                    bestExtractions.set(extractCode, [...extractHistory]);  
-                }
+        if (this.mode === "Expert") {
+            
+            if (!localStorage.getItem("extractRanks")) {
+                // if There is none
+                var bestExtractions = new Map()
+                bestExtractions.set(extractCode, [...extractHistory])
 
             } else {
-                bestExtractions.set(extractCode, [...extractHistory]);
+                var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
+
+                if (bestExtractions.has(extractCode)) {
+                    var prevBest = bestExtractions.get(extractCode);
+                    var prevSum = 0;
+
+                    prevBest.forEach( record => {
+                        prevSum += record[0];
+                    })
+
+                    if (prevSum < extractRankSum) {
+                        console.log("NEW EXRACT RANKING");
+                        
+                        bestExtractions.set(extractCode, [...extractHistory]);  
+                    }
+
+                } else {
+                    bestExtractions.set(extractCode, [...extractHistory]);
+                }
             }
-        }
 
-        const tempArray = Array.from(bestExtractions.entries());
-        const jsonString = JSON.stringify(tempArray);
+            const tempArray = Array.from(bestExtractions.entries());
+            const jsonString = JSON.stringify(tempArray);
 
-        // Stringify the array
-        localStorage.setItem("extractRanks", jsonString);
+            // Stringify the array
+            localStorage.setItem("extractRanks", jsonString);
 
 
-        // Show Best Ranks
-        var bestExtract = bestExtractions.get(extractCode);
-        var bestSum = 0;
+            // Show Best Ranks
+            var bestExtract = bestExtractions.get(extractCode);
+            var bestSum = 0;
 
-        for (let index = 0; index < bestExtract.length; index++) {
+            for (let index = 0; index < bestExtract.length; index++) {
 
-            bestSum += bestExtract[index][0];
+                bestSum += bestExtract[index][0];
 
-            var _x = windowCenterX - GRID * 6.5 + index * xOffset;
-            
-            const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+                var _x = windowCenterX - GRID * 6.5 + index * xOffset;
+                
+                const bestRank = this.add.sprite(_x ,GRID * 18.5, "ranksSpriteSheet", bestExtract[index][0]
+                ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
+                
+            }
+
+            var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
+
+            var bestExtractRank = bestSum / bestExtract.length; 
+
+            var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
             ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
-            
         }
-
-        var _x = windowCenterX - GRID * 6.5 + (bestExtract.length) * xOffset;
-
-        var bestExtractRank = bestSum / bestExtract.length; 
-
-        var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
-        ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
 
 
         this.extractHole[0].play('extractHoleClose');
@@ -6073,7 +6044,7 @@ class GameScene extends Phaser.Scene {
         const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
-                `BEST EXTRACTION`
+                `EXTRACTION TRACKER - ONLY ON EXPERT`
         ).setOrigin(0.5,0).setScale(0.5);
         
         var _totalScore = 0
@@ -6519,7 +6490,8 @@ class GameScene extends Phaser.Scene {
             score: this.nextScore, 
             lives: this.lives, 
             startupAnim: false,
-            camDirection: this.camDirection
+            camDirection: this.camDirection,
+            mode: ourPersist.mode,
         });
         ourInputScene.scene.restart();
 
@@ -6683,6 +6655,7 @@ class GameScene extends Phaser.Scene {
 
 
         // #region Hold Reset
+        // TODO SHOULD BE CHANGED TO UNDOING BLACK HOLE TWEENS
         if (this.spaceKey.getDuration() > RESET_WAIT_TIME 
             && this.pressedSpaceDuringWait 
             && this.gState === GState.WAIT_FOR_INPUT
@@ -6690,11 +6663,11 @@ class GameScene extends Phaser.Scene {
         ) {
                 console.log("SPACE LONG ENOUGH BRO");
  
-                this.events.off('addScore');
+                //this.events.off('addScore');
 
  
                 this.lives -= 1;
-                this.scene.restart( { score: this.stageStartScore, lives: this.lives });
+                //this.scene.restart( { score: this.stageStartScore, lives: this.lives, });
         }
 
         
@@ -6990,7 +6963,6 @@ class GameScene extends Phaser.Scene {
                 this.coinSpawnCounter -= 1;
 
                 if (this.coinSpawnCounter < 1 && this.spawnCoins && this.mode === "Classic") {
-                    debugger
                     console.log("COIN TIME YAY. SPAWN a new coin");
 
                     var validLocations = this.validSpawnLocations();
