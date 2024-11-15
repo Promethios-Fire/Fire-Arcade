@@ -44,7 +44,7 @@ const DEBUG_SCENE = "StageCodex"
 const DEBUG_ARGS = {
     stage:"World_0-1"
 }
-const DEBUG_FORCE_EXPERT = false;
+const DEBUG_FORCE_EXPERT = true;
 const NO_EXPERT_CHOICE = true;
 
 

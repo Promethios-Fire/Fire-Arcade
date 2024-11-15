@@ -11,7 +11,7 @@ var checkRank = function(stageName, targetRank) {
     switch (this.scene.get("GameScene").mode) {
         case "Classic":
             if (BEST_OF_CLASSIC.get(stageName) != undefined ) {
-                debugger
+                
                 var resultRank = BEST_OF_CLASSIC.get(stageName).stageRank()
                 var bool = resultRank >= targetRank
                 return  bool;
@@ -22,6 +22,7 @@ var checkRank = function(stageName, targetRank) {
             break;
 
         case "Expert":
+            debugger
             if (BEST_OF_CLASSIC.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
                 var resultRank = BEST_OF_EXPERT.get(stageName).stageRank()
                 var bool = resultRank >= targetRank
@@ -94,7 +95,7 @@ export const EXTRACT_CODES = [
 
 export const STAGE_UNLOCKS = new Map([
     ['dino-tess', function () { checkRank.bind(this);
-        return checkRank.call(this,[STAGES.get("4-3"), RANKS.WOOD])}],
+        return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
     ['og-plus', function () { 
         var checkLevels = [
             STAGES.get("1-1"),
@@ -105,30 +106,30 @@ export const STAGE_UNLOCKS = new Map([
             STAGES.get("2-3"),
         ];
         var pass = checkLevels.every(stage => {
-            return checkRank.call(this,[stage, RANKS.GOLD]);
+            return checkRank.call(this,stage, RANKS.GOLD);
         });
         return pass}],
         //return checkRank.call(this,["World_2-4", RANKS.GOLD)}],
     ['railgun', function () { 
-        return checkRank.call(this,[STAGES.get("4-3"), RANKS.WOOD])}],
+        return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
     ['two-wide-corridors', function () { 
-        return checkRank.call(this,[STAGES.get("8-3"), RANKS.WOOD])}],
+        return checkRank.call(this,STAGES.get("8-3"), RANKS.WOOD)}],
     ['two-wide-corridors', function () {
-        return checkRank.call(this,[STAGES.get("8-3"), RANKS.WOOD]);}],
+        return checkRank.call(this,STAGES.get("8-3"), RANKS.WOOD);}],
     ['double-back-portals', function () {
-        return checkRank.call(this,[STAGES.get("10-4"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD);
     }],
     ['easy-wrap', function () {
         return PLAYER_STATS.wraps > 128;
     }],
     ['hard-wrap', function () {
-        return checkRank.call(this,[STAGES.get("3-2"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("3-2"), RANKS.WOOD);
     }],
     ['more-blocks', function () {
-        return checkRank.call(this,[STAGES.get("2-1"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("2-1"), RANKS.WOOD);
     }],
     ['wrap-and-warp', function () {
-        return checkRank.call(this,[STAGES.get("1-2"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("1-2"), RANKS.WOOD);
     }],
     ['learn-to-wrap', function () {
         return true;
@@ -140,34 +141,34 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['unidirectional-portals', function () {
-        return checkRank.call(this,[STAGES.get("8-2"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("8-2"), RANKS.WOOD);
     }],
     ['hardest----for-now', function () {
-        return checkRank.call(this,[STAGES.get("10-3"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("10-3"), RANKS.WOOD);
     }],
     ['swirl-swirl', function () {
-        return checkRank.call(this,[STAGES.get("4-4"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("4-4"), RANKS.WOOD);
     }],
     ['eye', function () {
-        return checkRank.call(this,[STAGES.get("4-2"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("4-2"), RANKS.WOOD);
     }],
     ['plus-plus', function () {
-        return checkRank.call(this,[STAGES.get("10-2"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("10-2"), RANKS.WOOD);
     }],
     ['col', function () {
-        return checkRank.call(this,[STAGES.get("4-2"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("4-2"), RANKS.WOOD);
     }],
     ['its-a-snek', function () {
-        return checkRank.call(this,[STAGES.get("4-1"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("4-1"), RANKS.WOOD);
     }],
     ['now-a-fourth', function () {
-        return checkRank.call(this,[STAGES.get("8-3"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("8-3"), RANKS.WOOD);
     }],
     ['horizontal-uturns', function () {
-        return checkRank.call(this,[STAGES.get("9-3"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("9-3"), RANKS.WOOD);
     }],
     ['horizontal-gaps', function () {
-        return checkRank.call(this,[STAGES.get("9-2"), RANKS.WOOD]); 
+        return checkRank.call(this,STAGES.get("9-2"), RANKS.WOOD); 
     }],
     ['first-medium', function () {
         return true;
@@ -176,30 +177,30 @@ export const STAGE_UNLOCKS = new Map([
         return false;
     }],
     ['easy-racer', function () {
-        return checkRank.call(this,[STAGES.get("0-1"), RANKS.PLATINUM]);
+        return checkRank.call(this,STAGES.get("0-1"), RANKS.PLATINUM);
     }],
     ['hello-ghosts', function () {
         return false;
     }],
     ['medium-happy', function () {
-        return checkRank.call(this,[STAGES.get("2-3"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("2-3"), RANKS.WOOD);
     }],
     ['bidirectional-portals', function () {
-        return checkRank.call(this,[STAGES.get("8-1"), RANKS.WOOD]); 
+        return checkRank.call(this,STAGES.get("8-1"), RANKS.WOOD); 
     }],
     ['start', function ( ) { 
         return true
     }],
     ['babies-first-wall', function () {
-        return checkRank.call(this,[STAGES.get("0-1"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("0-1"), RANKS.WOOD);
     }],
     ['horz-rows', function () {
-        return checkRank.call(this,[STAGES.get("1-1"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("1-1"), RANKS.WOOD);
     }],
     ['first-blocks', function () {
-        return checkRank.call(this,[STAGES.get("1-3"), RANKS.WOOD]);
+        return checkRank.call(this,STAGES.get("1-3"), RANKS.WOOD);
     }],
     ['medium-wrap', function () {
-        return checkRank.call(this,[STAGES.get("3-1"), RANKS.WOOD])
+        return checkRank.call(this,STAGES.get("3-1"), RANKS.WOOD)
     }],
 ]);
