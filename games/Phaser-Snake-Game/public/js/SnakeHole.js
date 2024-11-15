@@ -4048,7 +4048,6 @@ class GameScene extends Phaser.Scene {
 
                                     
                                     // Easier to see when debugging with debugger in console.
-                                    debugger
                                     stageName;
                                     var temp = STAGE_UNLOCKS.get(propObj.value);
                                     //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
