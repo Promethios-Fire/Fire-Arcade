@@ -499,11 +499,130 @@ class SpaceBoyScene extends Phaser.Scene {
             
         }, this);
 
+        //plinko
+        var discPositions = [
+            // Left column
+            { x: GRID * 6, y: GRID * 0 - 12 },
+            { x: GRID * 6, y: GRID * 0.5 - 12 },
+            { x: GRID * 6, y: GRID * 1 - 12 },
+            { x: GRID * 6, y: GRID * 1.5 - 12 },
+            { x: GRID * 6, y: GRID * 2 - 12 },
+            { x: GRID * 6, y: GRID * 2.5 - 12 },
+            { x: GRID * 6, y: GRID * 3 - 12 },
+            { x: GRID * 6, y: GRID * 4 - 12 },
+            { x: GRID * 6, y: GRID * 4.5 - 12 },
+            { x: GRID * 6, y: GRID * 5 - 12 },
+            { x: GRID * 6, y: GRID * 5.5 - 12 },
+            { x: GRID * 6, y: GRID * 6 - 12 },
+            { x: GRID * 6, y: GRID * 6.5 - 12 },
+            { x: GRID * 6, y: GRID * 7 - 12 },
+            { x: GRID * 6, y: GRID * 7.5 - 12 },
+            { x: GRID * 6, y: GRID * 8 - 12 },
+            // Right column
+            { x: GRID * 6.25, y: GRID * 0 - 6 },
+            { x: GRID * 6.25, y: GRID * 0.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 1 - 6 },
+            { x: GRID * 6.25, y: GRID * 1.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 2 - 6 },
+            { x: GRID * 6.25, y: GRID * 2.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 3 - 6 },
+            { x: GRID * 6.25, y: GRID * 4 - 6 },
+            { x: GRID * 6.25, y: GRID * 4.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 5 - 6 },
+            { x: GRID * 6.25, y: GRID * 5.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 6 - 6 },
+            { x: GRID * 6.25, y: GRID * 6.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 7 - 6 },
+            { x: GRID * 6.25, y: GRID * 7.5 - 6 },
+            { x: GRID * 6.25, y: GRID * 8 - 6 }
+        ];
+
+
+
+        // Create 32 plinko discs using Matter Physics
+        discPositions.forEach(function(position){ 
+            var plinkoDisc = this.matter.add.sprite(position.x, position.y, 'plinkoDisc').setDepth(100);
+            plinkoDisc.setCircle(3);
+            plinkoDisc.setBounce(0.0);
+            plinkoDisc.setFriction(0.000);
+            plinkoDisc.setFrictionAir(0.000);
+            plinkoDisc.setFixedRotation();
+        }, this);
+
+        /*this.plinkoDisc = this.matter.add.sprite(GRID * 6.5, GRID * 8, 'plinkoDisc',1);
+        this.plinkoDisc.setCircle();
+        this.plinkoDisc.setBounce(0.5);*/
+        //this.plinkoDisc.setFriction(0.005);
+        //this.plinkoDisc.setFrictionAir(0.005);
+
+        //this.tube = this.physics.add.sprite(GRID * 7,GRID * 20, 200,10);
+        //this.tube.setImmovable(true);
+        //this.tube.body.allowGravity = false;
+
+        // Create a group for tubes
+        // Define tube positions and sizes
+        
+        var tubeData = [
+            // Starting Top Tube
+            { x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
+            { x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
+            // Leftmost horizontal platforms
+            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 25, height: 1, angle: 2 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 18, width: 24, height: 1, angle: 2 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 34, width: 24, height: 1, angle: 2 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 50, width: 24, height: 1, angle: 2 },
+            // Rightmost horizontal platforms
+            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 1, angle: 3 },
+            { x: GRID * 9 + 1, y: GRID * 22 + 10, width: 20, height: 1, angle: -2 },
+            { x: GRID * 9 + 1, y: GRID * 22 + 26, width: 20, height: 1, angle: -2 },
+            { x: GRID * 9 + 1, y: GRID * 22 + 42, width: 20, height: 1, angle: -2 },
+            { x: GRID * 9 + 1, y: GRID * 22 + 58, width: 27, height: 1, angle: -2 },
+            // Left wall
+            { x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
+            // Right wall
+            { x: GRID * 9.5 + 6, y: GRID * 24 + 2, width: 2, height: 80, angle: 0 },
+            // Diagonol Wall
+            // Outer Curve
+            { x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
+            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 10, height: 2, angle: 45 },
+            { x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
+            // Inner Curve
+            { x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
+
+        ];
+        
+        for (var i = 0; i < tubeData.length; i++) {
+            var data = tubeData[i];
+            var tube = this.matter.add.rectangle(data.x, data.y, data.width, data.height, {
+                 isStatic: true // Ensure the tube is immovable 
+            });
+            this.matter.body.setAngle(tube, Phaser.Math.DegToRad(data.angle)); // Apply the angle separately 
+            tube.friction = 0; // Set the friction of the tube to 0 
+        } 
         
 
         
+
+        // Angled tube
+        /*var angledTube = this.matter.add.rectangle(GRID * 7 + 2, GRID * 17 + 56, 20, 2, {
+            angle: Phaser.Math.DegToRad(45),
+            isStatic: true // Ensure the tube is immovable
+        });
+        var angledTube2 = this.matter.add.rectangle(GRID * 7.5, GRID * 16.5 + 54, 15, 2, {
+            angle: Phaser.Math.DegToRad(45),
+            isStatic: true // Ensure the tube is immovable
+        });*/
+
+
+
+        // Enable collision between the plinkoDisc and the tubes
+        //this.matter.add.collider(this.plinkoDisc, tubes);
 
     }
+        
+
+        
+
     startMusic () {
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
@@ -959,6 +1078,8 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
+        //this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6 });
+        this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6});
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('boostMeterBG', 'assets/sprites/UI_boostMeterBG.png');
@@ -9184,12 +9305,13 @@ var config = {
         mode: Phaser.Scale.FIT,
     },
     //parent: 'phaser-example',
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0}
-        }
-    },
+    physics: 
+        { default: 'matter',
+             matter: { 
+                debug: false,
+                 gravity: { y: 0.9 }
+            } 
+        },
     fx: {
         glow: {
             distance: 36,
