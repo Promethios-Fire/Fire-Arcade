@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
-const DEBUG_SKIP_TO_SCENE = true;
+const DEBUG_SKIP_TO_SCENE = false;
 const DEBUG_SCENE = "ExtractTracker"
 const DEBUG_ARGS = {
     stage:"World_0-1"
@@ -1660,43 +1660,75 @@ class ExtractTracker extends Phaser.Scene {
                     ).setOrigin(0,0).setScale(1);
 
                     trackerContainer.add(pathTitle);
-    
-                    for (let index = 0; index < bestExtract.length; index++) {
-
-                        var _rank = bestExtract[index][0];
-                        var _id = bestExtract[index][1];
-                        var _scoreSnapshot = bestExtract[index][2]
-
-                        bestSum += _rank;
-    
-                        var _x = topLeft + index * letterOffset;
-
-                        
-                        const bestRank = this.add.sprite(_x , rowY, "ranksSpriteSheet", _rank
-                        ).setDepth(80).setOrigin(0.5,0).setScale(0.5);
-
-                        const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`,16
-                        ).setOrigin(0.5,0).setScale(0.75);
-
-                        trackerContainer.add([bestRank, stageID]);
-                        
-                    }
-                    var _x = topLeft + bestExtract.length * letterOffset;
-    
-                    var bestExtractRank = bestSum / bestExtract.length;
                     
-                    const bestScoreTitle = this.add.bitmapText(_x + GRID * 2, rowY, 'mainFont', "SCORE", 16
+                    if (bestExtract === "Classic Clear") {
+                        
+                        
+                        var idArray = extractKey.split("|");
+                        for (let index = 0; index < idArray.length; index++) {
+
+                            var _x = topLeft + index * letterOffset;
+                            
+                            const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${idArray[index]}`,16
+                            ).setOrigin(0.5,0).setScale(0.75);
+                            trackerContainer.add([stageID]);
+
+                        }
+
+                        var _x = topLeft + idArray.length * letterOffset;
+    
+
+                    } else {
+                        for (let index = 0; index < bestExtract.length; index++) {
+
+                            var _rank = bestExtract[index][0];
+                            var _id = bestExtract[index][1];
+                            var _scoreSnapshot = bestExtract[index][2]
+    
+                            bestSum += _rank;
+        
+                            var _x = topLeft + index * letterOffset;
+    
+                            
+                            const bestRank = this.add.sprite(_x , rowY, "ranksSpriteSheet", _rank
+                            ).setDepth(80).setOrigin(0.5,0).setScale(0.5);
+    
+                            const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`,16
+                            ).setOrigin(0.5,0).setScale(0.75);
+    
+                            trackerContainer.add([bestRank, stageID]);
+                            
+                        }
+
+                        var _x = topLeft + bestExtract.length * letterOffset;
+    
+                        var bestExtractRank = bestSum / bestExtract.length;
+        
+                        const finalRank = this.add.sprite(_x + GRID * .5, rowY - 2, "ranksSpriteSheet", Math.floor(bestExtractRank)
+                        ).setDepth(80).setOrigin(0.5,0).setScale(1);
+
+                        trackerContainer.add([finalRank]);
+
+                    }
+
+                    var bestScoreTitle = this.add.bitmapText(_x + GRID * 2, rowY, 'mainFont', "SCORE", 16
                     ).setOrigin(0,0).setScale(0.75);
 
-                    const bestScore = this.add.bitmapText(_x + GRID * 2, rowY + 15, 'mainFont',
+                    var bestScore = this.add.bitmapText(_x + GRID * 2, rowY + 15, 'mainFont',
                         commaInt(bestExtract[bestExtract.length - 1][2]),
                     16).setOrigin(0,0).setScale(1);
-    
-                    const finalRank = this.add.sprite(_x + GRID * .5, rowY - 2, "ranksSpriteSheet", Math.floor(bestExtractRank)
-                    ).setDepth(80).setOrigin(0.5,0).setScale(1);
 
-                    trackerContainer.add([bestScoreTitle, bestScore, finalRank]);
+                    if (bestExtract === "Classic Clear") {
+                        bestScoreTitle.x -= GRID * 2.5;
+                        bestScore.x -= GRID * 2.5;
+                        bestScoreTitle.setText("CLASSIC");
+                        bestScore.setText("CLEAR");
+                        
+                    }
 
+                    trackerContainer.add([bestScoreTitle, bestScore]);
+
+                    
                     this.yMap.set(extractKey, {
                         extractCode:extractKey, 
                         x: topLeft,
@@ -1725,10 +1757,8 @@ class ExtractTracker extends Phaser.Scene {
             // Display something if they have not yet done an extraction on
         }
 
-        var selected = this.yMap.get("0-1|3-1|3-2|3-3");
+        var selected = this.yMap.get([...this.yMap.keys()][0]);
         var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
-
-        var yMap = this.yMap;
 
 
         this.tweens.add({
@@ -6100,34 +6130,45 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 `RANK`
         ).setOrigin(0.5,0).setScale(0.5);
-
-        if (this.mode === "Expert") {
             
             if (!localStorage.getItem("extractRanks")) {
                 // if There is none
                 var bestExtractions = new Map()
-                bestExtractions.set(extractCode, [...extractHistory])
+                bestExtractions.set(extractCode, "Classic Clear");
 
             } else {
                 var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")))
-
+                    
                 if (bestExtractions.has(extractCode)) {
-                    var prevBest = bestExtractions.get(extractCode);
-                    var prevSum = 0;
-
-                    prevBest.forEach( record => {
-                        prevSum += record[0];
-                    })
-
-                    if (prevSum < extractRankSum) {
-                        console.log("NEW EXRACT RANKING");
-                        
-                        bestExtractions.set(extractCode, [...extractHistory]);  
+                    if (this.mode === "Expert") {
+                        if (bestExtractions.get(extractCode) != "Classic Clear") {
+                            var prevBest = bestExtractions.get(extractCode);
+                            var prevSum = 0;
+                            prevBest.forEach( record => {
+                                prevSum += record[0];
+                            })
+                            if (prevSum < extractRankSum) {
+                                console.log("NEW EXRACT RANKING");   
+                                bestExtractions.set(extractCode, [...extractHistory]);  
+                            }
+                        } else {
+                            console.log("FIRST EXPERT RANKING CLEAR"); 
+                            bestExtractions.set(extractCode, [...extractHistory]);
+                        }
                     }
-
                 } else {
-                    bestExtractions.set(extractCode, [...extractHistory]);
+                    switch (this.mode) {
+                        case "Classic":
+                            bestExtractions.set(extractCode, "Classic Clear");
+                            break;
+                        case "Expert":
+                            bestExtractions.set(extractCode, [...extractHistory]);
+                            break;
+                        default:
+                            break;
+                    }     
                 }
+                
             }
 
             const tempArray = Array.from(bestExtractions.entries());
@@ -6158,7 +6199,7 @@ class GameScene extends Phaser.Scene {
 
             var finalRank = this.add.sprite(_x + GRID * .5,GRID * 18.5, "ranksSpriteSheet", Math.floor(bestExtractRank)
             ).setDepth(80).setOrigin(0.5,0).setPipeline('Light2D').setScale(0.5);
-        }
+        
 
 
         this.extractHole[0].play('extractHoleClose');

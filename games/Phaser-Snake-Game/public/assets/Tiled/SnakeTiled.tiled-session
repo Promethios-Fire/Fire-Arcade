@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "Tutorial_3.json",
+    "activeFile": "World_8-3_Adv_Portaling.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -2739,23 +2739,31 @@
     "openFiles": [
         "Tutorial_1.json",
         "Tutorial_2.json",
-        "Tutorial_3.json"
+        "Tutorial_3.json",
+        "World_0-1.json",
+        "World_1-2.json",
+        "World_1-1.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
+        "World_8-3_Adv_Portaling.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
-        "r-11-07-1.json",
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
-        "World_10-4.json",
         "World_0-1.json",
-        "archive-World_1-1-max-combo-record.json",
+        "World_1-2.json",
+        "World_1-1.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
         "World_8-3_Adv_Portaling.json",
-        "World_8-2_Adv_Portaling.json",
-        "World_9-4_Final_Exams.json",
-        "World_9-3_Final_Exams.json",
-        "World_9-2_Final_Exams.json"
+        "World_8-5_Adv_Portaling.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
