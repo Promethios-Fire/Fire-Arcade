@@ -6244,10 +6244,11 @@ class GameScene extends Phaser.Scene {
                 `FINAL SCORE:`
         ).setOrigin(1,0).setScale(0.5);
 
-        const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 10, 'div', Object.assign({}, STYLE_DEFAULT,
+        const bestRanksLableUI = this.add.dom(windowCenterX - GRID * 0.5, finalWindowTop + GRID * 9, 'div', Object.assign({}, STYLE_DEFAULT,
             finalScoreStyle, {
             })).setHTML(
-                `EXTRACTION TRACKER - ONLY ON EXPERT`
+                `BEST EXTRACTION TRACKER
+                 AVAILABLE ON EXPERT`
         ).setOrigin(0.5,0).setScale(0.5);
         
         var _totalScore = 0
