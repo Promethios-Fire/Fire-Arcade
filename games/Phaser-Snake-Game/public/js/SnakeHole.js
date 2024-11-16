@@ -621,6 +621,8 @@ class TutorialScene extends Phaser.Scene {
     }
     create(tutorialPanels) {
 
+        this.scene.get("PersistScene").setArrows(false);
+
         // AUDIO
         this.pop02 = this.sound.add('pop02');
 
@@ -1564,22 +1566,24 @@ class QuickMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-TAB', function() {
+            ourPersist.setArrows(false);
             //this.scene.sleep("QuickMenuScene");
             var option = this.menuList[0]; //tab calls option 1 every time
+            debugger
+            
             this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
         }, this);
 
         if (qMenuArgs.sideScene) {
             //menu arrows
-            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
-            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+            
+            ourPersist.setArrows(true);
 
             this.input.keyboard.on('keydown-LEFT', e => {
+                ourPersist.setArrows(false, "LEFT");
 
                 const ourGame = this.scene.get("GameScene");
-    
+                
                 if (!this.scene.isSleeping("StageCodex")) {
                     this.scene.sleep("QuickMenuScene");
                     this.scene.launch('StageCodex', {
@@ -1601,6 +1605,7 @@ class QuickMenuScene extends Phaser.Scene {
             }, this);
     
             this.input.keyboard.on('keydown-RIGHT', e => {
+                ourPersist.setArrows(false, "RIGHT");
     
                 const ourGame = this.scene.get("GameScene");
     
@@ -1841,11 +1846,10 @@ class ExtractTracker extends Phaser.Scene {
 
         
         
-        
-        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+
             
         this.input.keyboard.on('keydown-LEFT', e => {
+            this.scene.get("PersistScene").setArrows(true, "RIGHT");
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             const game = this.scene.get("GameScene");
@@ -2055,12 +2059,14 @@ class StageCodex extends Phaser.Scene {
             }, this);               
         }
 
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+        
 
         this.input.keyboard.on('keydown-RIGHT', e => {
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
+
+            ourPersist.setArrows(true, "LEFT");
+
             const game = this.scene.get("GameScene");
             game.scene.resume();
             game.scene.setVisible(true);
@@ -2293,11 +2299,6 @@ class MainMenuScene extends Phaser.Scene {
         
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
 
-        //menu arrows
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuR.play('arrowMenuIdle').setAlpha(0);
-        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
 
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
@@ -2429,10 +2430,10 @@ class MainMenuScene extends Phaser.Scene {
                 this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
-                arrowMenuL,arrowMenuR,
                 ...menuElements,
                 this.exitButton,
-                this.graphics
+                this.graphics,
+                ourPersist.arrowL,ourPersist.arrowR
             ],
             alpha: 1,
             duration: 100,
@@ -2763,7 +2764,7 @@ class GalaxyMapScene extends Phaser.Scene {
         const ourMenuScene = this.scene.get('MainMenuScene');
 
         this.arrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        this.arrowR.play('arrowMenuIdle').setAlpha(1);
+        //this.arrowR.play('arrowMenuIdle').setAlpha(1);
 
         this.galaxyMapState = 0;
         
@@ -2983,6 +2984,15 @@ class PersistScene extends Phaser.Scene {
     this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
 
 
+    //menu arrows
+    this.arrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+    this.arrowR.play('arrowMenuIdle').setAlpha(0);
+    this.arrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+    this.arrowL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
+
+
+
+
     const styleBottomText = {
         "font-size": '12px',
         "font-weight": 400,
@@ -3041,7 +3051,42 @@ class PersistScene extends Phaser.Scene {
                 }
         });
     }
-
+    setArrows(onOff, option){
+        // BOOL
+        if (onOff) {
+            switch (option) {
+                case "RIGHT":
+                    this.arrowR.setAlpha(1);   
+                    break;
+                case "LEFT":
+                    this.arrowL.setAlpha(1);
+                    break;
+            
+                default:
+                    this.arrowR.setAlpha(1);
+                    this.arrowL.setAlpha(1);
+                    break;
+            } 
+            
+        } else {
+            
+            switch (option) {
+                case "RIGHT":
+                    this.arrowR.setAlpha(0);   
+                    break;
+                case "LEFT":
+                    this.arrowL.setAlpha(0);
+                    break;
+            
+                default:
+                    debugger
+                    this.arrowR.setAlpha(0);
+                    this.arrowL.setAlpha(0);
+                    break;
+            } 
+        }
+         
+    }
     
     update(time, delta) {
 
@@ -5685,6 +5730,7 @@ class GameScene extends Phaser.Scene {
             //console.log(ourQuickMenu.renderer.pipelines.FX_PIPELINE.pixelate)
         }
         else{
+            this.scene.get("PersistScene").setArrows(false);
             // we remove the postFX pixelate pipeline to disable it as setting to 0 or -1 does nothing
             // setting the object to null ensures garbage collection -- works now, but errors from desync if holding tab down
             ourPersist.bgFront.postFX.remove(this.fxbgFront)

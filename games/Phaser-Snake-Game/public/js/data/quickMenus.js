@@ -56,8 +56,10 @@ export var QUICK_MENUS = new Map([
             const ourGameScene = this.scene.get("GameScene");
             console.log("RETURN TO STAGE");
             ourGameScene.backgroundBlur(false);
+            
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
+            this.scene.get("PersistScene").setArrows(false);
             this.scene.stop(); 
         }],
         ['REDO STAGE (- 1 Coin)', function () {
