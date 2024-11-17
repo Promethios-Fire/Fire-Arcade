@@ -1,20 +1,45 @@
 
-import { PLAYER_STATS, RANKS } from "../SnakeHole.js";
+import { BEST_OF_CLASSIC, BEST_OF_EXPERT, PLAYER_STATS, RANKS } from "../SnakeHole.js";
 
-import { BEST_OF_STAGE_DATA} from "../SnakeHole.js"
+import { BEST_OF_ALL} from "../SnakeHole.js"
 
 
 
-var checkRank = function(stageName, targetRank) {
+export var checkRank = function(stageName, targetRank) {
+    // Only unlock on expert if you unlocked in classic.
+    // But progress Expert just like you progress classic.
+    switch (this.scene.get("GameScene").mode) {
+        case "Classic":
+            if (BEST_OF_CLASSIC.get(stageName) != undefined ) {
+                
+                var resultRank = BEST_OF_CLASSIC.get(stageName).stageRank()
+                var bool = resultRank >= targetRank
+                return  bool;
+            } else {
+                //debugger
+                return false;
+            }
+            break;
+
+        case "Expert":
+            if (BEST_OF_CLASSIC.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
+                var resultRank = BEST_OF_EXPERT.get(stageName).stageRank()
+                var bool = resultRank >= targetRank
+                return  bool;
+            } else {
+                //debugger
+                return false;
+            }
     
-        if (BEST_OF_STAGE_DATA.get(stageName) != undefined ) {
-            var resultRank = BEST_OF_STAGE_DATA.get(stageName).stageRank()
-            var bool = resultRank >= targetRank
-            return  bool;
-        } else {
-            //debugger
-            return false;
-        }
+            
+            break;
+    
+        default:
+            break;
+    }
+    
+    
+
 }
 
 export const STAGES = new Map([
@@ -35,10 +60,14 @@ export const STAGES = new Map([
     ["4-4", "World_4-4"],
     ["4-5", "World_4-5"],
     ["5-1", "World_5-1_Racing"],
+    ["5-2", "World_5-2_Racing"],
+    ["5-3", "World_5-3_Racing"],
+    ["5-4", "World_5-4_Racing"],
     ["8-1", "World_8-1_Adv_Portaling"],
     ["8-2", "World_8-2_Adv_Portaling"],
     ["8-3", "World_8-3_Adv_Portaling"],
     ["8-4", "World_8-4_Adv_Portaling"],
+    ["8-5", "World_8-5_Adv_Portaling"],
     ["9-2", "World_9-2_Final_Exams"],
     ["9-3", "World_9-3_Final_Exams"],
     ["9-4", "World_9-4_Final_Exams"],
@@ -47,15 +76,58 @@ export const STAGES = new Map([
     ["10-4", "World_10-4"],
 ])
 
+export const EXTRACT_CODES = [
+    "0-1|1-1|1-2|1-3",
+    "0-1|2-1|2-2|2-3",
+    "0-1|2-1|2-2|2-4",
+    "0-1|3-1|3-2|3-3",
+    "0-1|4-1|4-2|4-3",
+    "0-1|4-1|4-4|4-5",
+    "0-1|5-1|5-2|5-3",
+    "0-1|5-1|5-2|5-4",
+    "0-1|8-1|8-2|8-4",
+    "0-1|8-1|8-3|8-4",
+    "0-1|8-1|8-2|8-5",
+    "0-1|1-1|9-2|9-3|9-4",
+    "0-1|2-1|10-2|10-3|10-4",
+    
+];
+
 /* Template
         ['', function () { 
-        return checkRank("", RANKS.WOOD)}],
+        return checkRank.call(this,"", RANKS.WOOD)}],
 */
 
 
 export const STAGE_UNLOCKS = new Map([
-    ['dino-tess', function () { 
-        return checkRank(STAGES.get("4-3"), RANKS.WOOD)}],
+    ['long-racer', function () { 
+        return checkRank.call(this,STAGES.get("5-1"), RANKS.WOOD)}],
+    ['tri-racer', function () { 
+        return checkRank.call(this,STAGES.get("5-2"), RANKS.WOOD)}],
+    ['hard-racer', function () { 
+        var checkLevels = [
+            STAGES.get("5-1"),
+            STAGES.get("5-2"),
+            STAGES.get("5-3"),
+        ];
+        var pass = checkLevels.every(stage => {
+            return checkRank.call(this,stage, RANKS.GOLD);
+        });
+
+        return pass}],
+    ['you-portal-turn-now', function () { 
+        var checkLevels = [
+            STAGES.get("8-1"),
+            STAGES.get("8-2"),
+            STAGES.get("8-4"),
+        ];
+        var pass = checkLevels.every(stage => {
+            return checkRank.call(this,stage, RANKS.SILVER);
+        });
+
+        return pass}],
+    ['dino-tess', function () { checkRank.bind(this);
+        return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
     ['og-plus', function () { 
         var checkLevels = [
             STAGES.get("1-1"),
@@ -66,32 +138,28 @@ export const STAGE_UNLOCKS = new Map([
             STAGES.get("2-3"),
         ];
         var pass = checkLevels.every(stage => {
-            return checkRank(stage, RANKS.GOLD);
+            return checkRank.call(this,stage, RANKS.GOLD);
         });
         return pass}],
-        //return checkRank("World_2-4", RANKS.GOLD)}],
+        //return checkRank.call(this,["World_2-4", RANKS.GOLD)}],
     ['railgun', function () { 
-        return checkRank(STAGES.get("4-3"), RANKS.WOOD)}],
-    ['two-wide-corridors', function () { 
-        return checkRank(STAGES.get("8-3"), RANKS.WOOD)}],
-    ['babies-first-wall', function () {
-        return checkRank(STAGES.get("0-1"), RANKS.WOOD)}],
+        return checkRank.call(this,STAGES.get("4-3"), RANKS.WOOD)}],
     ['two-wide-corridors', function () {
-        return checkRank(STAGES.get("8-3"), RANKS.WOOD);}],
+        return checkRank.call(this,STAGES.get("8-4"), RANKS.WOOD);}],
     ['double-back-portals', function () {
-        return checkRank(STAGES.get("10-4"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD);
     }],
     ['easy-wrap', function () {
         return PLAYER_STATS.wraps > 128;
     }],
     ['hard-wrap', function () {
-        return checkRank(STAGES.get("3-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("3-2"), RANKS.WOOD);
     }],
     ['more-blocks', function () {
-        return checkRank(STAGES.get("2-1"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("2-1"), RANKS.WOOD);
     }],
     ['wrap-and-warp', function () {
-        return checkRank(STAGES.get("1-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("1-2"), RANKS.WOOD);
     }],
     ['learn-to-wrap', function () {
         return true;
@@ -103,34 +171,34 @@ export const STAGE_UNLOCKS = new Map([
         return true;
     }],
     ['unidirectional-portals', function () {
-        return checkRank(STAGES.get("8-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("8-2"), RANKS.WOOD);
     }],
     ['hardest----for-now', function () {
-        return checkRank(STAGES.get("10-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("10-3"), RANKS.WOOD);
     }],
     ['swirl-swirl', function () {
-        return checkRank(STAGES.get("4-4"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("4-4"), RANKS.WOOD);
     }],
     ['eye', function () {
-        return checkRank(STAGES.get("4-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("4-2"), RANKS.WOOD);
     }],
     ['plus-plus', function () {
-        return checkRank(STAGES.get("10-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("10-2"), RANKS.WOOD);
     }],
     ['col', function () {
-        return checkRank(STAGES.get("4-2"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("4-2"), RANKS.WOOD);
     }],
     ['its-a-snek', function () {
-        return checkRank(STAGES.get("4-1"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("4-1"), RANKS.WOOD);
     }],
     ['now-a-fourth', function () {
-        return checkRank(STAGES.get("8-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("8-4"), RANKS.WOOD);
     }],
     ['horizontal-uturns', function () {
-        return checkRank(STAGES.get("9-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("9-3"), RANKS.WOOD);
     }],
     ['horizontal-gaps', function () {
-        return checkRank(STAGES.get("9-2"), RANKS.WOOD); 
+        return checkRank.call(this,STAGES.get("9-2"), RANKS.WOOD); 
     }],
     ['first-medium', function () {
         return true;
@@ -139,30 +207,30 @@ export const STAGE_UNLOCKS = new Map([
         return false;
     }],
     ['easy-racer', function () {
-        return checkRank(STAGES.get("0-1"), RANKS.PLATINUM);
+        return checkRank.call(this,STAGES.get("0-1"), RANKS.PLATINUM);
     }],
     ['hello-ghosts', function () {
         return false;
     }],
     ['medium-happy', function () {
-        return checkRank(STAGES.get("2-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("2-3"), RANKS.WOOD);
     }],
     ['bidirectional-portals', function () {
-        return checkRank(STAGES.get("8-1"), RANKS.WOOD); 
+        return checkRank.call(this,STAGES.get("8-1"), RANKS.WOOD); 
     }],
     ['start', function ( ) { 
         return true
     }],
     ['babies-first-wall', function () {
-        return checkRank(STAGES.get("0-1"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("0-1"), RANKS.WOOD);
     }],
     ['horz-rows', function () {
-        return checkRank(STAGES.get("1-1"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("1-1"), RANKS.WOOD);
     }],
     ['first-blocks', function () {
-        return checkRank(STAGES.get("1-3"), RANKS.WOOD);
+        return checkRank.call(this,STAGES.get("1-3"), RANKS.WOOD);
     }],
     ['medium-wrap', function () {
-        return checkRank(STAGES.get("3-1"), RANKS.WOOD)
+        return checkRank.call(this,STAGES.get("3-1"), RANKS.WOOD)
     }],
 ]);

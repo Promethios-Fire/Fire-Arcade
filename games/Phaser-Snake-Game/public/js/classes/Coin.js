@@ -1,4 +1,4 @@
-import {GRID, X_OFFSET, Y_OFFSET, commaInt} from "../SnakeHole.js";
+import {GRID, PLAYER_STATS, X_OFFSET, Y_OFFSET, commaInt} from "../SnakeHole.js";
 
 var Coin = new Phaser.Class({
 
@@ -41,6 +41,7 @@ var Coin = new Phaser.Class({
         //this.snakeCritical = false;
 
         ourPersistScene.coins += 1;
+        PLAYER_STATS.totalCoinsCollected += 1;
         if (ourPersistScene.coins > 0) {
             scene.coinsUIIcon.setVisible(true)
         }

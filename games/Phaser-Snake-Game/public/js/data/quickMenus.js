@@ -1,4 +1,4 @@
-import { PLAYER_STATS, RANKS, START_STAGE } from "../SnakeHole.js";
+import { PLAYER_STATS, RANKS, START_STAGE, START_UUID } from "../SnakeHole.js";
 import { TUTORIAL_PANELS } from "./tutorialScreens.js";
 
 export var QUICK_MENUS = new Map([
@@ -16,8 +16,14 @@ export var QUICK_MENUS = new Map([
         }],
         ["Classic", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
+            const ourGame = this.scene.get("GameScene");
 
-            if (localStorage.hasOwnProperty(`3026c8f1-2b04-479c-b474-ab4c05039999-bestStageData`)) {
+            const ourPersist = this.scene.get("PersistScene");
+            ourPersist.mode = "Classic";
+
+            this.scene.get("InputScene").scene.restart();
+
+            if (localStorage.hasOwnProperty(`${START_UUID}_best-Classic`)) {
                 var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
                 mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
             } else {
@@ -25,9 +31,23 @@ export var QUICK_MENUS = new Map([
             }
 
             mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+            mainMenuScene.scene.stop();
             this.scene.stop();
         }],
         ["Expert", function () {
+            const mainMenuScene = this.scene.get("MainMenuScene");
+            const ourGame = this.scene.get("GameScene");
+
+            const ourPersist = this.scene.get("PersistScene");
+            ourPersist.mode = "Expert";
+
+            this.scene.get("InputScene").scene.restart();
+
+            var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+            mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+            mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+            
+            this.scene.stop();
             // Do Stuff
         }],
     ])],
@@ -36,21 +56,25 @@ export var QUICK_MENUS = new Map([
             const ourGameScene = this.scene.get("GameScene");
             console.log("RETURN TO STAGE");
             ourGameScene.backgroundBlur(false);
+            this.scene.get("StageCodex").scene.stop();
+            this.scene.get("ExtractTracker").scene.stop();
             this.scene.stop(); 
         }],
         ['REDO STAGE (- 1 Coin)', function () {
             const ourGameScene = this.scene.get("GameScene");
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPersist = this.scene.get("PersistScene");
 
 
-            if (ourGameScene.scene.get("PersistScene").coins > 0) {
+            if (ourPersist.coins > 0) {
 
-                ourGameScene.scene.get("PersistScene").coins -= 1;
-                ourGameScene.scene.get("PersistScene").loseCoin();
+                ourPersist.coins -= 1;
+                ourPersist.loseCoin();
                 
                 // Clear for reseting game
                 ourGameScene.events.off('addScore');
                 ourGameScene.events.off('spawnBlackholes');
+                ourGameScene.scene.get("InputScene").scene.restart();
 
                 var previous = ourGameScene.scene.get("SpaceBoyScene").stageHistory.pop();
                 if (previous != undefined) {
@@ -66,6 +90,7 @@ export var QUICK_MENUS = new Map([
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
+                    mode: ourPersist.mode
                     //lives: this.lives 
                 });
                 ourSpaceBoy.shiftLight1.setAlpha(0);
@@ -79,10 +104,14 @@ export var QUICK_MENUS = new Map([
             const ourGameScene = this.scene.get("GameScene");
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
+            const ourPersist = this.scene.get("PersistScene");
+            
             console.log("BACK TO MAIN MENU");
             // Clear for reseting game
+
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
+            ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.scene.start("MainMenuScene");
             ourGameScene.backgroundBlur(false);
@@ -95,12 +124,14 @@ export var QUICK_MENUS = new Map([
         ['RESTART ADVENTURE', function () {
             const ourGameScene = this.scene.get("GameScene");
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPersist = this.scene.get("PersistScene");
             // TODO: send to origin
 
 
             // Clear for reseting game
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
+            ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.backgroundBlur(false);
             // Restart  
@@ -108,6 +139,7 @@ export var QUICK_MENUS = new Map([
                 stage: START_STAGE,
                 score: 0,
                 startupAnim: true,
+                mode: ourPersist.mode
             });
 
             ourSpaceBoy.shiftLight1.setAlpha(0);

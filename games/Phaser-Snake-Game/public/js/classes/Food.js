@@ -83,7 +83,7 @@ var Food = new Phaser.Class({
             scene.comboCounter = 0;
         }
 
-        PLAYER_STATS.globalStore += timeSinceFruit;
+        PLAYER_STATS.globalScore += timeSinceFruit;
 
         scene.events.emit('addScore', this); 
         scene.snake.grow(scene);
