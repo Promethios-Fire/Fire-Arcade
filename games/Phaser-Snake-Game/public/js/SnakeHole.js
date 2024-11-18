@@ -1896,14 +1896,12 @@ class StageCodex extends Phaser.Scene {
         var categoryText;
 
         if (!checkExpertUnlocked.call(this)) {
-            debugger
             bestOfDisplay = BEST_OF_ALL;
             sumOfBestDisplay = ourPersist.sumOfBestAll;
             stagesCompleteDisplay = ourPersist.stagesCompleteAll;
             categoryText = "";
             
         } else {
-            debugger
             switch (args.category) {
                 case "Classic":
                     bestOfDisplay = BEST_OF_CLASSIC;
@@ -1912,7 +1910,6 @@ class StageCodex extends Phaser.Scene {
                     categoryText = "Classic";
                     break;
                 case "Expert":
-                    debugger
                     bestOfDisplay = BEST_OF_EXPERT;
                     sumOfBestDisplay = ourPersist.sumOfBestExpert;
                     stagesCompleteDisplay = ourPersist.stagesCompleteExpert;
@@ -2112,17 +2109,86 @@ class StageCodex extends Phaser.Scene {
         var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuR.play('arrowMenuIdle').setAlpha(1);
 
-        this.input.keyboard.on('keydown-RIGHT', e => {
-            //this.cameras.main.scrollX += SCREEN_WIDTH;
-            //this.cameras.main.scrollX += SCREEN_WIDTH;
-            const game = this.scene.get("GameScene");
-            game.scene.resume();
-            game.scene.setVisible(true);
+        if (!checkExpertUnlocked.call(this)) {
+            // Default
+            this.input.keyboard.on('keydown-RIGHT', e => {
+                const game = this.scene.get("GameScene");
+                game.scene.resume();
+                game.scene.setVisible(true);
 
-            this.scene.wake('QuickMenuScene');
-            this.scene.sleep('StageCodex');
+                this.scene.wake('QuickMenuScene');
+                this.scene.sleep('StageCodex');
+                
+                }, this
+            );
+        } else {
+
+            switch (args.category) {
+                case "Classic":
+                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+
+                    this.input.keyboard.on('keydown-LEFT', e => {
+                            this.scene.restart({
+                                stage: this.scene.get("GameScene").stage,
+                                category: "Overall"
+                            });
+                        }, this
+                    );
+
+                    this.input.keyboard.on('keydown-RIGHT', e => {
+                        const game = this.scene.get("GameScene");
+                        game.scene.resume();
+                        game.scene.setVisible(true);
+        
+                        this.scene.wake('QuickMenuScene');
+                        this.scene.sleep('StageCodex');
+                        
+                        }, this
+                    );
+                    break;
+
+                case "Expert":
+                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+                    this.input.keyboard.on('keydown-LEFT', e => {
+                        this.scene.restart({
+                            stage: this.scene.get("GameScene").stage,
+                            category: "Overall"
+                        });
+                        }, this
+                    );
+                    this.input.keyboard.on('keydown-RIGHT', e => {
+                        const game = this.scene.get("GameScene");
+                        game.scene.resume();
+                        game.scene.setVisible(true);
+        
+                        this.scene.wake('QuickMenuScene');
+                        this.scene.sleep('StageCodex');
+                        
+                        }, this
+                    );
+                    
+                    break;
+
+                case "Overall":
+                    this.input.keyboard.on('keydown-RIGHT', e => {
+                        this.scene.restart({
+                            stage: this.scene.get("GameScene").stage,
+                            category: this.scene.get("GameScene").mode
+                        });
+                        }, this
+                    );
+                    
+                    break;
             
-        }, this);
+                default:
+                    break;
+            }
+            
+
+            
+        }
     }
 }
 
