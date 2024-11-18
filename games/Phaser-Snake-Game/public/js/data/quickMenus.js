@@ -93,6 +93,9 @@ export var QUICK_MENUS = new Map([
                     //lives: this.lives 
                 });
             }
+
+            this.scene.get("StageCodex").scene.stop();
+            this.scene.get("ExtractTracker").scene.stop();
             this.scene.stop();  
 
         }],
@@ -109,6 +112,9 @@ export var QUICK_MENUS = new Map([
             
             ourGameScene.scene.start("MainMenuScene");
             ourGameScene.backgroundBlur(false);
+
+            this.scene.get("StageCodex").scene.stop();
+            this.scene.get("ExtractTracker").scene.stop();
             this.scene.stop(); 
             return true;
         }],
@@ -132,6 +138,8 @@ export var QUICK_MENUS = new Map([
                 mode: ourPersist.mode
             });
 
+            this.scene.get("StageCodex").scene.stop();
+            this.scene.get("ExtractTracker").scene.stop();
             this.scene.stop(); 
             return true;
         }],

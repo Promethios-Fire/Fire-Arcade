@@ -3,11 +3,23 @@ import { BEST_OF_CLASSIC, BEST_OF_EXPERT, PLAYER_STATS, RANKS } from "../SnakeHo
 
 import { BEST_OF_ALL} from "../SnakeHole.js"
 
+export var checkRankGlobal = function(stageName, targetRank) {
+    if (BEST_OF_ALL.get(stageName) != undefined ) {
+                
+        var resultRank = BEST_OF_ALL.get(stageName).stageRank()
+        var bool = resultRank >= targetRank
+        return  bool;
+    } else {
+        //debugger
+        return false;
+    }
 
+}
 
 export var checkRank = function(stageName, targetRank) {
     // Only unlock on expert if you unlocked in classic.
     // But progress Expert just like you progress classic.
+    
     switch (this.scene.get("GameScene").mode) {
         case "Classic":
             if (BEST_OF_CLASSIC.get(stageName) != undefined ) {
