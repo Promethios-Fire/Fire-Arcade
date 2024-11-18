@@ -580,52 +580,65 @@ class SpaceBoyScene extends Phaser.Scene {
         //plinko
         var discPositions = [
             // Left column
-            { x: GRID * 6, y: GRID * 0 - 12 },
-            { x: GRID * 6, y: GRID * 0.5 - 12 },
-            { x: GRID * 6, y: GRID * 1 - 12 },
-            { x: GRID * 6, y: GRID * 1.5 - 12 },
-            { x: GRID * 6, y: GRID * 2 - 12 },
-            { x: GRID * 6, y: GRID * 2.5 - 12 },
-            { x: GRID * 6, y: GRID * 3 - 12 },
-            { x: GRID * 6, y: GRID * 4 - 12 },
-            { x: GRID * 6, y: GRID * 4.5 - 12 },
-            { x: GRID * 6, y: GRID * 5 - 12 },
-            { x: GRID * 6, y: GRID * 5.5 - 12 },
-            { x: GRID * 6, y: GRID * 6 - 12 },
-            { x: GRID * 6, y: GRID * 6.5 - 12 },
-            { x: GRID * 6, y: GRID * 7 - 12 },
-            { x: GRID * 6, y: GRID * 7.5 - 12 },
-            { x: GRID * 6, y: GRID * 8 - 12 },
+            /*{ x: GRID * 6, y: GRID * (0 + 6) },
+            { x: GRID * 6, y: GRID * (0.5 + 6) },
+            { x: GRID * 6, y: GRID * (1 + 6) },
+            { x: GRID * 6, y: GRID * (1.5 + 6) },
+            { x: GRID * 6, y: GRID * (2 + 6) },
+            { x: GRID * 6, y: GRID * (2.5 + 6) },
+            { x: GRID * 6, y: GRID * (3 + 6) },
+            { x: GRID * 6, y: GRID * (4 + 6) },
+            { x: GRID * 6, y: GRID * (4.5 + 6) },
+            { x: GRID * 6, y: GRID * (5 + 6) },
+            { x: GRID * 6, y: GRID * (5.5 + 6) },
+            { x: GRID * 6, y: GRID * (6 + 6) },
+            { x: GRID * 6, y: GRID * (6.5 + 6) },
+            { x: GRID * 6, y: GRID * (7 + 6) },
+            { x: GRID * 6, y: GRID * (7.5 + 6) },
+            { x: GRID * 6, y: GRID * (8 + 6) },*/
             // Right column
-            { x: GRID * 6.25, y: GRID * 0 - 6 },
-            { x: GRID * 6.25, y: GRID * 0.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 1 - 6 },
-            { x: GRID * 6.25, y: GRID * 1.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 2 - 6 },
-            { x: GRID * 6.25, y: GRID * 2.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 3 - 6 },
-            { x: GRID * 6.25, y: GRID * 4 - 6 },
-            { x: GRID * 6.25, y: GRID * 4.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 5 - 6 },
-            { x: GRID * 6.25, y: GRID * 5.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 6 - 6 },
-            { x: GRID * 6.25, y: GRID * 6.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 7 - 6 },
-            { x: GRID * 6.25, y: GRID * 7.5 - 6 },
-            { x: GRID * 6.25, y: GRID * 8 - 6 }
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
         ];
 
+        // Initialize delay interval and index
+        var delay = 400;
+        var index = 0;
 
-
-        // Create 32 plinko discs using Matter Physics
-        discPositions.forEach(function(position){ 
+        var spawnDisc = function() {
+        if (index < discPositions.length){
+            var position = discPositions[index];
             var plinkoDisc = this.matter.add.sprite(position.x, position.y, 'plinkoDisc').setDepth(100);
-            plinkoDisc.setCircle(3);
+            plinkoDisc.setCircle(3.333);
+            //plinkoDisc.setMass(5)
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
             plinkoDisc.setFrictionAir(0.000);
             plinkoDisc.setFixedRotation();
-        }, this);
+            index++;
+            this.time.delayedCall(delay,spawnDisc, [], this);
+            }
+        };
+        spawnDisc.call(this);
+
 
         /*this.plinkoDisc = this.matter.add.sprite(GRID * 6.5, GRID * 8, 'plinkoDisc',1);
         this.plinkoDisc.setCircle();
@@ -645,24 +658,24 @@ class SpaceBoyScene extends Phaser.Scene {
             { x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
             { x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
             // Leftmost horizontal platforms
-            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 25, height: 1, angle: 2 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 18, width: 24, height: 1, angle: 2 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 34, width: 24, height: 1, angle: 2 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 50, width: 24, height: 1, angle: 2 },
+            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 18.5, width: 25, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 34.5, width: 25, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 50.5, width: 25, height: 0.5, angle: 1.25 },
             // Rightmost horizontal platforms
-            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 1, angle: 3 },
-            { x: GRID * 9 + 1, y: GRID * 22 + 10, width: 20, height: 1, angle: -2 },
-            { x: GRID * 9 + 1, y: GRID * 22 + 26, width: 20, height: 1, angle: -2 },
-            { x: GRID * 9 + 1, y: GRID * 22 + 42, width: 20, height: 1, angle: -2 },
-            { x: GRID * 9 + 1, y: GRID * 22 + 58, width: 27, height: 1, angle: -2 },
+            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 0.5, angle: 3 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 10.5, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 26.5, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 42, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 59, width: 27, height: 0.5, angle: -2 },
             // Left wall
             { x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
             // Right wall
-            { x: GRID * 9.5 + 6, y: GRID * 24 + 2, width: 2, height: 80, angle: 0 },
+            { x: GRID * 9.5 + 19, y: GRID * 24 + 2, width: 24, height: 80, angle: 0 },
             // Diagonol Wall
             // Outer Curve
             { x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
-            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 10, height: 2, angle: 45 },
+            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 20, height: 2, angle: 45 },
             { x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
             // Inner Curve
             { x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
@@ -10102,7 +10115,7 @@ var config = {
         { default: 'matter',
              matter: { 
                 debug: false,
-                 gravity: { y: 0.9 }
+                 gravity: { y: 3 }
             } 
         },
     fx: {
