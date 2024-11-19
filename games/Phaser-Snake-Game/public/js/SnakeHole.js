@@ -512,8 +512,17 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight'
-        ).setOrigin(0,0).setDepth(51).setAlpha(0);
+        this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
+
+        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 1, Y_OFFSET + GRID * 6,
+             'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -2, Y_OFFSET + GRID * 6,
+             'shiftLight',1).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 32 + 7, Y_OFFSET + GRID * 6,
+             'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
+        
+        this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
+        setOrigin(0,0).setDepth(51).setAlpha(0);
 
         this.tweens.add({
             targets: this.spaceBoyLight,
@@ -569,15 +578,168 @@ class SpaceBoyScene extends Phaser.Scene {
             
         }, this);
 
+
+        //const group1 = this.matter.world.nextGroup();
+        var categoryA = this.matter.world.nextCategory();
+        var categoryB = this.matter.world.nextCategory();
+
+        // Create a group for tubes
+        // Define tube positions and sizes
+
+        
+        var tubeData = [
+            // Starting Top Tube
+            { x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
+            { x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
+            // Leftmost horizontal platforms
+            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 18.5, width: 25, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 34.5, width: 25, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 50.5, width: 25, height: 0.5, angle: 1.25 },
+            // Rightmost horizontal platforms
+            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 0.5, angle: 3 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 10.5, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 26.5, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 42, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 59, width: 30, height: 0.5, angle: -2 },
+            // Left wall
+            { x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
+            // Right wall
+            { x: GRID * 9.5 + 19, y: GRID * 24 + 2, width: 24, height: 80, angle: 0 },
+            // Diagonol Wall
+            // Outer Curve
+            { x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
+            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 20, height: 2, angle: 45 },
+            { x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
+            // Inner Curve
+            { x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
+
+        ];
+
+        
+        for (var i = 0; i < tubeData.length; i++) {
+            var data = tubeData[i];
+            var tube = this.matter.add.rectangle(data.x, data.y, data.width, data.height, {
+                 isStatic: true // Ensure the tube is immovable 
+            });
+            //tube.setCollisionCategory(categoryB);
+
+            this.matter.body.setAngle(tube, Phaser.Math.DegToRad(data.angle)); // Apply the angle separately 
+            
+            tube.friction = 0; // Set the friction of the tube to 0 
+        } 
+        //plinkoDisc.setCollidesWith(categoryB);
+
+        
         this.music.on('pause', () => {
             pauseButton.setTintFill(0x8B0000);
         }, this);
 
+
+        //plinko
+        var discPositions = [
+            // Left column
+            /*{ x: GRID * 6, y: GRID * (0 + 6) },
+            { x: GRID * 6, y: GRID * (0.5 + 6) },
+            { x: GRID * 6, y: GRID * (1 + 6) },
+            { x: GRID * 6, y: GRID * (1.5 + 6) },
+            { x: GRID * 6, y: GRID * (2 + 6) },
+            { x: GRID * 6, y: GRID * (2.5 + 6) },
+            { x: GRID * 6, y: GRID * (3 + 6) },
+            { x: GRID * 6, y: GRID * (4 + 6) },
+            { x: GRID * 6, y: GRID * (4.5 + 6) },
+            { x: GRID * 6, y: GRID * (5 + 6) },
+            { x: GRID * 6, y: GRID * (5.5 + 6) },
+            { x: GRID * 6, y: GRID * (6 + 6) },
+            { x: GRID * 6, y: GRID * (6.5 + 6) },
+            { x: GRID * 6, y: GRID * (7 + 6) },
+            { x: GRID * 6, y: GRID * (7.5 + 6) },
+            { x: GRID * 6, y: GRID * (8 + 6) },*/
+            // Right column
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+            { x: GRID * 6.25, y: GRID * (8 + 12)},
+        ];
+
+        // Initialize delay interval and index
+        var delay = 100;
+        var index = 0;
+
+
+
+        var spawnDisc = function() {
+        if (index < discPositions.length){
+            var position = discPositions[index];
+            var plinkoDisc = this.matter.add.sprite(position.x, position.y, 'plinkoDisc').setDepth(49);
+            plinkoDisc.setCircle(3.333);
+            //plinkoDisc.setMass(5)
+            plinkoDisc.setBounce(0.0);
+            plinkoDisc.setFriction(0.000);
+            plinkoDisc.setFrictionAir(0.000);
+            plinkoDisc.setFixedRotation();
+            //.setCollisionGroup(categoryA);
+            //plinkoDisc.setCollidesWith(categoryB);
+            //plinkoDisc.setSensor(true);
+            index++;
+            this.time.delayedCall(delay,spawnDisc, [], this);
+            }
+        };
+        spawnDisc.call(this);
+
+
+        /*this.plinkoDisc = this.matter.add.sprite(GRID * 6.5, GRID * 8, 'plinkoDisc',1);
+        this.plinkoDisc.setCircle();
+        this.plinkoDisc.setBounce(0.5);*/
+        //this.plinkoDisc.setFriction(0.005);
+        //this.plinkoDisc.setFrictionAir(0.005);
+
+        //this.tube = this.physics.add.sprite(GRID * 7,GRID * 20, 200,10);
+        //this.tube.setImmovable(true);
+        //this.tube.body.allowGravity = false;
+
         
 
         
+
+        
+
+        // Angled tube
+        /*var angledTube = this.matter.add.rectangle(GRID * 7 + 2, GRID * 17 + 56, 20, 2, {
+            angle: Phaser.Math.DegToRad(45),
+            isStatic: true // Ensure the tube is immovable
+        });
+        var angledTube2 = this.matter.add.rectangle(GRID * 7.5, GRID * 16.5 + 54, 15, 2, {
+            angle: Phaser.Math.DegToRad(45),
+            isStatic: true // Ensure the tube is immovable
+        });*/
+
+
+
+        // Enable collision between the plinkoDisc and the tubes
+        //this.matter.add.collider(this.plinkoDisc, tubes);
 
     }
+        
+
+        
+
     startMusic () {
 
 
@@ -1003,6 +1165,7 @@ class StartScene extends Phaser.Scene {
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
+        this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
         this.load.image('comboBG','assets/sprites/UI_comboBG.png')
@@ -1026,6 +1189,8 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
+        //this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6 });
+        this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6});
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
         this.load.image('boostMeterFrame', 'assets/sprites/UI_boostMeterFrame.png');
         this.load.image('boostMeterBG', 'assets/sprites/UI_boostMeterBG.png');
@@ -1058,6 +1223,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('shiftLight', 'assets/sprites/spaceBoyShiftLight.png', { frameWidth: 12, frameHeight: 12 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
@@ -1156,6 +1322,7 @@ class StartScene extends Phaser.Scene {
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GamesScene");
         const ourStartScene = this.scene.get("StartScene");
+
 
         //pauses and resumes sound so queued sfx don't play all at once upon resuming
         window.addEventListener('focus', function () {
@@ -3014,10 +3181,12 @@ class PersistScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     }
     loseCoin(){ // 
-        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        this.coinsUICopy.setGravity(0,400)
+        var randomVec2 = new Phaser.Math.Vector2(Phaser.Math.Between(-2,1),Phaser.Math.Between(-2,5))
+        this.coinsUICopy.applyForce(randomVec2)
+        //this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        //this.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
         //TODO trigger UI coin loader animation here
     }
@@ -3701,7 +3870,11 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
+                ourSpaceBoy.shiftLight1.setAlpha(0);
+                ourSpaceBoy.shiftLight2.setAlpha(0);
+                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("YES");
+                
                 ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore("MainMenuScene", {});
                 return true;
@@ -3744,6 +3917,9 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
+                ourSpaceBoy.shiftLight1.setAlpha(0);
+                ourSpaceBoy.shiftLight2.setAlpha(0);
+                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
 
@@ -3911,7 +4087,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
         .setDepth(100).setVisible(false);
         
         this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
@@ -5092,7 +5268,7 @@ class GameScene extends Phaser.Scene {
 
 
          // Countdown Text
-        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 4, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 1, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
             'color': '#FCFFB2',
             'text-shadow': '0 0 4px #FF9405, 0 0 8px #F8FF05',
             'font-size': '22px',
@@ -5184,6 +5360,7 @@ class GameScene extends Phaser.Scene {
         this.events.on('addScore', function (fruit) {
 
             const ourGameScene = this.scene.get('GameScene');
+            const ourScoreScene = this.scene.get('ScoreScene');
 
             var scoreText = this.add.dom(fruit.x, fruit.y - GRID -  4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 color: COLOR_SCORE,
@@ -5228,7 +5405,7 @@ class GameScene extends Phaser.Scene {
 
                 var movingElectronTween = this.tweens.add( {
                     targets: electronToCapacitor,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -6,
                     y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 0,
@@ -5240,7 +5417,7 @@ class GameScene extends Phaser.Scene {
                 });
                 var movingElectronTween2 = this.tweens.add( {
                     targets: electronToCapacitor2,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -10,
                     y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 33.3,
@@ -5252,7 +5429,7 @@ class GameScene extends Phaser.Scene {
                 });
                 var movingElectronTween3 = this.tweens.add( {
                     targets: electronToCapacitor3,
-                    x: ourSpaceBoy.scoreFrame.getCenter().x -7,
+                    x: ourSpaceBoy.scoreFrame.getCenter().x -10,
                     y: ourSpaceBoy.scoreFrame.getCenter().y,
                     duration:300,
                     delay: 66.7,
@@ -5328,6 +5505,21 @@ class GameScene extends Phaser.Scene {
                     paused: false
                  }, this);   
             }
+
+            switch (this.length) {
+                case this.lengthGoal - 3:
+                    ourSpaceBoy.shiftLight1.setAlpha(1);
+                    break;
+                case this.lengthGoal - 2:
+                    ourSpaceBoy.shiftLight2.setAlpha(1);
+                    break;
+                case this.lengthGoal - 1:
+                    ourSpaceBoy.shiftLight3.setAlpha(1);
+                    break;
+                default:
+                    break;
+            }
+
             
         }, this);
 
@@ -5931,7 +6123,7 @@ class GameScene extends Phaser.Scene {
 
                         ourPersist.cameras.main.scrollX = 0;
                         ourPersist.cameras.main.scrollY = 0;*/
-                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
+                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                         .setDepth(100);
                         
                         this.gState = GState.PLAY;
@@ -5983,19 +6175,19 @@ class GameScene extends Phaser.Scene {
                 if (animation.key === 'electronFanfareForm') {
                     this.tweens.add({
                         targets: [this.electronFanfare,this.atomComet],
-                        x: ourSpaceBoy.scoreFrame.getCenter().x -3,
+                        x: ourSpaceBoy.scoreFrame.getCenter().x -6,
                         y: ourSpaceBoy.scoreFrame.getCenter().y,
                         ease: 'Sine.easeIn',
                         duration: 1250,
                         onComplete: () => {
                             ourGame.countDown.setAlpha(1);
-                            ourGame.countDown.x = X_OFFSET + GRID * 4 - 3;
+                            ourGame.countDown.x = X_OFFSET + GRID * 4 - 6;
                             ourGame.countDown.y = 3;
                             this.atomComet.destroy();
                         }
                     });
                             ourGame.countDown.setHTML('W1N');
-                            ourGame.countDown.x += 4
+                            ourGame.countDown.x += 3
                     }
                     
             });
@@ -6458,6 +6650,7 @@ class GameScene extends Phaser.Scene {
     warpToNext(nextStageIndex) {
 
         const ourPersist = this.scene.get('PersistScene');
+        const ourSpaceboy = this.scene.get('SpaceBoyScene');
         this.gState = GState.TRANSITION;
 
         ourPersist.comboCover.setVisible(true);
@@ -6480,7 +6673,8 @@ class GameScene extends Phaser.Scene {
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
             this.tweens.add({
-                targets: [ourGameScene.countDown,ourGameScene.coinUIText],
+                targets: [ourGameScene.countDown,ourGameScene.coinUIText,
+                    ourSpaceboy.shiftLight1,ourSpaceboy.shiftLight2,ourSpaceboy.shiftLight3],
                 alpha: { from: 1, to: 0},
                 ease: 'Sine.InOut',
                 duration: 500,
@@ -7576,6 +7770,7 @@ class ScoreScene extends Phaser.Scene {
         const ourScoreScene = this.scene.get('ScoreScene');
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         //bypass scorescene temporarily for slowmo
         //ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
@@ -9941,12 +10136,13 @@ var config = {
         mode: Phaser.Scale.FIT,
     },
     //parent: 'phaser-example',
-    physics: {
-        default: 'arcade',
-        arcade: {
-            gravity: { y: 0}
-        }
-    },
+    physics: 
+        { default: 'matter',
+             matter: { 
+                debug: true,
+                 gravity: { y: 3 }
+            }
+        },
     fx: {
         glow: {
             distance: 36,
