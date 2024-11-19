@@ -512,7 +512,8 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-        
+        this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
+
         this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 1, Y_OFFSET + GRID * 6,
              'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
         this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -2, Y_OFFSET + GRID * 6,
@@ -577,6 +578,64 @@ class SpaceBoyScene extends Phaser.Scene {
             
         }, this);
 
+
+        //const group1 = this.matter.world.nextGroup();
+        var categoryA = this.matter.world.nextCategory();
+        var categoryB = this.matter.world.nextCategory();
+
+        // Create a group for tubes
+        // Define tube positions and sizes
+
+        
+        var tubeData = [
+            // Starting Top Tube
+            { x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
+            { x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
+            // Leftmost horizontal platforms
+            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 18.5, width: 25, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 34.5, width: 25, height: 0.5, angle: 1.25 },
+            { x: GRID * 8.5 - 1, y: GRID * 22 + 50.5, width: 25, height: 0.5, angle: 1.25 },
+            // Rightmost horizontal platforms
+            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 0.5, angle: 3 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 10.5, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 26.5, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 42, width: 20, height: 0.5, angle: -1.25 },
+            { x: GRID * 9 + 2, y: GRID * 22 + 59, width: 30, height: 0.5, angle: -2 },
+            // Left wall
+            { x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
+            // Right wall
+            { x: GRID * 9.5 + 19, y: GRID * 24 + 2, width: 24, height: 80, angle: 0 },
+            // Diagonol Wall
+            // Outer Curve
+            { x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
+            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 20, height: 2, angle: 45 },
+            { x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
+            // Inner Curve
+            { x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
+
+        ];
+
+        
+        for (var i = 0; i < tubeData.length; i++) {
+            var data = tubeData[i];
+            var tube = this.matter.add.rectangle(data.x, data.y, data.width, data.height, {
+                 isStatic: true // Ensure the tube is immovable 
+            });
+            //tube.setCollisionCategory(categoryB);
+
+            this.matter.body.setAngle(tube, Phaser.Math.DegToRad(data.angle)); // Apply the angle separately 
+            
+            tube.friction = 0; // Set the friction of the tube to 0 
+        } 
+        //plinkoDisc.setCollidesWith(categoryB);
+
+        
+        this.music.on('pause', () => {
+            pauseButton.setTintFill(0x8B0000);
+        }, this);
+
+
         //plinko
         var discPositions = [
             // Left column
@@ -620,19 +679,24 @@ class SpaceBoyScene extends Phaser.Scene {
         ];
 
         // Initialize delay interval and index
-        var delay = 400;
+        var delay = 100;
         var index = 0;
+
+
 
         var spawnDisc = function() {
         if (index < discPositions.length){
             var position = discPositions[index];
-            var plinkoDisc = this.matter.add.sprite(position.x, position.y, 'plinkoDisc').setDepth(100);
+            var plinkoDisc = this.matter.add.sprite(position.x, position.y, 'plinkoDisc').setDepth(49);
             plinkoDisc.setCircle(3.333);
             //plinkoDisc.setMass(5)
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
             plinkoDisc.setFrictionAir(0.000);
             plinkoDisc.setFixedRotation();
+            //.setCollisionGroup(categoryA);
+            //plinkoDisc.setCollidesWith(categoryB);
+            //plinkoDisc.setSensor(true);
             index++;
             this.time.delayedCall(delay,spawnDisc, [], this);
             }
@@ -650,49 +714,7 @@ class SpaceBoyScene extends Phaser.Scene {
         //this.tube.setImmovable(true);
         //this.tube.body.allowGravity = false;
 
-        // Create a group for tubes
-        // Define tube positions and sizes
         
-        var tubeData = [
-            // Starting Top Tube
-            { x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
-            { x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
-            // Leftmost horizontal platforms
-            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 18.5, width: 25, height: 0.5, angle: 1.25 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 34.5, width: 25, height: 0.5, angle: 1.25 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 50.5, width: 25, height: 0.5, angle: 1.25 },
-            // Rightmost horizontal platforms
-            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 0.5, angle: 3 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 10.5, width: 20, height: 0.5, angle: -1.25 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 26.5, width: 20, height: 0.5, angle: -1.25 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 42, width: 20, height: 0.5, angle: -1.25 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 59, width: 27, height: 0.5, angle: -2 },
-            // Left wall
-            { x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
-            // Right wall
-            { x: GRID * 9.5 + 19, y: GRID * 24 + 2, width: 24, height: 80, angle: 0 },
-            // Diagonol Wall
-            // Outer Curve
-            { x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
-            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 20, height: 2, angle: 45 },
-            { x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
-            // Inner Curve
-            { x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
-
-        ];
-        
-        for (var i = 0; i < tubeData.length; i++) {
-            var data = tubeData[i];
-            var tube = this.matter.add.rectangle(data.x, data.y, data.width, data.height, {
-                 isStatic: true // Ensure the tube is immovable 
-            });
-            this.matter.body.setAngle(tube, Phaser.Math.DegToRad(data.angle)); // Apply the angle separately 
-            tube.friction = 0; // Set the friction of the tube to 0 
-        } 
-        this.music.on('pause', () => {
-            pauseButton.setTintFill(0x8B0000);
-        }, this);
 
         
 
@@ -1143,6 +1165,7 @@ class StartScene extends Phaser.Scene {
         
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
+        this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
         this.load.image('comboBG','assets/sprites/UI_comboBG.png')
