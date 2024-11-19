@@ -3181,10 +3181,12 @@ class PersistScene extends Phaser.Scene {
     this.graphics = this.add.graphics();
     }
     loseCoin(){ // 
-        this.coinsUICopy = this.physics.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
+        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png'
         ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        this.coinsUICopy.setGravity(0,400)
+        var randomVec2 = new Phaser.Math.Vector2(Phaser.Math.Between(-2,1),Phaser.Math.Between(-2,5))
+        this.coinsUICopy.applyForce(randomVec2)
+        //this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        //this.coinsUICopy.setGravity(0,400)
         //TODO add coin flip here
         //TODO trigger UI coin loader animation here
     }
@@ -10139,7 +10141,7 @@ var config = {
              matter: { 
                 debug: true,
                  gravity: { y: 3 }
-            } 
+            }
         },
     fx: {
         glow: {
