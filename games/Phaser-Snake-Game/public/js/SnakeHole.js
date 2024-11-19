@@ -610,7 +610,18 @@ class SpaceBoyScene extends Phaser.Scene {
                 
                 break;
             case `track_175`: // Red Alert Song
-            debugger
+                this.music.stop();
+                this.music = this.sound.add(`track_175`,{
+                    volume: 0.33
+                });
+
+                this.music.play();
+                this.trackID.setText(175);
+
+                this.music.play();
+                this.music.on('complete', () => {
+                    this.nextSong();
+                }, this);
                 
                 break;
         
@@ -5666,8 +5677,9 @@ class GameScene extends Phaser.Scene {
 
     // #region .snakeCriticalState(
     snakeCriticalState(){
-        const coins = this.scene.get("PersistScene").coins
+        const coins = this.scene.get("PersistScene").coins;
         if (coins === 0 && this.snakeCritical === false){
+            this.scene.get("SpaceBoyScene").nextSong(`track_175`);
             this.snakeCriticalTween = this.tweens.addCounter({
                 from: 255,
                 to: 0,
@@ -5691,6 +5703,8 @@ class GameScene extends Phaser.Scene {
             if (this.snakeCriticalTween != null){
                 this.snakeCriticalTween.destroy();
             }
+            this.scene.get("SpaceBoyScene").music.stop();
+            this.scene.get("SpaceBoyScene").nextSong();
             this.snakeCriticalTween = this.tweens.addCounter({
                 from: this.snakeCriticalTween.getValue(),
                 to: 255,
@@ -7206,6 +7220,11 @@ class GameScene extends Phaser.Scene {
             }
         }*/
 
+        this.snakeCriticalState(); // TODO: This should only be called once when the snake bonks
+        // Then it should be toggled off in coin.js when onOver iff the snake is in a critical state.
+        // It is out of the loop now so it works as soon as the coin is lost even when in bonked state.
+        
+
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
@@ -7292,7 +7311,7 @@ class GameScene extends Phaser.Scene {
                     });
                 }
                 
-            } 
+            }
             
             
             if (this.gState === GState.PLAY) {
@@ -7316,8 +7335,7 @@ class GameScene extends Phaser.Scene {
                 ourInputScene.moveCount += 1;
                 
 
-                this.snakeCriticalState();
-                
+
 
                 if (this.boostEnergy < 1) {
                     // add the tail in.
