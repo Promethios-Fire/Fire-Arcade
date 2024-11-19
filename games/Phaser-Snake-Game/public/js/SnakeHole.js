@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -586,10 +586,6 @@ class SpaceBoyScene extends Phaser.Scene {
 
     }
     startMusic () {
-
-
-        
-        
         //music.on('complete', listener);
         
         //music.play();
@@ -599,25 +595,45 @@ class SpaceBoyScene extends Phaser.Scene {
         }, this);
 
     }
-    nextSong () {
-
-        if (this.shuffledTracks.length != 0) {
-        } else {
-            this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
-        }
-
-        var track = this.shuffledTracks.pop();
-
-        this.music = this.sound.add(`track_${track}`,{
-            volume: 0.33
-        });
-
-        this.music.play();
-        this.music.on('complete', () => {
-            this.nextSong();
-        }, this); 
+    nextSong (songID) {
         
-        this.trackID.setText(track);
+
+        switch (songID) {
+            case `track_149`: // Game Over Song
+                this.music.stop();
+                this.music = this.sound.add(`track_149`,{
+                    volume: 0.33
+                });
+
+                this.music.play();
+                this.trackID.setText(149);
+                
+                break;
+            case `track_175`: // Red Alert Song
+            debugger
+                
+                break;
+        
+            default: // Every thing else
+                if (this.shuffledTracks.length != 0) {
+                } else {
+                    this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+                }
+
+                var track = this.shuffledTracks.pop();
+
+                this.music = this.sound.add(`track_${track}`,{
+                    volume: 0.33
+                });
+
+                this.music.play();
+                this.music.on('complete', () => {
+                    this.nextSong();
+                }, this); 
+                
+                this.trackID.setText(track);
+                break;
+        }
 
     }
 }
@@ -6148,6 +6164,7 @@ class GameScene extends Phaser.Scene {
     // #region .gameOver(
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
+        this.scene.get('SpaceBoyScene').nextSong(`track_149`);
 
         //style
         const finalScoreStyle = {
@@ -6165,6 +6182,7 @@ class GameScene extends Phaser.Scene {
             "font-size":'32px',
             'font-weight': 400,
             'text-align': 'center',
+            "min-width": "550px",
             'text-transform': 'uppercase',
             "font-family": '"Press Start 2P", system-ui',
             })).setHTML(
@@ -6174,19 +6192,21 @@ class GameScene extends Phaser.Scene {
         
 
         //PRESS SPACE TO CONTINUE TEXT
-        // Give a few seconds before a player can hit continue
-        this.time.delayedCall(900, function() {
+        // Player waits for game over music to complete.
+        this.time.delayedCall(14000, function() {
             const ourGameScene = this.scene.get('GameScene');
-            var _continue_text = '[SPACE TO CONTINUE]';
+            var _continue_text = '[SPACE TO TRY AGAIN]';
 
             var _continueText = this.add.dom(SCREEN_WIDTH/2, GRID * 17,'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize":'32px',
                 "font-family": '"Press Start 2P", system-ui',
                 "text-shadow": "4px 4px 0px #000000",
+                "min-width": "550px",
+                "textAlign": 'center'
                 }
             )).setText(_continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
- 
+
             this.tweens.add({
                 targets: _continueText,
                 alpha: { from: 0, to: 1 },
@@ -6194,19 +6214,23 @@ class GameScene extends Phaser.Scene {
                 duration: 1000,
                 repeat: -1,
                 yoyo: true
-              });
+            });
 
             const onContinue = function () {
+                ourGameScene.scene.get("SpaceBoyScene").nextSong();
                 ourGameScene.scene.start('MainMenuScene');
             }
+            onContinue.bind(this);
+
             this.input.keyboard.on('keydown-SPACE', function() { 
+                
                 onContinue();
-            });
+            }, this);
 
             _continueText.on('pointerdown', e => {
                 onContinue();
-            });
-        }, [], this);
+            }, this);
+        }, [], this); 
 
 
 
@@ -7894,7 +7918,7 @@ class ScoreScene extends Phaser.Scene {
             'text-transform': 'uppercase',
             "line-height": '125%',
             "font-family": '"Press Start 2P", system-ui',
-            "min-width": "500px",
+            "min-width": "550px",
             "textAlign": 'center',
             "white-space": 'pre-line'
         })).setHTML(
