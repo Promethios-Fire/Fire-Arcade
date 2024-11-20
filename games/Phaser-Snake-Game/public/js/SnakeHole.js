@@ -518,6 +518,7 @@ class SpaceBoyScene extends Phaser.Scene {
         });
     }
     create() {
+        this.sound.mute = true; //TEMP MUTE SOUND
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
         this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
 
@@ -1196,7 +1197,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
-        
+        this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
+
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
         this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
@@ -3549,8 +3551,7 @@ class GameScene extends Phaser.Scene {
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
 
-
-        ourPersist.comboCover.setVisible(false);
+        
 
 
         if (this.stage == 'Tutorial_3') { // TODO @holden Move to customLevels.js
@@ -5301,11 +5302,18 @@ class GameScene extends Phaser.Scene {
         });
         
         
+        // pinball display/combo cover
+        ourPersist.comboCover.setVisible(false);
+
+        this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
+        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
+
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
             .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
 
         this.comboMasks = []
-        this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,this.letterO2,this.letterExplanationPoint)
+        this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
+            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake)
 
         this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
         this.comboMasksContainer.add(this.comboMasks);
@@ -6764,7 +6772,7 @@ class GameScene extends Phaser.Scene {
     warpToMenu(){
 
         const ourPersist = this.scene.get('PersistScene');
-
+        ourPersist.comboCover.setVisible(true);
 
         //dim UI
         this.time.delayedCall(1000, event => {
@@ -7084,12 +7092,14 @@ class GameScene extends Phaser.Scene {
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
+        var ourGame = this.scene.get("GameScene");
         ourPersist.loseCoin();
         this.coinsUIIcon.setVisible(false);
         ourPersist.coins += -1;
         this.coinUIText.setHTML(
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
         );
+        ourGame.comboCoverSnake.setTexture('UI_comboSnake', 5)
     }
     checkWinCon() { // Returns Bool
         if (this.lengthGoal > 0) { // Placeholder check for bonus level.
@@ -9531,6 +9541,7 @@ class InputScene extends Phaser.Scene {
                 // At anytime you can update the direction of the snake.
             gameScene.snake.head.setTexture('snakeDefault', 6);
             gameScene.snake.direction = DIRS.UP;
+            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 4)
             
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
             this.turns += 1;
@@ -9559,25 +9570,26 @@ class InputScene extends Phaser.Scene {
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
            
 
-               this.setPLAY(gameScene);
-               gameScene.snake.head.setTexture('snakeDefault', 7);
-           gameScene.snake.direction = DIRS.DOWN;
+            this.setPLAY(gameScene);
+            gameScene.snake.head.setTexture('snakeDefault', 7);
+            gameScene.snake.direction = DIRS.DOWN;
+            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 3)
 
-           this.turns += 1;
-           this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
+            this.turns += 1;
+            this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
 
-           var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
+            var _cornerTime = Math.abs((gameScene.time.now - gameScene.lastMoveTime) - gameScene.moveInterval);
 
-           if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
+            if (_cornerTime < gameScene.moveInterval) { // Moving on the same frame means you saved 0 frames not 99
                this.cornerTime += _cornerTime;
-           }
-           gameScene.lastMoveTime = gameScene.time.now;
+            }
+            gameScene.lastMoveTime = gameScene.time.now;
 
-           gameScene.snake.move(gameScene);
-           this.turnInputs[key] += 1;
+            gameScene.snake.move(gameScene);
+            this.turnInputs[key] += 1;
 
-           this.moveHistory.push([(gameScene.snake.head.x - X_OFFSET)/GRID, (gameScene.snake.head.y - Y_OFFSET)/GRID]);
-           gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
+            this.moveHistory.push([(gameScene.snake.head.x - X_OFFSET)/GRID, (gameScene.snake.head.y - Y_OFFSET)/GRID]);
+            gameScene.lastMoveTime = gameScene.time.now; // next cycle for move. This means techincally you can go as fast as you turn.
 
            
        }
@@ -9592,6 +9604,7 @@ class InputScene extends Phaser.Scene {
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
             gameScene.snake.direction = DIRS.LEFT;
+            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 2)
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -9618,9 +9631,10 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
             
-                this.setPLAY(gameScene);
-                gameScene.snake.head.setTexture('snakeDefault', 5);
+            this.setPLAY(gameScene);
+            gameScene.snake.head.setTexture('snakeDefault', 5);
             gameScene.snake.direction = DIRS.RIGHT;
+            gameScene.comboCoverSnake.setTexture('UI_comboSnake', 1)
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -10298,7 +10312,7 @@ var config = {
     physics: 
         { default: 'matter',
              matter: { 
-                debug: true,
+                debug: false,
                  gravity: { y: 3 }
             }
         },
@@ -10308,7 +10322,7 @@ var config = {
             quality: .1
         }
     },
-    audio: 
+    audio:
         { 
             disableWebAudio: false // allows Phaser to use better Web Audio API
         }, 

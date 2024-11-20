@@ -116,6 +116,7 @@ export var QUICK_MENUS = new Map([
             ourGameScene.events.off('spawnBlackholes');
             ourGameScene.scene.get("InputScene").scene.restart();
             
+            ourPersist.comboCover.setVisible(true);
             ourGameScene.scene.start("MainMenuScene");
             ourGameScene.backgroundBlur(false);
 
