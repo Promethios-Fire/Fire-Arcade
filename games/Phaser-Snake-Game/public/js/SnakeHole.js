@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 5; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -1101,7 +1101,7 @@ class TutorialScene extends Phaser.Scene {
                     startupAnim: true,
                     mode: scene.scene.get("PersistScene").mode
 
-                });      
+                });   
             }
 
             else {
@@ -5304,16 +5304,32 @@ class GameScene extends Phaser.Scene {
         
         
         // pinball display/combo cover
-        ourPersist.comboCover.setVisible(false);
+        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
+        .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
 
         this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
         ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
+        if (ourGame.stage == START_STAGE) {
+            ourGame.comboCoverSnake.setTexture('UI_comboSnake', 1)
+            this.tweens.add({
+                targets: ourGame.comboCoverSnake,
+                x: {from: ourGame.comboCoverSnake.x - 132,to:ourGame.comboCoverSnake.x + 0},
+                duration: 500,
+                ease: 'sine.inout',
+                yoyo: false,
+                delay: 0,
+                repeat: 0,
+                onComplete: () => {
+                    ourGame.comboCoverSnake.setTexture('UI_comboSnake', 0)
+                }
+            });  
+        } 
+        
 
         this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
         ).setOrigin(0.0,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
 
-        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
-            .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+
 
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
@@ -5328,6 +5344,14 @@ class GameScene extends Phaser.Scene {
         this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
         this.comboCover.mask.invertAlpha = true;
+        
+        // despite happening after the combo cover objects are created, 
+        // there's still a frame where the snake can be seen before its tween starts
+        // but only after resetting back to main menu
+        ourPersist.comboCover.setVisible(false);
+
+        
+
         
 
         //this.comboMasksContainer.setScrollFactor(0);
@@ -6383,6 +6407,9 @@ class GameScene extends Phaser.Scene {
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
         this.scene.get('SpaceBoyScene').nextSong(`track_149`);
+        var ourGame = this.scene.get("GameScene");
+        
+        ourGame.comboCoverSnake.setTexture('UI_comboSnake', 6)
 
         //style
         const finalScoreStyle = {
@@ -6776,7 +6803,6 @@ class GameScene extends Phaser.Scene {
     warpToMenu(){
 
         const ourPersist = this.scene.get('PersistScene');
-        ourPersist.comboCover.setVisible(true);
 
         //dim UI
         this.time.delayedCall(1000, event => {
@@ -6820,7 +6846,6 @@ class GameScene extends Phaser.Scene {
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
         this.gState = GState.TRANSITION;
 
-        ourPersist.comboCover.setVisible(true);
         this.scoreTweenShow();
 
         this.snake.head.setTexture('snakeDefault', 0);
@@ -6987,7 +7012,8 @@ class GameScene extends Phaser.Scene {
                         } else {
                             this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
                         }
-                        
+                        //setting this to visible is less noticible than leaving it blank for a frame
+                        ourPersist.comboCover.setVisible(true);
                     }
                 });
             }
@@ -7103,11 +7129,14 @@ class GameScene extends Phaser.Scene {
         this.coinUIText.setHTML(
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
         );
+        
         ourGame.comboCoverSnake.setTexture('UI_comboSnake', 5)
+        
         this.comboCoverBONK.setAlpha(1);
-        this.tweens.add({
+        
+        this.UI_bonkTween = this.tweens.add({
             targets: ourGame.comboCoverBONK, 
-            x: ourGame.comboCoverBONK.x - 240,
+            x: {from: ourGame.comboCoverBONK.x ,to:ourGame.comboCoverBONK.x - 240},
             yoyo: false,
             duration: 1600,
             ease: 'Linear',
@@ -7115,8 +7144,13 @@ class GameScene extends Phaser.Scene {
             onComplete: () =>{
                 this.comboCoverBONK.x = GRID * 17.5
                 this.comboCoverBONK.setAlpha(0);
-            }
-        });
+            },
+        }); 
+
+        //if (this.UI_bonkTween.isPlaying()) {
+        //    this.UI_bonkTween.restart();
+        //}
+        
 
     }
     checkWinCon() { // Returns Bool

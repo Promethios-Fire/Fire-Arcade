@@ -117,8 +117,9 @@ export var QUICK_MENUS = new Map([
             ourGameScene.scene.get("InputScene").scene.restart();
             
             ourPersist.comboCover.setVisible(true);
-            ourGameScene.scene.start("MainMenuScene");
             ourGameScene.backgroundBlur(false);
+            ourGameScene.scene.start("MainMenuScene");
+            
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
