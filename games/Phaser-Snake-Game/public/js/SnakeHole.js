@@ -4634,7 +4634,7 @@ class GameScene extends Phaser.Scene {
                                             blackholeImage.setTint(0xFFFFFF);
                                         }
 
-                                        if (this.stage === "World_0-1") {
+                                        if (this.stage === "World_0-1" && this.mode === "Classic") {
                                             switch (true) {
                                                 case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("1-1")) {
