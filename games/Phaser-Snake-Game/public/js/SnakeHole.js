@@ -1198,6 +1198,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
+        this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -5308,12 +5309,15 @@ class GameScene extends Phaser.Scene {
         this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
         ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
 
+        this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
+        ).setOrigin(0.0,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
+
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
             .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
 
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
-            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake)
+            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake, this.comboCoverBONK)
 
         this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
         this.comboMasksContainer.add(this.comboMasks);
@@ -7100,6 +7104,20 @@ class GameScene extends Phaser.Scene {
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
         );
         ourGame.comboCoverSnake.setTexture('UI_comboSnake', 5)
+        this.comboCoverBONK.setAlpha(1);
+        this.tweens.add({
+            targets: ourGame.comboCoverBONK, 
+            x: ourGame.comboCoverBONK.x - 240,
+            yoyo: false,
+            duration: 1600,
+            ease: 'Linear',
+            delay: 0,
+            onComplete: () =>{
+                this.comboCoverBONK.x = GRID * 17.5
+                this.comboCoverBONK.setAlpha(0);
+            }
+        });
+
     }
     checkWinCon() { // Returns Bool
         if (this.lengthGoal > 0) { // Placeholder check for bonus level.
