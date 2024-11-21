@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 5; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -519,8 +519,27 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         this.sound.mute = true; //TEMP MUTE SOUND
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(51);
-        this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
+
+        var matterJSON = this.cache.json.get('collisionData');
+
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52); 
+
+        this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(50);
+        this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
+        //this.plinkoBoard = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', null,
+            //{
+            //shape: matterJSON.plinkoBoard,}).setOrigin(0,0).setDepth(50);
+
+        //this.plinkoBoard.body.isStatic = true;
+        //this.plinkoBoard.setPosition(GRID * 7 + this.plinkoBoard.centerOfMass.x, GRID * 21.5 + this.plinkoBoard.centerOfMass.y);
+        
+        //ground.setPosition(0 + this.plinkoBoard.centerOfMass.x, 280 + this.plinkoBoard.centerOfMass.y);
+
+        //var leftPoly = this.matter.add.
+        
+        //this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
+
+        // var image = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', {shape: matterJSON.plinkoBoard});
 
         this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 1, Y_OFFSET + GRID * 6,
              'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
@@ -587,9 +606,6 @@ class SpaceBoyScene extends Phaser.Scene {
         }, this);
 
 
-        //const group1 = this.matter.world.nextGroup();
-        var categoryA = this.matter.world.nextCategory();
-        var categoryB = this.matter.world.nextCategory();
 
         // Create a group for tubes
         // Define tube positions and sizes
@@ -597,30 +613,35 @@ class SpaceBoyScene extends Phaser.Scene {
         
         var tubeData = [
             // Starting Top Tube
-            { x: GRID * 5.5 + 2, y: GRID * 12, width: 2, height: 200, angle: -1 },
-            { x: GRID * 6.75 + 2, y: GRID * 12.333, width: 2, height: 188, angle: 1 },
+            // new tube{ x: GRID * 7, y: GRID * 10, width: 2, height: 255, angle: 0, originX: 0, originY:1 },
+            //{ x: GRID * 7.8, y: GRID * 10, width: 2, height: 255, angle: 0, originX: 0, originY:1  },
+
+
+            { x: GRID * 7.1, y: GRID * 13.8, width: 1, height: 184, angle: 0 },
+            { x: GRID * 7.9, y: GRID * 13.8, width: 1, height: 184, angle: 0 },
+            
             // Leftmost horizontal platforms
-            { x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 18.5, width: 25, height: 0.5, angle: 1.25 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 34.5, width: 25, height: 0.5, angle: 1.25 },
-            { x: GRID * 8.5 - 1, y: GRID * 22 + 50.5, width: 25, height: 0.5, angle: 1.25 },
+            //{ x: GRID * 8.5 - 2 , y: GRID * 22 + 2, width: 27, height: 0.5, angle: 1.25 },
+            //{ x: GRID * 8.5 - 1, y: GRID * 22 + 18.5, width: 25, height: 0.5, angle: 1.25 },
+            //{ x: GRID * 8.5 - 1, y: GRID * 22 + 34.5, width: 25, height: 0.5, angle: 1.25 },
+            //{ x: GRID * 8.5 - 1, y: GRID * 22 + 50.5, width: 25, height: 0.5, angle: 1.25 },
             // Rightmost horizontal platforms
-            { x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 0.5, angle: 3 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 10.5, width: 20, height: 0.5, angle: -1.25 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 26.5, width: 20, height: 0.5, angle: -1.25 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 42, width: 20, height: 0.5, angle: -1.25 },
-            { x: GRID * 9 + 2, y: GRID * 22 + 59, width: 30, height: 0.5, angle: -2 },
+            //{ x: GRID * 9 , y: GRID * 22 - 5, width: 27, height: 0.5, angle: 3 },
+            //{ x: GRID * 9 + 2, y: GRID * 22 + 10.5, width: 20, height: 0.5, angle: -1.25 },
+            //{ x: GRID * 9 + 2, y: GRID * 22 + 26.5, width: 20, height: 0.5, angle: -1.25 },
+            //{ x: GRID * 9 + 2, y: GRID * 22 + 42, width: 20, height: 0.5, angle: -1.25 },
+            //{ x: GRID * 9 + 2, y: GRID * 22 + 59, width: 30, height: 0.5, angle: -2 },
             // Left wall
-            { x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
+            //{ x: GRID * 7.5 + 2, y: GRID * 24 + 2, width: 2, height: 48, angle: 0 },
             // Right wall
-            { x: GRID * 9.5 + 19, y: GRID * 24 + 2, width: 24, height: 80, angle: 0 },
+            //{ x: GRID * 9.5 + 19, y: GRID * 24 + 2, width: 24, height: 80, angle: 0 },
             // Diagonol Wall
             // Outer Curve
-            { x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
-            { x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 20, height: 2, angle: 45 },
-            { x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
+            //{ x: GRID * 7 + 4, y: GRID * 17 + 60, width: 10, height: 2, angle: 22.5 },
+            //{ x: GRID * 6.5 + 2, y: GRID * 17 + 54, width: 20, height: 2, angle: 45 },
+            //{ x: GRID * 6 - 0, y: GRID * 17 + 46, width: 10, height: 2, angle: 67.5 },
             // Inner Curve
-            { x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
+            //{ x: GRID * 7.5 - 2, y: GRID * 17 + 46, width: 20, height: 2, angle: 45 },
 
         ];
 
@@ -630,86 +651,21 @@ class SpaceBoyScene extends Phaser.Scene {
             var tube = this.matter.add.rectangle(data.x, data.y, data.width, data.height, {
                  isStatic: true // Ensure the tube is immovable 
             });
-            //tube.setCollisionCategory(categoryB);
 
             this.matter.body.setAngle(tube, Phaser.Math.DegToRad(data.angle)); // Apply the angle separately 
             
             tube.friction = 0; // Set the friction of the tube to 0 
         } 
-        //plinkoDisc.setCollidesWith(categoryB);
+
 
         
         this.music.on('pause', () => {
             pauseButton.setTintFill(0x8B0000);
         }, this);
 
+        
 
-        //plinko
-        var discPositions = [
-            // Left column
-            /*{ x: GRID * 6, y: GRID * (0 + 6) },
-            { x: GRID * 6, y: GRID * (0.5 + 6) },
-            { x: GRID * 6, y: GRID * (1 + 6) },
-            { x: GRID * 6, y: GRID * (1.5 + 6) },
-            { x: GRID * 6, y: GRID * (2 + 6) },
-            { x: GRID * 6, y: GRID * (2.5 + 6) },
-            { x: GRID * 6, y: GRID * (3 + 6) },
-            { x: GRID * 6, y: GRID * (4 + 6) },
-            { x: GRID * 6, y: GRID * (4.5 + 6) },
-            { x: GRID * 6, y: GRID * (5 + 6) },
-            { x: GRID * 6, y: GRID * (5.5 + 6) },
-            { x: GRID * 6, y: GRID * (6 + 6) },
-            { x: GRID * 6, y: GRID * (6.5 + 6) },
-            { x: GRID * 6, y: GRID * (7 + 6) },
-            { x: GRID * 6, y: GRID * (7.5 + 6) },
-            { x: GRID * 6, y: GRID * (8 + 6) },*/
-            // Right column
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-            { x: GRID * 6.25, y: GRID * (8 + 12)},
-        ];
-
-        // Initialize delay interval and index
-        var delay = 100;
-        var index = 0;
-
-
-
-        var spawnDisc = function() {
-        if (index < discPositions.length){
-            var position = discPositions[index];
-            var plinkoDisc = this.matter.add.sprite(position.x, position.y, 'plinkoDisc').setDepth(49);
-            plinkoDisc.setCircle(3.333);
-            //plinkoDisc.setMass(5)
-            plinkoDisc.setBounce(0.0);
-            plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.000);
-            plinkoDisc.setFixedRotation();
-            //.setCollisionGroup(categoryA);
-            //plinkoDisc.setCollidesWith(categoryB);
-            //plinkoDisc.setSensor(true);
-            index++;
-            this.time.delayedCall(delay,spawnDisc, [], this);
-            }
-        };
-        spawnDisc.call(this);
+        this.spawnPlinkos(2);
 
 
         /*this.plinkoDisc = this.matter.add.sprite(GRID * 6.5, GRID * 8, 'plinkoDisc',1);
@@ -743,6 +699,33 @@ class SpaceBoyScene extends Phaser.Scene {
         // Enable collision between the plinkoDisc and the tubes
         //this.matter.add.collider(this.plinkoDisc, tubes);
 
+    }
+    spawnPlinkos (number) {
+        if (number > 0){
+            var delay = 250;
+            
+            // TOP SPAWN
+            //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
+            var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
+                shape: {
+                    type: 'polygon',
+                    radius: 3.5,
+                    sides: 4,
+                },
+                //slop:0.8,
+            }).setDepth(49);
+            //plinkoDisc.setCircle(3.33);
+            plinkoDisc.setBounce(0.0);
+            plinkoDisc.setFriction(0.000);
+            plinkoDisc.setFrictionAir(0.005);
+            plinkoDisc.setFixedRotation();
+
+            number--;
+            this.time.delayedCall(delay, this.spawnPlinkos, [number], this);
+        } else {
+            return
+        }
+    
     }
         
 
@@ -1285,6 +1268,9 @@ class StartScene extends Phaser.Scene {
             //debugger
 
         });
+
+        // Load body shapes from JSON file generated using PhysicsEditor
+        this.load.json('collisionData', 'assets/zedRollerCollision.json');
 
         // #region Load Audio
         this.load.setPath('assets/audio');
@@ -2183,8 +2169,21 @@ class StageCodex extends Phaser.Scene {
                 const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
                 ).setOrigin(1,0).setScale(0.5);
 
-                const rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
-                ).setDepth(80).setOrigin(0,0).setScale(1);
+                var _rank = bestOf.stageRank();
+                debugger
+
+                
+
+                if (_rank != 5) {
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
+                    ).setDepth(80).setOrigin(0,0).setScale(1);
+                    
+                } else {
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", 4
+                    ).setDepth(80).setOrigin(0,0).setScale(1);
+                    rankIcon.setTintFill(COLOR_BONUS_HEX);
+                }
+
 
                 codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
 
@@ -4660,7 +4659,7 @@ class GameScene extends Phaser.Scene {
                                             blackholeImage.setTint(0xFFFFFF);
                                         }
 
-                                        if (this.stage === "World_0-1") {
+                                        if (this.stage === "World_0-1" && this.mode === "Classic") {
                                             switch (true) {
                                                 case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
                                                     if (stageName === STAGES.get("1-1")) {
@@ -8289,7 +8288,7 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(0)}</span>`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var frameTime = 16.667
+        var frameTime = 16.667;
 
         var _baseScore = this.stageData.calcBase();
         var _speedbonus = calcBonus(this.stageData.calcBase());
@@ -8643,11 +8642,19 @@ class ScoreScene extends Phaser.Scene {
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
         
-        let rank = this.stageData.stageRank() + 1; // FileNames start at 01.png
+        let rank = this.stageData.stageRank(); // FileNames start at 01.png
         //rank = 4; // Temp override.
+        if (rank != 5) {
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank
+            ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+
+        } else {
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", 4
+            ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+            letterRank.setTintFill(COLOR_BONUS_HEX);
+        }
         
-        var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank -1
-        ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
+        
 
         this.ScoreContainerL.add(letterRank)
         
@@ -9258,7 +9265,22 @@ class ScoreScene extends Phaser.Scene {
                 
 
                 
-                const zedObject = calcZedLevel(ourPersist.zeds)
+                console.log("ZedRolling");
+                var rollResults = rollZeds(currentLocal);
+
+                console.log("RollResults:", rollResults);
+                console.log("RollsLeft:", rollResults.get("rollsLeft"), ); // Rolls after the last zero best zero
+                ourPersist.zeds += rollResults.get("zedsEarned");
+                ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
+
+                const zedObject = calcZedLevel(ourPersist.zeds);
+                ourPersist.zedsUI.setHTML(
+                    `<span style ="color: limegreen;
+                    font-size: 14px;
+                    border: limegreen solid 1px;
+                    border-radius: 5px;
+                    padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
+                );
 
                 var extraFields = {
                     level: zedObject.level,
@@ -9349,78 +9371,6 @@ class ScoreScene extends Phaser.Scene {
         this.graphics.fillCircle(this.letterRankPath.vec.x, this.letterRankPath.vec.y, 8).setDepth(30);
         this.graphics.fillCircle(this.letterRankPath2.vec.x, this.letterRankPath2.vec.y, 8).setDepth(30);
         */
-
-        if (time >= this.lastRollTime + this.rollSpeed && scoreCountDown > 0) {
-            this.lastRollTime = time;
-            
-            //this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
-
-            //var i = 31;
-
-            if (this.bestHashInt) {
-                var leadingZeros = intToBinHash(this.bestHashInt).split('1').reverse().pop()
-                 
-                this.difficulty = leadingZeros.length;
-            }
-            else {
-                var leadingZeros = "";
-                this.difficulty = 1;
-            }
-
-            // The (+ 1) is so index doesn't equal 0 if it rolls the first number with the first bit being a 1
-            // Which is a 50% chance.
-
-
-            var temp = 2**this.difficulty
-            var innerRollNum = Math.ceil(2**this.difficulty/10)
-            
-            
-            
-            for (let index = innerRollNum; index > 0 ; index--) {
-                
-                
-
-                var roll = Phaser.Math.RND.integer();
-                if (roll < this.bestHashInt) {
-                    this.bestHashInt = roll;
-                }
-
-                if (this.foodLogSeed.slice(-1) < 1) {
-                    break;
-                }
-
-                this.foodLogSeed[this.foodLogSeed.length - 1] -= 1;
-            }
-
-            // #region HashUI Update
-
-            this.rollSpeed = Math.max(1, 20 - this.difficulty);
-
-            this.hashUI.setHTML(
-                `Rolling for Zeds (${this.foodLogSeed.slice(-1)})<br/> 
-                <span style="color:limegreen;text-decoration:underline;">${leadingZeros}</span><span style="color:limegreen">1</span>${intToBinHash(roll).slice(this.difficulty + 1)}<br/>
-                You earned <span style ="color:${COLOR_BONUS};font-weight:600;text-decoration:underline;">${this.difficulty}</span> Zeds this Run`
-            );
-
-            
-            if (this.prevZeds + this.difficulty > ourPersist.zeds) {
-                ourPersist.zeds = this.prevZeds + this.difficulty;
-                var zedsObj = calcZedLevel(ourPersist.zeds);
-
-                ourPersist.zedsUI.setHTML(
-                    `<span style ="color: limegreen;
-                    font-size: 16px;
-                    border: limegreen solid 1px;
-                    border-radius: 5px;
-                    padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} To Next Level.</span>`
-                );
-            }
-
-            //console.log(scoreCountDown, this.bestHashInt, intToBinHash(this.bestHashInt), this.foodLogSeed);
-
-            
-
-        }
     }
 
     end() {
@@ -10399,7 +10349,14 @@ var config = {
         { default: 'matter',
              matter: { 
                 debug: false,
-                 gravity: { y: 3 }
+                gravity: { y: 1 },
+                positionIterations: 6, //6
+                velocityIterations: 4, //4
+                constraintIterations: 2, //2
+                timing: {
+                    timestamp: 0,
+                    timeScale: 1, //1
+                },
             }
         },
     fx: {
