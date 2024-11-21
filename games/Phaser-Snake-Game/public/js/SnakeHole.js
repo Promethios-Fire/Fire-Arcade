@@ -1199,6 +1199,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
+        this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
+        this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -3204,7 +3206,7 @@ class PersistScene extends Phaser.Scene {
     this.comboCover.setScrollFactor(0);
     this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
-
+    
     
 
     this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
@@ -3515,6 +3517,8 @@ class GameScene extends Phaser.Scene {
         // BOOST METER
         this.boostEnergy = 600; // Value from 0-1000 which directly dictates ability to boost and the boost mask target.
         this.comboCounter = 0;
+
+        this.goFadeOut = false;
 
 
         this.coinSpawnCounter = 100;
@@ -5306,9 +5310,12 @@ class GameScene extends Phaser.Scene {
         // pinball display/combo cover
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
         .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+        this.comboCoverReady = this.add.sprite(GRID * 15, 2, 'UI_comboReady', 0
+        ).setOrigin(1,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
 
         this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
         ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
+        // show snake pan across pinball display
         if (ourGame.stage == START_STAGE) {
             ourGame.comboCoverSnake.setTexture('UI_comboSnake', 1)
             this.tweens.add({
@@ -5324,16 +5331,30 @@ class GameScene extends Phaser.Scene {
                 }
             });  
         } 
+        // fade in 'READY?'
+        this.tweens.add({
+            targets: ourGame.comboCoverReady,
+            alpha: {from: 0, to: 1},
+            duration: 500,
+            ease: 'sine.inout',
+            yoyo: false,
+            delay: 0,
+            repeat: 0,
+        });  
         
 
         this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
         ).setOrigin(0.0,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
 
 
+        
+
+
 
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
-            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake, this.comboCoverBONK)
+            this.letterO2,this.letterExplanationPoint,this.comboCoverSnake,
+             this.comboCoverBONK,this.comboCoverReady)
 
         this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
         this.comboMasksContainer.add(this.comboMasks);
@@ -7571,6 +7592,19 @@ class GameScene extends Phaser.Scene {
             
             
             if (this.gState === GState.PLAY) {
+                var ourGame = this.scene.get("GameScene");
+                // fade out 'GO!'
+                if (!ourGame.goFadeOut) {
+                    this.comboCoverReady.setTexture('UI_comboGo');
+                    this.comboCoverReady.setOrigin(1.5,0)
+                    ourGame.goFadeOut = true;
+                    this.tweens.add({
+                        targets: ourGame.comboCoverReady,
+                        alpha: 0,
+                        duration: 500,
+                        ease: 'sine.inout',
+                    });
+                }
 
                 if (!this.winned) {
                     this.time.delayedCall(1000, event => {
