@@ -3595,7 +3595,7 @@ class GameScene extends Phaser.Scene {
         this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length)
         ourPersist.mapProgressPanelStage = ourPersist.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
          'mainFont', 
-            `${this.stage}`, 
+            `${this.stage.split("_")[1]}`, 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
 
         ourPersist.panelArray.push(ourPersist.mapProgressPanelStage)
