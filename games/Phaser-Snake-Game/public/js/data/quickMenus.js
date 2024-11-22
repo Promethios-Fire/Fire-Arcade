@@ -101,7 +101,7 @@ export var QUICK_MENUS = new Map([
                 ourSpaceBoy.shiftLight2.setAlpha(0);
                 ourSpaceBoy.shiftLight3.setAlpha(0);
             }
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneCleanup('half');
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
@@ -148,7 +148,7 @@ export var QUICK_MENUS = new Map([
             ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.backgroundBlur(false);
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneCleanup('restart');
             // Restart  
             ourGameScene.scene.start("GameScene", {
                 stage: START_STAGE,

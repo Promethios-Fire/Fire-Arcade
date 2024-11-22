@@ -3591,13 +3591,14 @@ class GameScene extends Phaser.Scene {
         if (!ourPersist.panelArray) {
             ourPersist.panelArray = [];
         }
-        const panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length)
-        ourPersist.mapProgressPanelStage = ourPersist.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + panelCursorIndex),
+        
+        this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length)
+        ourPersist.mapProgressPanelStage = ourPersist.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
          'mainFont', 
             `${this.stage}`, 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
 
-            ourPersist.panelArray.push(ourPersist.mapProgressPanelStage)
+        ourPersist.panelArray.push(ourPersist.mapProgressPanelStage)
         
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
@@ -6898,21 +6899,41 @@ class GameScene extends Phaser.Scene {
         
         
     }
-    gameSceneCleanup(){
+    gameSceneCleanup(cleanupType = 'full'){
         // TODO: event listener cleanup here
         // scene blur removal
         const ourPersist = this.scene.get('PersistScene');
 
-        ourPersist.mapProgressPanelText.setText('SHIP LOG')
-        ourPersist.panelArray.forEach( stageData => {
-            stageData.destroy();
-        });
-        if (this.electronFanfare) {
-            this.electronFanfare.setAlpha(0);
+        if (cleanupType === 'half') {
+            if (this.electronFanfare) {
+                this.electronFanfare.setAlpha(0);
+            }
+            if (this.CapSparkFinale) {
+                this.CapSparkFinale.destroy();
+            }
         }
-        if (this.CapSparkFinale) {
-            this.CapSparkFinale.destroy();
+        if (cleanupType === 'restart') {
+            ourPersist.panelArray.forEach( stageData => {
+                stageData.destroy();
+            });
+            ourPersist.panelArray = [];
+            console.log(this.panelCursorIndex)
+            this.panelCursorIndex = 0;
+            if (this.electronFanfare) {
+                this.electronFanfare.setAlpha(0);
+            }
+            if (this.CapSparkFinale) {
+                this.CapSparkFinale.destroy();
+            }
         }
+        if (cleanupType === 'full') {
+            ourPersist.mapProgressPanelText.setText('SHIP LOG')
+            ourPersist.panelArray.forEach( stageData => {
+                stageData.destroy();
+            });
+            ourPersist.panelArray = [];
+        }
+
     }
     
  
