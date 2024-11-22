@@ -1,5 +1,5 @@
 
-import { BEST_OF_CLASSIC, BEST_OF_EXPERT, PLAYER_STATS, RANKS } from "../SnakeHole.js";
+import { BEST_OF_CLASSIC, BEST_OF_EXPERT, PLAYER_STATS, RANKS, MODES } from "../SnakeHole.js";
 
 import { BEST_OF_ALL} from "../SnakeHole.js"
 
@@ -21,7 +21,7 @@ export var checkRank = function(stageName, targetRank) {
     // But progress Expert just like you progress classic.
     
     switch (this.scene.get("GameScene").mode) {
-        case "Classic":
+        case MODES.CLASSIC:
             if (BEST_OF_CLASSIC.get(stageName) != undefined ) {
                 
                 var resultRank = BEST_OF_CLASSIC.get(stageName).stageRank()
@@ -33,7 +33,7 @@ export var checkRank = function(stageName, targetRank) {
             }
             break;
 
-        case "Expert":
+        case MODES.EXPERT:
             if (BEST_OF_CLASSIC.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
                 var resultRank = BEST_OF_EXPERT.get(stageName).stageRank()
                 var bool = resultRank >= targetRank

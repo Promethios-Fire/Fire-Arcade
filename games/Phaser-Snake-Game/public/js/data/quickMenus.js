@@ -1,4 +1,4 @@
-import { PLAYER_STATS, RANKS, START_STAGE, START_UUID } from "../SnakeHole.js";
+import { PLAYER_STATS, RANKS, START_STAGE, START_UUID, MODES } from "../SnakeHole.js";
 import { TUTORIAL_PANELS } from "./tutorialScreens.js";
 
 export var QUICK_MENUS = new Map([
@@ -19,7 +19,7 @@ export var QUICK_MENUS = new Map([
             const ourGame = this.scene.get("GameScene");
 
             const ourPersist = this.scene.get("PersistScene");
-            ourPersist.mode = "Classic";
+            ourPersist.mode = MODES.CLASSIC;
 
             this.scene.get("InputScene").scene.restart();
 
@@ -39,7 +39,7 @@ export var QUICK_MENUS = new Map([
             const ourGame = this.scene.get("GameScene");
 
             const ourPersist = this.scene.get("PersistScene");
-            ourPersist.mode = "Expert";
+            ourPersist.mode = MODES.EXPERT;
 
             this.scene.get("InputScene").scene.restart();
 
