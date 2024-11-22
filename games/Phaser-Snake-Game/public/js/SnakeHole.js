@@ -3588,23 +3588,23 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
-        if (!ourPersist.panelArray) {
-            ourPersist.panelArray = []; // Move to be part of the Init of the class.
+        if (!ourSpaceBoyScene.panelArray) {
+            ourSpaceBoyScene.panelArray = []; // Move to be part of the Init of the class.
         }
         
         this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
         var stageID = this.stage.split("_")[1];
-        ourPersist.mapProgressPanelStage = ourPersist.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
+        ourSpaceBoyScene.mapProgressPanelStage = ourSpaceBoyScene.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
          'mainFont', 
             `${stageID}`, 
             8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
-        var outLine = this.add.rectangle(GRID * 11 + 1, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 2, 10,  
+        this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 2, 10,  
             ).setOrigin(1,0).setDepth(100).setAlpha(1);
-        outLine.setFillStyle(0x000000, 0);
-        outLine.setStrokeStyle(1, 0x1f211b, 1);
+        this.stageOutLine.setFillStyle(0x000000, 0);
+        this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
 
-        ourPersist.panelArray.push(ourPersist.mapProgressPanelStage);
+        ourSpaceBoyScene.panelArray.push(ourSpaceBoyScene.mapProgressPanelStage);
         
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
@@ -6909,6 +6909,9 @@ class GameScene extends Phaser.Scene {
         // TODO: event listener cleanup here
         // scene blur removal
         const ourPersist = this.scene.get('PersistScene');
+        const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+
+        this.stageOutLine.destroy();
 
         if (cleanupType === 'half') {
             if (this.electronFanfare) {
@@ -6919,10 +6922,10 @@ class GameScene extends Phaser.Scene {
             }
         }
         if (cleanupType === 'restart') {
-            ourPersist.panelArray.forEach( stageData => {
+            ourSpaceBoy.panelArray.forEach( stageData => {
                 stageData.destroy();
             });
-            ourPersist.panelArray = [];
+            ourSpaceBoy.panelArray = [];
             console.log(this.panelCursorIndex)
             this.panelCursorIndex = 0;
             if (this.electronFanfare) {
@@ -6934,10 +6937,10 @@ class GameScene extends Phaser.Scene {
         }
         if (cleanupType === 'full') {
             ourPersist.mapProgressPanelText.setText('SHIP LOG')
-            ourPersist.panelArray.forEach( stageData => {
+            ourSpaceBoy.panelArray.forEach( stageData => {
                 stageData.destroy();
             });
-            ourPersist.panelArray = [];
+            ourSpaceBoy.panelArray = [];
         }
 
     }
@@ -6950,7 +6953,7 @@ class GameScene extends Phaser.Scene {
         this.gState = GState.TRANSITION;
 
         this.scoreTweenShow();
-
+        this.stageOutLine.destroy();
         this.snake.head.setTexture('snakeDefault', 0);
 
         if (this.helpPanel) {
