@@ -381,8 +381,8 @@ export const RANKS = Object.freeze({
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with SpeedBonus
     [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
-    [RANKS.GOLD, 14000],
-    [RANKS.SILVER, 7000],
+    [RANKS.GOLD, 12000],
+    [RANKS.SILVER, 6000],
     [RANKS.BRONZE, 3000],
     [RANKS.WOOD, 0],
 
