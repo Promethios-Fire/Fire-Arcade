@@ -518,7 +518,7 @@ class SpaceBoyScene extends Phaser.Scene {
         });
     }
     create() {
-        //this.sound.mute = true; //TEMP MUTE SOUND
+        this.sound.mute = true; //TEMP MUTE SOUND
 
         var matterJSON = this.cache.json.get('collisionData');
 
@@ -1198,6 +1198,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
+        this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png')
         this.load.image('comboBG','assets/sprites/UI_comboBG.png')
         
         // Tilemap
@@ -3218,8 +3219,13 @@ class PersistScene extends Phaser.Scene {
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
     
     
+    this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
+        "SHIP LOG", 
+        8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
 
     this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
+    
+    this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(51);
 
     //waveshader
     //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
@@ -3308,6 +3314,10 @@ class PersistScene extends Phaser.Scene {
     this.prevStagesCompleteExpert = this.stagesCompleteExpert;
     this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
 
+
+        
+    //this.mapProgressPanelText.setTint(0xffffff); // Set the tint to white to prepare for inversion
+    //this.mapProgressPanelText.setBlendMode(Phaser.BlendModes.DIFFERENCE); // Use the difference blend mode to invert colors
 
     const styleBottomText = {
         "font-size": '12px',

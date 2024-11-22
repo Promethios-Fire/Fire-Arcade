@@ -21,6 +21,8 @@ export var QUICK_MENUS = new Map([
             const ourPersist = this.scene.get("PersistScene");
             ourPersist.mode = "Classic";
 
+            ourPersist.mapProgressPanelText.setText('ADVENTURE')
+
             this.scene.get("InputScene").scene.restart();
 
             if (localStorage.hasOwnProperty(`${START_UUID}_best-Classic`)) {
@@ -40,6 +42,8 @@ export var QUICK_MENUS = new Map([
 
             const ourPersist = this.scene.get("PersistScene");
             ourPersist.mode = "Expert";
+
+            ourPersist.mapProgressPanelText.setText('ADV. EXP')
 
             this.scene.get("InputScene").scene.restart();
 
