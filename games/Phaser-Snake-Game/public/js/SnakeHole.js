@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3588,8 +3588,17 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
+        if (!ourPersist.panelArray) {
+            ourPersist.panelArray = [];
+        }
+        const panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length)
+        ourPersist.mapProgressPanelStage = ourPersist.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + panelCursorIndex),
+         'mainFont', 
+            `${this.stage}`, 
+            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
 
-
+            ourPersist.panelArray.push(ourPersist.mapProgressPanelStage)
+        
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
@@ -6892,6 +6901,12 @@ class GameScene extends Phaser.Scene {
     gameSceneCleanup(){
         // TODO: event listener cleanup here
         // scene blur removal
+        const ourPersist = this.scene.get('PersistScene');
+
+        ourPersist.mapProgressPanelText.setText('SHIP LOG')
+        ourPersist.panelArray.forEach( stageData => {
+            stageData.destroy();
+        });
         if (this.electronFanfare) {
             this.electronFanfare.setAlpha(0);
         }
