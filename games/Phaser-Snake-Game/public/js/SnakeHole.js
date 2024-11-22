@@ -6934,6 +6934,7 @@ class GameScene extends Phaser.Scene {
             if (this.CapSparkFinale) {
                 this.CapSparkFinale.destroy();
             }
+            ourSpaceBoy.scene.restart();
         }
         if (cleanupType === 'full') {
             ourPersist.mapProgressPanelText.setText('SHIP LOG')
