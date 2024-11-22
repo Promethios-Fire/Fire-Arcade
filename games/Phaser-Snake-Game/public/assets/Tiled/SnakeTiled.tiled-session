@@ -979,7 +979,7 @@
             "scale": 2.8363505747126436,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.99118585684616,
+                "x": 328.4149739121625,
                 "y": 162.0039511676207
             }
         },
@@ -1059,9 +1059,20 @@
         "World_2-4.json#tileSheetx24": {
             "scaleInDock": 1
         },
+        "World_3-1_Wrap.json": {
+            "scale": 4.670833333333333,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.95182872435325,
+                "y": 161.96253345227476
+            }
+        },
+        "World_3-1_Wrap.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "World_3-2_Wrap.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 2,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 173.68012528086064,
                 "y": 161.8329134608838
@@ -1071,11 +1082,11 @@
             "scaleInDock": 1
         },
         "World_3-3_Wrap.json": {
-            "scale": 2.1102011494252872,
-            "selectedLayer": 3,
+            "scale": 4.670833333333333,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.68012528086064,
-                "y": 161.8329134608838
+                "x": 173.95182872435325,
+                "y": 161.96253345227476
             }
         },
         "World_3-3_Wrap.json#tileSheetx12": {
@@ -1240,7 +1251,7 @@
             "scale": 2.336781609195402,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.5292670929661,
+                "x": 173.52926709296608,
                 "y": 161.97491392031483
             }
         },
@@ -1251,11 +1262,22 @@
             "scale": 2.8363505747126436,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.99118585684616,
+                "x": 173.99118585684613,
                 "y": 162.0039511676207
             }
         },
         "World_5-3_Racing.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "World_5-4_Racing.json": {
+            "scale": 4.670833333333333,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.95182872435325,
+                "y": 161.96253345227476
+            }
+        },
+        "World_5-4_Racing.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "World_6-2_Adv_Portaling.json": {
