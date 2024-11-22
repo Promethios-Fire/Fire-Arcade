@@ -3589,16 +3589,22 @@ class GameScene extends Phaser.Scene {
             })
         }
         if (!ourPersist.panelArray) {
-            ourPersist.panelArray = [];
+            ourPersist.panelArray = []; // Move to be part of the Init of the class.
         }
         
-        this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length)
+        this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
+        var stageID = this.stage.split("_")[1];
         ourPersist.mapProgressPanelStage = ourPersist.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
          'mainFont', 
-            `${this.stage.split("_")[1]}`, 
-            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
+            `${stageID}`, 
+            8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
-        ourPersist.panelArray.push(ourPersist.mapProgressPanelStage)
+        var outLine = this.add.rectangle(GRID * 11 + 1, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 2, 10,  
+            ).setOrigin(1,0).setDepth(100).setAlpha(1);
+        outLine.setFillStyle(0x000000, 0);
+        outLine.setStrokeStyle(1, 0x1f211b, 1);
+
+        ourPersist.panelArray.push(ourPersist.mapProgressPanelStage);
         
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
