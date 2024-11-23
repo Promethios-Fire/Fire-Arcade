@@ -339,7 +339,7 @@ var Snake = new Phaser.Class({
                     scene.portals.forEach(portal => {
                         portal.portalHighlight.visible = false;
                     });
-                    
+
                     //portal.snakePortalingSprite.visible = false;
                     //portal.targetObject.snakePortalingSprite.visible = false;
                     scene.scene.get("SpaceBoyScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
@@ -353,7 +353,8 @@ var Snake = new Phaser.Class({
                     console.log('WOO')
                     //scene.finalScore();
                     scene.scene.get("SpaceBoyScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                    scene.extractPrompt();
+                    debugger // TODO Extract Prompt needs to handle Gauntlet Mode.
+                    scene.extractPrompt(); // Maybe higher function that determines which to call.
                 }
             }
 

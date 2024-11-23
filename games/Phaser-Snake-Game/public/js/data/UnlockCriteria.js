@@ -118,6 +118,23 @@ export const EXTRACT_CODES = [
     
 ];
 
+export const GAUNTLET_CODES = new Map([
+    ["Easy Gauntlet", {
+        checkUnlock: function () {
+            return checkRankGlobal(STAGES.get("2-4"), RANKS.WOOD);
+        },
+        stages: "1-1|2-1|1-2|2-2|1-3|2-3|2-4",
+        startingCoins: 24,
+    }],
+    ["Medium Gauntlet", {
+        checkUnlock: function () {
+            return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
+        },
+        stages: "0-1",
+        startingCoins: 0,
+    }],
+]);
+
 /* Template
         ['', function () { 
         return checkRank.call(this,"", RANKS.WOOD)}],
