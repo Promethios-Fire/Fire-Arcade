@@ -17,9 +17,12 @@ export var QUICK_MENUS = new Map([
         ["Classic", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
             const ourGame = this.scene.get("GameScene");
-
             const ourPersist = this.scene.get("PersistScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+
             ourPersist.mode = MODES.CLASSIC;
+
+            ourSpaceBoy.mapProgressPanelText.setText('ADVENTURE')
 
             this.scene.get("InputScene").scene.restart();
 
@@ -37,9 +40,12 @@ export var QUICK_MENUS = new Map([
         ["Expert", function () {
             const mainMenuScene = this.scene.get("MainMenuScene");
             const ourGame = this.scene.get("GameScene");
-
             const ourPersist = this.scene.get("PersistScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+           
             ourPersist.mode = MODES.EXPERT;
+
+            ourSpaceBoy.mapProgressPanelText.setText('ADV. EXP')
 
             this.scene.get("InputScene").scene.restart();
 
@@ -97,7 +103,7 @@ export var QUICK_MENUS = new Map([
                 ourSpaceBoy.shiftLight2.setAlpha(0);
                 ourSpaceBoy.shiftLight3.setAlpha(0);
             }
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneCleanup('half');
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
@@ -141,10 +147,11 @@ export var QUICK_MENUS = new Map([
             // Clear for reseting game
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
+            //ourGameScene.electronFanfare.off('animationcomplete');
             ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.backgroundBlur(false);
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneCleanup('restart');
             // Restart  
             ourGameScene.scene.start("GameScene", {
                 stage: START_STAGE,

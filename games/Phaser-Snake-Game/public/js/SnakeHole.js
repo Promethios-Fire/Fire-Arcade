@@ -547,6 +547,10 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(50);
         this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
+        this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
+        this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
+            "SHIP LOG", 
+            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
         //this.plinkoBoard = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', null,
             //{
             //shape: matterJSON.plinkoBoard,}).setOrigin(0,0).setDepth(50);
@@ -1219,6 +1223,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
+        this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png')
         this.load.image('comboBG','assets/sprites/UI_comboBG.png')
         
         // Tilemap
@@ -3330,8 +3335,11 @@ class PersistScene extends Phaser.Scene {
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
     
     
+    
 
     this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
+    
+    
 
     //waveshader
     //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
@@ -3420,6 +3428,10 @@ class PersistScene extends Phaser.Scene {
     this.prevStagesCompleteExpert = this.stagesCompleteExpert;
     this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
 
+
+        
+    //this.mapProgressPanelText.setTint(0xffffff); // Set the tint to white to prepare for inversion
+    //this.mapProgressPanelText.setBlendMode(Phaser.BlendModes.DIFFERENCE); // Use the difference blend mode to invert colors
 
     const styleBottomText = {
         "font-size": '12px',
@@ -3680,7 +3692,6 @@ class GameScene extends Phaser.Scene {
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
-
         
 
 
@@ -3690,8 +3701,24 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
+        if (!ourSpaceBoyScene.panelArray) {
+            ourSpaceBoyScene.panelArray = []; // Move to be part of the Init of the class.
+        }
+        
+        this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
+        var stageID = this.stage.split("_")[1];
+        ourSpaceBoyScene.mapProgressPanelStage = ourSpaceBoyScene.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
+         'mainFont', 
+            `${stageID}`, 
+            8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
+        this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
+            ).setOrigin(1,0).setDepth(100).setAlpha(1);
+        this.stageOutLine.setFillStyle(0x000000, 0);
+        this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
 
+        ourSpaceBoyScene.panelArray.push(ourSpaceBoyScene.mapProgressPanelStage);
+        
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
 
@@ -6946,11 +6973,16 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
+                // Important: clear electronFanfare WITH destroy and setting to null.
+                // when restarting, if any instance of electronFanfare exists, it will error on level clear
+                // also called fron gameSceneCleanup() function, but imperative here too
                 if (ourGameScene.electronFanfare) {
-                    ourGameScene.electronFanfare.setAlpha(0);
+                    ourGameScene.electronFanfare.off('animationcomplete');
+                    ourGameScene.electronFanfare.destroy();
+                    ourGameScene.electronFanfare = null;
                 }
                 if (ourGameScene.CapSparkFinale) {
-                    ourGameScene.CapSparkFinale.setAlpha(0);
+                    ourGameScene.CapSparkFinale.destroy();
                 }
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
@@ -7005,15 +7037,49 @@ class GameScene extends Phaser.Scene {
         
         
     }
-    gameSceneCleanup(){
+    gameSceneCleanup(cleanupType = 'full'){
         // TODO: event listener cleanup here
         // scene blur removal
-        if (this.electronFanfare) {
-            this.electronFanfare.setAlpha(0);
+        const ourPersist = this.scene.get('PersistScene');
+        const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+
+        this.stageOutLine.destroy();
+
+        if (cleanupType === 'half') {
+            if (this.electronFanfare) {
+                this.electronFanfare.destroy();
+                this.electronFanfare.off('animationcomplete');
+                this.electronFanfare = null;
+            }
+            if (this.CapSparkFinale) {
+                this.CapSparkFinale.destroy();
+            }
         }
-        if (this.CapSparkFinale) {
-            this.CapSparkFinale.destroy();
+        if (cleanupType === 'restart') {
+            ourSpaceBoy.panelArray.forEach( stageData => {
+                stageData.destroy();
+            });
+            ourSpaceBoy.panelArray = [];
+            console.log(this.panelCursorIndex)
+            this.panelCursorIndex = 0;
+            if (this.electronFanfare) {
+                this.electronFanfare.destroy();
+                this.electronFanfare.off('animationcomplete');
+                this.electronFanfare = null;
+            }
+            if (this.CapSparkFinale) {
+                this.CapSparkFinale.destroy();
+            }
+            ourSpaceBoy.scene.restart();
         }
+        if (cleanupType === 'full') {
+            ourSpaceBoy.mapProgressPanelText.setText('SHIP LOG')
+            ourSpaceBoy.panelArray.forEach( stageData => {
+                stageData.destroy();
+            });
+            ourSpaceBoy.panelArray = [];
+        }
+
     }
     
  
@@ -7024,7 +7090,7 @@ class GameScene extends Phaser.Scene {
         this.gState = GState.TRANSITION;
 
         this.scoreTweenShow();
-
+        this.stageOutLine.destroy();
         this.snake.head.setTexture('snakeDefault', 0);
 
         if (this.helpPanel) {
