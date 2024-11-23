@@ -480,6 +480,7 @@ export const GState = Object.freeze({
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
+const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed3";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const START_COINS = 4;
@@ -887,25 +888,11 @@ class TutorialScene extends Phaser.Scene {
             });
         })
 
-
         // Defaults everything to invisible so you don't need to remember to set in TUTORIAL_PANELS .
         panelContents.forEach( item => {
             item.alpha = 0;
         })
 
-        
-
-
-        
-        // -james note. Start of create should be here.
-        
-
-        if (localStorage["version"] === undefined) {
-            this.hasPlayedBefore = false;
-
-        } else {
-            this.hasPlayedBefore = true;
-        }
 
         //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
         
@@ -1448,7 +1435,7 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
         
-        //temporarily removing HOW TO PLAY section from scene to move it elsewhere
+        //temporaily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
             console.log("Testing LOCAL STORAGE => Has not played.", );
@@ -3725,12 +3712,10 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
-        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_0-1') {
-            
-            debugger
+        var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Classic`);
+        if (tutorialData === null && this.stage === 'World_0-1') {
             this.stage = 'Tutorial_1';
             console.log('Tutorial Time!', this.stage);
-            //this.tutorialState = true;
         }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
