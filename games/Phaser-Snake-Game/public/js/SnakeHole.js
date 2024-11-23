@@ -391,9 +391,11 @@ export const MODES = Object.freeze({
     GAUNTLET: 4
 })
 
-const MODE_TEXT = new Map([
+const MODE_LOCAL = new Map([
     [MODES.CLASSIC, "Classic"],
+    [MODES.GAUNTLET, "Classic"], // Use classic stage data
     [MODES.EXPERT, "Expert"],
+    
 
 ]);
 
@@ -5354,7 +5356,7 @@ class GameScene extends Phaser.Scene {
 
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${MODE_TEXT.get(this.mode)}`));       
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${MODE_LOCAL.get(this.mode)}`));       
 
         if (bestLogJSON) {
             // is false if best log has never existed
@@ -8425,7 +8427,7 @@ class ScoreScene extends Phaser.Scene {
 
         // #region Save Best To Local.
 
-        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`));
+        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`));
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
@@ -8444,7 +8446,7 @@ class ScoreScene extends Phaser.Scene {
 
             
             if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
-                localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`, JSON.stringify(this.stageData));
+                localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`, JSON.stringify(this.stageData));
             }
             
         }
@@ -8461,8 +8463,8 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        if (localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`)) {
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`));
+        if (localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`));
 
         } else {
             // If a test level. Use World 0_1 as a filler to not break UI stuff.
