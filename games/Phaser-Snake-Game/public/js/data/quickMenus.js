@@ -145,6 +145,7 @@ export var QUICK_MENUS = new Map([
             // Clear for reseting game
             ourGameScene.events.off('addScore');
             ourGameScene.events.off('spawnBlackholes');
+            //ourGameScene.electronFanfare.off('animationcomplete');
             ourGameScene.scene.get("InputScene").scene.restart();
             
             ourGameScene.backgroundBlur(false);

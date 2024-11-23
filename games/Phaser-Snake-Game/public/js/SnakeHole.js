@@ -3578,7 +3578,6 @@ class GameScene extends Phaser.Scene {
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
-
         
 
 
@@ -3599,7 +3598,7 @@ class GameScene extends Phaser.Scene {
             `${stageID}`, 
             8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
-        this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 2, 10,  
+        this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
             ).setOrigin(1,0).setDepth(100).setAlpha(1);
         this.stageOutLine.setFillStyle(0x000000, 0);
         this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
@@ -6846,11 +6845,16 @@ class GameScene extends Phaser.Scene {
               });
 
             const onContinue = function () {
+                // Important: clear electronFanfare WITH destroy and setting to null.
+                // when restarting, if any instance of electronFanfare exists, it will error on level clear
+                // also called fron gameSceneCleanup() function, but imperative here too
                 if (ourGameScene.electronFanfare) {
-                    ourGameScene.electronFanfare.setAlpha(0);
+                    ourGameScene.electronFanfare.off('animationcomplete');
+                    ourGameScene.electronFanfare.destroy();
+                    ourGameScene.electronFanfare = null;
                 }
                 if (ourGameScene.CapSparkFinale) {
-                    ourGameScene.CapSparkFinale.setAlpha(0);
+                    ourGameScene.CapSparkFinale.destroy();
                 }
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
@@ -6915,7 +6919,9 @@ class GameScene extends Phaser.Scene {
 
         if (cleanupType === 'half') {
             if (this.electronFanfare) {
-                this.electronFanfare.setAlpha(0);
+                this.electronFanfare.destroy();
+                this.electronFanfare.off('animationcomplete');
+                this.electronFanfare = null;
             }
             if (this.CapSparkFinale) {
                 this.CapSparkFinale.destroy();
@@ -6929,7 +6935,9 @@ class GameScene extends Phaser.Scene {
             console.log(this.panelCursorIndex)
             this.panelCursorIndex = 0;
             if (this.electronFanfare) {
-                this.electronFanfare.setAlpha(0);
+                this.electronFanfare.destroy();
+                this.electronFanfare.off('animationcomplete');
+                this.electronFanfare = null;
             }
             if (this.CapSparkFinale) {
                 this.CapSparkFinale.destroy();
