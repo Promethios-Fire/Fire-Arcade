@@ -551,7 +551,7 @@ class SpaceBoyScene extends Phaser.Scene {
     init() {
         this.stageHistory = [];
         this.globalFoodLog = [];
-        this.panelArray = [];
+        this.navLog = [];
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -562,6 +562,7 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
+        const persist = this.scene.get("PersistScene");
 
         var matterJSON = this.cache.json.get('collisionData');
 
@@ -571,7 +572,7 @@ class SpaceBoyScene extends Phaser.Scene {
         this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
-            "SHIP LOG", 
+            "", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
 
 
@@ -611,23 +612,24 @@ class SpaceBoyScene extends Phaser.Scene {
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
 
 
-        // #region Ship Log
+        switch (persist.mode) {
+            case MODES.CLASSIC:
+                this.mapProgressPanelText.setText("ADVENTURE");
+                break;
+            case MODES.EXPERT:
+                this.mapProgressPanelText.setText("EXPERT");
+                debugger
+                break;
+            case MODES.GAUNTLET:
+                this.mapProgressPanelText.setText("GAUNTLET");
+                debugger
+                break;
+            default:
+                this.mapProgressPanelText.setText("SHIP LOG");
+                break;
+        }
 
-        // Do it from the history.
-
-        //this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
-        //var stageID = this.stage.split("_")[1];
-        //this.mapProgressPanelStage = ourSpaceBoyScene.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
-        // 'mainFont', 
-        //    `${stageID}`, 
-        //    8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
-
-        //this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
-        //    ).setOrigin(1,0).setDepth(100).setAlpha(1);
-        //this.stageOutLine.setFillStyle(0x000000, 0);
-        //this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
-
-        //this.panelArray.push(this.mapProgressPanelStage);
+        
         
         
         playButton.on('pointerdown', () => {
@@ -758,6 +760,51 @@ class SpaceBoyScene extends Phaser.Scene {
 
         // Enable collision between the plinkoDisc and the tubes
         //this.matter.add.collider(this.plinkoDisc, tubes);
+
+    }
+    setLog(currentStage) {
+        // #region Ship Log
+        while (this.navLog.length > 0) {
+            var log = this.navLog.pop();
+            log.destroy();
+            log = null;
+        }
+
+        // Do it from the history.
+        const persist = this.scene.get("PersistScene");
+        var offset = 12;
+        var index = 0;
+
+        if (this.stageHistory.length > 0) {
+            
+            this.stageHistory.forEach(stageData => {
+                
+                var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
+                'mainFont', 
+                   `${stageData.stage.split("_")[1]}`, 
+               8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+
+               this.navLog.push(_stageText);
+               index++;
+            });
+            
+        }
+
+        var stageID = currentStage.split("_")[1];
+        var stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125) + offset * index,
+         'mainFont', 
+            `${stageID}`, 
+        8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+
+        
+        var stageOutLine = this.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125) + offset * index, stageID.length * 5 + 3, 10,  
+            ).setOrigin(1,0).setDepth(100).setAlpha(1);
+        stageOutLine.setFillStyle(0x000000, 0);
+        stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
+
+        
+
+        this.navLog.push(stageText, stageOutLine);
 
     }
     spawnPlinkos (number) {
@@ -3815,9 +3862,11 @@ class GameScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Sine.Out',
         });
-        
 
         
+        
+
+        ourSpaceBoyScene.setLog(this.stage);
 
 
         switch (this.stage) {
@@ -7073,7 +7122,7 @@ class GameScene extends Phaser.Scene {
         
         
     }
-    gameSceneCleanup(cleanupType = 'full'){
+    gameSceneCleanup(){
         // TODO: event listener cleanup here
         // scene blur removal
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
@@ -7084,14 +7133,20 @@ class GameScene extends Phaser.Scene {
         ourGameScene.events.off('spawnBlackholes');
         ourGameScene.scene.get("InputScene").scene.restart();
 
-        ourSpaceBoy.scene.restart();
+        while (ourSpaceBoy.navLog.length > 0) {
+            var log = ourSpaceBoy.navLog.pop();
+            log.destroy();
+            log = null;
+        }
 
+
+        /*
         if (cleanupType === 'half') {
         }
         if (cleanupType === 'restart') {
         }
         if (cleanupType === 'full') {
-        }
+        }*/
 
     }
     
@@ -7245,7 +7300,7 @@ class GameScene extends Phaser.Scene {
                 }
             },
             onComplete: () =>{
-                this.gameSceneCleanup();
+                
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -7285,6 +7340,7 @@ class GameScene extends Phaser.Scene {
                                 debugger // Leave for safety break
                                 break;
                         }
+                        this.gameSceneCleanup();
 
                     }
                 });

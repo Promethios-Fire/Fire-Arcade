@@ -120,6 +120,7 @@ export var QUICK_MENUS = new Map([
             
             ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
+            debugger
             ourGameScene.gameSceneCleanup();
 
             ourGameScene.scene.start("MainMenuScene");
