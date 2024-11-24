@@ -551,6 +551,7 @@ class SpaceBoyScene extends Phaser.Scene {
     init() {
         this.stageHistory = [];
         this.globalFoodLog = [];
+        this.panelArray = [];
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -572,20 +573,14 @@ class SpaceBoyScene extends Phaser.Scene {
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "SHIP LOG", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
-        //this.plinkoBoard = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', null,
-            //{
-            //shape: matterJSON.plinkoBoard,}).setOrigin(0,0).setDepth(50);
 
-        //this.plinkoBoard.body.isStatic = true;
-        //this.plinkoBoard.setPosition(GRID * 7 + this.plinkoBoard.centerOfMass.x, GRID * 21.5 + this.plinkoBoard.centerOfMass.y);
-        
-        //ground.setPosition(0 + this.plinkoBoard.centerOfMass.x, 280 + this.plinkoBoard.centerOfMass.y);
 
-        //var leftPoly = this.matter.add.
-        
-        //this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
-
-        // var image = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', {shape: matterJSON.plinkoBoard});
+        // Middle UI
+        this.CapSpark = this.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        .setDepth(100).setVisible(false);
+        this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+            this.setVisible(false)
+        });
 
         this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 1, Y_OFFSET + GRID * 6,
              'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
@@ -1320,7 +1315,6 @@ class StartScene extends Phaser.Scene {
         this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
         this.load.audio('pop03', [ 'pop03.ogg', 'pop03.mp3']);
         this.load.audio('chime01',[ 'chime01.ogg', 'chime01.mp3'])
-        //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
             {
@@ -3793,10 +3787,10 @@ class GameScene extends Phaser.Scene {
             `${stageID}`, 
             8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
-        this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
+        ourSpaceBoyScene.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
             ).setOrigin(1,0).setDepth(100).setAlpha(1);
-        this.stageOutLine.setFillStyle(0x000000, 0);
-        this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
+        ourSpaceBoyScene.stageOutLine.setFillStyle(0x000000, 0);
+        ourSpaceBoyScene.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
 
         ourSpaceBoyScene.panelArray.push(ourSpaceBoyScene.mapProgressPanelStage);
         
@@ -4470,12 +4464,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
-        .setDepth(100).setVisible(false);
         
-        this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
-            this.setVisible(false)
-        })
 
         this.lightMasksContainer = this.make.container(0, 0);
          
@@ -4487,7 +4476,7 @@ class GameScene extends Phaser.Scene {
         
         // Audio
         this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
-        //this.capSparkSFX = this.sound.add('capSpark');
+
         
 
         //this.pointCollect = this.sound.add('pointCollect01');
@@ -5922,9 +5911,8 @@ class GameScene extends Phaser.Scene {
                 });
                 
                 //ourGameScene.capSparkSFX.play();
-                ourGameScene.CapSpark.play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
-                .setDepth(100)
-                ourGameScene.CapSpark.setVisible(true);
+                ourSpaceBoyScene.CapSpark.play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5);
+                ourSpaceBoyScene.CapSpark.setVisible(true);
             }
             
             if (timeLeft > SCORE_FLOOR) {
@@ -6607,23 +6595,23 @@ class GameScene extends Phaser.Scene {
 
                         ourPersist.cameras.main.scrollX = 0;
                         ourPersist.cameras.main.scrollY = 0;*/
-                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
+                        ourSpaceBoy.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                         .setDepth(100);
                         
                         this.gState = GState.PLAY;
                 }
             });
             // atomic comet
-            this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
-            this.atomComet.play('atomCometSpawn');
-            this.atomComet.chain(['atomCometIdle']);
+            ourSpaceBoy.atomComet.play('atomCometSpawn');
+            ourSpaceBoy.atomComet.chain(['atomCometIdle']);
 
 
             // rainbow electronFanfare
-            this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
-            this.electronFanfare.play('electronFanfareForm');
+            ourSpaceBoy.electronFanfare.play('electronFanfareForm');
             
 
             // emit stars from electronFanfare
@@ -6633,7 +6621,7 @@ class GameScene extends Phaser.Scene {
                 alpha: { start: 1, end: 0 },
                 anim: 'starIdle',
                 lifespan: 1000,
-                follow: this.electronFanfare,
+                follow: ourSpaceBoy.electronFanfare,
             }).setFrequency(150,[1]).setDepth(1);
 
             ourGame.countDown.setAlpha(0);
@@ -6654,11 +6642,11 @@ class GameScene extends Phaser.Scene {
         });
 
         // Atomic Comet and Electron Fanfare Tween
-        if (this.electronFanfare) {
-            this.electronFanfare.on('animationcomplete', (animation, frame) => {
+        if (ourSpaceBoy.electronFanfare) {
+            ourSpaceBoy.electronFanfare.on('animationcomplete', (animation, frame) => {
                 if (animation.key === 'electronFanfareForm') {
                     this.tweens.add({
-                        targets: [this.electronFanfare,this.atomComet],
+                        targets: [ourSpaceBoy.electronFanfare,ourSpaceBoy.atomComet],
                         x: ourSpaceBoy.scoreFrame.getCenter().x -6,
                         y: ourSpaceBoy.scoreFrame.getCenter().y,
                         ease: 'Sine.easeIn',
@@ -6667,7 +6655,7 @@ class GameScene extends Phaser.Scene {
                             ourGame.countDown.setAlpha(1);
                             ourGame.countDown.x = X_OFFSET + GRID * 4 - 6;
                             ourGame.countDown.y = 3;
-                            this.atomComet.destroy();
+                            ourSpaceBoy.atomComet.destroy();
                         }
                     });
                             ourGame.countDown.setHTML('W1N');
@@ -6676,7 +6664,7 @@ class GameScene extends Phaser.Scene {
                     
             });
 
-            this.electronFanfare.chain(['electronFanfareIdle']);
+            ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
         }
 
         
@@ -7083,14 +7071,8 @@ class GameScene extends Phaser.Scene {
                 // Important: clear electronFanfare WITH destroy and setting to null.
                 // when restarting, if any instance of electronFanfare exists, it will error on level clear
                 // also called fron gameSceneCleanup() function, but imperative here too
-                if (ourGameScene.electronFanfare) {
-                    ourGameScene.electronFanfare.off('animationcomplete');
-                    ourGameScene.electronFanfare.destroy();
-                    ourGameScene.electronFanfare = null;
-                }
-                if (ourGameScene.CapSparkFinale) {
-                    ourGameScene.CapSparkFinale.destroy();
-                }
+
+              
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
             }
@@ -7147,44 +7129,21 @@ class GameScene extends Phaser.Scene {
     gameSceneCleanup(cleanupType = 'full'){
         // TODO: event listener cleanup here
         // scene blur removal
-        const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+        const ourGameScene = this.scene.get('GameScene');
 
-        this.stageOutLine.destroy();
+        // Clear for reseting game
+        ourGameScene.events.off('addScore');
+        ourGameScene.events.off('spawnBlackholes');
+        ourGameScene.scene.get("InputScene").scene.restart();
+
+        ourSpaceBoy.scene.restart();
 
         if (cleanupType === 'half') {
-            if (this.electronFanfare) {
-                this.electronFanfare.destroy();
-                this.electronFanfare.off('animationcomplete');
-                this.electronFanfare = null;
-            }
-            if (this.CapSparkFinale) {
-                this.CapSparkFinale.destroy();
-            }
         }
         if (cleanupType === 'restart') {
-            ourSpaceBoy.panelArray.forEach( stageData => {
-                stageData.destroy();
-            });
-            ourSpaceBoy.panelArray = [];
-            console.log(this.panelCursorIndex)
-            this.panelCursorIndex = 0;
-            if (this.electronFanfare) {
-                this.electronFanfare.destroy();
-                this.electronFanfare.off('animationcomplete');
-                this.electronFanfare = null;
-            }
-            if (this.CapSparkFinale) {
-                this.CapSparkFinale.destroy();
-            }
-            ourSpaceBoy.scene.restart();
         }
         if (cleanupType === 'full') {
-            ourSpaceBoy.mapProgressPanelText.setText('SHIP LOG')
-            ourSpaceBoy.panelArray.forEach( stageData => {
-                stageData.destroy();
-            });
-            ourSpaceBoy.panelArray = [];
         }
 
     }
@@ -7197,7 +7156,6 @@ class GameScene extends Phaser.Scene {
         this.gState = GState.TRANSITION;
 
         this.scoreTweenShow();
-        this.stageOutLine.destroy();
         this.snake.head.setTexture('snakeDefault', 0);
 
         if (this.helpPanel) {
@@ -7327,6 +7285,7 @@ class GameScene extends Phaser.Scene {
             alpha: {from: 5, to: 0},
             rotation: 5,
             onDelay: () =>{
+                
                 if (allTheThings.length > 150) {
                     blackholeTween.timeScale += .04;
                 }
@@ -7339,6 +7298,7 @@ class GameScene extends Phaser.Scene {
                 }
             },
             onComplete: () =>{
+                this.gameSceneCleanup();
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -7535,36 +7495,10 @@ class GameScene extends Phaser.Scene {
         
     }
 
-    nextStage(stageName,camDirection) {
+    nextStage(stageName, camDirection) {
         const ourInputScene = this.scene.get("InputScene");
         this.camDirection = camDirection
 
-        
-        //console.log(STAGE_UNLOCKS['start'].call());
-        //console.log(STAGE_UNLOCKS['babies-first-wall'].call());
-
-        // #region Check Unlocked
-        //*
-        
-        var unlockedLevels = [];
-        
-        
-
-        var nextStage = "";
-        if (unlockedLevels.length > 0 ) {
-            nextStage = Phaser.Math.RND.pick(unlockedLevels);
-        } else {
-            /**
-             * If a slug is not set up properly it will try to load the next 
-             * directly from the Tiled map properties.
-             */
-            nextStage = Phaser.Math.RND.pick(this.nextStages);
-        }
-
-
-
-        
-    
         this.scene.restart( { 
             stage: stageName, 
             score: this.nextScore, 
@@ -7573,14 +7507,6 @@ class GameScene extends Phaser.Scene {
             camDirection: this.camDirection,
             mode: this.scene.get("PersistScene").mode,
         });
-        ourInputScene.scene.restart();
-
-        // Mainmenu Code @holden
-        //ourMainMenuScene.scene.restart( {
-        //    startingAnimation: "menuReturn"
-        //});
-
-
     }
 
     scoreTweenShow(){
@@ -7824,9 +7750,7 @@ class GameScene extends Phaser.Scene {
             this.gState = GState.TRANSITION;
             this.snake.direction = DIRS.STOP;
             this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
-            this.events.off('addScore');
-            this.events.off('spawnBlackholes');
-            this.scene.get("InputScene").scene.restart();
+            this.gameSceneCleanup();
             this.gameOver();
 
         }
@@ -9679,12 +9603,9 @@ class ScoreScene extends Phaser.Scene {
                     extraFields.toString(),
                     );
                 
-                    // Event listeners need to be removed manually
-                // Better if possible to do this as part of UIScene clean up
-                // As the event is defined there, but this works and its' here. - James
+                
+                // Turns off score post score screen.
                 ourGame.events.off('addScore');
-                ourGame.events.off('spawnBlackholes');
-                ourGame.scene.get("InputScene").scene.restart();
 
 
                 ourGame.backgroundBlur(false);
