@@ -549,7 +549,6 @@ class SpaceBoyScene extends Phaser.Scene {
         super({key: 'SpaceBoyScene', active: false});
     }
     init() {
-        this.stageHistory = [];
         this.globalFoodLog = [];
         this.navLog = [];
 
@@ -775,9 +774,9 @@ class SpaceBoyScene extends Phaser.Scene {
         var offset = 12;
         var index = 0;
 
-        if (this.stageHistory.length > 0) {
+        if (persist.stageHistory.length > 0) {
             
-            this.stageHistory.forEach(stageData => {
+            persist.stageHistory.forEach(stageData => {
                 
                 var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
                 'mainFont', 
@@ -1171,7 +1170,7 @@ class TutorialScene extends Phaser.Scene {
             const spaceBoy = scene.scene.get("SpaceBoyScene");
             if (scene.continueText.visible === true) {
                 // Clear for reseting game
-                spaceBoy.stageHistory = [];
+                scene.scene.get("PersistScene").stageHistory = [];
                 scene.scene.get("PersistScene").coins = START_COINS;
 
 
@@ -3450,6 +3449,7 @@ class PersistScene extends Phaser.Scene {
     init() {
         this.zeds = 0;
         this.coins = START_COINS;
+        this.stageHistory = [];
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -6822,6 +6822,7 @@ class GameScene extends Phaser.Scene {
     finalScore(nextScene, args){
         const ourStartScene = this.scene.get('StartScene');
         const spaceBoy = this.scene.get("SpaceBoyScene");
+        const persist = this.scene.get("PersistScene");
 
 
         //style
@@ -6842,10 +6843,10 @@ class GameScene extends Phaser.Scene {
         var windowCenterX = SCREEN_WIDTH/2;
         var extractHistory = [];
 
-        for (let index = 0; index < spaceBoy.stageHistory.length; index++) {
-            var id = spaceBoy.stageHistory[index].getID();
-            var _rank = spaceBoy.stageHistory[index].stageRank();
-            scoreCount += spaceBoy.stageHistory[index].calcTotal();
+        for (let index = 0; index < persist.stageHistory.length; index++) {
+            var id = persist.stageHistory[index].getID();
+            var _rank = persist.stageHistory[index].stageRank();
+            scoreCount += persist.stageHistory[index].calcTotal();
             extractRankSum += _rank;
             if (extractCode.length === 0) {
                 extractCode = id
@@ -6874,9 +6875,9 @@ class GameScene extends Phaser.Scene {
         }
 
 
-        var _x = windowCenterX - GRID * 6.5 + (spaceBoy.stageHistory.length) * xOffset;
+        var _x = windowCenterX - GRID * 6.5 + (persist.stageHistory.length) * xOffset;
 
-        var extractRank = extractRankSum / spaceBoy.stageHistory.length; 
+        var extractRank = extractRankSum / persist.stageHistory.length; 
 
         
 
@@ -7025,7 +7026,7 @@ class GameScene extends Phaser.Scene {
         
         var _totalScore = 0
 
-        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
+        this.scene.get("PersistScene").stageHistory.forEach( stageData => {
             _totalScore += stageData.calcTotal();
         });
         _totalScore = Math.floor(_totalScore); //rounds down to whole number
@@ -7038,7 +7039,7 @@ class GameScene extends Phaser.Scene {
                 `${formattedScore}`
         ).setOrigin(0,0).setScale(0.5);
 
-        spaceBoy.stageHistory = []; // Empty Now
+        persist.stageHistory = []; // Empty Now
 
         //PRESS SPACE TO CONTINUE TEXT
         // Give a few seconds before a player can hit continue
@@ -8370,8 +8371,8 @@ class ScoreScene extends Phaser.Scene {
 
 
 
-        var tempStageHistory = [...this.scene.get("SpaceBoyScene").stageHistory, this.stageData];
-        console.log("STAGE HISTORY: MID SCORE SCREEN.", this.scene.get("SpaceBoyScene").stageHistory, this.stageData);
+        var tempStageHistory = [...this.scene.get("PersistScene").stageHistory, this.stageData];
+        console.log("STAGE HISTORY: MID SCORE SCREEN.", this.scene.get("PersistScene").stageHistory, this.stageData);
     
 
         // #region Save Best To Local.
