@@ -609,6 +609,25 @@ class SpaceBoyScene extends Phaser.Scene {
 
         const playButton = this.add.sprite(columnX , GRID * 7, 'mediaButtons', 2
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+
+
+        // #region Ship Log
+
+        // Do it from the history.
+
+        //this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
+        //var stageID = this.stage.split("_")[1];
+        //this.mapProgressPanelStage = ourSpaceBoyScene.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
+        // 'mainFont', 
+        //    `${stageID}`, 
+        //    8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+
+        //this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
+        //    ).setOrigin(1,0).setDepth(100).setAlpha(1);
+        //this.stageOutLine.setFillStyle(0x000000, 0);
+        //this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
+
+        //this.panelArray.push(this.mapProgressPanelStage);
         
         
         playButton.on('pointerdown', () => {
@@ -3776,23 +3795,8 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
-        if (!ourSpaceBoyScene.panelArray) {
-            ourSpaceBoyScene.panelArray = []; // Move to be part of the Init of the class.
-        }
         
-        this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
-        var stageID = this.stage.split("_")[1];
-        ourSpaceBoyScene.mapProgressPanelStage = ourSpaceBoyScene.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
-         'mainFont', 
-            `${stageID}`, 
-            8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
-        ourSpaceBoyScene.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
-            ).setOrigin(1,0).setDepth(100).setAlpha(1);
-        ourSpaceBoyScene.stageOutLine.setFillStyle(0x000000, 0);
-        ourSpaceBoyScene.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
-
-        ourSpaceBoyScene.panelArray.push(ourSpaceBoyScene.mapProgressPanelStage);
         
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
@@ -3803,8 +3807,6 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.scrollX = -this.camDirection.y * 10
         this.cameras.main.scrollY = -this.camDirection.x * 10
         
-        //ourPersist.bgCoords.x += this.camDirection.y/4;
-        //ourPersist.bgCoords.y += this.camDirection.x/4;
         
         var cameraOpeningTween = this.tweens.add({
             targets: this.cameras.main,
@@ -3814,90 +3816,35 @@ class GameScene extends Phaser.Scene {
             ease: 'Sine.Out',
         });
         
-        //test portal walls  @holden do we still need this?
-        if (this.stage == 'testingFuturistic_x' ) {
-            var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
-            var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
-            var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
-            portalWall.play('pWallFlatMiddle')
-            portalWallL.play('pWallFlatLeft')
-            portalWallR.play('pWallFlatRight')
-            portalWall.setTint(0xFF0000)
-            portalWallL.setTint(0xFF0000)
-            portalWallR.setTint(0xFF0000)
-            var portalWall2 = this.add.sprite(X_OFFSET + GRID * 19, GRID * 23).setOrigin(0,0);
-            var portalWallL2 = this.add.sprite(X_OFFSET + GRID * 18, GRID * 23).setOrigin(0,0);
-            var portalWallR2 = this.add.sprite(X_OFFSET + GRID * 20, GRID * 23).setOrigin(0,0);
-            //this.wallLight = this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 66, 'lightColor').setIntensity(1.5);
-
-            portalWall2.play('pWallFlatMiddle')
-            portalWallL2.play('pWallFlatLeft')
-            portalWallR2.play('pWallFlatRight')
-            portalWall2.setTint(0xFF0000)
-            portalWallL2.setTint(0xFF0000)
-            portalWallR2.setTint(0xFF0000)
-            this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
-            this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
-            var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
-            var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
-            portalWallL3.play('pWallFlatLeft')
-            portalWallR3.play('pWallFlatRight')
-            portalWallR3.setTint(0x9900FF)
-            portalWallL3.setTint(0x9900FF)
-            var portalWallL4 = this.add.sprite(X_OFFSET + GRID * 15, GRID * 28).setOrigin(0,0);
-            var portalWallR4 = this.add.sprite(X_OFFSET + GRID * 16, GRID * 28).setOrigin(0,0);
-            portalWallL4.play('pWallFlatLeft')
-            portalWallR4.play('pWallFlatRight')
-            portalWallL4.setTint(0x9900FF)
-            portalWallR4.setTint(0x9900FF)
-            this.lights.addLight(X_OFFSET + GRID * 16, GRID * 28, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
-            this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
-        }
-
-        if (this.stage === "testingFuturistic") {
-            ourPersist.fx.hue(330);
-        }
-        if (this.stage === "testingRacetrack") {
-            ourPersist.fx.hue(300);
-        }
-        else{
-            ourPersist.fx.hue(0)
-        }
-
-
-
-
-
-        /*if (this.startupAnim) { // @holden should we save this?
-            var tween = this.tweens.addCounter({
-                from: 0,
-                to: 600,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                onUpdate: tween =>
-                    {   
-                        this.graphics.clear();
-                        var value = (tween.getValue());
-                        this.tweenValue = value
-                        this.shape1 = this.make.graphics().fillCircle(this.snake.head.x + GRID * .5, this.snake.head.y + GRID * .5, value);
-                        var geomask1 = this.shape1.createGeometryMask();
-                        
-                        this.cameras.main.setMask(geomask1,true)
-                    }
-            });
-            tween.on('complete', ()=>{ //need this or else visual bugs occur
-                this.cameras.main.setMask(false)
-            });
-        }*/
-        //this.cameras.main.setAlpha(1)
 
         
-        
-        //loadAnimations(this);
-        //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
 
 
-       
+        switch (this.stage) {
+            case STAGES.get("1-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("2-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("3-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("4-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("5-1"):
+                ourPersist.fx.hue(300); // Move to Racing levels
+                break;
+            case STAGES.get("8-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            //if (this.stage === "testingFuturistic") {
+            //    ourPersist.fx.hue(330);
+            //}
+            default:
+                break;
+        }
 
 
         // SOUND
