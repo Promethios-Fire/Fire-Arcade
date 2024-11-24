@@ -560,7 +560,7 @@ class SpaceBoyScene extends Phaser.Scene {
         });
     }
     create() {
-        //this.sound.mute = true; //TEMP MUTE SOUND
+        this.sound.mute = true; //TEMP MUTE SOUND
 
         var matterJSON = this.cache.json.get('collisionData');
 
