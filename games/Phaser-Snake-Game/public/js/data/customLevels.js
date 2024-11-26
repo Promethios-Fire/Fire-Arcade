@@ -1,9 +1,10 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, commaInt } from "../SnakeHole.js";
 
 export var STAGE_OVERRIDES = new Map([
     ["Tutorial_1", {
         preFix: function (scene) {
             
+            scene.mode = MODES.TUTORIAL;
             scene.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99
 
@@ -16,6 +17,7 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
 
             debugger
+            scene.mode = MODES.TUTORIAL;
             scene.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
 
@@ -33,7 +35,7 @@ export var STAGE_OVERRIDES = new Map([
     ["Tutorial_3", {
         preFix: function (scene) {
 
-            debugger
+            scene.mode = MODES.TUTORIAL;
             scene.scene.get('PersistScene').coins = 20
 
         },

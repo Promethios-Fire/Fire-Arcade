@@ -6,7 +6,7 @@ import { Snake } from './classes/Snake.js';
 
 
 import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
-import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract} from './data/UnlockCriteria.js';
+import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -54,6 +54,9 @@ const DEBUG_ARGS = {
 
 const DEBUG_FORCE_EXPERT = false;
 const EXPERT_CHOICE = true;
+
+const DEBUG_FORCE_GAUNTLET = true;
+const DEBUG_GAUNTLET_ID = "Easy_Gauntlet"
 
 
 // 1 frame is 16.666 milliseconds
@@ -140,14 +143,17 @@ var updateSumOfBest = function(scene) {
     scene.stagesCompleteClassic = 0;
     scene.stagesCompleteExpert = 0;
     scene.stagesCompleteAll = 0;
+    scene.stagesCompleteTut = 0;
 
     scene.sumOfBestClassic = 0;
     scene.sumOfBestExpert = 0;
     scene.sumOfBestAll = 0;
+    scene.sumOfBestTut = 0;
 
     BEST_OF_ALL = new Map();
     BEST_OF_CLASSIC = new Map ();
     BEST_OF_EXPERT = new Map ();
+    BEST_OF_TUTORIAL = new Map ();
 
     var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
@@ -204,6 +210,18 @@ var updateSumOfBest = function(scene) {
         }
 
     })
+
+    TUTORIAL_UUIDS.forEach( uuid => {
+        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}_best-Tutorial`));
+        if (tempJSON != null) {
+            var _stageDataTut = new StageData(tempJSON);
+            scene.stagesCompleteTut += 1;
+
+            BEST_OF_TUTORIAL.set(_stageDataTut.stage, _stageDataTut);
+
+            scene.sumOfBestTut += _stageDataTut.calcTotal();  
+        }
+    });
 }
 
 
@@ -305,6 +323,7 @@ var rollZeds = function(score) {
 export var BEST_OF_ALL = new Map (); // STAGE DATA TYPE
 export var BEST_OF_CLASSIC = new Map ();
 export var BEST_OF_EXPERT = new Map ();
+var BEST_OF_TUTORIAL = new Map ();
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -389,16 +408,19 @@ const RANK_BENCHMARKS = new Map([
 ]);
 
 export const MODES = Object.freeze({
-    CLASSIC: 0,
-    EXPERT: 1,
-    HADCORE: 2,
-    OVERALL: 3
+    TUTORIAL: 0,
+    CLASSIC: 1,
+    EXPERT: 2,
+    HADCORE: 3,
+    OVERALL: 4,
+    GAUNTLET: 5
 })
 
-const MODE_TEXT = new Map([
+const MODE_LOCAL = new Map([
     [MODES.CLASSIC, "Classic"],
+    [MODES.GAUNTLET, "Classic"], // Use classic stage data
     [MODES.EXPERT, "Expert"],
-
+    [MODES.TUTORIAL, "Tutorial"]
 ]);
 
 const SAFE_MIN_WIDTH = "550px"
@@ -482,7 +504,14 @@ export const GState = Object.freeze({
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
+const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
+
+const TUTORIAL_UUIDS = [
+    "e80aad2f-f24a-4619-b525-7dc3af65ed33",
+    "72cb50a1-6f72-4569-9bd5-ab3b23a87ea2",
+    "4c577a41-07a0-4aea-923e-d33c36893027"
+];
 
 const START_COINS = 4;
 
@@ -522,14 +551,29 @@ class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
     }
 }
 
+/** 
+ Template Scene
+
+class __Scene extends Phaser.Scene {
+    constructor () {
+        super({key: '__Scene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
+*/
+
 // #region SpaceBoyScene
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
         super({key: 'SpaceBoyScene', active: false});
     }
     init() {
-        this.stageHistory = [];
         this.globalFoodLog = [];
+        this.navLog = [];
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -540,6 +584,7 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
+        const persist = this.scene.get("PersistScene");
 
         var matterJSON = this.cache.json.get('collisionData');
 
@@ -549,22 +594,16 @@ class SpaceBoyScene extends Phaser.Scene {
         this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
-            "SHIP LOG", 
+            "", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
-        //this.plinkoBoard = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', null,
-            //{
-            //shape: matterJSON.plinkoBoard,}).setOrigin(0,0).setDepth(50);
 
-        //this.plinkoBoard.body.isStatic = true;
-        //this.plinkoBoard.setPosition(GRID * 7 + this.plinkoBoard.centerOfMass.x, GRID * 21.5 + this.plinkoBoard.centerOfMass.y);
-        
-        //ground.setPosition(0 + this.plinkoBoard.centerOfMass.x, 280 + this.plinkoBoard.centerOfMass.y);
 
-        //var leftPoly = this.matter.add.
-        
-        //this.plinkoBoard = this.add.sprite(GRID * 7,GRID * 21.5, 'plinkoBoard').setOrigin(0,0).setDepth(50);
-
-        // var image = this.matter.add.sprite(GRID * 7, GRID * 21.5, 'plinkoBoard', {shape: matterJSON.plinkoBoard});
+        // Middle UI
+        this.CapSpark = this.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
+        .setDepth(100).setVisible(false);
+        this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
+            this.setVisible(false)
+        });
 
         this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 1, Y_OFFSET + GRID * 6,
              'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
@@ -584,49 +623,69 @@ class SpaceBoyScene extends Phaser.Scene {
             delay: 500,
             });
 
-        var columnX = X_OFFSET - GRID * 7;
+        var columnX = X_OFFSET + GRID * 36;
 
-        this.trackID = this.add.bitmapText(columnX - GRID - 6, GRID * 7, 'mainFont', `000`, 16
-        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTint(0xF0F0F0);
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
 
-        const playButton = this.add.sprite(columnX , GRID * 7, 'mediaButtons', 2
+        const loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+
+
+        switch (persist.mode) {
+            case MODES.CLASSIC:
+                this.mapProgressPanelText.setText("ADVENTURE");
+                break;
+            case MODES.EXPERT:
+                this.mapProgressPanelText.setText("EXPERT");
+                debugger
+                break;
+            case MODES.GAUNTLET:
+                this.mapProgressPanelText.setText("GAUNTLET");
+                debugger
+                break;
+            default:
+                this.mapProgressPanelText.setText("SHIP LOG");
+                break;
+        }
+
         
         
-        playButton.on('pointerdown', () => {
+        
+        loopButton.on('pointerdown', () => {
             this.music.play();
-            playButton.setTintFill(0xCFFF04);
+            loopButton.setFrame(5);
         }, this);
     
-        const pauseButton = this.add.sprite(columnX , GRID * 8.5, 'mediaButtons', 3
+        const pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
         pauseButton.on('pointerdown', () => {
             if (this.music.isPlaying) {
-                    pauseButton.setTintFill(0x8B0000);
+                    pauseButton.setFrame(1);
                     this.music.pause();
             }  else {
 
-                if (pauseButton.tint === 0x8B0000) {
+                    pauseButton.setFrame(0);
                     this.music.resume();
-                    pauseButton.setTintFill(0x000000);
-                }
+                    //pauseButton.setTintFill(0x000000);
+                
             }
         }, this);
 
-        const nextButton = this.add.sprite(columnX , GRID * 10, 'mediaButtons', 1
+        const nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         nextButton.on('pointerdown', () => {
-            nextButton.setTintFill(0xCFFF04)
+            nextButton.setFrame(3);
             this.music.stop();
-            this.nextSong();  
+            this.nextSong();
         }, this);
 
         this.input.on('pointerup', function(pointer){
-            playButton.setTintFill(0x000000);
-            nextButton.setTintFill(0x000000);
+            loopButton.setFrame(4);
+            nextButton.setFrame(2);
             
         }, this);
 
@@ -685,7 +744,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
         
         this.music.on('pause', () => {
-            pauseButton.setTintFill(0x8B0000);
+            //pauseButton.setTintFill(0x8B0000);
         }, this);
 
         
@@ -723,6 +782,51 @@ class SpaceBoyScene extends Phaser.Scene {
 
         // Enable collision between the plinkoDisc and the tubes
         //this.matter.add.collider(this.plinkoDisc, tubes);
+
+    }
+    setLog(currentStage) {
+        // #region Ship Log
+        while (this.navLog.length > 0) {
+            var log = this.navLog.pop();
+            log.destroy();
+            log = null;
+        }
+
+        // Do it from the history.
+        const persist = this.scene.get("PersistScene");
+        var offset = 12;
+        var index = 0;
+
+        if (persist.stageHistory.length > 0) {
+            
+            persist.stageHistory.forEach(stageData => {
+                
+                var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
+                'mainFont', 
+                   `${stageData.stage.split("_")[1]}`, 
+               8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+
+               this.navLog.push(_stageText);
+               index++;
+            });
+            
+        }
+
+        var stageID = currentStage.split("_")[1];
+        var stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125) + offset * index,
+         'mainFont', 
+            `${stageID}`, 
+        8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+
+        
+        var stageOutLine = this.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125) + offset * index, stageID.length * 5 + 3, 10,  
+            ).setOrigin(1,0).setDepth(100).setAlpha(1);
+        stageOutLine.setFillStyle(0x000000, 0);
+        stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
+
+        
+
+        this.navLog.push(stageText, stageOutLine);
 
     }
     spawnPlinkos (number) {
@@ -823,6 +927,36 @@ class SpaceBoyScene extends Phaser.Scene {
     }
 }
 
+class MusicPlayerScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'MusicPlayerScene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
+class PinballDisplayScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'PinballDisplayScene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
+class PlinkoMachineScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'PlinkoMachineScene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
 // #region TutorialScene
 class TutorialScene extends Phaser.Scene {
     constructor () {
@@ -889,25 +1023,11 @@ class TutorialScene extends Phaser.Scene {
             });
         })
 
-
         // Defaults everything to invisible so you don't need to remember to set in TUTORIAL_PANELS .
         panelContents.forEach( item => {
             item.alpha = 0;
         })
 
-        
-
-
-        
-        // -james note. Start of create should be here.
-        
-
-        if (localStorage["version"] === undefined) {
-            this.hasPlayedBefore = false;
-
-        } else {
-            this.hasPlayedBefore = true;
-        }
 
         //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
         
@@ -1103,7 +1223,7 @@ class TutorialScene extends Phaser.Scene {
             const spaceBoy = scene.scene.get("SpaceBoyScene");
             if (scene.continueText.visible === true) {
                 // Clear for reseting game
-                spaceBoy.stageHistory = [];
+                scene.scene.get("PersistScene").stageHistory = [];
                 scene.scene.get("PersistScene").coins = START_COINS;
 
 
@@ -1212,7 +1332,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
-        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
@@ -1313,7 +1433,6 @@ class StartScene extends Phaser.Scene {
         this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
         this.load.audio('pop03', [ 'pop03.ogg', 'pop03.mp3']);
         this.load.audio('chime01',[ 'chime01.ogg', 'chime01.mp3'])
-        //this.load.audio('capSpark', [ 'capSpark.ogg', 'capSpark.mp3']); //still need to find a good sound
 
         SOUND_ATOM.forEach(soundID =>
             {
@@ -1450,7 +1569,7 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('GalaxyMapScene');
         this.scene.launch('PersistScene');
         
-        //temporarily removing HOW TO PLAY section from scene to move it elsewhere
+        //temporaily removing HOW TO PLAY section from scene to move it elsewhere
         if (localStorage["version"] === undefined) {
             this.hasPlayedBefore = false;
             console.log("Testing LOCAL STORAGE => Has not played.", );
@@ -2206,6 +2325,12 @@ class StageCodex extends Phaser.Scene {
             
         } else {
             switch (args.category) {
+                case MODES.TUTORIAL:
+                    bestOfDisplay = BEST_OF_TUTORIAL;
+                    sumOfBestDisplay = ourPersist.sumOfBestTut;
+                    stagesCompleteDisplay = ourPersist.stagesCompleteTut;
+                    categoryText = "Tutorial";
+                    break;
                 case MODES.CLASSIC:
                     bestOfDisplay = BEST_OF_CLASSIC;
                     sumOfBestDisplay = ourPersist.sumOfBestClassic;
@@ -2646,6 +2771,69 @@ class MainMenuScene extends Phaser.Scene {
                 return true;
             }],
             ['gauntlet', function () {
+                const ourPersist = this.scene.get("PersistScene");
+                const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+
+                var generateMenu = [
+                    ["Tab to Menu", function () {
+                        this.scene.wake('MainMenuScene');
+                        this.scene.stop("QuickMenuScene");
+                    }],
+                ];
+
+                GAUNTLET_CODES.forEach( (val, key, map) => {
+                    
+                    var menuKey;
+                    var menuVal;
+                    
+                    if (val.checkUnlock.call()) {
+                        menuKey = key;
+                        menuVal = function () {
+                            ourPersist.mode = MODES.GAUNTLET;
+                            ourPersist.coins = val.startingCoins;
+                            ourPersist.gauntlet = val.stages.split("|");
+                            ourPersist.gauntletSize = ourPersist.gauntlet.length;
+                            ourSpaceBoy.mapProgressPanelText.setText(key);
+
+                            this.scene.get("InputScene").scene.restart();
+
+                            // Launch Game Here
+                            var startID = ourPersist.gauntlet.shift();
+                            //debugger
+                            this.scene.launch("GameScene", {
+                                stage: STAGES.get(startID),
+                                score: 0,
+                                startupAnim: true,
+                                mode: ourPersist.mode
+                            });
+
+                            mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+                            mainMenuScene.scene.stop();
+                            this.scene.stop();
+                        }
+                        
+                        generateMenu.push([menuKey, menuVal]);
+                        
+
+                    } else {
+                    }
+                    
+
+                })
+
+                var qMenu = new Map(generateMenu);
+
+                mainMenuScene.scene.launch("QuickMenuScene", {
+                    menuOptions: qMenu, 
+                    textPrompt: "Gauntlet Mode",
+                    fromScene: mainMenuScene,
+                    cursorIndex: 1,
+                    sideScenes: false
+                });
+                mainMenuScene.scene.bringToTop("QuickMenuScene");
+
+                mainMenuScene.scene.sleep('MainMenuScene');
+
                 return true;
             }],
             ['endless', function () {
@@ -3314,6 +3502,7 @@ class PersistScene extends Phaser.Scene {
     init() {
         this.zeds = 0;
         this.coins = START_COINS;
+        this.stageHistory = [];
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -3427,6 +3616,12 @@ class PersistScene extends Phaser.Scene {
     this.prevSumOfBestExpert = this.sumOfBestExpert;
     this.prevStagesCompleteExpert = this.stagesCompleteExpert;
     this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
+
+    this.prevSumOfBestTut = this.sumOfBestTut;
+    this.prevStagesCompleteTut = this.stagesCompleteTut;
+    this.prevPlayerRankTut = calcSumOfBestRank(this.sumOfBestTut);
+
+    
 
 
         
@@ -3664,11 +3859,10 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
-        if (!ourTutorialScene.hasPlayedBefore && this.stage === 'World_0-1') {
-            
-            this.stage = 'Tutorial_1';
+        var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
+        if (tutorialData === null && this.stage === 'World_0-1') {
+            this.stage = 'Tutorial_1'; // Remeber Override!
             console.log('Tutorial Time!', this.stage);
-            //this.tutorialState = true;
         }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
@@ -3701,23 +3895,8 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
-        if (!ourSpaceBoyScene.panelArray) {
-            ourSpaceBoyScene.panelArray = []; // Move to be part of the Init of the class.
-        }
         
-        this.panelCursorIndex = (this.scene.get("SpaceBoyScene").stageHistory.length);
-        var stageID = this.stage.split("_")[1];
-        ourSpaceBoyScene.mapProgressPanelStage = ourSpaceBoyScene.add.bitmapText(GRID * 11, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex),
-         'mainFont', 
-            `${stageID}`, 
-            8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
-        this.stageOutLine = ourSpaceBoyScene.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125 + this.panelCursorIndex), stageID.length * 5 + 3, 10,  
-            ).setOrigin(1,0).setDepth(100).setAlpha(1);
-        this.stageOutLine.setFillStyle(0x000000, 0);
-        this.stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
-
-        ourSpaceBoyScene.panelArray.push(ourSpaceBoyScene.mapProgressPanelStage);
         
         
         this.snakeCritical = false;   /// Note; @holden this should move to the init scene?
@@ -3728,8 +3907,6 @@ class GameScene extends Phaser.Scene {
         this.cameras.main.scrollX = -this.camDirection.y * 10
         this.cameras.main.scrollY = -this.camDirection.x * 10
         
-        //ourPersist.bgCoords.x += this.camDirection.y/4;
-        //ourPersist.bgCoords.y += this.camDirection.x/4;
         
         var cameraOpeningTween = this.tweens.add({
             targets: this.cameras.main,
@@ -3738,91 +3915,38 @@ class GameScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Sine.Out',
         });
-        
-        //test portal walls  @holden do we still need this?
-        if (this.stage == 'testingFuturistic_x' ) {
-            var portalWall = this.add.sprite(X_OFFSET + GRID * 9, GRID * 9).setOrigin(0,0);
-            var portalWallL = this.add.sprite(X_OFFSET + GRID * 8, GRID * 9).setOrigin(0,0);
-            var portalWallR = this.add.sprite(X_OFFSET + GRID * 10, GRID * 9).setOrigin(0,0);
-            portalWall.play('pWallFlatMiddle')
-            portalWallL.play('pWallFlatLeft')
-            portalWallR.play('pWallFlatRight')
-            portalWall.setTint(0xFF0000)
-            portalWallL.setTint(0xFF0000)
-            portalWallR.setTint(0xFF0000)
-            var portalWall2 = this.add.sprite(X_OFFSET + GRID * 19, GRID * 23).setOrigin(0,0);
-            var portalWallL2 = this.add.sprite(X_OFFSET + GRID * 18, GRID * 23).setOrigin(0,0);
-            var portalWallR2 = this.add.sprite(X_OFFSET + GRID * 20, GRID * 23).setOrigin(0,0);
-            //this.wallLight = this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 66, 'lightColor').setIntensity(1.5);
-
-            portalWall2.play('pWallFlatMiddle')
-            portalWallL2.play('pWallFlatLeft')
-            portalWallR2.play('pWallFlatRight')
-            portalWall2.setTint(0xFF0000)
-            portalWallL2.setTint(0xFF0000)
-            portalWallR2.setTint(0xFF0000)
-            this.lights.addLight(X_OFFSET + GRID * 19, GRID * 23, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
-            this.lights.addLight(X_OFFSET + GRID * 9, GRID * 9, 128,  0xFF0000).setIntensity(2).setOrigin(0,0);
-            var portalWallL3 = this.add.sprite(X_OFFSET + GRID * 12, GRID * 4).setOrigin(0,0);
-            var portalWallR3 = this.add.sprite(X_OFFSET + GRID * 13, GRID * 4).setOrigin(0,0);
-            portalWallL3.play('pWallFlatLeft')
-            portalWallR3.play('pWallFlatRight')
-            portalWallR3.setTint(0x9900FF)
-            portalWallL3.setTint(0x9900FF)
-            var portalWallL4 = this.add.sprite(X_OFFSET + GRID * 15, GRID * 28).setOrigin(0,0);
-            var portalWallR4 = this.add.sprite(X_OFFSET + GRID * 16, GRID * 28).setOrigin(0,0);
-            portalWallL4.play('pWallFlatLeft')
-            portalWallR4.play('pWallFlatRight')
-            portalWallL4.setTint(0x9900FF)
-            portalWallR4.setTint(0x9900FF)
-            this.lights.addLight(X_OFFSET + GRID * 16, GRID * 28, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
-            this.lights.addLight(X_OFFSET + GRID * 12, GRID * 4, 128,  0x9900FF).setIntensity(2).setOrigin(0,0);
-        }
-
-        if (this.stage === "testingFuturistic") {
-            ourPersist.fx.hue(330);
-        }
-        if (this.stage === "testingRacetrack") {
-            ourPersist.fx.hue(300);
-        }
-        else{
-            ourPersist.fx.hue(0)
-        }
-
-
-
-
-
-        /*if (this.startupAnim) { // @holden should we save this?
-            var tween = this.tweens.addCounter({
-                from: 0,
-                to: 600,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                onUpdate: tween =>
-                    {   
-                        this.graphics.clear();
-                        var value = (tween.getValue());
-                        this.tweenValue = value
-                        this.shape1 = this.make.graphics().fillCircle(this.snake.head.x + GRID * .5, this.snake.head.y + GRID * .5, value);
-                        var geomask1 = this.shape1.createGeometryMask();
-                        
-                        this.cameras.main.setMask(geomask1,true)
-                    }
-            });
-            tween.on('complete', ()=>{ //need this or else visual bugs occur
-                this.cameras.main.setMask(false)
-            });
-        }*/
-        //this.cameras.main.setAlpha(1)
 
         
         
-        //loadAnimations(this);
-        //this.load.spritesheet('portals', 'assets/sprites/portalAnim.png', { frameWidth: 64, frameHeight: 64 });
+
+        ourSpaceBoyScene.setLog(this.stage);
 
 
-       
+        switch (this.stage) {
+            case STAGES.get("1-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("2-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("3-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("4-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            case STAGES.get("5-1"):
+                ourPersist.fx.hue(300); // Move to Racing levels
+                break;
+            case STAGES.get("8-1"):
+                ourPersist.fx.hue(0); // Move to Racing levels
+                break;
+            //if (this.stage === "testingFuturistic") {
+            //    ourPersist.fx.hue(330);
+            //}
+            default:
+                break;
+        }
 
 
         // SOUND
@@ -4389,12 +4513,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.CapSpark = ourSpaceBoyScene.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
-        .setDepth(100).setVisible(false);
         
-        this.CapSpark.on(Phaser.Animations.Events.ANIMATION_COMPLETE, function (anim, frame, gameObject) {
-            this.setVisible(false)
-        })
 
         this.lightMasksContainer = this.make.container(0, 0);
          
@@ -4406,7 +4525,7 @@ class GameScene extends Phaser.Scene {
         
         // Audio
         this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
-        //this.capSparkSFX = this.sound.add('capSpark');
+
         
 
         //this.pointCollect = this.sound.add('pointCollect01');
@@ -4648,263 +4767,301 @@ class GameScene extends Phaser.Scene {
                 const BLACK_HOLE_START_TILE_INDEX = 641;
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
-                // #region Layer: Next
-                if (this.map.getLayer('Next')) {
-                    this.nextStagePortalLayer.visible = true;
-                    
-                    var blackholeTileIndex = 641; // Starting First column in the row.
-                    this.extractLables = [];
-                    var nextStagesCopy = this.nextStages.slice();
-                    
-                    //console.log('PORTAL LAYER',this.nextStagePortalLayer);
-
-                    // Add one extract hole spawn here if it exists.
-                    if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
-                        var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
-                        var extractImage = this.add.sprite(extractTile.pixelX + X_OFFSET, extractTile.pixelY + Y_OFFSET, 'extractHole.png' 
-                        ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
-                        extractTile.index = -1;
-
-                        this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
-                            "EXTRACT!", 
-                            16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(1);
-                        
-                        
-                        this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 11 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 22, 0x1a1a1a  
-                        ).setDepth(49).setAlpha(0);
-                        //debugger
-                        this.r3.postFX.addShine(1, .5, 5)
-                        this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
-
-                        this.extractHole.push(extractImage);
-                        this.extractLables.push(this.extractText,this.r3);
-
-                        this.tweens.add({
-                            targets: [this.r3,this.extractText],
-                            alpha: {from: 0, to: 1},
-                            ease: 'Sine.easeOutIn',
-                            duration: 50,
-                            delay: this.tweens.stagger(150)
-                        });
-                        
-                    }
-
-                    for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
-                        
-                        if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
-                            var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
-
-                        
+                switch (true) {
+                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                        if (this.map.getLayer('Next')) {
+                            this.nextStagePortalLayer.visible = true;
                             
-                            var stageRaw = nextStagesCopy.shift();
-                            var stageName = STAGES.get(stageRaw);
-                            if (stageName === undefined) { // Catches levels that are not in STAGES
-                                stageName = stageRaw;
-                            } 
-                            var dataName = `${stageName}.properties`;
-                            var data = this.cache.json.get(dataName);
-                        
-                            data.forEach( propObj => {
+                            var blackholeTileIndex = 641; // Starting First column in the row.
+                            this.extractLables = [];
+                            var nextStagesCopy = this.nextStages.slice();
+                            
+                            //console.log('PORTAL LAYER',this.nextStagePortalLayer);
+        
+                            // Add one extract hole spawn here if it exists.
+                            if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
+                                var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
+                                var extractImage = this.add.sprite(extractTile.pixelX + X_OFFSET, extractTile.pixelY + Y_OFFSET, 'extractHole.png' 
+                                ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
+                                extractTile.index = -1;
+        
+                                this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                                    "EXTRACT!", 
+                                    16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(1);
                                 
-                                if (propObj.name === 'slug') {
-
-                                    if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
-                                        tile.index = -1;
-                                        // Only removes levels that have unlock slugs.
-                                        // Easier to debug which levels don't have slugs formatted correctly.
-                                    }
-
+                                
+                                this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 11 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 22, 0x1a1a1a  
+                                ).setDepth(49).setAlpha(0);
+                                //debugger
+                                this.r3.postFX.addShine(1, .5, 5)
+                                this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
+        
+                                this.extractHole.push(extractImage);
+                                this.extractLables.push(this.extractText,this.r3);
+        
+                                this.tweens.add({
+                                    targets: [this.r3,this.extractText],
+                                    alpha: {from: 0, to: 1},
+                                    ease: 'Sine.easeOutIn',
+                                    duration: 50,
+                                    delay: this.tweens.stagger(150)
+                                });
+                                
+                            }
+        
+                            for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
+                                
+                                if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
+                                    var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
+        
+                                
                                     
-                                    // Easier to see when debugging with debugger in console.
-                                    stageName;
-                                    var temp = STAGE_UNLOCKS.get(propObj.value);
-                                    //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
-
-                                    var stageID = stageName.split("_")[1];
-                                    var hasPath = checkCanExtract(stageID);
-                                    
-                                    
-                                    var spawnOn;
-                                    if (!hasPath && this.mode === MODES.EXPERT) {
-                                        spawnOn = false;
-                                    } else {
-                                        spawnOn = true;
-                                    }
-                                   
-                                    
-
-                                    //debugger
-                                    if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) {
-                                        // Now we know the Stage is unlocked, so make the black hole tile.
+                                    var stageRaw = nextStagesCopy.shift();
+                                    var stageName = STAGES.get(stageRaw);
+                                    if (stageName === undefined) { // Catches levels that are not in STAGES
+                                        stageName = stageRaw;
+                                    } 
+                                    var dataName = `${stageName}.properties`;
+                                    var data = this.cache.json.get(dataName);
+                                
+                                    data.forEach( propObj => {
                                         
-                                        //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
-
-
-                                        //this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
-                                        //    "EXTRACT", 
-                                        //    16).setDepth(50).setAlpha(0);
-
-                                        var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
-                                            stageName.replaceAll("_", " ").toUpperCase(),
-                                            8).setOrigin(0.5,0.5).setDepth(50).setAlpha(0);
-                                    
-                                        
-                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
-                                        ).setDepth(49).setAlpha(0);
-
-                                        r1.postFX.addShine(1, .5, 5)
-                                        r1.setStrokeStyle(2, 0x4d9be6, 0.75);
-
-                                        
-                                        
-                                        var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
-                                        ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
-
-
-                                        
-
-                                        
-
-
-
-                                        //extractImage.playAfterRepeat('extractHoleClose');
-                                        
-                                        
-                                        //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
-                                        //this.cameras.main.postFX.addBarrel(this,-0.5);
-                                        //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
-                                        /*this.blackholes.forEach(blackholeImage =>{
-                                            this.cameras.main.postFX.addBarrel([.125]) 
-                                        })*/
-                                        
-                                        this.blackholes.push(blackholeImage);
-                                        
-                                        
-                                        this.blackholesContainer.add(this.blackholes);
-                                    
-
-                                        this.blackholeLabels.push(stageText,r1);
-                                        if (blackholeImage.anims.getName() === 'blackholeForm')
-                                            {
-                                                blackholeImage.playAfterRepeat('blackholeIdle');
+                                        if (propObj.name === 'slug') {
+        
+                                            if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
+                                                tile.index = -1;
+                                                // Only removes levels that have unlock slugs.
+                                                // Easier to debug which levels don't have slugs formatted correctly.
                                             }
-
-                                        //line code doesn't work yet
-                                        //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
-                                        //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
-                                        
-                                        if (BEST_OF_ALL.get(stageName) != undefined) {
-                                            switch (BEST_OF_ALL.get(stageName).stageRank()) {
-                                                case RANKS.WOOD:
-                                                    blackholeImage.setTint(0xB87333);
-                                                    break;
-                                                case RANKS.BRONZE:
-                                                    blackholeImage.setTint(0xCD7F32);
-                                                    break;
-                                                case RANKS.SILVER:
-                                                    blackholeImage.setTint(0xC0C0C0);
-                                                    break;
-                                                case RANKS.GOLD:
-                                                    blackholeImage.setTint(0xDAA520);
-                                                    break;
-                                                case RANKS.PLATINUM:
-                                                    blackholeImage.setTint(0xE5E4E2);
-                                                    break;
-                                                case RANKS.GRAND_MASTER:
-                                                    blackholeImage.setTint(0xE5E4E2);
-                                                    break;
-                                                default:
-                                                    // here is if you have never played a level before
-                                                    blackholeImage.setTint(0xFFFFFF);    
-                                                    break;
+        
+                                            
+                                            // Easier to see when debugging with debugger in console.
+                                            stageName;
+                                            var temp = STAGE_UNLOCKS.get(propObj.value);
+                                            //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
+        
+                                            var stageID = stageName.split("_")[1];
+                                            var hasPath = checkCanExtract(stageID);
+                                            
+                                            
+                                            var spawnOn;
+                                            if (!hasPath && this.mode === MODES.EXPERT) {
+                                                spawnOn = false;
+                                            } else {
+                                                spawnOn = true;
                                             }
-                                        } else {
-                                            blackholeImage.setTint(0xFFFFFF);
-                                        }
-
-                                        if (this.stage === "World_0-1" && this.mode === MODES.CLASSIC) {
-                                            switch (true) {
-                                                case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
-                                                    if (stageName === STAGES.get("1-1")) {
-                                                        blackholeImage.postFX.addShine(1, .5, 5);
-                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                        
-                                                    }
-                                                    break;
-                                                case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
-                                                    if (stageName === STAGES.get("2-1")) {
-                                                        blackholeImage.postFX.addShine(1, .5, 5);
-                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                    }
-                                                    break;
-                                                case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
-                                                    if (stageName === STAGES.get("4-1")) {
-                                                        blackholeImage.postFX.addShine(1, .5, 5);
-                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                    }
-                                                    break;
-                                                case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
-                                                    if (stageName === STAGES.get("8-1")) {
-                                                        blackholeImage.postFX.addShine(1, .5, 5);
-                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                    }
-                                                    break;
-                                                case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
-                                                    if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
-                                                        blackholeImage.postFX.addShine(1, .5, 5);
-                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                    }
-                                                    if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
-                                                        blackholeImage.postFX.addShine(1, .5, 5);
-                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                    }     
+                                           
+                                            
+        
+                                            //debugger
+                                            if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) {
+                                                // Now we know the Stage is unlocked, so make the black hole tile.
                                                 
-                                                    break;
+                                                //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
+        
+        
+                                                //this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                                                //    "EXTRACT", 
+                                                //    16).setDepth(50).setAlpha(0);
+        
+                                                var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
+                                                    stageName.replaceAll("_", " ").toUpperCase(),
+                                                    8).setOrigin(0.5,0.5).setDepth(50).setAlpha(0);
                                             
-                                                default:
-                                                    break;
+                                                
+                                                var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
+                                                ).setDepth(49).setAlpha(0);
+        
+                                                r1.postFX.addShine(1, .5, 5)
+                                                r1.setStrokeStyle(2, 0x4d9be6, 0.75);
+        
+                                                
+                                                
+                                                var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                                ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+        
+        
+                                                
+        
+                                                
+        
+        
+        
+                                                //extractImage.playAfterRepeat('extractHoleClose');
+                                                
+                                                
+                                                //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+                                                //this.cameras.main.postFX.addBarrel(this,-0.5);
+                                                //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
+                                                /*this.blackholes.forEach(blackholeImage =>{
+                                                    this.cameras.main.postFX.addBarrel([.125]) 
+                                                })*/
+                                                
+                                                this.blackholes.push(blackholeImage);
+                                                
+                                                
+                                                this.blackholesContainer.add(this.blackholes);
+                                            
+        
+                                                this.blackholeLabels.push(stageText,r1);
+                                                if (blackholeImage.anims.getName() === 'blackholeForm')
+                                                    {
+                                                        blackholeImage.playAfterRepeat('blackholeIdle');
+                                                    }
+        
+                                                //line code doesn't work yet
+                                                //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
+                                                //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
+                                                
+                                                if (BEST_OF_ALL.get(stageName) != undefined) {
+                                                    switch (BEST_OF_ALL.get(stageName).stageRank()) {
+                                                        case RANKS.WOOD:
+                                                            blackholeImage.setTint(0xB87333);
+                                                            break;
+                                                        case RANKS.BRONZE:
+                                                            blackholeImage.setTint(0xCD7F32);
+                                                            break;
+                                                        case RANKS.SILVER:
+                                                            blackholeImage.setTint(0xC0C0C0);
+                                                            break;
+                                                        case RANKS.GOLD:
+                                                            blackholeImage.setTint(0xDAA520);
+                                                            break;
+                                                        case RANKS.PLATINUM:
+                                                            blackholeImage.setTint(0xE5E4E2);
+                                                            break;
+                                                        case RANKS.GRAND_MASTER:
+                                                            blackholeImage.setTint(0xE5E4E2);
+                                                            break;
+                                                        default:
+                                                            // here is if you have never played a level before
+                                                            blackholeImage.setTint(0xFFFFFF);    
+                                                            break;
+                                                    }
+                                                } else {
+                                                    blackholeImage.setTint(0xFFFFFF);
+                                                }
+        
+                                                if (this.stage === "World_0-1" && this.mode === MODES.CLASSIC) {
+                                                    switch (true) {
+                                                        case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
+                                                            if (stageName === STAGES.get("1-1")) {
+                                                                blackholeImage.postFX.addShine(1, .5, 5);
+                                                                blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                
+                                                            }
+                                                            break;
+                                                        case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
+                                                            if (stageName === STAGES.get("2-1")) {
+                                                                blackholeImage.postFX.addShine(1, .5, 5);
+                                                                blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                            }
+                                                            break;
+                                                        case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
+                                                            if (stageName === STAGES.get("4-1")) {
+                                                                blackholeImage.postFX.addShine(1, .5, 5);
+                                                                blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                            }
+                                                            break;
+                                                        case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
+                                                            if (stageName === STAGES.get("8-1")) {
+                                                                blackholeImage.postFX.addShine(1, .5, 5);
+                                                                blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                            }
+                                                            break;
+                                                        case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
+                                                            if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
+                                                                blackholeImage.postFX.addShine(1, .5, 5);
+                                                                blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                            }
+                                                            if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
+                                                                blackholeImage.postFX.addShine(1, .5, 5);
+                                                                blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                            }     
+                                                        
+                                                            break;
+                                                    
+                                                        default:
+                                                            break;
+                                                    }
+                                                    
+                                                }
+                                                
+                                                this.nextStagePortals.push(blackholeImage);
+                                                
+                                                this.add.particles(blackholeImage.x, blackholeImage.y, 'megaAtlas', {
+                                                    frame: ['portalParticle01.png'],
+                                                    color: [ 0xFFFFFF,0x000000],
+                                                    colorEase: 'quad.out',
+                                                    x:{min: -9 - 12, max: 24 + 12},
+                                                    y:{min: -9 - 12, max: 24 + 12},
+                                                    scale: {start: 1, end: .25},
+                                                    speed: 1,
+                                                    moveToX: 7,
+                                                    moveToY: 7,
+                                                    alpha:{start: 1, end: 0 },
+                                                    ease: 'Sine.easeOutIn',
+                                                }).setFrequency(667,[1]).setDepth(0);
+        
                                             }
+                                            else {
+                                                // Push false portal so index is correct on warp to next
+                                                this.nextStagePortals.push(undefined);
+                                            }
+                                             
+                                            this.tweens.add({
+                                                targets: this.blackholeLabels,
+                                                alpha: {from: 0, to: 1},
+                                                ease: 'Sine.easeOutIn',
+                                                duration: 50,
+                                                delay: this.tweens.stagger(150)
+                                            });
+        
                                             
                                         }
-                                        
-                                        this.nextStagePortals.push(blackholeImage);
-                                        
-                                        this.add.particles(blackholeImage.x, blackholeImage.y, 'megaAtlas', {
-                                            frame: ['portalParticle01.png'],
-                                            color: [ 0xFFFFFF,0x000000],
-                                            colorEase: 'quad.out',
-                                            x:{min: -9 - 12, max: 24 + 12},
-                                            y:{min: -9 - 12, max: 24 + 12},
-                                            scale: {start: 1, end: .25},
-                                            speed: 1,
-                                            moveToX: 7,
-                                            moveToY: 7,
-                                            alpha:{start: 1, end: 0 },
-                                            ease: 'Sine.easeOutIn',
-                                        }).setFrequency(667,[1]).setDepth(0);
-
-                                    }
-                                    else {
-                                        // Push false portal so index is correct on warp to next
-                                        this.nextStagePortals.push(undefined);
-                                    }
-                                     
-                                    this.tweens.add({
-                                        targets: this.blackholeLabels,
-                                        alpha: {from: 0, to: 1},
-                                        ease: 'Sine.easeOutIn',
-                                        duration: 50,
-                                        delay: this.tweens.stagger(150)
                                     });
-
+        
+                                    blackholeTileIndex++;
+                                }
+                            }
+                        }
+                        break;
+                
+                    case this.mode === MODES.GAUNTLET:
+                        var nextTile;
+                        if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
+                            nextTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
+                        } else { // There exists Stage Maps
+                            var spawnPoints = [];
+                            this.nextStagePortalLayer.forEachTile( tile => {
+                                if (tile.index > 640 && tile.index < 640 + 9) {
                                     
+                                    spawnPoints.push(tile);
                                 }
                             });
-
-                            blackholeTileIndex++;
+                            var nextTile = Phaser.Utils.Array.RemoveRandomElement(spawnPoints)
                         }
-                    }
-                } 
+                        
+                        var extractImage = this.add.sprite(nextTile.pixelX + X_OFFSET, nextTile.pixelY + Y_OFFSET, 'extractHole.png' 
+                        ).setDepth(10).setOrigin(0.4125,0.4125)
+                        if (ourPersist.gauntlet.length === 0) {
+                            extractImage.play('extractHoleIdle');
+                            this.extractHole.push(extractImage);
+                            
+                        } else {
+                            extractImage.play('blackholeForm');
+                            extractImage.playAfterRepeat('blackholeIdle');
+                            this.nextStagePortals.push(extractImage);
+                        }
+
+                        break;
+                    default:
+                        debugger // Leave this in as a safety break
+                        break;
+                }
+
+                // #region Layer: Next
+                 
             }
         }, this);
 
@@ -5257,7 +5414,7 @@ class GameScene extends Phaser.Scene {
 
 
         // Calculate this locally (FYI: This is the part that needs to be loaded before it can be displayed)
-        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${MODE_TEXT.get(this.mode)}`));       
+        var bestLogJSON = JSON.parse(localStorage.getItem(`${this.stageUUID}_best-${MODE_LOCAL.get(this.mode)}`));       
 
         if (bestLogJSON) {
             // is false if best log has never existed
@@ -5801,9 +5958,8 @@ class GameScene extends Phaser.Scene {
                 });
                 
                 //ourGameScene.capSparkSFX.play();
-                ourGameScene.CapSpark.play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
-                .setDepth(100)
-                ourGameScene.CapSpark.setVisible(true);
+                ourSpaceBoyScene.CapSpark.play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5);
+                ourSpaceBoyScene.CapSpark.setVisible(true);
             }
             
             if (timeLeft > SCORE_FLOOR) {
@@ -6502,23 +6658,23 @@ class GameScene extends Phaser.Scene {
 
                         ourPersist.cameras.main.scrollX = 0;
                         ourPersist.cameras.main.scrollY = 0;*/
-                        this.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
+                        ourSpaceBoy.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                         .setDepth(100);
                         
                         this.gState = GState.PLAY;
                 }
             });
             // atomic comet
-            this.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
-            this.atomComet.play('atomCometSpawn');
-            this.atomComet.chain(['atomCometIdle']);
+            ourSpaceBoy.atomComet.play('atomCometSpawn');
+            ourSpaceBoy.atomComet.chain(['atomCometIdle']);
 
 
             // rainbow electronFanfare
-            this.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+            ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
             .setDepth(100);
-            this.electronFanfare.play('electronFanfareForm');
+            ourSpaceBoy.electronFanfare.play('electronFanfareForm');
             
 
             // emit stars from electronFanfare
@@ -6528,7 +6684,7 @@ class GameScene extends Phaser.Scene {
                 alpha: { start: 1, end: 0 },
                 anim: 'starIdle',
                 lifespan: 1000,
-                follow: this.electronFanfare,
+                follow: ourSpaceBoy.electronFanfare,
             }).setFrequency(150,[1]).setDepth(1);
 
             ourGame.countDown.setAlpha(0);
@@ -6549,11 +6705,11 @@ class GameScene extends Phaser.Scene {
         });
 
         // Atomic Comet and Electron Fanfare Tween
-        if (this.electronFanfare) {
-            this.electronFanfare.on('animationcomplete', (animation, frame) => {
+        if (ourSpaceBoy.electronFanfare) {
+            ourSpaceBoy.electronFanfare.on('animationcomplete', (animation, frame) => {
                 if (animation.key === 'electronFanfareForm') {
                     this.tweens.add({
-                        targets: [this.electronFanfare,this.atomComet],
+                        targets: [ourSpaceBoy.electronFanfare,ourSpaceBoy.atomComet],
                         x: ourSpaceBoy.scoreFrame.getCenter().x -6,
                         y: ourSpaceBoy.scoreFrame.getCenter().y,
                         ease: 'Sine.easeIn',
@@ -6562,7 +6718,7 @@ class GameScene extends Phaser.Scene {
                             ourGame.countDown.setAlpha(1);
                             ourGame.countDown.x = X_OFFSET + GRID * 4 - 6;
                             ourGame.countDown.y = 3;
-                            this.atomComet.destroy();
+                            ourSpaceBoy.atomComet.destroy();
                         }
                     });
                             ourGame.countDown.setHTML('W1N');
@@ -6571,7 +6727,7 @@ class GameScene extends Phaser.Scene {
                     
             });
 
-            this.electronFanfare.chain(['electronFanfareIdle']);
+            ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
         }
 
         
@@ -6701,6 +6857,7 @@ class GameScene extends Phaser.Scene {
 
     // #region .extractPrompt(
     extractPrompt(){
+
         const ourGameScene = this.scene.get('GameScene');
         ourGameScene.extractMenuOn = true;
 
@@ -6732,6 +6889,7 @@ class GameScene extends Phaser.Scene {
     finalScore(nextScene, args){
         const ourStartScene = this.scene.get('StartScene');
         const spaceBoy = this.scene.get("SpaceBoyScene");
+        const persist = this.scene.get("PersistScene");
 
 
         //style
@@ -6752,10 +6910,10 @@ class GameScene extends Phaser.Scene {
         var windowCenterX = SCREEN_WIDTH/2;
         var extractHistory = [];
 
-        for (let index = 0; index < spaceBoy.stageHistory.length; index++) {
-            var id = spaceBoy.stageHistory[index].getID();
-            var _rank = spaceBoy.stageHistory[index].stageRank();
-            scoreCount += spaceBoy.stageHistory[index].calcTotal();
+        for (let index = 0; index < persist.stageHistory.length; index++) {
+            var id = persist.stageHistory[index].getID();
+            var _rank = persist.stageHistory[index].stageRank();
+            scoreCount += persist.stageHistory[index].calcTotal();
             extractRankSum += _rank;
             if (extractCode.length === 0) {
                 extractCode = id
@@ -6784,9 +6942,9 @@ class GameScene extends Phaser.Scene {
         }
 
 
-        var _x = windowCenterX - GRID * 6.5 + (spaceBoy.stageHistory.length) * xOffset;
+        var _x = windowCenterX - GRID * 6.5 + (persist.stageHistory.length) * xOffset;
 
-        var extractRank = extractRankSum / spaceBoy.stageHistory.length; 
+        var extractRank = extractRankSum / persist.stageHistory.length; 
 
         
 
@@ -6835,6 +6993,7 @@ class GameScene extends Phaser.Scene {
                         bestExtractions.set(extractCode, [...extractHistory]);
                         break;
                     default:
+                        debugger // Safety Break. Do not remove.
                         break;
                 }     
             }
@@ -6934,7 +7093,7 @@ class GameScene extends Phaser.Scene {
         
         var _totalScore = 0
 
-        this.scene.get("SpaceBoyScene").stageHistory.forEach( stageData => {
+        this.scene.get("PersistScene").stageHistory.forEach( stageData => {
             _totalScore += stageData.calcTotal();
         });
         _totalScore = Math.floor(_totalScore); //rounds down to whole number
@@ -6947,7 +7106,7 @@ class GameScene extends Phaser.Scene {
                 `${formattedScore}`
         ).setOrigin(0,0).setScale(0.5);
 
-        spaceBoy.stageHistory = []; // Empty Now
+        persist.stageHistory = []; // Empty Now
 
         //PRESS SPACE TO CONTINUE TEXT
         // Give a few seconds before a player can hit continue
@@ -6976,14 +7135,8 @@ class GameScene extends Phaser.Scene {
                 // Important: clear electronFanfare WITH destroy and setting to null.
                 // when restarting, if any instance of electronFanfare exists, it will error on level clear
                 // also called fron gameSceneCleanup() function, but imperative here too
-                if (ourGameScene.electronFanfare) {
-                    ourGameScene.electronFanfare.off('animationcomplete');
-                    ourGameScene.electronFanfare.destroy();
-                    ourGameScene.electronFanfare = null;
-                }
-                if (ourGameScene.CapSparkFinale) {
-                    ourGameScene.CapSparkFinale.destroy();
-                }
+
+              
                 ourGameScene.scene.get("PersistScene").coins = START_COINS;
                 ourGameScene.scene.start(nextScene, args); 
             }
@@ -7037,49 +7190,33 @@ class GameScene extends Phaser.Scene {
         
         
     }
-    gameSceneCleanup(cleanupType = 'full'){
+    gameSceneCleanup(){
         // TODO: event listener cleanup here
         // scene blur removal
-        const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+        const ourGameScene = this.scene.get('GameScene');
 
-        this.stageOutLine.destroy();
+        // Clear for reseting game
+        ourGameScene.events.off('addScore');
+        ourGameScene.events.off('spawnBlackholes');
+        ourGameScene.scene.get("InputScene").scene.restart();
 
-        if (cleanupType === 'half') {
-            if (this.electronFanfare) {
-                this.electronFanfare.destroy();
-                this.electronFanfare.off('animationcomplete');
-                this.electronFanfare = null;
-            }
-            if (this.CapSparkFinale) {
-                this.CapSparkFinale.destroy();
-            }
-        }
-        if (cleanupType === 'restart') {
-            ourSpaceBoy.panelArray.forEach( stageData => {
-                stageData.destroy();
-            });
-            ourSpaceBoy.panelArray = [];
-            console.log(this.panelCursorIndex)
-            this.panelCursorIndex = 0;
-            if (this.electronFanfare) {
-                this.electronFanfare.destroy();
-                this.electronFanfare.off('animationcomplete');
-                this.electronFanfare = null;
-            }
-            if (this.CapSparkFinale) {
-                this.CapSparkFinale.destroy();
-            }
-            ourSpaceBoy.scene.restart();
-        }
-        if (cleanupType === 'full') {
-            ourSpaceBoy.mapProgressPanelText.setText('SHIP LOG')
-            ourSpaceBoy.panelArray.forEach( stageData => {
-                stageData.destroy();
-            });
-            ourSpaceBoy.panelArray = [];
+        while (ourSpaceBoy.navLog.length > 0) {
+            var log = ourSpaceBoy.navLog.pop();
+            log.destroy();
+            log = null;
         }
 
+    }
+    gameSceneFullCleanup() {
+        // Put end of run clean up loop.
+        //while (ourSpaceBoy.navLog.length > 0) {
+        //    var log = ourSpaceBoy.navLog.pop();
+        //    log.destroy();
+        //    log = null;
+        //}
+
+        this.gameSceneCleanup();
     }
     
  
@@ -7090,7 +7227,6 @@ class GameScene extends Phaser.Scene {
         this.gState = GState.TRANSITION;
 
         this.scoreTweenShow();
-        this.stageOutLine.destroy();
         this.snake.head.setTexture('snakeDefault', 0);
 
         if (this.helpPanel) {
@@ -7220,6 +7356,7 @@ class GameScene extends Phaser.Scene {
             alpha: {from: 5, to: 0},
             rotation: 5,
             onDelay: () =>{
+                
                 if (allTheThings.length > 150) {
                     blackholeTween.timeScale += .04;
                 }
@@ -7232,6 +7369,7 @@ class GameScene extends Phaser.Scene {
                 }
             },
             onComplete: () =>{
+                
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -7247,16 +7385,32 @@ class GameScene extends Phaser.Scene {
                     ease: 'Sine.In',
                     delay: 500,
                     onComplete: () =>{
-                        var nextStageRaw = this.nextStages[nextStageIndex];
-                        if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
-
-                            this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                        switch (true) {
+                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                                var nextStageRaw = this.nextStages[nextStageIndex];
+                                if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
+        
+                                    this.nextStage(this.nextStages[nextStageIndex], camDirection);
+                                    
+                                } else {
+                                    this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                                }
+                                //setting this to visible is less noticible than leaving it blank for a frame
+                                ourPersist.comboCover.setVisible(true);
+                                break;
+                            case this.mode === MODES.GAUNTLET:
+                                var nextStageID = ourPersist.gauntlet.shift();
+                                this.nextStage(STAGES.get(nextStageID), camDirection);
+                                // TODO Save best Gauntlet score to localData also SAVE on GAMEOVER
+                                // TODO HANDLE GAUNTLET IN SCORE SCREEN
                             
-                        } else {
-                            this.nextStage(STAGES.get(this.nextStages[nextStageIndex]), camDirection);
+                                break;
+                            default:
+                                debugger // Leave for safety break
+                                break;
                         }
-                        //setting this to visible is less noticible than leaving it blank for a frame
-                        ourPersist.comboCover.setVisible(true);
+                        this.gameSceneCleanup();
+
                     }
                 });
             }
@@ -7413,36 +7567,10 @@ class GameScene extends Phaser.Scene {
         
     }
 
-    nextStage(stageName,camDirection) {
+    nextStage(stageName, camDirection) {
         const ourInputScene = this.scene.get("InputScene");
         this.camDirection = camDirection
 
-        
-        //console.log(STAGE_UNLOCKS['start'].call());
-        //console.log(STAGE_UNLOCKS['babies-first-wall'].call());
-
-        // #region Check Unlocked
-        //*
-        
-        var unlockedLevels = [];
-        
-        
-
-        var nextStage = "";
-        if (unlockedLevels.length > 0 ) {
-            nextStage = Phaser.Math.RND.pick(unlockedLevels);
-        } else {
-            /**
-             * If a slug is not set up properly it will try to load the next 
-             * directly from the Tiled map properties.
-             */
-            nextStage = Phaser.Math.RND.pick(this.nextStages);
-        }
-
-
-
-        
-    
         this.scene.restart( { 
             stage: stageName, 
             score: this.nextScore, 
@@ -7451,14 +7579,6 @@ class GameScene extends Phaser.Scene {
             camDirection: this.camDirection,
             mode: this.scene.get("PersistScene").mode,
         });
-        ourInputScene.scene.restart();
-
-        // Mainmenu Code @holden
-        //ourMainMenuScene.scene.restart( {
-        //    startingAnimation: "menuReturn"
-        //});
-
-
     }
 
     scoreTweenShow(){
@@ -7713,9 +7833,7 @@ class GameScene extends Phaser.Scene {
             this.gState = GState.TRANSITION;
             this.snake.direction = DIRS.STOP;
             this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
-            this.events.off('addScore');
-            this.events.off('spawnBlackholes');
-            this.scene.get("InputScene").scene.restart();
+            this.gameSceneCleanup();
             this.gameOver();
 
         }
@@ -8332,13 +8450,13 @@ class ScoreScene extends Phaser.Scene {
 
 
 
-        var tempStageHistory = [...this.scene.get("SpaceBoyScene").stageHistory, this.stageData];
-        console.log("STAGE HISTORY: MID SCORE SCREEN.", this.scene.get("SpaceBoyScene").stageHistory, this.stageData);
+        var tempStageHistory = [...this.scene.get("PersistScene").stageHistory, this.stageData];
+        console.log("STAGE HISTORY: MID SCORE SCREEN.", this.scene.get("PersistScene").stageHistory, this.stageData);
     
 
         // #region Save Best To Local.
 
-        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`));
+        var bestLogRaw = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`));
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
@@ -8357,7 +8475,7 @@ class ScoreScene extends Phaser.Scene {
 
             
             if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
-                localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`, JSON.stringify(this.stageData));
+                localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`, JSON.stringify(this.stageData));
             }
             
         }
@@ -8374,8 +8492,8 @@ class ScoreScene extends Phaser.Scene {
         // Pre Calculate needed values
         var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
 
-        if (localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`)) {
-            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_TEXT.get(ourGame.mode)}`));
+        if (localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`)) {
+            var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`));
 
         } else {
             // If a test level. Use World 0_1 as a filler to not break UI stuff.
@@ -8813,13 +8931,11 @@ class ScoreScene extends Phaser.Scene {
             ease: 'linear',
             delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
             onComplete: () => {
-                letterRank.setAlpha(1)
-                //stageScoreUI.setAlpha(1)
-                //this.scorePanelLRank.setAlpha(1)
-                this.bestOfModeUI.setAlpha(1);
-                this.sumOfBestUI.setAlpha(1);
-                this.stagesCompleteUI.setAlpha(1);
-                this.playerRankUI.setAlpha(1);
+                letterRank.setAlpha(1);
+
+                modeScoreContainer.each( item => {
+                    item.setAlpha(1);
+                });
 
                 if(ourGame.mode === MODES.EXPERT) {
                     ourPersist.coins += this.stageData.stageRank();
@@ -9237,120 +9353,152 @@ class ScoreScene extends Phaser.Scene {
 
 
     
+        // important updates interal variables 
         updateSumOfBest(ourPersist);
-        var prevStagesComplete;
-        var prevSumOfBest;
-        var prevPlayerRank;
 
-        var totalLevels;
-        var newRank;
-        var stagesComplete;
-        var sumOfBest;
+        var modeScoreContainer = this.add.container();
 
-        switch (ourGame.mode) {
-            case MODES.CLASSIC:
-                prevStagesComplete = ourPersist.prevStagesCompleteClassic;
-                prevSumOfBest = ourPersist.prevSumOfBestClassic;
-                prevPlayerRank = ourPersist.prevPlayerRankClassic;
+        switch (true) {
+            case ourGame.mode === MODES.CLASSIC 
+                || ourGame.mode === MODES.EXPERT
+                || ourGame.mode === MODES.TUTORIAL:
+                // #region Adventure
+                var prevStagesComplete;
+                var prevSumOfBest;
+                var prevPlayerRank;
 
-                totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
-                newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
-                stagesComplete = ourPersist.stagesCompleteClassic;
-                sumOfBest = ourPersist.sumOfBestClassic;
+                var totalLevels;
+                var newRank;
+                var stagesComplete;
+                var sumOfBest;
+
+                switch (ourGame.mode) {
+                    case MODES.CLASSIC:
+                        prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                        prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                        prevPlayerRank = ourPersist.prevPlayerRankClassic;
+
+                        totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+                        stagesComplete = ourPersist.stagesCompleteClassic;
+                        sumOfBest = ourPersist.sumOfBestClassic;
+                        
+                        break;
+                    case MODES.EXPERT:
+                        prevStagesComplete = ourPersist.prevStagesCompleteExpert;
+                        prevSumOfBest = ourPersist.prevSumOfBestExpert;
+                        prevPlayerRank = ourPersist.prevPlayerRankExpert;
+
+                        totalLevels = BEST_OF_CLASSIC.size;
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
+                        stagesComplete = ourPersist.stagesCompleteExpert;
+                        sumOfBest = ourPersist.sumOfBestExpert;
+                        break;
+                    
+                    case MODES.TUTORIAL:
+                        prevStagesComplete = ourPersist.prevStagesCompleteTut;
+                        prevSumOfBest = ourPersist.prevSumOfBestTut;
+                        prevPlayerRank = ourPersist.prevPlayerRankTut;
+
+                        totalLevels = Math.min(ourPersist.stagesCompleteTut + Math.ceil(ourPersist.stagesCompleteTut / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestTut);
+                        stagesComplete = ourPersist.stagesCompleteTut;
+                        sumOfBest = ourPersist.sumOfBestTut;
+                        break
+                    
+                    default:
+                        // Leave this one as a safety trigger
+                        debugger 
+                        break;
+                }
+
+                
+                var bestOfTitle;
+                if (ourGame.mode === MODES.EXPERT) {
+                    bestOfTitle = `Best of Expert`
+                } else {
+                    bestOfTitle = ``;
+                }
+                
+                if (prevStagesComplete < stagesComplete) {
+                    var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
+                } else {
+                    var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels}`
+                }
+
+                if (prevSumOfBest < sumOfBest) {
+                    var bestIncrease = sumOfBest - prevSumOfBest;
+                    var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
+                } else {
+                    var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span>`
+                }
+
+                if (prevPlayerRank > newRank) {
+
+                    var rankIncrease = prevPlayerRank - newRank;
+                    var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
+                } else {
+                    var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
+                }
+
+                this.bestOfModeUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize":'20px',
+                    "font-weight": '400',
+                    "text-shadow": '#000000 1px 0 6px',
+                    //"font-style": 'italic',
+                    //"font-weight": 'bold',
+                    })).setHTML(
+                        bestOfTitle
+                ).setOrigin(0,0).setScale(0.5).setAlpha(0);
+                
+                this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize":'20px',
+                    "font-weight": '400',
+                    "text-shadow": '#000000 1px 0 6px',
+                    //"font-style": 'italic',
+                    //"font-weight": 'bold',
+                    })).setHTML(
+                        stageCompleteContents
+                ).setOrigin(0,0).setScale(0.5).setAlpha(0);
+                
+                this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize":'20px',
+                    "font-weight": '400',
+                    "text-shadow": '#000000 1px 0 6px',
+                    //"font-style": 'italic',
+                    //"font-weight": 'bold',
+                    })).setHTML(
+                        sumBestContent
+                ).setOrigin(0,0).setScale(0.5).setAlpha(0);
+
+                this.playerRankUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 23.25, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    "fontSize":'20px',
+                    "font-weight": '400',
+                    "text-shadow": '#000000 1px 0 6px',
+                    //"font-style": 'italic',
+                    //"font-weight": 'bold',
+                    })).setHTML( // % ‰ ‱
+                        rankContent
+                ).setOrigin(0,0).setScale(0.5).setAlpha(0);
+                // #endregion
+
+                modeScoreContainer.add([
+                    this.bestOfModeUI, this.sumOfBestUI, this.stagesCompleteUI, this.playerRankUI
+                ]);
                 
                 break;
-            case MODES.EXPERT:
-                prevStagesComplete = ourPersist.prevStagesCompleteExpert;
-                prevSumOfBest = ourPersist.prevSumOfBestExpert;
-                prevPlayerRank = ourPersist.prevPlayerRankExpert;
-
-                totalLevels = BEST_OF_CLASSIC.size;
-                newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
-                stagesComplete = ourPersist.stagesCompleteExpert;
-                sumOfBest = ourPersist.sumOfBestExpert;
-                
+            case ourGame.mode === MODES.GAUNTLET:
                 break;
         
             default:
-                // Leave this one. Something is wrong if this triggers.
-                debugger 
+                debugger // Safety break. Keep this
                 break;
         }
 
+
+
         
-        var bestOfTitle;
-        if (ourGame.mode === MODES.EXPERT) {
-            bestOfTitle = `Best of Expert`
-        } else {
-            bestOfTitle = ``;
-        }
-        
-        if (prevStagesComplete < stagesComplete) {
-            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels} + <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">1</span>`
-        } else {
-            var stageCompleteContents = `STAGES COMPLETE : ${commaInt(stagesComplete)} / ${totalLevels}`
-        }
-
-        if (prevSumOfBest < sumOfBest) {
-            var bestIncrease = sumOfBest - prevSumOfBest;
-            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
-        } else {
-            var sumBestContent = `SUM OF BEST : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span>`
-        }
-
-        if (prevPlayerRank > newRank) {
-
-            var rankIncrease = prevPlayerRank - newRank;
-            var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
-        } else {
-            var rankContent = `PLAYER RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
-        }
-
-        this.bestOfModeUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize":'20px',
-            "font-weight": '400',
-            "text-shadow": '#000000 1px 0 6px',
-            //"font-style": 'italic',
-            //"font-weight": 'bold',
-            })).setHTML(
-                bestOfTitle
-        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
-        
-        this.stagesCompleteUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *21.25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize":'20px',
-            "font-weight": '400',
-            "text-shadow": '#000000 1px 0 6px',
-            //"font-style": 'italic',
-            //"font-weight": 'bold',
-            })).setHTML(
-                stageCompleteContents
-        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
-        
-        this.sumOfBestUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize":'20px',
-            "font-weight": '400',
-            "text-shadow": '#000000 1px 0 6px',
-            //"font-style": 'italic',
-            //"font-weight": 'bold',
-            })).setHTML(
-                sumBestContent
-        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
-
-        this.playerRankUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID * 23.25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize":'20px',
-            "font-weight": '400',
-            "text-shadow": '#000000 1px 0 6px',
-            //"font-style": 'italic',
-            //"font-weight": 'bold',
-            })).setHTML( // % ‰ ‱
-                rankContent
-        ).setOrigin(0,0).setScale(0.5).setAlpha(0);
-
-        // #region Help Card
-        /*var card = this.add.image(SCREEN_WIDTH/2, 19*GRID, 'helpCard02').setDepth(10);
-        card.setOrigin(0.5,0); 
-        card.displayHeight = 108;*/
-
+        // #region TOTAL SCORE
         var totalScore = 0;
 
 
@@ -9358,7 +9506,6 @@ class ScoreScene extends Phaser.Scene {
             totalScore += stageData.calcTotal();
         });
 
-        // #endregion
         /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
             width: '500px',
             'font-size':'22px',
@@ -9420,6 +9567,9 @@ class ScoreScene extends Phaser.Scene {
         
         //this.scene.stop();
 
+        // END
+        // #region prev tracker
+
         ourPersist.prevSumOfBestClassic = ourPersist.sumOfBestClassic;
         ourPersist.prevStagesCompleteClassic = ourPersist.stagesCompleteClassic;
         ourPersist.prevPlayerRankClassic = calcSumOfBestRank(ourPersist.sumOfBestClassic);
@@ -9428,7 +9578,9 @@ class ScoreScene extends Phaser.Scene {
         ourPersist.prevStagesCompleteExpert = ourPersist.stagesCompleteExpert;
         ourPersist.prevPlayerRankExpert = calcSumOfBestRank(ourPersist.sumOfBestExpert);
 
-
+        ourPersist.prevSumOfBestTut = ourPersist.sumOfBestTut;
+        ourPersist.prevStagesCompleteTut = ourPersist.stagesCompleteTut;
+        ourPersist.prevPlayerRankTut = calcSumOfBestRank(ourPersist.sumOfBestTut);
 
 
         // Give a few seconds before a player can hit continue
@@ -9534,12 +9686,9 @@ class ScoreScene extends Phaser.Scene {
                     extraFields.toString(),
                     );
                 
-                    // Event listeners need to be removed manually
-                // Better if possible to do this as part of UIScene clean up
-                // As the event is defined there, but this works and its' here. - James
+                
+                // Turns off score post score screen.
                 ourGame.events.off('addScore');
-                ourGame.events.off('spawnBlackholes');
-                ourGame.scene.get("InputScene").scene.restart();
 
 
                 ourGame.backgroundBlur(false);
@@ -10614,9 +10763,10 @@ var config = {
     
     scene: [ StartScene, 
         MainMenuScene, QuickMenuScene, GalaxyMapScene, 
-        PersistScene, SpaceBoyScene, GameScene, 
-        InputScene, ScoreScene, TutorialScene,
-        StageCodex, ExtractTracker]
+        PersistScene, TutorialScene,
+        GameScene, InputScene, ScoreScene, 
+        StageCodex, ExtractTracker,
+        SpaceBoyScene, PinballDisplayScene, PlinkoMachineScene, MusicPlayerScene]
 };
 
 // #region Screen Settings

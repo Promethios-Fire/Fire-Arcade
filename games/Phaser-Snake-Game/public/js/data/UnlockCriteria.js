@@ -118,6 +118,54 @@ export const EXTRACT_CODES = [
     
 ];
 
+export const GAUNTLET_CODES = new Map([
+    ["Easy Gauntlet", {
+        checkUnlock: function () {
+            return checkRankGlobal(STAGES.get("2-4"), RANKS.WOOD);
+        },
+        stages: "1-3|2-3|2-4|2-2|1-3|2-3|2-4", //"1-1|2-1|1-2|2-2|1-3|2-3|2-4"
+        startingCoins: 24,
+    }],
+    ["Oops! All Ones", {
+        checkUnlock: function () {
+            var checkLevels = [
+                STAGES.get("1-1"), STAGES.get("2-1"), STAGES.get("3-1"),
+                STAGES.get("4-1"), STAGES.get("5-1"), STAGES.get("8-1"),
+                STAGES.get("9-2"), STAGES.get("10-2"),
+            ];
+            var pass = checkLevels.every(stage => {
+                return checkRankGlobal(stage, RANKS.WOOD);
+            });
+            return pass;
+            //return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
+        },
+        stages: "1-1|2-1|3-1|4-1|5-1|8-1|9-2|10-2",
+        startingCoins: 1,
+    }],
+    ["Tutorial Is Over -- Marathon", {
+        checkUnlock: function () {
+            return true;
+            //return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
+        },
+        stages: "0-1|1-1|1-2|1-3|2-1|2-2|2-3|4-1|4-2|4-3|8-1|8-2|8-4|9-2|9-3|9-4|10-2|10-3|10-4",
+        startingCoins: 36,
+    }],
+    ["Extra Worlds", {
+        checkUnlock: function () {
+            return checkRankGlobal(STAGES.get("5-4"), RANKS.WOOD);
+        },
+        stages: "5-1|3-1|5-2|3-2|5-3|3-3|5-4",
+        startingCoins: 20,
+    }],
+    ["Hardest Only -- 0 Lives", {
+        checkUnlock: function () {
+            return checkRankGlobal(STAGES.get("4-5"), RANKS.WOOD);
+        },
+        stages: "4-5|9-4|10-4",
+        startingCoins: 0,
+    }],
+]);
+
 /* Template
         ['', function () { 
         return checkRank.call(this,"", RANKS.WOOD)}],

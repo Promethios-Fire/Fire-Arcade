@@ -78,9 +78,9 @@ export var QUICK_MENUS = new Map([
                 ourPersist.loseCoin();
                 
                 // Clear for reseting game
-                ourGameScene.events.off('addScore');
-                ourGameScene.events.off('spawnBlackholes');
-                ourGameScene.scene.get("InputScene").scene.restart();
+                //ourGameScene.events.off('addScore');
+                //ourGameScene.events.off('spawnBlackholes');
+                //ourGameScene.scene.get("InputScene").scene.restart();
 
                 var previous = ourGameScene.scene.get("SpaceBoyScene").stageHistory.pop();
                 if (previous != undefined) {
@@ -99,11 +99,10 @@ export var QUICK_MENUS = new Map([
                     mode: ourPersist.mode
                     //lives: this.lives 
                 });
-                ourSpaceBoy.shiftLight1.setAlpha(0);
-                ourSpaceBoy.shiftLight2.setAlpha(0);
-                ourSpaceBoy.shiftLight3.setAlpha(0);
+
+                ourGameScene.gameSceneCleanup();
             }
-            ourGameScene.gameSceneCleanup('half');
+            
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
@@ -113,27 +112,22 @@ export var QUICK_MENUS = new Map([
         ['BACK TO MAIN MENU', function () {
             const ourGameScene = this.scene.get("GameScene");
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-
             const ourPersist = this.scene.get("PersistScene");
             
             console.log("BACK TO MAIN MENU");
-            // Clear for reseting game
-
-            ourGameScene.events.off('addScore');
-            ourGameScene.events.off('spawnBlackholes');
-            ourGameScene.scene.get("InputScene").scene.restart();
+            
+            ourGameScene.gameSceneCleanup();
             
             ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
+            debugger
             ourGameScene.gameSceneCleanup();
+
             ourGameScene.scene.start("MainMenuScene");
             
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
-            ourSpaceBoy.shiftLight1.setAlpha(0);
-            ourSpaceBoy.shiftLight2.setAlpha(0);
-            ourSpaceBoy.shiftLight3.setAlpha(0);
             this.scene.stop(); 
             return true;
         }],
@@ -145,13 +139,10 @@ export var QUICK_MENUS = new Map([
 
 
             // Clear for reseting game
-            ourGameScene.events.off('addScore');
-            ourGameScene.events.off('spawnBlackholes');
-            //ourGameScene.electronFanfare.off('animationcomplete');
-            ourGameScene.scene.get("InputScene").scene.restart();
+            ourGameScene.gameSceneCleanup();
             
             ourGameScene.backgroundBlur(false);
-            ourGameScene.gameSceneCleanup('restart');
+            
             // Restart  
             ourGameScene.scene.start("GameScene", {
                 stage: START_STAGE,
@@ -162,9 +153,6 @@ export var QUICK_MENUS = new Map([
 
             this.scene.get("StageCodex").scene.stop();
             this.scene.get("ExtractTracker").scene.stop();
-            ourSpaceBoy.shiftLight1.setAlpha(0);
-            ourSpaceBoy.shiftLight2.setAlpha(0);
-            ourSpaceBoy.shiftLight3.setAlpha(0);
 
             this.scene.stop(); 
             return true;

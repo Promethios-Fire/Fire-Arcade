@@ -26,6 +26,10 @@ var Snake = new Phaser.Class({
         
         this.body.unshift(this.head);
 
+        //if (coins 0) {
+        //    
+        //}
+
         this.lastPlayedCombo = 0;
         this.lastPortal = undefined; // Set
         this.closestPortal = undefined; // TYPE Portal.
@@ -339,10 +343,10 @@ var Snake = new Phaser.Class({
                     scene.portals.forEach(portal => {
                         portal.portalHighlight.visible = false;
                     });
-                    
+
                     //portal.snakePortalingSprite.visible = false;
                     //portal.targetObject.snakePortalingSprite.visible = false;
-                    scene.scene.get("SpaceBoyScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
                     scene.warpToNext(index);
                 }
 
@@ -352,8 +356,9 @@ var Snake = new Phaser.Class({
                 if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
                     console.log('WOO')
                     //scene.finalScore();
-                    scene.scene.get("SpaceBoyScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                    scene.extractPrompt();
+                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                    debugger // TODO Extract Prompt needs to handle Gauntlet Mode.
+                    scene.extractPrompt(); // Maybe higher function that determines which to call.
                 }
             }
 
@@ -440,6 +445,10 @@ var Snake = new Phaser.Class({
         
         this.direction = DIRS.STOP;
         scene.screenShake();
+
+        if (ourPersistScene.coins === 0) {
+            // tween.
+        }
 
         if (!scene.stopOnBonk) {
 
