@@ -5747,9 +5747,9 @@ class GameScene extends Phaser.Scene {
             //.setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
         this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 2, GRID * 7, 'mainFont', ``, 8)
-        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 29.25) + 2, GRID * 7, 'mainFont', ``, 8)
-        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
         //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
  
@@ -5761,10 +5761,10 @@ class GameScene extends Phaser.Scene {
         if (this.lengthGoal != 0) {
             this.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
-            ).setOrigin(0,0).setAlpha(1);
+            ).setOrigin(0,0).setAlpha(0);
             this.lengthGoalUILabel.setText(
             `LENGTH\nGOAL`
-            ).setOrigin(0,0).setAlpha(1);
+            ).setOrigin(0,0).setAlpha(0);
             this.lengthGoalUILabel.setLineSpacing(3)
             this.lengthGoalUI.setLineSpacing(3)
         }
@@ -6097,7 +6097,8 @@ class GameScene extends Phaser.Scene {
             
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
-                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                    //targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer],
                     alpha: 1,
                     duration: 300,
                     ease: 'sine.inout',
