@@ -23,9 +23,28 @@ var Snake = new Phaser.Class({
 
         this.previous = [];
 
-        
         this.body.unshift(this.head);
+        this.bodyVisualTween = scene.tweens.addCounter({
+            from: 255,
+            to: 0,
+            yoyo: true,
+            duration: 500,
+            ease: 'Linear',
+            repeat: -1,
+            onUpdate: tween =>{
+                const value = Math.floor(tween.getValue());
+                const color1 = Phaser.Display.Color.RGBToString(200, value, value);
+                //scene.coinUIText.node.style.color = color1;
+                this.body.forEach((part) => {
+                    part.setTint(Phaser.Display.Color.GetColor(200, value, value));
+                });
+            }
+        });
 
+        if (scene.scene.get("PersistScene").coins > 0) {
+            this.bodyVisualTween.pause();
+        }
+        
         //if (coins 0) {
         //    
         //}
@@ -445,12 +464,15 @@ var Snake = new Phaser.Class({
     // #region Bonk()
     bonk: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
+        const musicPlayer = scene.scene.get('MusicPlayerScene');
         
         this.direction = DIRS.STOP;
         scene.screenShake();
 
-        if (ourPersistScene.coins === 0) {
-            // tween.
+        if (ourPersistScene.coins === 1) {
+            debugger
+            musicPlayer.nextSong(`track_175`);
+            this.bodyVisualTween.resume();
         }
 
         if (!scene.stopOnBonk) {

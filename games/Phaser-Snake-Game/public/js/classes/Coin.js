@@ -40,11 +40,21 @@ var Coin = new Phaser.Class({
         scene.coinSound.play();
         //this.snakeCritical = false;
 
+        if (ourPersistScene.coins === 0) {
+            scene.scene.get("MusicPlayerScene").music.stop();
+            scene.scene.get("MusicPlayerScene").nextSong();
+            scene.snake.bodyVisualTween.pause();
+            scene.snake.body.forEach((part) => {
+                part.clearTint();
+            });
+        }
+
         ourPersistScene.coins += 1;
         PLAYER_STATS.totalCoinsCollected += 1;
         if (ourPersistScene.coins > 0) {
-            scene.coinsUIIcon.setVisible(true)
+            scene.coinsUIIcon.setVisible(true);
         }
+
         scene.coinUIText.setHTML(
             `${commaInt(ourPersistScene.coins).padStart(2, '0')}`
         )

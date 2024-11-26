@@ -123,7 +123,7 @@ export const GAUNTLET_CODES = new Map([
         checkUnlock: function () {
             return checkRankGlobal(STAGES.get("2-4"), RANKS.WOOD);
         },
-        stages: "1-3|2-3|2-4|2-2|1-3|2-3|2-4", //"1-1|2-1|1-2|2-2|1-3|2-3|2-4"
+        stages: "1-1|2-1|1-2|2-2|1-3|2-3|2-4", //"1-1|2-1|1-2|2-2|1-3|2-3|2-4"
         startingCoins: 24,
     }],
     ["Oops! All Ones", {
