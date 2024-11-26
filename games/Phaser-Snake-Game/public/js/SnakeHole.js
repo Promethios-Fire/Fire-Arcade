@@ -686,7 +686,35 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     create() {
 
-        
+        this.soundManager = this.sound;       
+        // Create an invisible interactive zone 
+        this.volumeControlZone = this.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
+             24, 36).setInteractive().setOrigin(0,0);
+
+        // debugging bounding box
+        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.volumeControlZone);
+
+        // is mouse hovering over volume wheel?
+        this.isVolumeControlActive = false;
+
+        this.volumeControlZone.on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+            this.isVolumeControlActive = true;
+        });
+        this.volumeControlZone.on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+            this.isVolumeControlActive = false
+        }); 
+
+        // Listen for mouse wheel events
+        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+            if (this.isVolumeControlActive){
+                const volumeChange = deltaY > 0 ? -0.1 : 0.1;
+                this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
+                console.log(`Volume: ${this.soundManager.volume}`);
+            }
+        });
+
         var columnX = X_OFFSET + GRID * 36;
         
         this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
@@ -731,7 +759,20 @@ class MusicPlayerScene extends Phaser.Scene {
             nextButton.setFrame(2);
             
         }, this);
-        
+
+        // checks whether cursor is over any button and then changes cursor
+        function setupButtonCursor(button, scene) {
+            button.on('pointerover', () => {
+                scene.input.setDefaultCursor('pointer');
+            });
+            button.on('pointerout', () => {
+                scene.input.setDefaultCursor('default');
+            });
+        }
+        setupButtonCursor(loopButton, this);
+        setupButtonCursor(nextButton, this);
+        setupButtonCursor(pauseButton, this);
+         
         this.music.on('pause', () => {
             //pauseButton.setTintFill(0x8B0000);
         }, this);
