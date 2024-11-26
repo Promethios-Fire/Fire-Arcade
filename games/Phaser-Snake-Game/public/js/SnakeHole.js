@@ -543,6 +543,21 @@ class WaveShaderPipeline extends Phaser.Renderer.WebGL.Pipelines.MultiPipeline {
     }
 }
 
+/** 
+ Template Scene
+
+class __Scene extends Phaser.Scene {
+    constructor () {
+        super({key: '__Scene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
+*/
+
 // #region SpaceBoyScene
 class SpaceBoyScene extends Phaser.Scene {
     constructor () {
@@ -901,6 +916,36 @@ class SpaceBoyScene extends Phaser.Scene {
                 break;
         }
 
+    }
+}
+
+class MusicPlayerScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'MusicPlayerScene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
+class PinballDisplayScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'PinballDisplayScene', active: false});
+    }
+    init() {
+    }
+    create() {
+    }
+}
+
+class PlinkoMachineScene extends Phaser.Scene {
+    constructor () {
+        super({key: 'PlinkoMachineScene', active: false});
+    }
+    init() {
+    }
+    create() {
     }
 }
 
@@ -10684,9 +10729,10 @@ var config = {
     
     scene: [ StartScene, 
         MainMenuScene, QuickMenuScene, GalaxyMapScene, 
-        PersistScene, SpaceBoyScene, GameScene, 
-        InputScene, ScoreScene, TutorialScene,
-        StageCodex, ExtractTracker]
+        PersistScene, TutorialScene,
+        GameScene, InputScene, ScoreScene, 
+        StageCodex, ExtractTracker,
+        SpaceBoyScene, PinballDisplayScene, PlinkoMachineScene, MusicPlayerScene]
 };
 
 // #region Screen Settings
