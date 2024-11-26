@@ -615,14 +615,14 @@ class SpaceBoyScene extends Phaser.Scene {
             delay: 500,
             });
 
-        var columnX = X_OFFSET - GRID * 7;
+        var columnX = X_OFFSET + GRID * 36;
 
-        this.trackID = this.add.bitmapText(columnX - GRID - 6, GRID * 7, 'mainFont', `000`, 16
-        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTint(0xF0F0F0);
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
 
-        const playButton = this.add.sprite(columnX , GRID * 7, 'mediaButtons', 2
+        const loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
 
 
@@ -646,38 +646,38 @@ class SpaceBoyScene extends Phaser.Scene {
         
         
         
-        playButton.on('pointerdown', () => {
+        loopButton.on('pointerdown', () => {
             this.music.play();
-            playButton.setTintFill(0xCFFF04);
+            loopButton.setFrame(5);
         }, this);
     
-        const pauseButton = this.add.sprite(columnX , GRID * 8.5, 'mediaButtons', 3
+        const pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
         pauseButton.on('pointerdown', () => {
             if (this.music.isPlaying) {
-                    pauseButton.setTintFill(0x8B0000);
+                    pauseButton.setFrame(1);
                     this.music.pause();
             }  else {
 
-                if (pauseButton.tint === 0x8B0000) {
+                    pauseButton.setFrame(0);
                     this.music.resume();
-                    pauseButton.setTintFill(0x000000);
-                }
+                    //pauseButton.setTintFill(0x000000);
+                
             }
         }, this);
 
-        const nextButton = this.add.sprite(columnX , GRID * 10, 'mediaButtons', 1
+        const nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         nextButton.on('pointerdown', () => {
-            nextButton.setTintFill(0xCFFF04)
+            nextButton.setFrame(3);
             this.music.stop();
-            this.nextSong();  
+            this.nextSong();
         }, this);
 
         this.input.on('pointerup', function(pointer){
-            playButton.setTintFill(0x000000);
-            nextButton.setTintFill(0x000000);
+            loopButton.setFrame(4);
+            nextButton.setFrame(2);
             
         }, this);
 
@@ -736,7 +736,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
         
         this.music.on('pause', () => {
-            pauseButton.setTintFill(0x8B0000);
+            //pauseButton.setTintFill(0x8B0000);
         }, this);
 
         
@@ -1324,7 +1324,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
-        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
