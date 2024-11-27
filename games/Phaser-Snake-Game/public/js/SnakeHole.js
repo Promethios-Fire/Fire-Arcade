@@ -5812,17 +5812,31 @@ class GameScene extends Phaser.Scene {
 
         this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
             .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * .7 - 2 , 'mainFont',`${commaInt(this.bestBase.toString())}`,14)
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFont',`${commaInt(this.bestBase.toString())}`,14)
             .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
 
         // Score Text SET INVISIBLE
         this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
             .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFont',`0`, 14)
-            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        //this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFont',`0`, 14)
+        //    .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
-        //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
+        
+        this.scoreValue = this.add.dom(X_OFFSET + GRID * 34 - 1, GRID * 2.7 - 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+            'color':"#1f211b",
+            'text-transform': 'uppercase',
+            "font-weight": 400,
+            'font-size': '28px',
+            //"font-family": '"Press Start 2P", system-ui',
+            })).setHTML(
+                `0`
+        ).setOrigin(1, 0).setScale(.5).setScrollFactor(0);
+        
+        
+        
+        
+            //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
         this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 34 - 2,  GRID * 3 + 12 , 'mainFont',` +`,8)
         .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
