@@ -9479,10 +9479,17 @@ class ScoreScene extends Phaser.Scene {
 
                 
                 var bestOfTitle;
-                if (ourGame.mode === MODES.EXPERT) {
-                    bestOfTitle = `Best of Expert`
-                } else {
-                    bestOfTitle = ``;
+
+                switch (ourGame.mode) {
+                    case MODES.EXPERT:
+                        bestOfTitle = `Best of Expert`
+                        break;
+                    case MODES.PRACTICE:
+                        bestOfTitle = `Practicing! Score Not Saved.`
+                        break;
+                    default:
+                        bestOfTitle = ``;
+                        break;
                 }
                 
                 if (prevStagesComplete < stagesComplete) {
