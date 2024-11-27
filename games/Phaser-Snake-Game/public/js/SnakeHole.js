@@ -2692,6 +2692,9 @@ class StageCodex extends Phaser.Scene {
             this.input.keyboard.on('keydown-SPACE', e => {
                 if (exitButton.frame.name === 1) {
                     console.log("Exiting!");
+                    this.scene.wake('MainMenuScene');
+                    this.scene.sleep('StageCodex');
+
                 } else {
                     console.log("Launch Practice!", selected.stageTitle);
                     
