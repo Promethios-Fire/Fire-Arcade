@@ -633,6 +633,10 @@ class SpaceBoyScene extends Phaser.Scene {
                 this.mapProgressPanelText.setText("GAUNTLET");
                 debugger
                 break;
+            case MODES.PRACTICE:
+                this.mapProgressPanelText.setText("PRACTICE");
+                debugger
+                break;
             default:
                 this.mapProgressPanelText.setText("SHIP LOG");
                 break;
@@ -2853,6 +2857,9 @@ class MainMenuScene extends Phaser.Scene {
                     practiceMode: true,
                     
                 });
+                mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
+                debugger
+                mainMenuScene.scene.get("PersistScene").coins = 12;
                 mainMenuScene.scene.sleep('MainMenuScene');
                 return true;
             }],
