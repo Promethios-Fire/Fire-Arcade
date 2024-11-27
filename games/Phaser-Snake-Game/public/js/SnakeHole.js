@@ -686,13 +686,27 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     create() {
 
-        this.soundManager = this.sound;       
-        // Create an invisible interactive zone 
+        this.soundManager = this.sound;
+
+        // Create an invisible interactive zone for volume dial
         this.volumeControlZone = this.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
              24, 36).setInteractive().setOrigin(0,0);
-
         // debugging bounding box
         //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.volumeControlZone);
+
+        this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5,
+            GRID * 2.5, 'uiVolumeIcon',0).setDepth(100);
+        this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5,
+            GRID * 5.75, 'uiVolumeSlider').setDepth(100);
+        this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5,
+            GRID * 5.75, 'uiVolumeSliderWidget').setDepth(101);
+        this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5,
+            GRID * 5.75, 'uiVolumeSliderWidgetRendered').setDepth(101);
+
+        const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
+        this.volumeSlider.setMask(volumeMask)
+        this.volumeSliderWidgetMask.visible = false;
+        this.volumeSlider.mask.invertAlpha = true;
 
         // is mouse hovering over volume wheel?
         this.isVolumeControlActive = false;
@@ -709,10 +723,41 @@ class MusicPlayerScene extends Phaser.Scene {
         // Listen for mouse wheel events
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
             if (this.isVolumeControlActive){
-                const volumeChange = deltaY > 0 ? -0.1 : 0.1;
+                
+                let volumeChange;
+                if (deltaY > 0) {
+                    volumeChange = -0.125; 
+                } 
+                else {
+                    volumeChange = 0.125; 
+                }
+                // clamp volume from 0-1
                 this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
-                console.log(`Volume: ${this.soundManager.volume}`);
-            }
+                
+                
+                // y values for adjust the volumeSliderWidget and Mask
+                const minY = 40;
+                const maxY = 99;
+                const newY = minY + (maxY - minY) * (1 - this.soundManager.volume);
+                this.volumeSliderWidgetMask.y = newY;
+                this.volumeSliderWidgetReal.y = newY;
+
+                console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
+
+                // set volume icon based on volume level
+                if (this.soundManager.volume === 0) {
+                    this.volumeIcon.setFrame(3);
+                }
+                else if (this.soundManager.volume > 0 && this.soundManager.volume <= 0.33) {
+                    this.volumeIcon.setFrame(2);
+                }
+                else if (this.soundManager.volume > 0.33 && this.soundManager.volume <= 0.66) {
+                    this.volumeIcon.setFrame(1);
+                }
+                else if (this.soundManager.volume > 0.66)
+                    this.volumeIcon.setFrame(0);
+                }
+                
         });
 
         var columnX = X_OFFSET + GRID * 36;
@@ -1442,6 +1487,10 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
         //this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6});
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
