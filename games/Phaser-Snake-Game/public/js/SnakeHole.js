@@ -683,10 +683,15 @@ class MusicPlayerScene extends Phaser.Scene {
         this.music = this.sound.add(`track_${this.startTrack}`,{
             volume: 0.33
         });
+
+        this.playerPaused = false;
     }
     create() {
 
         this.soundManager = this.sound;
+
+        // Start volume at 50%
+        this.soundManager.volume = 0.5;
 
         // Create an invisible interactive zone for volume dial
         this.volumeControlZone = this.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
@@ -778,16 +783,16 @@ class MusicPlayerScene extends Phaser.Scene {
         const pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
+        
         pauseButton.on('pointerdown', () => {
             if (this.music.isPlaying) {
                     pauseButton.setFrame(1);
                     this.music.pause();
+                    this.playerPaused = true;
             }  else {
-
                     pauseButton.setFrame(0);
                     this.music.resume();
-                    //pauseButton.setTintFill(0x000000);
-                
+                    this.playerPaused = false;
             }
         }, this);
 
@@ -805,7 +810,7 @@ class MusicPlayerScene extends Phaser.Scene {
             
         }, this);
 
-        // checks whether cursor is over any button and then changes cursor
+        // checks whether cursor is over any button and then changes cursor to hand
         function setupButtonCursor(button, scene) {
             button.on('pointerover', () => {
                 scene.input.setDefaultCursor('pointer');
@@ -819,9 +824,34 @@ class MusicPlayerScene extends Phaser.Scene {
         setupButtonCursor(pauseButton, this);
          
         this.music.on('pause', () => {
-            //pauseButton.setTintFill(0x8B0000);
+            pauseButton.setFrame(1);
         }, this);
+
+
+        //pauses and resumes sound so queued sfx don't play all at once upon resuming
+        window.addEventListener('focus', () => {
+            
+            this.sound.resumeAll(); //resuming all resumes all music so old tracks need to be destroyed
+            if (this.playerPaused) {
+                this.music.pause();
+            }
+            else{
+                pauseButton.setFrame(0);
+            }
+            //console.log('All sounds paused:', game.sound.sounds);
+        });
+        
+        window.addEventListener('blur', () => {
+            pauseButton.setFrame(1)
+            //this.music.pause();
+            this.sound.pauseAll(); // this prevents sound from being able to resume
+            
+            //console.log('All sounds resumed:', game.sound.sounds);
+        });
+        //this.pauseOnBlur = true;
     }
+
+
     startMusic() {
         //music.on('complete', listener);
         this.music = this.sound.add(`track_86`,{
@@ -829,10 +859,11 @@ class MusicPlayerScene extends Phaser.Scene {
         });
         
         //music.play();
+        //check for loop button here
         this.music.play();
-        this.music.on('complete', () => {
-            this.nextSong();
-        }, this);
+        //this.music.on('complete', () => {
+        //    this.nextSong();
+        //}, this);
 
     }
     nextSong (songID) {
@@ -1629,20 +1660,6 @@ class StartScene extends Phaser.Scene {
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GameScene");
         const ourStartScene = this.scene.get("StartScene");
-
-
-        //pauses and resumes sound so queued sfx don't play all at once upon resuming
-        window.addEventListener('focus', function () {
-            game.sound.pauseAll();
-            //console.log('All sounds paused:', game.sound.sounds);
-        });
-        
-        window.addEventListener('blur', function () {
-            game.sound.resumeAll();
-            //console.log('All sounds resumed:', game.sound.sounds);
-        });
-
-        this.pauseOnBlur = true;
         
         
 
@@ -3230,7 +3247,7 @@ class MainMenuScene extends Phaser.Scene {
             if (!mainMenuScene.pressedSpace) {
 
                 if (!this.scene.get("MusicPlayerScene").hasStarted) {
-                    this.scene.get("MusicPlayerScene").startMusic();
+                    //this.scene.get("MusicPlayerScene").startMusic();
                 } 
 
                 mainMenuScene.pressToPlayTween.stop();
@@ -4091,6 +4108,19 @@ class GameScene extends Phaser.Scene {
         var _chargeUp = this.sound.add('chargeUp');
         this.pop03 = this.sound.add('pop03')
         this.chime01 = this.sound.add('chime01')
+        this.snakeCrash = this.sound.add('snakeCrash');
+        //this.pointCollect = this.sound.add('pointCollect01');
+        //this.pointCollect.play();
+
+        SOUND_ATOM.forEach(soundID => {
+            this.atomSounds.push(this.sound.add(soundID[0]));
+            });
+        SOUND_PORTAL.forEach(soundID => {
+            this.portalSounds.push(this.sound.add(soundID[0]));
+            });
+        SOUND_POINT_COLLECT.forEach(soundID => {
+            this.pointSounds.push(this.sound.add(soundID[0], {volume: 0.5}));
+            });
 
         //_chargeUp.play();
 
@@ -4684,23 +4714,10 @@ class GameScene extends Phaser.Scene {
             }
         
         
-        // Audio
-        this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
+
 
         
 
-        //this.pointCollect = this.sound.add('pointCollect01');
-        //this.pointCollect.play();
-
-        SOUND_ATOM.forEach(soundID => {
-            this.atomSounds.push(this.sound.add(soundID[0]));
-            });
-        SOUND_PORTAL.forEach(soundID => {
-            this.portalSounds.push(this.sound.add(soundID[0]));
-            });
-        SOUND_POINT_COLLECT.forEach(soundID => {
-            this.pointSounds.push(this.sound.add(soundID[0], {volume: 0.5}));
-            });
 
         // Starting Game State
         this.gState = GState.START_WAIT;
@@ -7246,6 +7263,8 @@ class GameScene extends Phaser.Scene {
             log = null;
         }
 
+
+
     }
     gameSceneFullCleanup() {
         // Put end of run clean up loop.
@@ -7256,6 +7275,10 @@ class GameScene extends Phaser.Scene {
         //}
 
         this.gameSceneCleanup();
+        // this prevents old tracks from persisting when resetting
+        this.sound.sounds.forEach((sound) => {
+            sound.stop();
+        });
     }
     
  

@@ -116,7 +116,7 @@ export var QUICK_MENUS = new Map([
             
             console.log("BACK TO MAIN MENU");
             
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneFullCleanup();
             
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
