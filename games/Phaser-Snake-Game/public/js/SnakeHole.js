@@ -47,6 +47,8 @@ const DEBUG_ARGS = {
 const DEBUG_FORCE_EXPERT = false;
 const EXPERT_CHOICE = true;
 
+const START_RANDOM = true;
+
 const DEBUG_FORCE_GAUNTLET = true;
 const DEBUG_GAUNTLET_ID = "Easy_Gauntlet"
 
@@ -752,15 +754,24 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     startMusic() {
         //music.on('complete', listener);
-        this.music = this.sound.add(`track_86`,{
-            volume: 0.2
-        });
-        
-        //music.play();
-        this.music.play();
-        this.music.on('complete', () => {
+
+        if (!START_RANDOM) {
+            this.music = this.sound.add(`track_86`,{
+                volume: 0.2
+            });
+            
+            //music.play();
+            this.music.play();
+            this.music.on('complete', () => {
+                this.nextSong();
+            }, this);
+        } else {
             this.nextSong();
-        }, this);
+        }
+        
+        
+
+
         
         this.hasStarted = true;
 
@@ -1971,86 +1982,86 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
         }, this);
 
-        if (qMenuArgs.sideScene) {
-            //menu arrows
-            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
-            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-            this.input.keyboard.on('keydown-LEFT', e => {
+        //menu arrows
+        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-                const ourGame = this.scene.get("GameScene");
+        this.input.keyboard.on('keydown-LEFT', e => {
 
-                
-                var displayList;
-                switch (ourGame.mode) {
-                    case MODES.CLASSIC:
-                        displayList = ["Classic", "Overall", "Expert"];
-                        break;
-                    case MODES.EXPERT:
-                        displayList = ["Expert", "Overall", "Classic"];
-                        break;
-                    case MODES.TUTORIAL:
-                        displayList = ["Tutorial"];
-                        break;
-                    case MODES.GAUNTLET:
-                        displayList = ["Overall", "Classic", "Expert"];
-                        break;
-                    default:
-                        break;
-                }
-    
-                if (!this.scene.isSleeping("StageCodex")) {
-                    this.scene.launch('StageCodex', {
-                        stage: this.scene.get("GameScene").stage,
-                        originScene: this.scene.get("GameScene"),
-                        fromQuickMenu: true,
-                        displayList: displayList,
-                        displayIndex: 0
-                        //category: this.scene.get("GameScene").mode
-                    });
-                    this.scene.sleep("QuickMenuScene");
-                } else {
-                    this.scene.wake("StageCodex");
-                    this.scene.sleep("QuickMenuScene");
-                }
-    
-                ourGame.scene.pause();
-                ourGame.scene.setVisible(false);
-                
-                /***
-                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-                 * DON't USE UNLESS YOU FIGURE THAT OUT
-                 * //this.scene.sleep('GameScene');
-                 */
-            }, this);
-    
-            this.input.keyboard.on('keydown-RIGHT', e => {
-    
-                const ourGame = this.scene.get("GameScene");
-    
-                if (!this.scene.isSleeping('ExtractTracker')) {
-                    this.scene.sleep("QuickMenuScene");
-                    this.scene.launch('ExtractTracker', {
-                        stage: this.scene.get("GameScene").stage
-                    });
-                } else {
-                    this.scene.wake('ExtractTracker');
-                    this.scene.sleep("QuickMenuScene");
-                }
-    
-                ourGame.scene.pause();
-                ourGame.scene.setVisible(false);
-                
-                /***
-                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-                 * DON't USE UNLESS YOU FIGURE THAT OUT
-                 * //this.scene.sleep('GameScene');
-                 */
-            }, this);
+            const ourGame = this.scene.get("GameScene");
+
             
-        }
+            var displayList;
+            switch (ourGame.mode) {
+                case MODES.CLASSIC:
+                    displayList = ["Classic", "Overall", "Expert"];
+                    break;
+                case MODES.EXPERT:
+                    displayList = ["Expert", "Overall", "Classic"];
+                    break;
+                case MODES.TUTORIAL:
+                    displayList = ["Tutorial"];
+                    break;
+                case MODES.GAUNTLET:
+                    displayList = ["Overall", "Classic", "Expert"];
+                    break;
+                default:
+                    break;
+            }
+
+            if (!this.scene.isSleeping("StageCodex")) {
+                this.scene.launch('StageCodex', {
+                    stage: this.scene.get("GameScene").stage,
+                    originScene: this.scene.get("GameScene"),
+                    fromQuickMenu: true,
+                    displayList: displayList,
+                    displayIndex: 0
+                    //category: this.scene.get("GameScene").mode
+                });
+                this.scene.sleep("QuickMenuScene");
+            } else {
+                this.scene.wake("StageCodex");
+                this.scene.sleep("QuickMenuScene");
+            }
+
+            ourGame.scene.pause();
+            ourGame.scene.setVisible(false);
+            
+            /***
+             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+             * DON't USE UNLESS YOU FIGURE THAT OUT
+             * //this.scene.sleep('GameScene');
+             */
+        }, this);
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+
+            const ourGame = this.scene.get("GameScene");
+
+            if (!this.scene.isSleeping('ExtractTracker')) {
+                this.scene.sleep("QuickMenuScene");
+                this.scene.launch('ExtractTracker', {
+                    stage: this.scene.get("GameScene").stage
+                });
+            } else {
+                this.scene.wake('ExtractTracker');
+                this.scene.sleep("QuickMenuScene");
+            }
+
+            ourGame.scene.pause();
+            ourGame.scene.setVisible(false);
+            
+            /***
+             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+             * DON't USE UNLESS YOU FIGURE THAT OUT
+             * //this.scene.sleep('GameScene');
+             */
+        }, this);
+            
+        
 
         
 
@@ -2371,15 +2382,18 @@ class StageCodex extends Phaser.Scene {
         this.selected = {};
 
     }
-    create (args) {
+    create (codexArgs) {
+        var ourPersist = this.scene.get("PersistScene");
 
-        var displayList = args.displayList;
-        var displayIndex = args.displayIndex ?? 0;
+        var displayList = codexArgs.displayList ?? ["Overall", "Classic", "Expert"];
+        var displayIndex = codexArgs.displayIndex ?? 0;
+
+        var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageID;
 
         var displayCategory = displayList[displayIndex];
-        var originScene = args.originScene;
+        var originScene = codexArgs.originScene;
 
-        var ourPersist = this.scene.get("PersistScene");
+       
         this.scene.moveBelow("StageCodex", "SpaceBoyScene");
         var topLeft = X_OFFSET + GRID * 1.5;
         var rowY = Y_OFFSET + GRID * 5;
@@ -2560,11 +2574,15 @@ class StageCodex extends Phaser.Scene {
             })
 
 
-            var selected = this.yMap.get(args.stage);
+            var selected = this.yMap.get(stageDisplay);
 
             
             if (selected === undefined) { // Haven't beaten level yet
                 var selected = this.yMap.get(ourPersist.prevStage);
+            }
+
+            if (selected === undefined) { // Storage Level was not unlocked yet on a mode.
+                var selected = this.yMap.get(START_STAGE);
             }
 
             var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
@@ -2589,6 +2607,7 @@ class StageCodex extends Phaser.Scene {
                 
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
+                ourPersist.prevCodexStageID = nextSelect;
                 
                 containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
@@ -2610,6 +2629,7 @@ class StageCodex extends Phaser.Scene {
                 
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
+                ourPersist.prevCodexStageID = nextSelect;
                 
                 containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
@@ -2630,10 +2650,22 @@ class StageCodex extends Phaser.Scene {
         // Default
         this.input.keyboard.on('keydown-RIGHT', e => {
             //const game = this.scene.get("GameScene");
-            originScene.scene.resume();
-            originScene.scene.setVisible(true);
+            if (originScene.scene.isPaused()) {
+                originScene.scene.resume();
+                originScene.scene.setVisible(true);
+            } else {
+            }
 
-            if (args.fromQuickMenu) {
+            if (originScene.scene.key == "MainMenuScene") {
+                
+                debugger
+                this.scene.wake("MainMenuScene");
+            }
+
+            
+            
+
+            if (codexArgs.fromQuickMenu) {
                 this.scene.wake('QuickMenuScene');
             }
            
@@ -2653,7 +2685,7 @@ class StageCodex extends Phaser.Scene {
                 var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
                 this.scene.restart({
                     stage: this.scene.get("GameScene").stage,
-                    originScene: this.scene.get("GameScene"),
+                    originScene: originScene,
                     fromQuickMenu: true, 
                     displayList: displayList,
                     displayIndex: newIndex
@@ -2767,8 +2799,7 @@ class MainMenuScene extends Phaser.Scene {
                         menuOptions: qMenu, 
                         textPrompt: "MODE SELECTOR",
                         fromScene: mainMenuScene,
-                        cursorIndex: 1,
-                        sideScenes: false
+                        cursorIndex: 1
                     });
                     mainMenuScene.scene.bringToTop("QuickMenuScene");
 
@@ -2957,7 +2988,6 @@ class MainMenuScene extends Phaser.Scene {
         selected.node.style.color = "white";
 
         var mapEngaged = false;
-        this.menuState = 0
 
         
 
@@ -2970,19 +3000,25 @@ class MainMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-LEFT', e => {
-            if (this.pressedSpace && this.menuState == 0) {
-                this.cameras.main.scrollX -= SCREEN_WIDTH
-                ourMap.cameras.main.scrollX -= SCREEN_WIDTH
-                mainMenuScene.scene.sleep('MainMenuScene');
-                this.menuState = 1;
+            if (this.pressedSpace ) {
+                //this.cameras.main.scrollX -= SCREEN_WIDTH
+
+                this.scene.launch("StageCodex", {
+                    originScene: this,
+                    fromQuickMenu: false,
+                    
+                });
+                this.scene.sleep('MainMenuScene');
+                
             }
-        });
+        }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
-            if (this.pressedSpace && this.menuState == 1) {
-                this.cameras.main.scrollX += SCREEN_WIDTH
-                ourMap.cameras.main.scrollX += SCREEN_WIDTH
-                mainMenuScene.scene.wake('MainMenuScene');
-                this.menuState = 0;
+            if (this.pressedSpace) {
+                //this.cameras.main.scrollX += SCREEN_WIDTH
+                //ourMap.cameras.main.scrollX += SCREEN_WIDTH
+                //mainMenuScene.scene.wake('MainMenuScene');
+                
+                ;
             }
         });
     
@@ -3526,6 +3562,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.coins = START_COINS;
         this.stageHistory = [];
+        this.prevCodexStageID = START_STAGE;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
