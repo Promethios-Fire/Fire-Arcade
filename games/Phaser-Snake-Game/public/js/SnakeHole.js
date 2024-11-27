@@ -2402,16 +2402,20 @@ class StageCodex extends Phaser.Scene {
         var displayCategory = displayList[displayIndex];
         var originScene = codexArgs.originScene;
 
-        if (practiceMode) {
-            var exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(1);
+
+        var exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
             
-            var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-                "fontSize": '24px',
-                "fontWeight": 400,
-                "color": "#181818",
-            }),
-                    `EXIT`
-            ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
+        var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "#181818",
+        }),
+                `EXIT`
+        ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+
+        if (practiceMode) {
+            exitButton.setAlpha(1);
+            textElement.setAlpha(1);
         }
 
        
