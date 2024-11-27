@@ -83,8 +83,6 @@ var Food = new Phaser.Class({
             scene.comboCounter = 0;
         }
 
-        PLAYER_STATS.globalScore += timeSinceFruit;
-
         scene.events.emit('addScore', this); 
         scene.snake.grow(scene);
         // Avoid double _atom getting while in transition
@@ -113,6 +111,16 @@ var Food = new Phaser.Class({
         }, [], this);
 
         scene.onEat(this);
+        if (scene.snake.body.length > 29) {
+            PLAYER_STATS.atomsOverEaten += 1;
+            if (scene.snake.body.length - 1 > PLAYER_STATS.longestBody) {
+                PLAYER_STATS.longestBody = scene.snake.body.length - 1;
+            }
+            
+        }
+
+        
+
 
         
         

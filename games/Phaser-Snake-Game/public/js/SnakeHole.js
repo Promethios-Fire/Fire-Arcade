@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -54,6 +54,8 @@ const DEBUG_ARGS = {
 
 const DEBUG_FORCE_EXPERT = false;
 const EXPERT_CHOICE = true;
+
+const START_RANDOM = true;
 
 const DEBUG_FORCE_GAUNTLET = true;
 const DEBUG_GAUNTLET_ID = "Easy_Gauntlet"
@@ -241,7 +243,9 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
         ["globalScore", PLAYER_STATS.globalScore ?? 0],
         ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
         ["totalCoinsCollected", PLAYER_STATS.totalCoinsCollected ?? 0],
-        ["expertCoinsNotSpawned", PLAYER_STATS.expertCoinsNotSpawned ?? 0]
+        ["expertCoinsNotSpawned", PLAYER_STATS.expertCoinsNotSpawned ?? 0],
+        ["atomsOverEaten", PLAYER_STATS.atomsOverEaten ?? 0],
+        ["longestBody", PLAYER_STATS.longestBody ?? 0],
     ]);
 
     // Add Saved Values
@@ -253,14 +257,27 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 }
 
-var updatePlayerStats = function (stageData) {
+export var updatePlayerStats = function (stageData) {
 
     
-    PLAYER_STATS.bonks += stageData.bonks;
-    PLAYER_STATS.atomsEaten += stageData.foodLog.length;
-    PLAYER_STATS.turns += stageData.turns;
-    PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
 
+    var oldKeyList = ["atomsOverAte",
+    "globalStore",
+    "overEat"]
+
+    oldKeyList.forEach( key => {
+        if (key in PLAYER_STATS) {
+            delete PLAYER_STATS[key];
+        }
+    });
+
+    if (stageData) {
+        PLAYER_STATS.bonks += stageData.bonks;
+        PLAYER_STATS.atomsEaten += stageData.foodLog.length;
+        PLAYER_STATS.turns += stageData.turns;
+        PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);  
+    }
+    
     // This also saves changes not listed here that
     // are made directly to PLAYER_STATS object.
     // Like Wrapping and Portaling etc...
@@ -409,12 +426,22 @@ const RANK_BENCHMARKS = new Map([
 
 export const MODES = Object.freeze({
     TUTORIAL: 0,
-    CLASSIC: 1,
-    EXPERT: 2,
-    HADCORE: 3,
-    OVERALL: 4,
-    GAUNTLET: 5
-})
+    PRACTICE: 1,
+    ADVENTURE: 2,
+    CLASSIC: 3,
+    EXPERT: 4,
+    HARDCORE: 5,
+    GAUNTLET: 6,
+});
+
+export const MODES_TEXT = new Map([
+    [MODES.PRACTICE, "Practice"],
+    [MODES.CLASSIC, "Adventure"],
+    [MODES.EXPERT, "Adventure"],
+    [MODES.GAUNTLET, "Gauntlet"],
+
+]);
+
 
 const MODE_LOCAL = new Map([
     [MODES.CLASSIC, "Classic"],
@@ -624,6 +651,10 @@ class SpaceBoyScene extends Phaser.Scene {
                 this.mapProgressPanelText.setText("GAUNTLET");
                 debugger
                 break;
+            case MODES.PRACTICE:
+                this.mapProgressPanelText.setText("PRACTICE");
+                debugger
+                break;
             default:
                 this.mapProgressPanelText.setText("SHIP LOG");
                 break;
@@ -746,15 +777,24 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     startMusic() {
         //music.on('complete', listener);
-        this.music = this.sound.add(`track_86`,{
-            volume: 0.2
-        });
-        
-        //music.play();
-        this.music.play();
-        this.music.on('complete', () => {
+
+        if (!START_RANDOM) {
+            this.music = this.sound.add(`track_86`,{
+                volume: 0.2
+            });
+            
+            //music.play();
+            this.music.play();
+            this.music.on('complete', () => {
+                this.nextSong();
+            }, this);
+        } else {
             this.nextSong();
-        }, this);
+        }
+        
+        
+
+
         
         this.hasStarted = true;
 
@@ -1310,10 +1350,7 @@ class TutorialScene extends Phaser.Scene {
                 onComplete: () => {
                     scene.scene.setVisible(false);
                     //this.scene.get("UIScene").setVisible(false);
-                    
-                    //this.scene.launch('UIScene');
-                    //scene.scene.launch('GameScene');
-                    scene.scene.launch('MainMenuScene');
+
                     ourPersist.starterTween.stop();
                     ourPersist.openingTween(scene.tweenValue);
                     scene.openingTweenStart.stop();
@@ -1784,10 +1821,7 @@ class StartScene extends Phaser.Scene {
                 onComplete: () => {
                     scene.scene.setVisible(false);
                     //this.scene.get("UIScene").setVisible(false);
-                    
-                    //this.scene.launch('UIScene');
-                    //scene.scene.launch('GameScene');
-                    scene.scene.launch('MainMenuScene');
+
                     ourPersist.starterTween.stop();
                     ourPersist.openingTween(scene.tweenValue);
                     scene.openingTweenStart.stop();
@@ -1971,63 +2005,86 @@ class QuickMenuScene extends Phaser.Scene {
             this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
         }, this);
 
-        if (qMenuArgs.sideScene) {
-            //menu arrows
-            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
-            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-            this.input.keyboard.on('keydown-LEFT', e => {
+        //menu arrows
+        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-                const ourGame = this.scene.get("GameScene");
-    
-                if (!this.scene.isSleeping("StageCodex")) {
-                    this.scene.launch('StageCodex', {
-                        stage: this.scene.get("GameScene").stage,
-                        category: this.scene.get("GameScene").mode
-                    });
-                    this.scene.sleep("QuickMenuScene");
-                } else {
-                    this.scene.wake("StageCodex");
-                    this.scene.sleep("QuickMenuScene");
-                }
-    
-                ourGame.scene.pause();
-                ourGame.scene.setVisible(false);
-                
-                /***
-                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-                 * DON't USE UNLESS YOU FIGURE THAT OUT
-                 * //this.scene.sleep('GameScene');
-                 */
-            }, this);
-    
-            this.input.keyboard.on('keydown-RIGHT', e => {
-    
-                const ourGame = this.scene.get("GameScene");
-    
-                if (!this.scene.isSleeping('ExtractTracker')) {
-                    this.scene.sleep("QuickMenuScene");
-                    this.scene.launch('ExtractTracker', {
-                        stage: this.scene.get("GameScene").stage
-                    });
-                } else {
-                    this.scene.wake('ExtractTracker');
-                    this.scene.sleep("QuickMenuScene");
-                }
-    
-                ourGame.scene.pause();
-                ourGame.scene.setVisible(false);
-                
-                /***
-                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-                 * DON't USE UNLESS YOU FIGURE THAT OUT
-                 * //this.scene.sleep('GameScene');
-                 */
-            }, this);
+        this.input.keyboard.on('keydown-LEFT', e => {
+
+            const ourGame = this.scene.get("GameScene");
+
             
-        }
+            var displayList;
+            switch (ourGame.mode) {
+                case MODES.CLASSIC:
+                    displayList = ["Classic", "Overall", "Expert"];
+                    break;
+                case MODES.EXPERT:
+                    displayList = ["Expert", "Overall", "Classic"];
+                    break;
+                case MODES.TUTORIAL:
+                    displayList = ["Tutorial"];
+                    break;
+                case MODES.GAUNTLET:
+                    displayList = ["Overall", "Classic", "Expert"];
+                    break;
+                default:
+                    break;
+            }
+
+            if (!this.scene.isSleeping("StageCodex")) {
+                this.scene.launch('StageCodex', {
+                    stage: this.scene.get("GameScene").stage,
+                    originScene: this.scene.get("GameScene"),
+                    fromQuickMenu: true,
+                    displayList: displayList,
+                    displayIndex: 0
+                    //category: this.scene.get("GameScene").mode
+                });
+                this.scene.sleep("QuickMenuScene");
+            } else {
+                this.scene.wake("StageCodex");
+                this.scene.sleep("QuickMenuScene");
+            }
+
+            ourGame.scene.pause();
+            ourGame.scene.setVisible(false);
+            
+            /***
+             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+             * DON't USE UNLESS YOU FIGURE THAT OUT
+             * //this.scene.sleep('GameScene');
+             */
+        }, this);
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+
+            const ourGame = this.scene.get("GameScene");
+
+            if (!this.scene.isSleeping('ExtractTracker')) {
+                this.scene.sleep("QuickMenuScene");
+                this.scene.launch('ExtractTracker', {
+                    stage: this.scene.get("GameScene").stage
+                });
+            } else {
+                this.scene.wake('ExtractTracker');
+                this.scene.sleep("QuickMenuScene");
+            }
+
+            ourGame.scene.pause();
+            ourGame.scene.setVisible(false);
+            
+            /***
+             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+             * DON't USE UNLESS YOU FIGURE THAT OUT
+             * //this.scene.sleep('GameScene');
+             */
+        }, this);
+            
+        
 
         
 
@@ -2348,8 +2405,38 @@ class StageCodex extends Phaser.Scene {
         this.selected = {};
 
     }
-    create (args) {
+    create (codexArgs) {
         var ourPersist = this.scene.get("PersistScene");
+        this.scene.moveAbove("StageCodex", "SpaceBoyScene");
+
+        var disableArrows = codexArgs.disableArrows ?? false;
+        var practiceMode = codexArgs.practiceMode ?? false;
+
+        var displayList = codexArgs.displayList ?? ["Overall", "Classic", "Expert"];
+        var displayIndex = codexArgs.displayIndex ?? 0;
+
+        var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageID;
+
+        var displayCategory = displayList[displayIndex];
+        var originScene = codexArgs.originScene;
+
+
+        var exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
+            
+        var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize": '24px',
+            "fontWeight": 400,
+            "color": "#181818",
+        }),
+                `EXIT`
+        ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
+
+        if (practiceMode) {
+            exitButton.setAlpha(1);
+            textElement.setAlpha(1);
+        }
+
+       
         this.scene.moveBelow("StageCodex", "SpaceBoyScene");
         var topLeft = X_OFFSET + GRID * 1.5;
         var rowY = Y_OFFSET + GRID * 5;
@@ -2378,26 +2465,26 @@ class StageCodex extends Phaser.Scene {
             categoryText = "";
             
         } else {
-            switch (args.category) {
-                case MODES.TUTORIAL:
+            switch (displayCategory) {
+                case "Tutorial":
                     bestOfDisplay = BEST_OF_TUTORIAL;
                     sumOfBestDisplay = ourPersist.sumOfBestTut;
                     stagesCompleteDisplay = ourPersist.stagesCompleteTut;
                     categoryText = "Tutorial";
                     break;
-                case MODES.CLASSIC:
+                case "Classic":
                     bestOfDisplay = BEST_OF_CLASSIC;
                     sumOfBestDisplay = ourPersist.sumOfBestClassic;
                     stagesCompleteDisplay = ourPersist.stagesCompleteClassic;
                     categoryText = "Classic";
                     break;
-                case MODES.EXPERT:
+                case "Expert":
                     bestOfDisplay = BEST_OF_EXPERT;
                     sumOfBestDisplay = ourPersist.sumOfBestExpert;
                     stagesCompleteDisplay = ourPersist.stagesCompleteExpert;
                     categoryText = "Expert";
                     break;
-                case MODES.OVERALL:
+                case "Overall":
                     bestOfDisplay = BEST_OF_ALL;
                     sumOfBestDisplay = ourPersist.sumOfBestAll;
                     stagesCompleteDisplay = ourPersist.stagesCompleteAll;
@@ -2530,11 +2617,15 @@ class StageCodex extends Phaser.Scene {
             })
 
 
-            var selected = this.yMap.get(args.stage);
+            var selected = this.yMap.get(stageDisplay);
 
             
             if (selected === undefined) { // Haven't beaten level yet
                 var selected = this.yMap.get(ourPersist.prevStage);
+            }
+
+            if (selected === undefined) { // Storage Level was not unlocked yet on a mode.
+                var selected = this.yMap.get(START_STAGE);
             }
 
             var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
@@ -2554,145 +2645,145 @@ class StageCodex extends Phaser.Scene {
             this.input.keyboard.on('keydown-UP', e => {
 
                 selected.title.clearTint()
+
+                if (practiceMode) {
+                    var safeIndex = Math.max(selected.index - 1, -1);
+                } else {
+                    var safeIndex = Math.max(selected.index - 1, 0);
+                }
                 
-                var safeIndex = Math.max(selected.index - 1, 0);
+                if (safeIndex != -1) {
+                    var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                    selected = this.yMap.get(nextSelect);
+                    ourPersist.prevCodexStageID = nextSelect;
+                    
+                    containerToY = selected.conY * -1 + nextRow;
+                    this.tweens.add({
+                        targets: codexContainer,
+                        y: containerToY,
+                        ease: 'Sine.InOut',
+                        duration: 500,
+                        onComplete: () => {
+                            if (exitButton.frame.name === 0) {
+                                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                            }
+                        }
+                    }, this);
+                    
+                } else {
+                    exitButton.setFrame(1);
+                    
+                    var firstElement = this.yMap.get([...this.yMap.keys()][0]);
+                    firstElement.title.clearTint();
+                    
+                }
                 
-                var nextSelect = ([...this.yMap.keys()][safeIndex]);
-                selected = this.yMap.get(nextSelect);
-                
-                containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: codexContainer,
-                    y: containerToY,
-                    ease: 'Sine.InOut',
-                    duration: 500,
-                    onComplete: () => {
-                        selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    }
-                }, this);
             }, this);
 
             this.input.keyboard.on('keydown-DOWN', e => {
 
-                selected.title.clearTint()
+                var dur = 500;
+                if (exitButton.frame.name === 1) {
+                    exitButton.setFrame(0);
+                    var safeIndex = 0;
+                    dur = 0;
+                } else {
+                    var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
+                }
 
-                var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
-                
+                selected.title.clearTint()
+     
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
+                ourPersist.prevCodexStageID = nextSelect;
                 
                 containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
                     targets: codexContainer,
                     y: containerToY,
                     ease: 'Sine.InOut',
-                    duration: 500,
+                    duration: dur,
                     onComplete: () => {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                     }
                 }, this);
-            }, this);               
+            }, this);  
         }
 
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+        if (practiceMode) {
+            this.input.keyboard.on('keydown-SPACE', e => {
+                if (exitButton.frame.name === 1) {
+                    console.log("Exiting!");
+                    this.scene.wake('MainMenuScene');
+                    this.scene.sleep('StageCodex');
 
-        // Default
-        this.input.keyboard.on('keydown-RIGHT', e => {
-            const game = this.scene.get("GameScene");
-            game.scene.resume();
-            game.scene.setVisible(true);
+                } else {
+                    console.log("Launch Practice!", selected.stageTitle);
+                    
+                    this.scene.start("GameScene", {
+                        stage: selected.stageTitle,
+                        score: 0,
+                        startupAnim: true,
+                        mode: MODES.PRACTICE
+                    });
+                    
+                }
+                
+            }, this); 
+        }
 
-            this.scene.wake('QuickMenuScene');
-            this.scene.sleep('StageCodex');
-            
-            }, this
-        );
-
-        if (!checkExpertUnlocked.call(this)) {
-            // Haven't unlocked Expert Mode
+        if (disableArrows) {
             
         } else {
+            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                arrowMenuR.play('arrowMenuIdle').setAlpha(1);
 
-            switch (args.category) {
-                case MODES.CLASSIC:
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                    arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+            // Default
+            this.input.keyboard.on('keydown-RIGHT', e => {
+                //const game = this.scene.get("GameScene");
+                if (originScene.scene.isPaused()) {
+                    originScene.scene.resume();
+                    originScene.scene.setVisible(true);
+                } else {
+                }
 
-
-                    var _nextCat;
-                    if (!args.prevOverall) {
-                        _nextCat = MODES.OVERALL;
-                    } else {
-                        _nextCat = MODES.EXPERT;
-                    }
+                if (originScene.scene.key == "MainMenuScene") {
                     
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category:_nextCat 
-                        });
-                        }, this
-                    );
+                    debugger
+                    this.scene.wake("MainMenuScene");
+                }
 
-                    break;
+                
+                
 
-                case MODES.EXPERT:
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                    arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
-                    
-                    var _nextCat;
-                    if (!args.prevOverall) {
-                        _nextCat = MODES.OVERALL;
-                    } else {
-                        _nextCat = MODES.CLASSIC;
-                    }
-                    
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category:_nextCat 
-                        });
-                        }, this
-                    );
+                if (codexArgs.fromQuickMenu) {
+                    this.scene.wake('QuickMenuScene');
+                }
+            
+                this.scene.sleep('StageCodex');
+                
+                }, this
+            );
 
-                    break;
-
-                case MODES.OVERALL:
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            if (!checkExpertUnlocked.call(this)) {
+                // Haven't unlocked Expert Mode
+                
+            } else {
+                var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
                         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-                    debugger
-                        var nextCat;
-                    switch (this.scene.get("GameScene").mode) {
-                        case MODES.CLASSIC:
-                            nextCat = MODES.EXPERT;
-                            break;
-                        case MODES.EXPERT:
-                            nextCat = MODES.CLASSIC;
-                            break;
-                    
-                        default:
-                            break;
-                    }
-                
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        debugger
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category: nextCat,
-                            prevOverall: true
-                        });
-                    }, this);
-                    
-                    break;
-            
-                default:
-                    break;
-            }
-            
-
-            
+                this.input.keyboard.on('keydown-LEFT', e => {
+                    var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
+                    this.scene.restart({
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: originScene,
+                        fromQuickMenu: true, 
+                        displayList: displayList,
+                        displayIndex: newIndex
+                    });
+                    }, this
+                );   
+            }                               
         }
     }
 }
@@ -2784,6 +2875,16 @@ class MainMenuScene extends Phaser.Scene {
         var menuOptions = new Map([
             ['practice', function () {
                 console.log("Practice");
+                this.scene.launch("StageCodex", {
+                    originScene: this,
+                    fromQuickMenu: false,
+                    disableArrows: true,
+                    practiceMode: true,
+                    
+                });
+                mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
+                mainMenuScene.scene.get("PersistScene").coins = 12;
+                mainMenuScene.scene.sleep('MainMenuScene');
                 return true;
             }],
             ['adventure', function () {
@@ -2794,14 +2895,13 @@ class MainMenuScene extends Phaser.Scene {
                 this.scene.get("StartScene").UUID_MAP.size;
                 
                 if (EXPERT_CHOICE && checkExpertUnlocked.call(this)) { // EXPERT_CHOICE
-                    var qMenu = QUICK_MENUS.get("adventure-mode");
+                    var qMenu = QUICK_MENUS.get(`adventure-mode`);
 
                     mainMenuScene.scene.launch("QuickMenuScene", {
                         menuOptions: qMenu, 
                         textPrompt: "MODE SELECTOR",
                         fromScene: mainMenuScene,
-                        cursorIndex: 1,
-                        sideScenes: false
+                        cursorIndex: 1
                     });
                     mainMenuScene.scene.bringToTop("QuickMenuScene");
 
@@ -2845,6 +2945,7 @@ class MainMenuScene extends Phaser.Scene {
                         menuVal = function () {
                             ourPersist.mode = MODES.GAUNTLET;
                             ourPersist.coins = val.startingCoins;
+                            ourPersist.gauntletKey = key;
                             ourPersist.gauntlet = val.stages.split("|");
                             ourPersist.gauntletSize = ourPersist.gauntlet.length;
                             ourSpaceBoy.mapProgressPanelText.setText(key);
@@ -2990,7 +3091,6 @@ class MainMenuScene extends Phaser.Scene {
         selected.node.style.color = "white";
 
         var mapEngaged = false;
-        this.menuState = 0
 
         
 
@@ -3003,19 +3103,25 @@ class MainMenuScene extends Phaser.Scene {
 
 
         this.input.keyboard.on('keydown-LEFT', e => {
-            if (this.pressedSpace && this.menuState == 0) {
-                this.cameras.main.scrollX -= SCREEN_WIDTH
-                ourMap.cameras.main.scrollX -= SCREEN_WIDTH
-                mainMenuScene.scene.sleep('MainMenuScene');
-                this.menuState = 1;
+            if (this.pressedSpace ) {
+                //this.cameras.main.scrollX -= SCREEN_WIDTH
+
+                this.scene.launch("StageCodex", {
+                    originScene: this,
+                    fromQuickMenu: false,
+                    
+                });
+                this.scene.sleep('MainMenuScene');
+                
             }
-        });
+        }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
-            if (this.pressedSpace && this.menuState == 1) {
-                this.cameras.main.scrollX += SCREEN_WIDTH
-                ourMap.cameras.main.scrollX += SCREEN_WIDTH
-                mainMenuScene.scene.wake('MainMenuScene');
-                this.menuState = 0;
+            if (this.pressedSpace) {
+                //this.cameras.main.scrollX += SCREEN_WIDTH
+                //ourMap.cameras.main.scrollX += SCREEN_WIDTH
+                //mainMenuScene.scene.wake('MainMenuScene');
+                
+                ;
             }
         });
     
@@ -3559,6 +3665,7 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.coins = START_COINS;
         this.stageHistory = [];
+        this.prevCodexStageID = START_STAGE;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -4435,7 +4542,7 @@ class GameScene extends Phaser.Scene {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
-                    mode: ourPersist.mode,
+                    mode: ourGameScene.mode,
                 });
                 return true;
             },
@@ -4811,8 +4918,8 @@ class GameScene extends Phaser.Scene {
                 
                 if (!this.scene.isActive(ourScoreScene) && !this.scene.isActive('StageCodex')){
                     this.scene.launch("QuickMenuScene", {
-                        menuOptions: QUICK_MENUS.get("tab-menu"), 
-                        textPrompt: "Quick Menu",
+                        menuOptions: QUICK_MENUS.get(`tab-menu-${MODES_TEXT.get(this.mode)}`), 
+                        textPrompt: `Quick Menu - ${MODES_TEXT.get(this.mode)}`,
                         fromScene: this,
                         cursorIndex: 0,
                         sideScene:true
@@ -5134,6 +5241,30 @@ class GameScene extends Phaser.Scene {
                             extractImage.playAfterRepeat('blackholeIdle');
                             this.nextStagePortals.push(extractImage);
                         }
+
+                        break;
+                    case this.mode === MODES.PRACTICE:
+                        
+                        var nextTile;
+                        if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
+                            nextTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
+                        } else { // There exists Stage Maps
+                            var spawnPoints = [];
+                            this.nextStagePortalLayer.forEachTile( tile => {
+                                if (tile.index > 640 && tile.index < 640 + 9) {
+                                    
+                                    spawnPoints.push(tile);
+                                }
+                            });
+                            var nextTile = Phaser.Utils.Array.RemoveRandomElement(spawnPoints)
+                        }
+
+                        var extractImage = this.add.sprite(nextTile.pixelX + X_OFFSET, nextTile.pixelY + Y_OFFSET, 'extractHole.png' 
+                        ).setDepth(10).setOrigin(0.4125,0.4125);
+
+                        extractImage.play('blackholeForm');
+                        extractImage.playAfterRepeat('blackholeIdle');
+                        this.nextStagePortals.push(extractImage);
 
                         break;
                     default:
@@ -5877,7 +6008,9 @@ class GameScene extends Phaser.Scene {
               });
             
             
-            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10
+            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+
+            PLAYER_STATS.globalScore += timeLeft;
             
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
@@ -6434,6 +6567,9 @@ class GameScene extends Phaser.Scene {
                 if (ourPersist.gauntlet.length === 0) {
                     finalFanfare = true;
                 }
+                break;
+            case this.mode === MODES.PRACTICE:
+                finalFanfare = false;
                 break;
         
             default:
@@ -7358,6 +7494,9 @@ class GameScene extends Phaser.Scene {
                                 // TODO HANDLE GAUNTLET IN SCORE SCREEN
                             
                                 break;
+                            case this.mode === MODES.PRACTICE:
+                                this.nextStage(this.stage, camDirection);
+                                break;
                             default:
                                 debugger // Leave for safety break
                                 break;
@@ -7531,7 +7670,7 @@ class GameScene extends Phaser.Scene {
             lives: this.lives, 
             startupAnim: false,
             camDirection: this.camDirection,
-            mode: this.scene.get("PersistScene").mode,
+            mode: this.mode,
         });
     }
 
@@ -8430,8 +8569,10 @@ class ScoreScene extends Phaser.Scene {
             this.stageData.newBest = true;
 
             
-            if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
+            if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000" && ourGame.mode != MODES.PRACTICE) {
                 localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`, JSON.stringify(this.stageData));
+            } else {
+                // Doesn't Save Score to local Storage
             }
             
         }
@@ -9100,8 +9241,8 @@ class ScoreScene extends Phaser.Scene {
 
             this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
             ).play(anim).setDepth(21).setScale(1).setAlpha(0);
-            this.ScoreContainerL.add(this.atomScoreIcon)  
-            scoreAtoms.push(this.atomScoreIcon)
+            this.ScoreContainerL.add(this.atomScoreIcon);
+            scoreAtoms.push(this.atomScoreIcon);
         }
         var _frame = 0
         var __frame = 0
@@ -9317,7 +9458,8 @@ class ScoreScene extends Phaser.Scene {
         switch (true) {
             case ourGame.mode === MODES.CLASSIC 
                 || ourGame.mode === MODES.EXPERT
-                || ourGame.mode === MODES.TUTORIAL:
+                || ourGame.mode === MODES.TUTORIAL
+                || ourGame.mode === MODES.PRACTICE:
                 // #region Adventure
                 var prevStagesComplete;
                 var prevSumOfBest;
@@ -9361,6 +9503,17 @@ class ScoreScene extends Phaser.Scene {
                         stagesComplete = ourPersist.stagesCompleteTut;
                         sumOfBest = ourPersist.sumOfBestTut;
                         break
+                    case MODES.PRACTICE:
+                            prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                            prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                            prevPlayerRank = ourPersist.prevPlayerRankClassic;
+    
+                            // This shouldn't update in practice? Because it doesn't save.
+                            totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                            newRank = prevPlayerRank;
+                            stagesComplete = prevStagesComplete;
+                            sumOfBest = prevSumOfBest;
+                            break
                     
                     default:
                         // Leave this one as a safety trigger
@@ -9370,10 +9523,17 @@ class ScoreScene extends Phaser.Scene {
 
                 
                 var bestOfTitle;
-                if (ourGame.mode === MODES.EXPERT) {
-                    bestOfTitle = `Best of Expert`
-                } else {
-                    bestOfTitle = ``;
+
+                switch (ourGame.mode) {
+                    case MODES.EXPERT:
+                        bestOfTitle = `Best of Expert`
+                        break;
+                    case MODES.PRACTICE:
+                        bestOfTitle = `Practicing! Score Not Saved.`
+                        break;
+                    default:
+                        bestOfTitle = ``;
+                        break;
                 }
                 
                 if (prevStagesComplete < stagesComplete) {
@@ -9606,40 +9766,43 @@ class ScoreScene extends Phaser.Scene {
                 
 
                 
-                console.log("ZedRolling");
-                var rollResults = rollZeds(currentLocal);
+                if (ourGame.mode != MODES.PRACTICE) {
+                    console.log("ZedRolling");
+                    var rollResults = rollZeds(currentLocal);
 
-                console.log("RollResults:", rollResults);
-                console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
-                ourPersist.zeds += rollResults.get("zedsEarned");
-                plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
-                //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
+                    console.log("RollResults:", rollResults);
+                    console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
+                    ourPersist.zeds += rollResults.get("zedsEarned");
+                    plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
+                    //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
-                const zedObject = calcZedLevel(ourPersist.zeds);
-                ourPersist.zedsUI.setHTML(
-                    `<span style ="color: limegreen;
-                    font-size: 14px;
-                    border: limegreen solid 1px;
-                    border-radius: 5px;
-                    padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
-                );
-
-                var extraFields = {
-                    level: zedObject.level,
-                    zedsToNext: zedObject.zedsToNext,
-                    startingScore: ourScoreScene.stageData.calcTotal(),
-                    rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
-                }
-
-                localStorage.setItem("zeds", ourPersist.zeds);
-                gameanalytics.GameAnalytics.addResourceEvent(
-                    gameanalytics.EGAResourceFlowType.Source,
-                    "zeds",
-                    ourScoreScene.difficulty,
-                    "Gameplay",
-                    "CompleteStage",
-                    extraFields.toString(),
+                    const zedObject = calcZedLevel(ourPersist.zeds);
+                    ourPersist.zedsUI.setHTML(
+                        `<span style ="color: limegreen;
+                        font-size: 14px;
+                        border: limegreen solid 1px;
+                        border-radius: 5px;
+                        padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
                     );
+
+                    var extraFields = {
+                        level: zedObject.level,
+                        zedsToNext: zedObject.zedsToNext,
+                        startingScore: ourScoreScene.stageData.calcTotal(),
+                        rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
+                    }
+
+                    localStorage.setItem("zeds", ourPersist.zeds);
+                    gameanalytics.GameAnalytics.addResourceEvent(
+                        gameanalytics.EGAResourceFlowType.Source,
+                        "zeds",
+                        ourScoreScene.difficulty,
+                        "Gameplay",
+                        "CompleteStage",
+                        extraFields.toString(),
+                        );
+
+                }
                 
                 
                 // Turns off score post score screen.
