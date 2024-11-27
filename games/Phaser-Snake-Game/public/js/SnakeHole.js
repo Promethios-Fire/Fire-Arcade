@@ -5818,7 +5818,7 @@ class GameScene extends Phaser.Scene {
 
         // Score Text SET INVISIBLE
         this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
-            .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         //this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFont',`0`, 14)
         //    .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
@@ -5832,13 +5832,21 @@ class GameScene extends Phaser.Scene {
             })).setHTML(
                 `0`
         ).setOrigin(1, 0).setScale(.5).setScrollFactor(0);
+    
+    
+    
+    
+        //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
+    this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 29 + 1,  GRID * 3 + 12 , 'mainFont',` +`,8)
+    .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         
         
         
         
             //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 34 - 2,  GRID * 3 + 12 , 'mainFont',` +`,8)
-        .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        // BELOW SCORE POSISTION
+        //this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 34 - 2,  GRID * 3 + 12 , 'mainFont',` +`,8)
+        //.setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
 
 
@@ -6140,7 +6148,7 @@ class GameScene extends Phaser.Scene {
                 targets: this.deltaScoreUI,
                 alpha:{ from: 1, to: 0 },
                 ease: 'Expo.easeInOut',
-                duration: 1750,
+                duration: 2000,
             })
             
 
