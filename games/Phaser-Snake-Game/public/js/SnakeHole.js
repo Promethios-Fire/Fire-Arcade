@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -421,7 +421,8 @@ export const MODES = Object.freeze({
     CLASSIC: 1,
     EXPERT: 2,
     HARDCORE: 3,
-    GAUNTLET: 4
+    GAUNTLET: 4,
+    PRACTICE: 5
 })
 
 const MODE_LOCAL = new Map([
@@ -2384,6 +2385,10 @@ class StageCodex extends Phaser.Scene {
     }
     create (codexArgs) {
         var ourPersist = this.scene.get("PersistScene");
+        this.scene.moveAbove("StageCodex", "SpaceBoyScene");
+
+        var disableArrows = codexArgs.disableArrows ?? false;
+        var practiceMode = codexArgs.practiceMode ?? false;
 
         var displayList = codexArgs.displayList ?? ["Overall", "Classic", "Expert"];
         var displayIndex = codexArgs.displayIndex ?? 0;
@@ -2392,6 +2397,18 @@ class StageCodex extends Phaser.Scene {
 
         var displayCategory = displayList[displayIndex];
         var originScene = codexArgs.originScene;
+
+        if (practiceMode) {
+            var exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(1);
+            
+            var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+                "color": "#181818",
+            }),
+                    `EXIT`
+            ).setOrigin(0.0,0).setScale(0.5).setAlpha(1);
+        }
 
        
         this.scene.moveBelow("StageCodex", "SpaceBoyScene");
@@ -2602,31 +2619,54 @@ class StageCodex extends Phaser.Scene {
             this.input.keyboard.on('keydown-UP', e => {
 
                 selected.title.clearTint()
+
+                if (practiceMode) {
+                    var safeIndex = Math.max(selected.index - 1, -1);
+                } else {
+                    var safeIndex = Math.max(selected.index - 1, 0);
+                }
                 
-                var safeIndex = Math.max(selected.index - 1, 0);
+                if (safeIndex != -1) {
+                    var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                    selected = this.yMap.get(nextSelect);
+                    ourPersist.prevCodexStageID = nextSelect;
+                    
+                    containerToY = selected.conY * -1 + nextRow;
+                    this.tweens.add({
+                        targets: codexContainer,
+                        y: containerToY,
+                        ease: 'Sine.InOut',
+                        duration: 500,
+                        onComplete: () => {
+                            if (exitButton.frame.name === 0) {
+                                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                            }
+                        }
+                    }, this);
+                    
+                } else {
+                    exitButton.setFrame(1);
+                    
+                    var firstElement = this.yMap.get([...this.yMap.keys()][0]);
+                    firstElement.title.clearTint();
+                    
+                }
                 
-                var nextSelect = ([...this.yMap.keys()][safeIndex]);
-                selected = this.yMap.get(nextSelect);
-                ourPersist.prevCodexStageID = nextSelect;
-                
-                containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: codexContainer,
-                    y: containerToY,
-                    ease: 'Sine.InOut',
-                    duration: 500,
-                    onComplete: () => {
-                        selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    }
-                }, this);
             }, this);
 
             this.input.keyboard.on('keydown-DOWN', e => {
 
-                selected.title.clearTint()
+                var dur = 500;
+                if (exitButton.frame.name === 1) {
+                    exitButton.setFrame(0);
+                    var safeIndex = 0;
+                    dur = 0;
+                } else {
+                    var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
+                }
 
-                var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
-                
+                selected.title.clearTint()
+     
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
                 ourPersist.prevCodexStageID = nextSelect;
@@ -2636,62 +2676,85 @@ class StageCodex extends Phaser.Scene {
                     targets: codexContainer,
                     y: containerToY,
                     ease: 'Sine.InOut',
-                    duration: 500,
+                    duration: dur,
                     onComplete: () => {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                     }
                 }, this);
-            }, this);               
+            }, this);  
         }
 
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
-
-        // Default
-        this.input.keyboard.on('keydown-RIGHT', e => {
-            //const game = this.scene.get("GameScene");
-            if (originScene.scene.isPaused()) {
-                originScene.scene.resume();
-                originScene.scene.setVisible(true);
-            } else {
-            }
-
-            if (originScene.scene.key == "MainMenuScene") {
+        if (practiceMode) {
+            this.input.keyboard.on('keydown-SPACE', e => {
+                if (exitButton.frame.name === 1) {
+                    console.log("Exiting!");
+                } else {
+                    console.log("Launch Practice!", selected.stageTitle);
+                    
+                    this.scene.start("GameScene", {
+                        stage: selected.stageTitle,
+                        score: 0,
+                        startupAnim: true,
+                        mode: MODES.PRACTICE
+                    });
+                    
+                }
                 
-                debugger
-                this.scene.wake("MainMenuScene");
-            }
+            }, this); 
+        }
 
-            
-            
-
-            if (codexArgs.fromQuickMenu) {
-                this.scene.wake('QuickMenuScene');
-            }
-           
-            this.scene.sleep('StageCodex');
-            
-            }, this
-        );
-
-        if (!checkExpertUnlocked.call(this)) {
-            // Haven't unlocked Expert Mode
+        if (disableArrows) {
             
         } else {
-            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                    arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                arrowMenuR.play('arrowMenuIdle').setAlpha(1);
 
-            this.input.keyboard.on('keydown-LEFT', e => {
-                var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
-                this.scene.restart({
-                    stage: this.scene.get("GameScene").stage,
-                    originScene: originScene,
-                    fromQuickMenu: true, 
-                    displayList: displayList,
-                    displayIndex: newIndex
-                });
+            // Default
+            this.input.keyboard.on('keydown-RIGHT', e => {
+                //const game = this.scene.get("GameScene");
+                if (originScene.scene.isPaused()) {
+                    originScene.scene.resume();
+                    originScene.scene.setVisible(true);
+                } else {
+                }
+
+                if (originScene.scene.key == "MainMenuScene") {
+                    
+                    debugger
+                    this.scene.wake("MainMenuScene");
+                }
+
+                
+                
+
+                if (codexArgs.fromQuickMenu) {
+                    this.scene.wake('QuickMenuScene');
+                }
+            
+                this.scene.sleep('StageCodex');
+                
                 }, this
-            );   
+            );
+
+            if (!checkExpertUnlocked.call(this)) {
+                // Haven't unlocked Expert Mode
+                
+            } else {
+                var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+
+                this.input.keyboard.on('keydown-LEFT', e => {
+                    var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
+                    this.scene.restart({
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: originScene,
+                        fromQuickMenu: true, 
+                        displayList: displayList,
+                        displayIndex: newIndex
+                    });
+                    }, this
+                );   
+            }                               
         }
     }
 }
@@ -2783,6 +2846,14 @@ class MainMenuScene extends Phaser.Scene {
         var menuOptions = new Map([
             ['practice', function () {
                 console.log("Practice");
+                this.scene.launch("StageCodex", {
+                    originScene: this,
+                    fromQuickMenu: false,
+                    disableArrows: true,
+                    practiceMode: true,
+                    
+                });
+                mainMenuScene.scene.sleep('MainMenuScene');
                 return true;
             }],
             ['adventure', function () {
@@ -4439,7 +4510,7 @@ class GameScene extends Phaser.Scene {
                     stage: START_STAGE,
                     score: 0,
                     startupAnim: true,
-                    mode: ourPersist.mode,
+                    mode: ourGameScene.mode,
                 });
                 return true;
             },
@@ -5138,6 +5209,30 @@ class GameScene extends Phaser.Scene {
                             extractImage.playAfterRepeat('blackholeIdle');
                             this.nextStagePortals.push(extractImage);
                         }
+
+                        break;
+                    case this.mode === MODES.PRACTICE:
+                        
+                        var nextTile;
+                        if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
+                            nextTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
+                        } else { // There exists Stage Maps
+                            var spawnPoints = [];
+                            this.nextStagePortalLayer.forEachTile( tile => {
+                                if (tile.index > 640 && tile.index < 640 + 9) {
+                                    
+                                    spawnPoints.push(tile);
+                                }
+                            });
+                            var nextTile = Phaser.Utils.Array.RemoveRandomElement(spawnPoints)
+                        }
+
+                        var extractImage = this.add.sprite(nextTile.pixelX + X_OFFSET, nextTile.pixelY + Y_OFFSET, 'extractHole.png' 
+                        ).setDepth(10).setOrigin(0.4125,0.4125);
+
+                        extractImage.play('blackholeForm');
+                        extractImage.playAfterRepeat('blackholeIdle');
+                        this.nextStagePortals.push(extractImage);
 
                         break;
                     default:
@@ -6426,6 +6521,9 @@ class GameScene extends Phaser.Scene {
                     finalFanfare = true;
                 }
                 break;
+            case this.mode === MODES.PRACTICE:
+                finalFanfare = false;
+                break;
         
             default:
                 debugger // Saftey Break. Don't remove.
@@ -7349,6 +7447,9 @@ class GameScene extends Phaser.Scene {
                                 // TODO HANDLE GAUNTLET IN SCORE SCREEN
                             
                                 break;
+                            case this.mode === MODES.PRACTICE:
+                                this.nextStage(this.stage, camDirection);
+                                break;
                             default:
                                 debugger // Leave for safety break
                                 break;
@@ -7522,7 +7623,7 @@ class GameScene extends Phaser.Scene {
             lives: this.lives, 
             startupAnim: false,
             camDirection: this.camDirection,
-            mode: this.scene.get("PersistScene").mode,
+            mode: this.mode,
         });
     }
 
@@ -8410,8 +8511,10 @@ class ScoreScene extends Phaser.Scene {
             this.stageData.newBest = true;
 
             
-            if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000") {
+            if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000" && ourGame.mode != MODES.PRACTICE) {
                 localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`, JSON.stringify(this.stageData));
+            } else {
+                // Doesn't Save Score to local Storage
             }
             
         }
@@ -9080,8 +9183,8 @@ class ScoreScene extends Phaser.Scene {
 
             this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
             ).play(anim).setDepth(21).setScale(1).setAlpha(0);
-            this.ScoreContainerL.add(this.atomScoreIcon)  
-            scoreAtoms.push(this.atomScoreIcon)
+            this.ScoreContainerL.add(this.atomScoreIcon);
+            scoreAtoms.push(this.atomScoreIcon);
         }
         var _frame = 0
         var __frame = 0
@@ -9297,7 +9400,8 @@ class ScoreScene extends Phaser.Scene {
         switch (true) {
             case ourGame.mode === MODES.CLASSIC 
                 || ourGame.mode === MODES.EXPERT
-                || ourGame.mode === MODES.TUTORIAL:
+                || ourGame.mode === MODES.TUTORIAL
+                || ourGame.mode === MODES.PRACTICE:
                 // #region Adventure
                 var prevStagesComplete;
                 var prevSumOfBest;
@@ -9341,6 +9445,17 @@ class ScoreScene extends Phaser.Scene {
                         stagesComplete = ourPersist.stagesCompleteTut;
                         sumOfBest = ourPersist.sumOfBestTut;
                         break
+                    case MODES.PRACTICE:
+                            prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                            prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                            prevPlayerRank = ourPersist.prevPlayerRankClassic;
+    
+                            // This shouldn't update in practice? Because it doesn't save.
+                            totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                            newRank = prevPlayerRank;
+                            stagesComplete = prevStagesComplete;
+                            sumOfBest = prevSumOfBest;
+                            break
                     
                     default:
                         // Leave this one as a safety trigger
@@ -9586,40 +9701,43 @@ class ScoreScene extends Phaser.Scene {
                 
 
                 
-                console.log("ZedRolling");
-                var rollResults = rollZeds(currentLocal);
+                if (ourGame.mode != MODES.PRACTICE) {
+                    console.log("ZedRolling");
+                    var rollResults = rollZeds(currentLocal);
 
-                console.log("RollResults:", rollResults);
-                console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
-                ourPersist.zeds += rollResults.get("zedsEarned");
-                plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
-                //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
+                    console.log("RollResults:", rollResults);
+                    console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
+                    ourPersist.zeds += rollResults.get("zedsEarned");
+                    plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
+                    //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
-                const zedObject = calcZedLevel(ourPersist.zeds);
-                ourPersist.zedsUI.setHTML(
-                    `<span style ="color: limegreen;
-                    font-size: 14px;
-                    border: limegreen solid 1px;
-                    border-radius: 5px;
-                    padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
-                );
-
-                var extraFields = {
-                    level: zedObject.level,
-                    zedsToNext: zedObject.zedsToNext,
-                    startingScore: ourScoreScene.stageData.calcTotal(),
-                    rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
-                }
-
-                localStorage.setItem("zeds", ourPersist.zeds);
-                gameanalytics.GameAnalytics.addResourceEvent(
-                    gameanalytics.EGAResourceFlowType.Source,
-                    "zeds",
-                    ourScoreScene.difficulty,
-                    "Gameplay",
-                    "CompleteStage",
-                    extraFields.toString(),
+                    const zedObject = calcZedLevel(ourPersist.zeds);
+                    ourPersist.zedsUI.setHTML(
+                        `<span style ="color: limegreen;
+                        font-size: 14px;
+                        border: limegreen solid 1px;
+                        border-radius: 5px;
+                        padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
                     );
+
+                    var extraFields = {
+                        level: zedObject.level,
+                        zedsToNext: zedObject.zedsToNext,
+                        startingScore: ourScoreScene.stageData.calcTotal(),
+                        rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
+                    }
+
+                    localStorage.setItem("zeds", ourPersist.zeds);
+                    gameanalytics.GameAnalytics.addResourceEvent(
+                        gameanalytics.EGAResourceFlowType.Source,
+                        "zeds",
+                        ourScoreScene.difficulty,
+                        "Gameplay",
+                        "CompleteStage",
+                        extraFields.toString(),
+                        );
+
+                }
                 
                 
                 // Turns off score post score screen.

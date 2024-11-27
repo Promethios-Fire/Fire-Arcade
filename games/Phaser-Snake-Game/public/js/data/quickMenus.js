@@ -96,7 +96,7 @@ export var QUICK_MENUS = new Map([
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
-                    mode: ourPersist.mode
+                    mode: ourGameScene.mode
                     //lives: this.lives 
                 });
 
