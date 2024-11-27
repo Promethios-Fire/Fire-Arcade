@@ -418,9 +418,8 @@ export const MODES = Object.freeze({
     TUTORIAL: 0,
     CLASSIC: 1,
     EXPERT: 2,
-    HADCORE: 3,
-    OVERALL: 4,
-    GAUNTLET: 5
+    HARDCORE: 3,
+    GAUNTLET: 4
 })
 
 const MODE_LOCAL = new Map([
@@ -1317,10 +1316,7 @@ class TutorialScene extends Phaser.Scene {
                 onComplete: () => {
                     scene.scene.setVisible(false);
                     //this.scene.get("UIScene").setVisible(false);
-                    
-                    //this.scene.launch('UIScene');
-                    //scene.scene.launch('GameScene');
-                    scene.scene.launch('MainMenuScene');
+
                     ourPersist.starterTween.stop();
                     ourPersist.openingTween(scene.tweenValue);
                     scene.openingTweenStart.stop();
@@ -1791,10 +1787,7 @@ class StartScene extends Phaser.Scene {
                 onComplete: () => {
                     scene.scene.setVisible(false);
                     //this.scene.get("UIScene").setVisible(false);
-                    
-                    //this.scene.launch('UIScene');
-                    //scene.scene.launch('GameScene');
-                    scene.scene.launch('MainMenuScene');
+
                     ourPersist.starterTween.stop();
                     ourPersist.openingTween(scene.tweenValue);
                     scene.openingTweenStart.stop();
@@ -1988,11 +1981,34 @@ class QuickMenuScene extends Phaser.Scene {
             this.input.keyboard.on('keydown-LEFT', e => {
 
                 const ourGame = this.scene.get("GameScene");
+
+                
+                var displayList;
+                switch (ourGame.mode) {
+                    case MODES.CLASSIC:
+                        displayList = ["Classic", "Overall", "Expert"];
+                        break;
+                    case MODES.EXPERT:
+                        displayList = ["Expert", "Overall", "Classic"];
+                        break;
+                    case MODES.TUTORIAL:
+                        displayList = ["Tutorial"];
+                        break;
+                    case MODES.GAUNTLET:
+                        displayList = ["Overall", "Classic", "Expert"];
+                        break;
+                    default:
+                        break;
+                }
     
                 if (!this.scene.isSleeping("StageCodex")) {
                     this.scene.launch('StageCodex', {
                         stage: this.scene.get("GameScene").stage,
-                        category: this.scene.get("GameScene").mode
+                        originScene: this.scene.get("GameScene"),
+                        fromQuickMenu: true,
+                        displayList: displayList,
+                        displayIndex: 0
+                        //category: this.scene.get("GameScene").mode
                     });
                     this.scene.sleep("QuickMenuScene");
                 } else {
@@ -2356,6 +2372,13 @@ class StageCodex extends Phaser.Scene {
 
     }
     create (args) {
+
+        var displayList = args.displayList;
+        var displayIndex = args.displayIndex ?? 0;
+
+        var displayCategory = displayList[displayIndex];
+        var originScene = args.originScene;
+
         var ourPersist = this.scene.get("PersistScene");
         this.scene.moveBelow("StageCodex", "SpaceBoyScene");
         var topLeft = X_OFFSET + GRID * 1.5;
@@ -2385,26 +2408,26 @@ class StageCodex extends Phaser.Scene {
             categoryText = "";
             
         } else {
-            switch (args.category) {
-                case MODES.TUTORIAL:
+            switch (displayCategory) {
+                case "Tutorial":
                     bestOfDisplay = BEST_OF_TUTORIAL;
                     sumOfBestDisplay = ourPersist.sumOfBestTut;
                     stagesCompleteDisplay = ourPersist.stagesCompleteTut;
                     categoryText = "Tutorial";
                     break;
-                case MODES.CLASSIC:
+                case "Classic":
                     bestOfDisplay = BEST_OF_CLASSIC;
                     sumOfBestDisplay = ourPersist.sumOfBestClassic;
                     stagesCompleteDisplay = ourPersist.stagesCompleteClassic;
                     categoryText = "Classic";
                     break;
-                case MODES.EXPERT:
+                case "Expert":
                     bestOfDisplay = BEST_OF_EXPERT;
                     sumOfBestDisplay = ourPersist.sumOfBestExpert;
                     stagesCompleteDisplay = ourPersist.stagesCompleteExpert;
                     categoryText = "Expert";
                     break;
-                case MODES.OVERALL:
+                case "Overall":
                     bestOfDisplay = BEST_OF_ALL;
                     sumOfBestDisplay = ourPersist.sumOfBestAll;
                     stagesCompleteDisplay = ourPersist.stagesCompleteAll;
@@ -2606,11 +2629,14 @@ class StageCodex extends Phaser.Scene {
 
         // Default
         this.input.keyboard.on('keydown-RIGHT', e => {
-            const game = this.scene.get("GameScene");
-            game.scene.resume();
-            game.scene.setVisible(true);
+            //const game = this.scene.get("GameScene");
+            originScene.scene.resume();
+            originScene.scene.setVisible(true);
 
-            this.scene.wake('QuickMenuScene');
+            if (args.fromQuickMenu) {
+                this.scene.wake('QuickMenuScene');
+            }
+           
             this.scene.sleep('StageCodex');
             
             }, this
@@ -2620,86 +2646,20 @@ class StageCodex extends Phaser.Scene {
             // Haven't unlocked Expert Mode
             
         } else {
-
-            switch (args.category) {
-                case MODES.CLASSIC:
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
                     arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-
-                    var _nextCat;
-                    if (!args.prevOverall) {
-                        _nextCat = MODES.OVERALL;
-                    } else {
-                        _nextCat = MODES.EXPERT;
-                    }
-                    
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category:_nextCat 
-                        });
-                        }, this
-                    );
-
-                    break;
-
-                case MODES.EXPERT:
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                    arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
-                    
-                    var _nextCat;
-                    if (!args.prevOverall) {
-                        _nextCat = MODES.OVERALL;
-                    } else {
-                        _nextCat = MODES.CLASSIC;
-                    }
-                    
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category:_nextCat 
-                        });
-                        }, this
-                    );
-
-                    break;
-
-                case MODES.OVERALL:
-                    var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-                        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
-
-                    debugger
-                        var nextCat;
-                    switch (this.scene.get("GameScene").mode) {
-                        case MODES.CLASSIC:
-                            nextCat = MODES.EXPERT;
-                            break;
-                        case MODES.EXPERT:
-                            nextCat = MODES.CLASSIC;
-                            break;
-                    
-                        default:
-                            break;
-                    }
-                
-                    this.input.keyboard.on('keydown-LEFT', e => {
-                        debugger
-                        this.scene.restart({
-                            stage: this.scene.get("GameScene").stage,
-                            category: nextCat,
-                            prevOverall: true
-                        });
-                    }, this);
-                    
-                    break;
-            
-                default:
-                    break;
-            }
-            
-
-            
+            this.input.keyboard.on('keydown-LEFT', e => {
+                var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
+                this.scene.restart({
+                    stage: this.scene.get("GameScene").stage,
+                    originScene: this.scene.get("GameScene"),
+                    fromQuickMenu: true, 
+                    displayList: displayList,
+                    displayIndex: newIndex
+                });
+                }, this
+            );   
         }
     }
 }
