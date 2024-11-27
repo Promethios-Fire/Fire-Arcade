@@ -699,13 +699,13 @@ class MusicPlayerScene extends Phaser.Scene {
         // debugging bounding box
         //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.volumeControlZone);
 
-        this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5,
+        this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
             GRID * 2.5, 'uiVolumeIcon',0).setDepth(100);
-        this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5,
+        this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
             GRID * 5.75, 'uiVolumeSlider').setDepth(100);
-        this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5,
+        this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
             GRID * 5.75, 'uiVolumeSliderWidget').setDepth(101);
-        this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5,
+        this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
             GRID * 5.75, 'uiVolumeSliderWidgetRendered').setDepth(101);
 
         const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
@@ -738,34 +738,39 @@ class MusicPlayerScene extends Phaser.Scene {
                 }
                 // clamp volume from 0-1
                 this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
+                this.updatedVolume = this.soundManager.volume + volumeChange
                 
-                
-                // y values for adjust the volumeSliderWidget and Mask
+                // y values for adjusting the volumeSliderWidget and Mask
                 const minY = 40;
                 const maxY = 99;
-                const newY = minY + (maxY - minY) * (1 - this.soundManager.volume);
-                this.volumeSliderWidgetMask.y = newY;
-                this.volumeSliderWidgetReal.y = newY;
-
-                console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
+                const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
+                
+                console.log(newY)
+                //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
 
                 // set volume icon based on volume level
-                if (this.soundManager.volume === 0) {
-                    this.volumeIcon.setFrame(3);
+                if (newY >= 40 && newY <= 99) {
+                    this.volumeSliderWidgetMask.y = newY;
+                    this.volumeSliderWidgetReal.y = newY;
+
+                    if (this.updatedVolume === 0) {
+                        this.volumeIcon.setFrame(3);
+                    }
+                    else if (this.updatedVolume > 0 && this.updatedVolume <= 0.33) {
+                        this.volumeIcon.setFrame(2);
+                    }
+                    else if (this.updatedVolume > 0.33 && this.updatedVolume <= 0.66) {
+                        this.volumeIcon.setFrame(1);
+                    }
+                    else if (this.updatedVolume > 0.66)
+                        this.volumeIcon.setFrame(0);
+                    }
                 }
-                else if (this.soundManager.volume > 0 && this.soundManager.volume <= 0.33) {
-                    this.volumeIcon.setFrame(2);
-                }
-                else if (this.soundManager.volume > 0.33 && this.soundManager.volume <= 0.66) {
-                    this.volumeIcon.setFrame(1);
-                }
-                else if (this.soundManager.volume > 0.66)
-                    this.volumeIcon.setFrame(0);
-                }
+
                 
         });
 
-        var columnX = X_OFFSET + GRID * 36;
+        var columnX = X_OFFSET + GRID * 36 + 1;
         
         this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
@@ -802,6 +807,10 @@ class MusicPlayerScene extends Phaser.Scene {
             nextButton.setFrame(3);
             this.music.stop();
             this.nextSong();
+            if (pauseButton.frame.name === 1) {
+                console.log('working')
+                pauseButton.setFrame(0)
+            }
         }, this);
 
         this.input.on('pointerup', function(pointer){
@@ -7204,7 +7213,7 @@ class GameScene extends Phaser.Scene {
                 onContinue();
             });
         }, [], this);
-        this.gameSceneCleanup()
+        this.gameSceneFullCleanup()
 
     }
 
