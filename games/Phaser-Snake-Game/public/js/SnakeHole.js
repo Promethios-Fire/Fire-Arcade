@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -973,7 +973,7 @@ class MusicPlayerScene extends Phaser.Scene {
     }
 
     startMusic() {
-        if (!START_RANDOM) {
+        //if (!START_RANDOM) { //commenting out until functionality can return
              // check that a song isn't already playing so we don't add more than 1
             // when looping back to the main menu
             if (!this.music.isPlaying && !this.playerPaused) {
@@ -983,7 +983,7 @@ class MusicPlayerScene extends Phaser.Scene {
                 });
                 this.music.play();
             }
-        }
+        //}
 
     }
     nextSong (songID) {
@@ -4682,6 +4682,7 @@ class GameScene extends Phaser.Scene {
                 
                 ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore("MainMenuScene", {});
+                // play small victory fanfare here perhaps
                 return true;
             },
             'CANCEL': function () {  
