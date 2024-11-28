@@ -1,4 +1,4 @@
-import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState,
+import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState, updatePlayerStats,
     DIRS, DEBUG, commaInt,
     LENGTH_GOAL, PLAYER_STATS, SPEED_SPRINT, COMBO_ADD_FLOOR,
     X_OFFSET,
@@ -23,9 +23,28 @@ var Snake = new Phaser.Class({
 
         this.previous = [];
 
-        
         this.body.unshift(this.head);
+        this.bodyVisualTween = scene.tweens.addCounter({
+            from: 255,
+            to: 0,
+            yoyo: true,
+            duration: 500,
+            ease: 'Linear',
+            repeat: -1,
+            onUpdate: tween =>{
+                const value = Math.floor(tween.getValue());
+                const color1 = Phaser.Display.Color.RGBToString(200, value, value);
+                //scene.coinUIText.node.style.color = color1;
+                this.body.forEach((part) => {
+                    part.setTint(Phaser.Display.Color.GetColor(200, value, value));
+                });
+            }
+        });
 
+        if (scene.scene.get("PersistScene").coins > 0) {
+            this.bodyVisualTween.pause();
+        }
+        
         //if (coins 0) {
         //    
         //}
@@ -266,6 +285,7 @@ var Snake = new Phaser.Class({
          */
 
         
+        
     
         // Actually Move the Snake Head
         if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
@@ -293,6 +313,8 @@ var Snake = new Phaser.Class({
                  }
                 
         }
+
+    
 
         if (GState.PLAY === scene.gState && this.body.length > 2) { 
             
@@ -347,6 +369,7 @@ var Snake = new Phaser.Class({
                     //portal.snakePortalingSprite.visible = false;
                     //portal.targetObject.snakePortalingSprite.visible = false;
                     scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                    updatePlayerStats()
                     scene.warpToNext(index);
                 }
 
@@ -442,12 +465,15 @@ var Snake = new Phaser.Class({
     // #region Bonk()
     bonk: function (scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
+        const musicPlayer = scene.scene.get('MusicPlayerScene');
         
         this.direction = DIRS.STOP;
         scene.screenShake();
 
-        if (ourPersistScene.coins === 0) {
-            // tween.
+        if (ourPersistScene.coins === 1) {
+            debugger
+            musicPlayer.nextSong(`track_175`);
+            this.bodyVisualTween.resume();
         }
 
         if (!scene.stopOnBonk) {
