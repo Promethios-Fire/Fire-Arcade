@@ -226,7 +226,54 @@ var updateSumOfBest = function(scene) {
     });
 }
 
+var tempSumOfBest = function(scene, stageData) {
+    // Dont think this logic works correctly. Should check if you want to use it.
+    var sumOfBest = 0;
 
+    scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
+        var tempJSONClassic = JSON.parse(localStorage.getItem(`${uuid}_best-Classic`));
+        var tempJSONExpert = JSON.parse(localStorage.getItem(`${uuid}_best-Expert`));
+
+        var _scoreTotalClassic;
+        var _currentStageTotal;
+        if (tempJSONClassic) { // False if not played stage before.
+            var _stageDataClassic = new StageData(tempJSONClassic);
+            _scoreTotalClassic = _stageDataClassic.calcTotal();
+
+
+            
+            if (_stageDataClassic.stage === stageData.stage) {
+                _currentStageTotal = stageData.calcTotal();
+            } else {
+                _currentStageTotal = 0;
+            }
+
+        }
+        else {
+            _scoreTotalClassic = 0; 
+            _currentStageTotal = 0;  
+        }
+
+        var _scoreTotalExpert
+        if (tempJSONExpert) {
+            var _stageDataExpert = new StageData(tempJSONExpert);
+            _scoreTotalExpert = _stageDataExpert.calcTotal();
+    
+        } else {
+            _scoreTotalExpert = 0;
+        }
+
+        
+
+        var scoreToAdd = Math.max(_scoreTotalClassic, _scoreTotalExpert,  _currentStageTotal);
+
+        sumOfBest += scoreToAdd;
+        
+
+    });
+
+    return sumOfBest;
+}
 
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
@@ -714,7 +761,7 @@ class MusicPlayerScene extends Phaser.Scene {
         super({key: 'MusicPlayerScene', active: false});
     }
     init() {
-        this.hasStarted = false;
+        this.startedOnce = false;
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -722,84 +769,240 @@ class MusicPlayerScene extends Phaser.Scene {
         this.music = this.sound.add(`track_${this.startTrack}`,{
             volume: 0.33
         });
+
+        // used to check if player intentionally pressed button,
+        // not if the feature state is on or off
+        this.playerPaused = false;
+        this.playerLooped = false;
     }
     create() {
+        this.soundManager = this.sound;
 
-        
-        var columnX = X_OFFSET + GRID * 36;
-        
+        // Start volume at 50%
+        this.soundManager.volume = 0.5;
+
+        // Create an invisible interactive zone for volume dial
+        this.volumeControlZone = this.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
+             24, 36).setInteractive().setOrigin(0,0);
+        // debugging bounding box
+        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.volumeControlZone);
+
+        // speaker icon above slider
+        this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 2.5, 'uiVolumeIcon',0).setDepth(100);
+        // volume slider icon
+        this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 5.75, 'uiVolumeSlider').setDepth(100);
+        // mask sprite
+        this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 5.75, 'uiVolumeSliderWidget').setDepth(101);
+        // rendered sprite
+        this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
+            GRID * 5.75, 'uiVolumeSliderWidgetRendered').setDepth(101);
+
+        const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
+        this.volumeSlider.setMask(volumeMask)
+        this.volumeSliderWidgetMask.visible = false;
+        this.volumeSlider.mask.invertAlpha = true;
+
+        // is mouse hovering over volume wheel?
+        this.isVolumeControlActive = false;
+
+        this.volumeControlZone.on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+            this.isVolumeControlActive = true;
+        });
+        this.volumeControlZone.on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+            this.isVolumeControlActive = false
+        }); 
+
+        // Listen for mouse wheel events
+        this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
+            if (this.isVolumeControlActive){
+                let volumeChange;
+                //checks for mouse scroll up or down
+                if (deltaY > 0) {
+                    volumeChange = -0.125; 
+                } 
+                else {
+                    volumeChange = 0.125; 
+                }
+                // clamp volume from 0-1
+                this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
+                this.updatedVolume = this.soundManager.volume + volumeChange
+                
+                // y values for adjusting the volumeSliderWidget and Mask
+                const minY = 40;
+                const maxY = 99;
+                const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
+                
+                // this console log is one event call behind hence this.updatedVolume
+                //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
+
+                // set volume icon based on volume level
+                if (newY >= 40 && newY <= 99) {
+                    this.volumeSliderWidgetMask.y = newY;
+                    this.volumeSliderWidgetReal.y = newY;
+
+                    if (this.updatedVolume === 0) {
+                        this.volumeIcon.setFrame(3);
+                    }
+                    else if (this.updatedVolume > 0 && this.updatedVolume <= 0.33) {
+                        this.volumeIcon.setFrame(2);
+                    }
+                    else if (this.updatedVolume > 0.33 && this.updatedVolume <= 0.66) {
+                        this.volumeIcon.setFrame(1);
+                    }
+                    else if (this.updatedVolume > 0.66)
+                        this.volumeIcon.setFrame(0);
+                    }
+                }
+
+                
+        });
+        // Buttons
+        var columnX = X_OFFSET + GRID * 36 + 1;
+
         this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
 
-        const loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
+        // Loop Button
+        this.loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
-        loopButton.on('pointerdown', () => {
-            this.music.play();
-            loopButton.setFrame(5);
+        this.loopButton.on('pointerdown', () => {
+            if (!this.playerLooped) {
+                this.playerLooped = true;
+                this.loopButton.setFrame(5);
+            }
+            else{
+                this.playerLooped = false;
+                this.loopButton.setFrame(4);
+            }
+            
+            
         }, this);
     
-        const pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
+        // Pause Button
+        this.pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
-        pauseButton.on('pointerdown', () => {
+        
+        this.pauseButton.on('pointerdown', () => {
+            // is music playing?
             if (this.music.isPlaying) {
-                    pauseButton.setFrame(1);
-                    this.music.pause();
-            }  else {
-
-                    pauseButton.setFrame(0);
-                    this.music.resume();
-                    //pauseButton.setTintFill(0x000000);
-                
-            }
+                this.pauseButton.setFrame(1);
+                this.music.pause();
+                this.playerPaused = true;
+            }  
+            // does music exist? and if so is it paused?
+            else if (this.music.isPaused) {
+                this.pauseButton.setFrame(0);
+                this.playerPaused = false;
+                this.music.resume();
+            } 
+            // this will unpause the player and queue a new song if
+            // entered game scene in a paused state
+            else {
+                this.pauseButton.setFrame(0);
+                this.playerPaused = false;
+                this.nextSong();
+            }   
         }, this);
 
-        const nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
+        // Next Button
+        this.nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
-        nextButton.on('pointerdown', () => {
-            nextButton.setFrame(3);
+        this.nextButton.on('pointerdown', () => {
+            // if looping enabled, disable
+            if (this.playerLooped) {
+                this.playerLooped = false;
+                this.loopButton.setFrame(4);
+            }
+            this.nextButton.setFrame(3);
             this.music.stop();
             this.nextSong();
+            if (this.pauseButton.frame.name === 1) {
+                console.log('working')
+                this.pauseButton.setFrame(0)
+            }
+            
         }, this);
 
+        // on mouse click up, only nextButton resets to unpressed state
         this.input.on('pointerup', function(pointer){
-            loopButton.setFrame(4);
-            nextButton.setFrame(2);
-            
+            this.nextButton.setFrame(2);
         }, this);
-        
+
+        // when music pauses, button updates accordingly
         this.music.on('pause', () => {
-            //pauseButton.setTintFill(0x8B0000);
+            this.pauseButton.setFrame(1);
         }, this);
-    }
-    startMusic() {
-        //music.on('complete', listener);
 
-        if (!START_RANDOM) {
-            this.music = this.sound.add(`track_86`,{
-                volume: 0.2
+        // checks whether cursor is over any button and then changes cursor to hand
+        function setupButtonCursor(button, scene) {
+            button.on('pointerover', () => {
+                scene.input.setDefaultCursor('pointer');
             });
-            
-            //music.play();
-            this.music.play();
-            this.music.on('complete', () => {
-                this.nextSong();
-            }, this);
-        } else {
-            this.nextSong();
+            button.on('pointerout', () => {
+                scene.input.setDefaultCursor('default');
+            });
         }
+        setupButtonCursor(this.loopButton, this);
+        setupButtonCursor(this.nextButton, this);
+        setupButtonCursor(this.pauseButton, this);
+         
+        //pauses and resumes sound so queued sfx don't play all at once upon resuming
+        window.addEventListener('focus', () => {
+            
+            this.sound.resumeAll(); //resumes all music instances so old tracks need to be stopped properly
+            if (this.playerPaused) {
+                this.music.pause(); //keeps music paused if player clicked pause button
+            }
+            else{
+                this.pauseButton.setFrame(0);
+            }
+        });
         
-        
+        window.addEventListener('blur', () => {
+            this.pauseButton.setFrame(1);
+            this.sound.pauseAll(); // this prevents sound from being able to resume
+        });
+    }
 
+    stopMusic() {
+        this.sound.sounds.forEach((sound) => {
+            sound.stop();
+        });
+    }
 
-        
-        this.hasStarted = true;
+    startMusic() {
+        //if (!START_RANDOM) { //commenting out until functionality can return
+             // check that a song isn't already playing so we don't add more than 1
+            // when looping back to the main menu
+            if (!this.music.isPlaying && !this.playerPaused) {
+                if (!this.startedOnce) {
+                    console.log('music playing from startMusic()')
+                    this.music = this.sound.add(`track_86`,{
+                        volume: 0.2
+                    });
+                    this.music.play();
+                    
+                } else {
+                    this.nextSong();
+                }
+                
+            }
+        //}
 
     }
     nextSong (songID) {
+        // we call stop here before calling next song to delete old instances of music
+        // prevents songs from double playing
+        this.stopMusic();
         switch (songID) {
             case `track_149`: // Game Over Song
                 this.music.stop();
@@ -811,6 +1014,7 @@ class MusicPlayerScene extends Phaser.Scene {
                 this.trackID.setText(149);
                 
                 break;
+
             case `track_175`: // Red Alert Song
                 this.music.stop();
                 this.music = this.sound.add(`track_175`,{
@@ -826,28 +1030,33 @@ class MusicPlayerScene extends Phaser.Scene {
                 }, this);
                 
                 break;
-        
-            default: // Every thing else
-                if (this.shuffledTracks.length != 0) {
-                } else {
-                    this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+
+            default: // Everything else
+                if (this.playerLooped) {
+                    this.music.play();
+                }
+                else {
+                    if (this.shuffledTracks.length != 0) {
+                    } else {
+                        this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
+                    }
+
+                    var track = this.shuffledTracks.pop();
+
+                    this.music = this.sound.add(`track_${track}`,{
+                        volume: 0.33
+                    });
+
+                    this.music.play();
+                    this.music.on('complete', () => {
+                        this.nextSong();
+                    }, this); 
+                    
+                    this.trackID.setText(track);
                 }
 
-                var track = this.shuffledTracks.pop();
-
-                this.music = this.sound.add(`track_${track}`,{
-                    volume: 0.33
-                });
-
-                this.music.play();
-                this.music.on('complete', () => {
-                    this.nextSong();
-                }, this); 
-                
-                this.trackID.setText(track);
                 break;
         }
-
     }
 }
 
@@ -919,13 +1128,8 @@ class PinballDisplayScene extends Phaser.Scene {
             alpha: 0,
         });
         
-
         this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
         ).setOrigin(0.0,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
-
-
-        
-
 
 
         this.comboMasks = []
@@ -942,11 +1146,6 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
         this.comboCover.mask.invertAlpha = true;
-        
-        // despite happening after the combo cover objects are created, 
-        // there's still a frame where the snake can be seen before its tween starts
-        // but only after resetting back to main menu
-        //ourPersist.comboCover.setVisible(false);
     }
 }
 
@@ -1122,7 +1321,6 @@ class TutorialScene extends Phaser.Scene {
             }), 
                 '[PRESS SPACE TO CONTINUE]',
         ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
-        
         this.continueText.setVisible(false).setAlpha(0);
 
         if (tutorialPanels.length === 1) {
@@ -1312,9 +1510,12 @@ class TutorialScene extends Phaser.Scene {
                 scene.scene.get("PersistScene").stageHistory = [];
                 scene.scene.get("PersistScene").coins = START_COINS;
 
-
-                scene.scene.get("MusicPlayerScene").music.pause();
-                scene.scene.get("MusicPlayerScene").nextSong();
+                //double check that player hasn't paused music so it isn't played again
+                if (!scene.scene.get("MusicPlayerScene").playerPaused) {
+                    console.log('music playing from TutorialScene onContinue')
+                    scene.scene.get("MusicPlayerScene").music.pause();
+                    scene.scene.get("MusicPlayerScene").nextSong();
+                }
 
                 // @Holden add transition to nextScene here.
                 scene.scene.start("GameScene", {
@@ -1448,6 +1649,10 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
         //this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6});
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
@@ -1586,20 +1791,6 @@ class StartScene extends Phaser.Scene {
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         const ourGame = this.scene.get("GameScene");
         const ourStartScene = this.scene.get("StartScene");
-
-
-        //pauses and resumes sound so queued sfx don't play all at once upon resuming
-        window.addEventListener('focus', function () {
-            game.sound.pauseAll();
-            //console.log('All sounds paused:', game.sound.sounds);
-        });
-        
-        window.addEventListener('blur', function () {
-            game.sound.resumeAll();
-            //console.log('All sounds resumed:', game.sound.sounds);
-        });
-
-        this.pauseOnBlur = true;
         
         
 
@@ -4118,6 +4309,19 @@ class GameScene extends Phaser.Scene {
         var _chargeUp = this.sound.add('chargeUp');
         this.pop03 = this.sound.add('pop03')
         this.chime01 = this.sound.add('chime01')
+        this.snakeCrash = this.sound.add('snakeCrash');
+        //this.pointCollect = this.sound.add('pointCollect01');
+        //this.pointCollect.play();
+
+        SOUND_ATOM.forEach(soundID => {
+            this.atomSounds.push(this.sound.add(soundID[0]));
+            });
+        SOUND_PORTAL.forEach(soundID => {
+            this.portalSounds.push(this.sound.add(soundID[0]));
+            });
+        SOUND_POINT_COLLECT.forEach(soundID => {
+            this.pointSounds.push(this.sound.add(soundID[0], {volume: 0.5}));
+            });
 
         //_chargeUp.play();
 
@@ -4491,6 +4695,7 @@ class GameScene extends Phaser.Scene {
                 
                 ourGameScene.extractMenuOn = false;
                 ourGameScene.finalScore("MainMenuScene", {});
+                // play small victory fanfare here perhaps
                 return true;
             },
             'CANCEL': function () {  
@@ -4711,23 +4916,10 @@ class GameScene extends Phaser.Scene {
             }
         
         
-        // Audio
-        this.snakeCrash = this.sound.add('snakeCrash'); // Move somewhere
+
 
         
 
-        //this.pointCollect = this.sound.add('pointCollect01');
-        //this.pointCollect.play();
-
-        SOUND_ATOM.forEach(soundID => {
-            this.atomSounds.push(this.sound.add(soundID[0]));
-            });
-        SOUND_PORTAL.forEach(soundID => {
-            this.portalSounds.push(this.sound.add(soundID[0]));
-            });
-        SOUND_POINT_COLLECT.forEach(soundID => {
-            this.pointSounds.push(this.sound.add(soundID[0], {volume: 0.5}));
-            });
 
         // Starting Game State
         this.gState = GState.START_WAIT;
@@ -6383,10 +6575,6 @@ class GameScene extends Phaser.Scene {
         }    
     }
 
-    // #region .snakeCriticalState(
-    snakeCriticalState(){
-        const coins = this.scene.get("PersistScene").coins;
-    }
 
     transitionVisual () {
         
@@ -6921,7 +7109,9 @@ class GameScene extends Phaser.Scene {
             });
 
             const onContinue = function () {
+                //set to next song so it doesn't repeat gameOver song
                 ourGameScene.scene.get("MusicPlayerScene").nextSong();
+                ourGameScene.gameSceneFullCleanup();
                 ourGameScene.scene.start('MainMenuScene');
             }
             onContinue.bind(this);
@@ -7255,7 +7445,7 @@ class GameScene extends Phaser.Scene {
                 onContinue();
             });
         }, [], this);
-        this.gameSceneCleanup()
+        this.gameSceneFullCleanup()
 
     }
 
@@ -7314,6 +7504,8 @@ class GameScene extends Phaser.Scene {
             log = null;
         }
 
+
+
     }
     gameSceneFullCleanup() {
         // Put end of run clean up loop.
@@ -7322,8 +7514,22 @@ class GameScene extends Phaser.Scene {
         //    log.destroy();
         //    log = null;
         //}
-
         this.gameSceneCleanup();
+
+        // reset music player
+        if (!this.scene.get("MusicPlayerScene").playerPaused) {
+            this.scene.get("MusicPlayerScene").pauseButton.setFrame(0);
+        }
+        if (!this.scene.get("MusicPlayerScene").playerLooped) {
+            this.scene.get("MusicPlayerScene").loopButton.setFrame(4);
+        }
+        this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
+
+        
+        // this prevents old tracks from persisting when resetting
+        this.sound.sounds.forEach((sound) => {
+            sound.stop();
+        });
     }
     
  
@@ -7684,7 +7890,8 @@ class GameScene extends Phaser.Scene {
 
     nextStage(stageName, camDirection) {
         const ourInputScene = this.scene.get("InputScene");
-        this.camDirection = camDirection
+        this.camDirection = camDirection;
+        this.scene.get("PersistScene").prevStage = this.stage;
 
         this.scene.restart( { 
             stage: stageName, 
@@ -7963,10 +8170,6 @@ class GameScene extends Phaser.Scene {
             }
         }*/
 
-        this.snakeCriticalState(); // TODO: This should only be called once when the snake bonks
-        // Then it should be toggled off in coin.js when onOver iff the snake is in a critical state.
-        // It is out of the loop now so it works as soon as the coin is lost even when in bonked state.
-        
 
 
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
@@ -8556,7 +8759,8 @@ class ScoreScene extends Phaser.Scene {
 
         // Update Stage Data
         updatePlayerStats(this.stageData);
-        ourPersist.prevStage = this.stageData.stage;
+        //ourPersist.prevStage = this.stageData.stage;
+        ourPersist.prevRank = this.stageData.rank();
 
         // For properties that may not exist.
         if (ourGame.tiledProperties.has("slug")) {
@@ -9076,7 +9280,7 @@ class ScoreScene extends Phaser.Scene {
             
         });
 
-        const stageScoreUI = this.add.dom(-SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -9085,8 +9289,50 @@ class ScoreScene extends Phaser.Scene {
                 "text-shadow": '#000000 1px 0 6px',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `TOTAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
+                `FINAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
         ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+
+        if (ourGame.mode === MODES.PRACTICE) {
+            // Show difference in best run to this run.
+
+            var current = Math.floor(this.stageData.calcTotal());
+            var bestScore = Math.floor(BEST_OF_ALL.get(this.stageData.stage).calcTotal())
+
+            var deltaColor;
+            var prefix;
+            if (current > bestScore) {
+                deltaColor = COLOR_BONUS;
+                prefix = "+";
+            } else {
+                deltaColor = COLOR_FOCUS;
+                prefix = "";
+            }
+            
+
+
+            const historicalBest = this.add.dom(SCREEN_WIDTH/2, GRID * 23.35, 'div', Object.assign({}, STYLE_DEFAULT,
+                {
+                    "font-size": "16px",
+                    "font-weight": '400',
+                    "text-align": 'right',
+                    "text-shadow": '#000000 1px 0 6px',
+                })).setHTML(
+                    //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                    `Saved Best*: ${commaInt(bestScore)}`
+            ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+            
+            const historicalDiff = this.add.dom(SCREEN_WIDTH/2, GRID * 24.10, 'div', Object.assign({}, STYLE_DEFAULT,
+                {
+                    "color": deltaColor,
+                    "font-size": "16px",
+                    "font-weight": '400',
+                    "text-align": 'right',
+                    "text-shadow": '#000000 1px 0 6px',
+                })).setHTML(
+                    //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                    `${prefix}${commaInt(current - bestScore)}`
+            ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+        }
 
         
         this.ScoreContainerL.add(
@@ -9526,16 +9772,16 @@ class ScoreScene extends Phaser.Scene {
                         sumOfBest = ourPersist.sumOfBestTut;
                         break
                     case MODES.PRACTICE:
-                            prevStagesComplete = ourPersist.prevStagesCompleteClassic;
-                            prevSumOfBest = ourPersist.prevSumOfBestClassic;
-                            prevPlayerRank = ourPersist.prevPlayerRankClassic;
-    
-                            // This shouldn't update in practice? Because it doesn't save.
-                            totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
-                            newRank = prevPlayerRank;
-                            stagesComplete = prevStagesComplete;
-                            sumOfBest = prevSumOfBest;
-                            break
+                        prevStagesComplete = ourPersist.prevStagesCompleteClassic;
+                        prevSumOfBest = ourPersist.prevSumOfBestClassic;
+                        prevPlayerRank = ourPersist.prevPlayerRankClassic;
+
+                        // Show temporary + if you had done it in Classic or Expert.
+                        totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+                        stagesComplete = ourPersist.stagesCompleteClassic;
+                        sumOfBest = ourPersist.prevSumOfBestClassic;
+                        break
                     
                     default:
                         // Leave this one as a safety trigger
@@ -9551,7 +9797,7 @@ class ScoreScene extends Phaser.Scene {
                         bestOfTitle = `Best of Expert`
                         break;
                     case MODES.PRACTICE:
-                        bestOfTitle = `Practicing! Score Not Saved.`
+                        bestOfTitle = `*Practicing! Score Not Saved`
                         break;
                     default:
                         bestOfTitle = ``;
@@ -9581,9 +9827,9 @@ class ScoreScene extends Phaser.Scene {
 
                 this.bestOfModeUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1, GRID *20.25, 'div', Object.assign({}, STYLE_DEFAULT, {
                     "fontSize":'20px',
-                    "font-weight": '400',
+                    //"font-weight": '400',
                     "text-shadow": '#000000 1px 0 6px',
-                    //"font-style": 'italic',
+                    "font-style": 'italic',
                     //"font-weight": 'bold',
                     })).setHTML(
                         bestOfTitle

@@ -121,7 +121,6 @@ export const QUICK_MENUS = new Map([
             
             console.log("BACK TO MAIN MENU");
             
-            ourGameScene.gameSceneCleanup();
             
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
@@ -282,10 +281,11 @@ export const QUICK_MENUS = new Map([
             
             console.log("BACK TO MAIN MENU");
             
+            ourGameScene.gameSceneCleanup();
             
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
-            ourGameScene.gameSceneCleanup();
+            debugger
 
             ourGameScene.scene.start("MainMenuScene");
             qMenuCleanup.call(this); 
