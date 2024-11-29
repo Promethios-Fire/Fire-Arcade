@@ -6052,8 +6052,8 @@ class GameScene extends Phaser.Scene {
     
     
         //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-    this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 29 + 1,  GRID * 3 + 12 , 'mainFont',` +`,8)
-    .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 33 - 1,  GRID * 4 + 7 , 'mainFont',` +`,8)
+        .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         
         
         
@@ -8976,7 +8976,7 @@ class ScoreScene extends Phaser.Scene {
         const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `FOOD SCORE:
+                `ATOM SCORE:
                 SPEED BONUS:`
         ).setOrigin(1, 0).setScale(0.5);
 
