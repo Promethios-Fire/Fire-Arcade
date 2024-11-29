@@ -461,6 +461,15 @@ export const RANKS = Object.freeze({
     GRAND_MASTER: 5
 });
 
+const RANK_LETTERS = new Map([
+    [RANKS.WOOD, "D"],
+    [RANKS.BRONZE, "C"],
+    [RANKS.SILVER, "B"],
+    [RANKS.GOLD, "A"],
+    [RANKS.PLATINUM, "S"],
+    [RANKS.GRAND_MASTER, "PS"]
+]);
+
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with SpeedBonus
     [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
@@ -483,9 +492,10 @@ export const MODES = Object.freeze({
 
 export const MODES_TEXT = new Map([
     [MODES.PRACTICE, "Practice"],
-    [MODES.CLASSIC, "Adventure"],
-    [MODES.EXPERT, "Adventure"],
+    [MODES.CLASSIC, "Classic"],
+    [MODES.EXPERT, "Expert"],
     [MODES.GAUNTLET, "Gauntlet"],
+    [MODES.TUTORIAL, "Classic"],
 
 ]);
 
@@ -727,7 +737,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 
                 var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
                 'mainFont', 
-                   `${stageData.stage.split("_")[1]}`, 
+                   `${stageData.stage.split("_")[1]} ${RANK_LETTERS.get(stageData.stageRank())}`, 
                8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
                this.navLog.push(_stageText);
@@ -1682,6 +1692,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
         this.load.spritesheet('CapElectronDispersion', 'assets/sprites/UI_CapElectronDispersion.png', { frameWidth: 28, frameHeight: 18 });
         //this.load.spritesheet('atomicPickup01Anim', 'assets/sprites/atomicPickup01Anim.png', { frameWidth: 24, frameHeight: 24 });
+        this.load.spritesheet('atomicPickupUISmall', 'assets/sprites/atomicPickupUISmall.png', { frameWidth: 9, frameHeight: 9 });
         this.load.spritesheet('atomicPickupComet', 'assets/sprites/atomicPickupComet.png', { frameWidth: 12, frameHeight: 12 });
         this.load.spritesheet('atomicPickupScore', 'assets/sprites/atomicPickupScoreAnim.png', { frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
@@ -2606,7 +2617,7 @@ class StageCodex extends Phaser.Scene {
         var displayList = codexArgs.displayList ?? ["Overall", "Classic", "Expert"];
         var displayIndex = codexArgs.displayIndex ?? 0;
 
-        var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageID;
+        var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageMemory;
 
         var displayCategory = displayList[displayIndex];
         var originScene = codexArgs.originScene;
@@ -2774,26 +2785,26 @@ class StageCodex extends Phaser.Scene {
                         _y = rowY + 34 + (nextRow * stageNumber);
                     }
                     var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
-                    ).setOrigin(0,0).setDepth(70).setScale(.75);
+                    ).setOrigin(0,0).setDepth(70)
 
                     switch (true) {
                         case foodScore > BOOST_ADD_FLOOR:
-                            _atom.play('atom01idle');
+                            _atom.play('atom01Small');
                             break;
 
                         case foodScore > 60:
-                            _atom.play('atom02idle');
+                            _atom.play('atom02Small');
                             break;
                         
                         case foodScore > 1:
-                            _atom.play('atom03idle');
+                            _atom.play('atom03Small');
                             break;
                         
                         case foodScore > 60:
                             break;
                     
                         default:
-                            _atom.play("atom04idle");
+                            _atom.play("atom04Small");
                             break;
                     }
 
@@ -2846,7 +2857,7 @@ class StageCodex extends Phaser.Scene {
                 if (safeIndex != -1) {
                     var nextSelect = ([...this.yMap.keys()][safeIndex]);
                     selected = this.yMap.get(nextSelect);
-                    ourPersist.prevCodexStageID = nextSelect;
+                    ourPersist.prevCodexStageMemory = nextSelect;
                     
                     containerToY = selected.conY * -1 + nextRow;
                     this.tweens.add({
@@ -2886,7 +2897,7 @@ class StageCodex extends Phaser.Scene {
      
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
-                ourPersist.prevCodexStageID = nextSelect;
+                ourPersist.prevCodexStageMemory = nextSelect;
                 
                 containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
@@ -3856,7 +3867,9 @@ class PersistScene extends Phaser.Scene {
         this.zeds = 0;
         this.coins = START_COINS;
         this.stageHistory = [];
-        this.prevCodexStageID = START_STAGE;
+        this.prevCodexStageMemory = START_STAGE;
+        this.prevStage = START_STAGE;
+        this.prevRank = 0;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -6958,31 +6971,34 @@ class GameScene extends Phaser.Scene {
                         this.gState = GState.PLAY;
                 }
             });
-            // atomic comet
-            ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            ourSpaceBoy.atomComet.play('atomCometSpawn');
-            ourSpaceBoy.atomComet.chain(['atomCometIdle']);
+
+            // check for extractHole so it doesn't fanfare in gauntlet and other modes
+            if (this.extractHole) {
+                // atomic comet
+                ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                .setDepth(100);
+                ourSpaceBoy.atomComet.play('atomCometSpawn');
+                ourSpaceBoy.atomComet.chain(['atomCometIdle']);
 
 
-            // rainbow electronFanfare
-            ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-            .setDepth(100);
-            ourSpaceBoy.electronFanfare.play('electronFanfareForm');
-            
+                // rainbow electronFanfare
+                ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                .setDepth(100);
+                ourSpaceBoy.electronFanfare.play('electronFanfareForm');
+                
 
-            // emit stars from electronFanfare
-            this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
-                speed: { min: -20, max: 20 },
-                angle: { min: 0, max: 360 },
-                alpha: { start: 1, end: 0 },
-                anim: 'starIdle',
-                lifespan: 1000,
-                follow: ourSpaceBoy.electronFanfare,
-            }).setFrequency(150,[1]).setDepth(1);
+                // emit stars from electronFanfare
+                this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
+                    speed: { min: -20, max: 20 },
+                    angle: { min: 0, max: 360 },
+                    alpha: { start: 1, end: 0 },
+                    anim: 'starIdle',
+                    lifespan: 1000,
+                    follow: ourSpaceBoy.electronFanfare,
+                }).setFrequency(150,[1]).setDepth(1);
 
-            ourGame.countDown.setAlpha(0);
-        }
+                ourGame.countDown.setAlpha(0);
+            }
 
         this.tweens.add({ //slower one-off snakeEating tween
             targets: this.snake.body, 
@@ -7022,7 +7038,11 @@ class GameScene extends Phaser.Scene {
             });
 
             ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
+            }
         }
+            
+
+            
 
         
 
@@ -7488,7 +7508,7 @@ class GameScene extends Phaser.Scene {
         
     }
     gameSceneCleanup(){
-        // TODO: event listener cleanup here
+        // TODO: finish event listener cleanup here
         // scene blur removal
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
         const ourGameScene = this.scene.get('GameScene');
@@ -7497,6 +7517,14 @@ class GameScene extends Phaser.Scene {
         ourGameScene.events.off('addScore');
         ourGameScene.events.off('spawnBlackholes');
         ourGameScene.scene.get("InputScene").scene.restart();
+
+        if (ourSpaceBoy.electronFanfare) {
+            
+            ourSpaceBoy.electronFanfare.destroy();
+        }
+        if (ourSpaceBoy.CapSparkFinale) {
+            ourSpaceBoy.CapSparkFinale.destroy();
+        }
 
         while (ourSpaceBoy.navLog.length > 0) {
             var log = ourSpaceBoy.navLog.pop();
@@ -7515,6 +7543,8 @@ class GameScene extends Phaser.Scene {
         //    log = null;
         //}
         this.gameSceneCleanup();
+
+        this.scene.get("PersistScene").prevRank = 0;
 
         // reset music player
         if (!this.scene.get("MusicPlayerScene").playerPaused) {
@@ -8760,7 +8790,6 @@ class ScoreScene extends Phaser.Scene {
         // Update Stage Data
         updatePlayerStats(this.stageData);
         //ourPersist.prevStage = this.stageData.stage;
-        ourPersist.prevRank = this.stageData.rank();
 
         // For properties that may not exist.
         if (ourGame.tiledProperties.has("slug")) {
@@ -9261,10 +9290,21 @@ class ScoreScene extends Phaser.Scene {
                 });
 
                 if(ourGame.mode === MODES.EXPERT) {
-                    ourPersist.coins += this.stageData.stageRank();
-                    ourGame.coinUIText.setHTML(
-                        `${commaInt(ourPersist.coins).padStart(2, '0')}`
-                    )
+
+                    var currentRank = this.stageData.stageRank();
+
+                    var rankDiff = currentRank - this.scene.get("PersistScene").prevRank;
+
+                    debugger
+                    if (rankDiff > 0) {
+                        ourPersist.coins += rankDiff;
+                        // TO DO. Better Visual this is happening would be nice. Like tween up the value.
+                        ourGame.coinUIText.setHTML(
+                            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+                        )
+                        this.scene.get("PersistScene").prevRank = currentRank; 
+                    }
+                    
                 }
             },
             onUpdate: tween =>
@@ -10786,6 +10826,32 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 12,
         repeat: -1
     })
+
+    scene.anims.create({
+        key: 'atom01Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [0,1,2,3,4,5,6,7,8,9]}),
+        frameRate: 12,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'atom02Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [10,11,12,13,14,15,16,17,18,19]}),
+        frameRate: 8,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'atom03Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [20,21,22,23,24,25,26,22,28,29]}),
+        frameRate: 6,
+        repeat: -1
+    });
+    scene.anims.create({
+        key: 'atom04Small',
+        frames: scene.anims.generateFrameNumbers('atomicPickupUISmall',{ frames: [30,31,32,33,34,35,36,37,38,39,40,41,42]}),
+        frameRate: 4,
+        repeat: -1
+    });
+    
 
     scene.textures.addSpriteSheetFromAtlas('atomicPickup01Anim', { atlas: 'megaAtlas', frameWidth: 12, frameHeight: 12,
         frame: 'atomicPickup01Anim.png'

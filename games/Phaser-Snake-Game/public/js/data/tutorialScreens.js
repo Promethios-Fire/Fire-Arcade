@@ -146,8 +146,8 @@ export var TUTORIAL_PANELS = new Map([
 
         var tutPortal1 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 2,
         SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
-        
         tutPortal1.play('portalIdle');
+
         var tutPortal2 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 2,
             SCREEN_HEIGHT/2 + GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
         tutPortal2.play('portalIdle');
@@ -158,7 +158,7 @@ export var TUTORIAL_PANELS = new Map([
         SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
 
         _map.get("text").push(tutText3);
-        _map.get("images").push(tutPortal1, tutPortal1, tutSnake2, tutSnake3);
+        _map.get("images").push(tutPortal1, tutPortal2, tutSnake2, tutSnake3);
         _map.get("panels").push(panel3);
         _map.set("growPanelTo", {w:240, h:160});
 

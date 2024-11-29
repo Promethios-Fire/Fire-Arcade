@@ -64,7 +64,7 @@ export const QUICK_MENUS = new Map([
             // Do Stuff
         }],
     ])],
-    ["tab-menu-Adventure", new Map([
+    ["tab-menu-Classic", new Map([
         [`RETURN TO STAGE`, function () {  
             const ourGameScene = this.scene.get("GameScene");
             console.log("RETURN TO STAGE");
@@ -124,7 +124,7 @@ export const QUICK_MENUS = new Map([
             
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneFullCleanup();
 
             ourGameScene.scene.start("MainMenuScene");
             
@@ -140,7 +140,74 @@ export const QUICK_MENUS = new Map([
 
 
             // Clear for reseting game
+            ourGameScene.gameSceneFullCleanup();
+            ourPersist.stageHistory = [];
+            
+            ourGameScene.backgroundBlur(false);
+            
+            // Restart  
+            ourGameScene.scene.start("GameScene", {
+                stage: START_STAGE,
+                score: 0,
+                startupAnim: true,
+                mode: ourPersist.mode
+            });
+
+            qMenuCleanup.call(this); 
+            return true;
+        }],
+    ])],
+    ["tab-menu-Expert", new Map([
+        [`RETURN TO STAGE`, function () {  
+            const ourGameScene = this.scene.get("GameScene");
+            console.log("RETURN TO STAGE");
+            ourGameScene.backgroundBlur(false);
+            qMenuCleanup.call(this);  
+        }],
+        ['REDO STAGE', function () {
+            const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPersist = this.scene.get("PersistScene");
+
+            ourGameScene.backgroundBlur(false);
+            ourGameScene.scene.restart( {
+                stage: ourGameScene.stage, 
+                score: ourGameScene.stageStartScore, 
+                mode: ourGameScene.mode
+                //lives: this.lives 
+            });
+
             ourGameScene.gameSceneCleanup();
+            qMenuCleanup.call(this);   
+
+        }],
+        ['BACK TO MAIN MENU', function () {
+            const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPersist = this.scene.get("PersistScene");
+            
+            console.log("BACK TO MAIN MENU");
+            
+            
+            //ourPersist.comboCover.setVisible(true);
+            ourGameScene.backgroundBlur(false);
+            ourGameScene.gameSceneFullCleanup();
+
+            ourGameScene.scene.start("MainMenuScene");
+            
+
+            qMenuCleanup.call(this); 
+            return true;
+        }],
+        ['RESTART EXPERT ADVENTURE', function () {
+            const ourGameScene = this.scene.get("GameScene");
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPersist = this.scene.get("PersistScene");
+            // TODO: send to origin
+
+
+            // Clear for reseting game
+            ourGameScene.gameSceneFullCleanup();
             ourPersist.stageHistory = [];
             
             ourGameScene.backgroundBlur(false);
@@ -189,11 +256,10 @@ export const QUICK_MENUS = new Map([
             
             console.log("BACK TO MAIN MENU");
             
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneFullCleanup();
             
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
-            ourGameScene.gameSceneCleanup();
 
             ourGameScene.scene.start("MainMenuScene");
             
@@ -209,7 +275,7 @@ export const QUICK_MENUS = new Map([
 
 
             // Clear for reseting game
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneFullCleanup();
             ourPersist.stageHistory = [];
             
             ourGameScene.backgroundBlur(false);
@@ -281,7 +347,7 @@ export const QUICK_MENUS = new Map([
             
             console.log("BACK TO MAIN MENU");
             
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneFullCleanup();
             
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
@@ -299,7 +365,7 @@ export const QUICK_MENUS = new Map([
 
 
             // Clear for reseting game
-            ourGameScene.gameSceneCleanup();
+            ourGameScene.gameSceneFullCleanup();
             ourPersist.gauntlet = GAUNTLET_CODES.get(ourPersist.gauntletKey).stages.split("|");
             ourPersist.stageHistory = [];
             
