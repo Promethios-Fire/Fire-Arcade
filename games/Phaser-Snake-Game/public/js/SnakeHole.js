@@ -2785,7 +2785,7 @@ class StageCodex extends Phaser.Scene {
                         _y = rowY + 34 + (nextRow * stageNumber);
                     }
                     var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
-                    ).setOrigin(0,0).setDepth(70)
+                    ).setOrigin(0,0).setDepth(50)
 
                     switch (true) {
                         case foodScore > BOOST_ADD_FLOOR:
@@ -2808,7 +2808,17 @@ class StageCodex extends Phaser.Scene {
                             break;
                     }
 
-                    codexContainer.add(_atom);
+                    
+
+                    if (foodIndex > 0 && foodScore > COMBO_ADD_FLOOR) {
+                        var _comboConnect = this.add.rectangle((topLeft) + ((foodIndex % 28) * foodSpace) - 2, _y + 3, 2, 3, 0xFFFF00, 1
+                        ).setOrigin(0,0).setDepth(51).setAlpha(1);
+                        codexContainer.add([_atom, _comboConnect]);
+                    } else {
+                        codexContainer.add(_atom);
+                    }
+
+                    
                     
                     
                     foodIndex += 1;
