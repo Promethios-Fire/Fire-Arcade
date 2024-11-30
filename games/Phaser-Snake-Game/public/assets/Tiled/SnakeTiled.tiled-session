@@ -820,8 +820,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.25,
-                "y": 161.75
+                "x": 160.75,
+                "y": 179.25
             }
         },
         "World_0-1.json#tileSheetx12": {
@@ -2702,14 +2702,14 @@
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
-        "World_0-1.json",
-        "World_1-2.json",
-        "World_1-1.json",
-        "r-11-12-4.json",
-        "r-11-12-3.json",
-        "r-11-12-2.json",
-        "r-11-12-1.json",
         "World_8-3_Adv_Portaling.json",
+        "r-11-12-1.json",
+        "r-11-12-2.json",
+        "r-11-12-3.json",
+        "r-11-12-4.json",
+        "World_1-1.json",
+        "World_1-2.json",
+        "World_0-1.json",
         "World_10-4.json"
     ],
     "resizeMap.removeObjects": false,

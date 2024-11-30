@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -471,7 +471,7 @@ const RANK_LETTERS = new Map([
 ]);
 
 const RANK_BENCHMARKS = new Map([
-    // Calibrated for use with SpeedBonus
+    // Calibrated for use with Stage Score
     [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
     [RANKS.GOLD, 12000],
     [RANKS.SILVER, 6000],
@@ -4273,6 +4273,7 @@ class GameScene extends Phaser.Scene {
                     Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
             })
         }
+
         
 
         
@@ -7699,6 +7700,9 @@ class GameScene extends Phaser.Scene {
             ease: 'linear'
             }, this);
 
+        var popCounter = 1;
+        var numberOfThings = allTheThings.length;
+
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
             x: this.snake.head.x - GRID * 1,
@@ -7720,13 +7724,23 @@ class GameScene extends Phaser.Scene {
                 else{
                     blackholeTween.timeScale += .02;
                 }
-                this.sound.play('pop03', { volume: popVolume });
-                if (popVolume >= 0.00) {
-                    popVolume -= .005
+                if (numberOfThings > 100) {
+                    if (popCounter % 2 === 1) {
+                        this.sound.play('pop03', { volume: popVolume });
+                        if (popVolume >= 0.00) {
+                            popVolume -= .005
+                        }
+                    }
+                } else {
+                    this.sound.play('pop03', { volume: popVolume });
+                    if (popVolume >= 0.00) {
+                        popVolume -= .005
+                    }
                 }
+
+                popCounter += 1;
             },
             onComplete: () =>{
-                
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -7746,7 +7760,7 @@ class GameScene extends Phaser.Scene {
                             case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
                                 var nextStageRaw = this.nextStages[nextStageIndex];
                                 if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
-        
+            
                                     this.nextStage(this.nextStages[nextStageIndex], camDirection);
                                     
                                 } else {
@@ -7770,11 +7784,13 @@ class GameScene extends Phaser.Scene {
                                 break;
                         }
                         this.gameSceneCleanup();
-
                     }
                 });
+                
             }
         });
+
+
 
         var blackholeTweenGround = this.tweens.add({
             targets: groundSprites, 
