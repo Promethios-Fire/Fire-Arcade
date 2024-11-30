@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -93,7 +93,7 @@ export const PORTAL_PAUSE = 2;
 
 
 // Speed Multiplier Stats
-const a = 1400; // Average Score
+const a = 3660; // Average Score 
 const lm = 28; // Minimum score
 const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
@@ -8623,13 +8623,13 @@ var StageData = new Phaser.Class({
         return `${this.stage}`;
     },
 
-    calcBase() {
+    atomTime() {
         var stageScore = this.foodLog.reduce((a,b) => a + b, 0);
         return stageScore;
     },
     
-    calcBonus() {
-        var base = this.calcBase()
+    stageScore() {
+        var base = this.atomTime()
         return calcBonus(base);
     },
 
@@ -8667,7 +8667,7 @@ var StageData = new Phaser.Class({
     },
 
     preAdditive() {
-        return this.calcBase() + calcBonus(this.calcBase());
+        return calcBonus(this.atomTime());
     },
 
     zedLevelBonus() {
@@ -8868,7 +8868,7 @@ class ScoreScene extends Phaser.Scene {
             });
 
         // Pre Calculate needed values
-        var stageAve = this.stageData.calcBase() / this.stageData.foodLog.length;
+        var stageAve = this.stageData.atomTime() / this.stageData.foodLog.length;
 
         if (localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`)) {
             var bestLogJSON = JSON.parse(localStorage.getItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`));
@@ -8880,7 +8880,7 @@ class ScoreScene extends Phaser.Scene {
 
         var bestLog = new StageData(bestLogJSON);
     
-        var bestLocal = bestLog.calcBase();
+        var bestLocal = bestLog.atomTime();
         var bestAve = bestLocal/bestLog.foodLog.length;
 
         // TODO: Don't do it a bonuse level? What do we do with the stage history on bonus levels?
@@ -8989,11 +8989,16 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 8, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
-                `ATOM SCORE:
-                SPEED BONUS:`
+                `ATOM TIME:`
+        ).setOrigin(1, 0).setScale(0.5);
+
+        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 11 + 10, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `STAGE SCORE:`
         ).setOrigin(1, 0).setScale(0.5);
 
         var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -9002,15 +9007,15 @@ class ScoreScene extends Phaser.Scene {
                 `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML( //_baseScore
-                `
-                +${commaInt(0)}
-                `
-        ).setOrigin(1, 0).setScale(0.5);
+        //var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        //    scorePartsStyle, {
+        //    })).setHTML( //_baseScore
+        //        `
+        //        +${commaInt(0)}
+        //        `
+        //).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 0, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore + _speedbonus
                 `
@@ -9020,8 +9025,8 @@ class ScoreScene extends Phaser.Scene {
 
         var frameTime = 16.667;
 
-        var _baseScore = this.stageData.calcBase();
-        var _speedbonus = calcBonus(this.stageData.calcBase());
+        var _baseScore = this.stageData.atomTime();
+        var _speedbonus = calcBonus(this.stageData.atomTime());
 
         var atomList = this.stageData.foodLog.slice();
         
@@ -9051,11 +9056,11 @@ class ScoreScene extends Phaser.Scene {
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
-                preAdditiveSpeedScoreUI1.setHTML(
-                    `
-                +${commaInt(value)}
-                `
-            ).setOrigin(1, 0).setScale(0.5);
+                //preAdditiveSpeedScoreUI1.setHTML(
+                //    `
+                //+${commaInt(value)}
+                //`
+                //).setOrigin(1, 0).setScale(0.5);
             },
             onComplete: () => {
                 //SFX
@@ -9070,7 +9075,7 @@ class ScoreScene extends Phaser.Scene {
                 preAdditiveSpeedScoreUI2.setHTML(
                     `
                 
-                <hr style="font-size:3px"/><span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(_baseScore + _speedbonus)}</span>`
+                <hr style="font-size:3px"/><span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(_speedbonus)}</span>`
             )}
         });
 
@@ -9110,15 +9115,16 @@ class ScoreScene extends Phaser.Scene {
 
                 `
         ).setOrigin(1,0).setScale(0.5);
-        var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-                "font-size":'12px'
-            })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                `
-
-                MEDAL +${0}%
-                `
-        ).setOrigin(1,0).setScale(0.5);
+       
+        //var multLablesUI3 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        //    scorePartsStyle, {
+        //        "font-size":'12px'
+        //    })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+        //        `
+        //
+        //        MEDAL +${0}%
+        //        `
+        //).setOrigin(1,0).setScale(0.5);
         
         this.tweens.addCounter({
             from: 0,
@@ -9164,12 +9170,12 @@ class ScoreScene extends Phaser.Scene {
             onUpdate: tween =>
             {
                 const value3 = Math.round(tween.getValue());
-                multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                    `
-
-                    MEDAL +${value3}%
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
+                //multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                //    `
+                //
+                //    MEDAL +${value3}%
+                //    `
+                //).setOrigin(1, 0).setScale(0.5);
             }
         });
         
@@ -9405,12 +9411,13 @@ class ScoreScene extends Phaser.Scene {
             [this.scorePanelL,
             this.scorePanelLRank,
             preAdditiveBaseScoreUI,
-            preAdditiveSpeedScoreUI1,
+            //preAdditiveSpeedScoreUI1,
+            stageScoreUILabel,
             preAdditiveSpeedScoreUI2,
             preAdditiveLablesUI,
             multLablesUI1,
             multLablesUI2,
-            multLablesUI3,
+            //multLablesUI3,
             multValuesUI1,
             multValuesUI2,
             postAdditiveLablesUI,
@@ -9715,7 +9722,7 @@ class ScoreScene extends Phaser.Scene {
 
                 MODE: <span style = "float: right">${bestLog.mode}</span>
                 BASE SCORE: <span style = "float: right">${_baseScore}</span>
-                SPEED BONUS: <span style = "float: right">${bestLog.calcBonus()}</span>
+                STAGE SCORE: <span style = "float: right">${bestLog.stageScore()}</span>
                 </br>
 
 
@@ -9972,7 +9979,7 @@ class ScoreScene extends Phaser.Scene {
         
         tempStageHistory.forEach( _stage => {
             _histLog = [ ..._histLog, ..._stage.foodLog];
-            sumOfBase += _stage.calcBase();
+            sumOfBase += _stage.atomTime();
             ourGame.nextScore += _stage.calcTotal();
 
         });
