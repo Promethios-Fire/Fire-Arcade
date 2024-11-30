@@ -470,12 +470,14 @@ const RANK_LETTERS = new Map([
     [RANKS.GRAND_MASTER, "PS"]
 ]);
 
+
+// S rank on 0-1 Atom time :3008
 const RANK_BENCHMARKS = new Map([
     // Calibrated for use with Stage Score
     [RANKS.GRAND_MASTER, COMBO_ADD_FLOOR], // Max Combo
-    [RANKS.GOLD, 12000],
-    [RANKS.SILVER, 6000],
-    [RANKS.BRONZE, 3000],
+    [RANKS.GOLD, 22000],  //  2888 ATOM TIME 
+    [RANKS.SILVER, 8600], //  2395
+    [RANKS.BRONZE, 3300], //  1633
     [RANKS.WOOD, 0],
 
 ]);
