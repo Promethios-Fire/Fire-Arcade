@@ -6321,7 +6321,7 @@ class GameScene extends Phaser.Scene {
 
             // Calc Level Score
             var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
-            var currentScore = baseScore + calcBonus(baseScore);
+            var currentScore = calcBonus(baseScore);
 
             var lastAtom = this.scoreHistory.slice(this.scoreHistory.length - 1);
 
@@ -6330,12 +6330,12 @@ class GameScene extends Phaser.Scene {
 
             var prevBase = lastHistory.reduce((a,b) => a + b, 0)
             
-            var lastScore = prevBase + calcBonus(prevBase);
+            var lastScore = calcBonus(prevBase);
             
-            var plusBonus = currentScore - lastScore - lastAtom;
+            //var plusBonus = currentScore - lastScore - lastAtom;
             var deltaScore =  currentScore - lastScore;
 
-            console.log("Current Score:", this.score + calcBonus(baseScore), "+Δ" ,baseScore + calcBonus(baseScore) - lastScore, "Length:", this.length);
+            console.log("Current Score:", currentScore, "+Δ" , deltaScore, "Length:", this.length);
 
             //this.runningScore = this.score + calcBonus(baseScore);
             
@@ -8686,7 +8686,7 @@ var StageData = new Phaser.Class({
     },
 
     postMult() {
-        return this.preAdditive() * this.bonusMult();
+        return Math.floor(this.preAdditive() * this.bonusMult());
     },
     
     bonkBonus(){
@@ -8995,7 +8995,7 @@ class ScoreScene extends Phaser.Scene {
                 `ATOM TIME:`
         ).setOrigin(1, 0).setScale(0.5);
 
-        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 11 + 10, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 11 + 11, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `STAGE SCORE:`
