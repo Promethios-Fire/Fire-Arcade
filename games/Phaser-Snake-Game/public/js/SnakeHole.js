@@ -1158,6 +1158,7 @@ class PlinkoMachineScene extends Phaser.Scene {
     }
     init() {
         this.zedIndex = 1;
+        this.zedsToAdd = 0;
     }
     create() {
         var matterJSON = this.cache.json.get('collisionData');
@@ -1232,8 +1233,7 @@ class PlinkoMachineScene extends Phaser.Scene {
         this.spawnPlinkos(2);
     }
     spawnPlinkos (number) {
-        this.zedIndex = 1;
-        this.zedsToAdd = 0;
+        
         if (number > 0){
             var delay = 250;
             
@@ -1268,7 +1268,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: zedText,
                     alpha: { from: 1, to: 0.0 },
-                    y: zedText.y - 12,
+                    y: zedText.y - 18,
                     ease: 'Sine.InOut',
                     duration: 750,
                     repeat: 0,
@@ -10161,6 +10161,9 @@ class ScoreScene extends Phaser.Scene {
                     console.log("RollResults:", rollResults);
                     console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
                     ourPersist.zeds += rollResults.get("zedsEarned");
+                    
+                    plinkoMachine.zedIndex = 1;
+                    plinkoMachine.zedsToAdd = 0;
                     plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                     //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
