@@ -655,9 +655,9 @@ class SpaceBoyScene extends Phaser.Scene {
         //this.sound.mute = true; //TEMP MUTE SOUND
         const persist = this.scene.get("PersistScene");
 
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52).setVisible(false); 
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
-        //this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
+        this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
@@ -1218,7 +1218,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             isStatic: true
         });
 
-        this.zedSum = this.add.dom(GRID * 6 , GRID * 18, 'div', Object.assign({}, STYLE_DEFAULT, {
+        this.zedSum = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_BONUS,
             //'color': '#FCFFB2',
             'font-weight': '400',
@@ -1228,14 +1228,6 @@ class PlinkoMachineScene extends Phaser.Scene {
             'padding': '3px 8px 0px 0px',
         })).setOrigin(1,0).setScale(.5);
 
-        //this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
-            // Do something when the sensor collides with another object
-        
-        //    
-        //}, this);
-
-        //plinkoSensor.on('collisionStart', (event) => {
-        //}, this);
         
         this.spawnPlinkos(2);
     }
@@ -1263,7 +1255,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                 this.zedsToAdd += this.zedIndex;
 
 
-                var zedText = this.add.dom(GRID *6 , GRID * 18, 'div', Object.assign({}, STYLE_DEFAULT, {
+                var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
                     color: COLOR_FOCUS,
                     //'color': '#FCFFB2',
                     'font-weight': '400',
@@ -1276,7 +1268,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                 this.tweens.add({
                     targets: zedText,
                     alpha: { from: 1, to: 0.0 },
-                    y: zedText.y - 9,
+                    y: zedText.y - 12,
                     ease: 'Sine.InOut',
                     duration: 750,
                     repeat: 0,
@@ -1297,12 +1289,12 @@ class PlinkoMachineScene extends Phaser.Scene {
                 if (number === 0) {
                     // On final plinko's collision
 
-                    var tween = this.tweens.add({
+                    var sineTween = this.tweens.add({
                         targets: this.zedSum,
                         alpha: { from: 0, to: 1 },
                         ease: 'Sine.InOut',
                         duration: 90,
-                        delay: 200,
+                        delay: 500,
                         //loop: 10,
                         repeat: -1,
                         yoyo: true,
@@ -1325,6 +1317,8 @@ class PlinkoMachineScene extends Phaser.Scene {
                         yoyo: false,
                         onComplete: () => {
                             this.zedSum.setText(" ");
+                            sineTween.stop();
+                            this.zedSum.setAlpha(1);
                         }
                     });
                 }
@@ -11274,7 +11268,7 @@ var config = {
     physics: 
         { default: 'matter',
              matter: { 
-                debug: true,
+                debug: false,
                 gravity: { y: 1 },
                 positionIterations: 6, //6
                 velocityIterations: 4, //4
