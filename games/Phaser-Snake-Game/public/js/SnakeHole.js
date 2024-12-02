@@ -100,6 +100,7 @@ const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
 
 // #region Utils Functions
 
+// move to unlock Criteria
 var checkExpertUnlocked = function () {
     return (
         checkRankGlobal(STAGES.get("9-4"), RANKS.WOOD)
@@ -654,9 +655,9 @@ class SpaceBoyScene extends Phaser.Scene {
         //this.sound.mute = true; //TEMP MUTE SOUND
         const persist = this.scene.get("PersistScene");
 
-        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52); 
+        this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52).setVisible(false); 
 
-        this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
+        //this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
@@ -1156,6 +1157,7 @@ class PlinkoMachineScene extends Phaser.Scene {
         super({key: 'PlinkoMachineScene', active: false});
     }
     init() {
+        this.zedIndex = 1;
     }
     create() {
         var matterJSON = this.cache.json.get('collisionData');
@@ -1210,10 +1212,36 @@ class PlinkoMachineScene extends Phaser.Scene {
             
             tube.friction = 0; // Set the friction of the tube to 0 
         }
+
+        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 2, 5, 5, {
+            isSensor: true ,
+            isStatic: true
+        });
+
+        this.zedSum = this.add.dom(GRID * 6 , GRID * 18, 'div', Object.assign({}, STYLE_DEFAULT, {
+            color: COLOR_BONUS,
+            //'color': '#FCFFB2',
+            'font-weight': '400',
+            'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+            'font-size': '22px',
+            'font-family': 'Oxanium',
+            'padding': '3px 8px 0px 0px',
+        })).setOrigin(1,0).setScale(.5);
+
+        //this.matter.world.on('collisionstart', function (event, bodyA, bodyB) {
+            // Do something when the sensor collides with another object
+        
+        //    
+        //}, this);
+
+        //plinkoSensor.on('collisionStart', (event) => {
+        //}, this);
         
         this.spawnPlinkos(2);
     }
     spawnPlinkos (number) {
+        this.zedIndex = 1;
+        this.zedsToAdd = 0;
         if (number > 0){
             var delay = 250;
             
@@ -1227,15 +1255,92 @@ class PlinkoMachineScene extends Phaser.Scene {
                 },
                 //slop:0.8,
             }).setDepth(40);
+
+
+            plinkoDisc.setOnCollideWith(this.plinkoSensor, pair => {
+                // pair.bodyA
+                // pair.bodyB
+                this.zedsToAdd += this.zedIndex;
+
+
+                var zedText = this.add.dom(GRID *6 , GRID * 18, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    color: COLOR_FOCUS,
+                    //'color': '#FCFFB2',
+                    'font-weight': '400',
+                    'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
+                    'font-size': '22px',
+                    'font-family': 'Oxanium',
+                    'padding': '3px 8px 0px 0px',
+                })).setOrigin(0,0).setScale(.5);
+                
+                this.tweens.add({
+                    targets: zedText,
+                    alpha: { from: 1, to: 0.0 },
+                    y: zedText.y - 9,
+                    ease: 'Sine.InOut',
+                    duration: 750,
+                    repeat: 0,
+                    yoyo: false,
+                    onComplete: () => {
+                        zedText.removeElement();
+                    }
+                });
+
+                zedText.setText(`+${this.zedIndex}`);
+                this.zedSum.setText(this.zedsToAdd);
+
+
+
+                console.log("Add", this.zedIndex, " Zeds for a total", this.zedsToAdd);
+                this.zedIndex += 1;
+
+                if (number === 0) {
+                    // On final plinko's collision
+
+                    var tween = this.tweens.add({
+                        targets: this.zedSum,
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        duration: 90,
+                        delay: 200,
+                        //loop: 10,
+                        repeat: -1,
+                        yoyo: true,
+                        onComplete: () => {
+
+                        }
+                    }, this);
+
+                    //tween.on('complete', () => {
+                    //});
+
+                    //debugger
+                    this.tweens.add({
+                        targets: this.zedSum,
+                        alpha: { from: 1, to: 0.0 },
+                        ease: 'Sine.InOut',
+                        duration: 1200,
+                        delay: 2400,
+                        repeat: 0,
+                        yoyo: false,
+                        onComplete: () => {
+                            this.zedSum.setText(" ");
+                        }
+                    });
+                }
+                // Do something
+            }, this);
+
             //plinkoDisc.setCircle(3.33);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.005);
+            plinkoDisc.setFrictionAir(0.01);
             plinkoDisc.setFixedRotation();
 
             number--;
             this.time.delayedCall(delay, this.spawnPlinkos, [number], this);
         } else {
+            console.log('Finished Visual Pinko Spawning');
             return
         }
     
@@ -4324,7 +4429,7 @@ class GameScene extends Phaser.Scene {
             //    ourPersist.fx.hue(330);
             //}
             default:
-                debugger // don't remove
+                debugger
                 break;
         }
 
@@ -6226,7 +6331,7 @@ class GameScene extends Phaser.Scene {
                 duration: 1000,
                 repeat: 0,
                 yoyo: false
-              });
+            });
             
             
             var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
@@ -11169,7 +11274,7 @@ var config = {
     physics: 
         { default: 'matter',
              matter: { 
-                debug: false,
+                debug: true,
                 gravity: { y: 1 },
                 positionIterations: 6, //6
                 velocityIterations: 4, //4
