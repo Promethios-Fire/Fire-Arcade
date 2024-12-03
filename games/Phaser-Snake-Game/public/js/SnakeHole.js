@@ -1747,7 +1747,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('background02','assets/sprites/background02.png')
         this.load.image('background02_frame2','assets/sprites/background02.png')
         this.load.image('background02_4','assets/sprites/background02_4.png')
-        
+        this.load.image('background02_2','assets/sprites/background02_2.png')
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -4027,14 +4027,17 @@ class PersistScene extends Phaser.Scene {
     // Scrolling BG1
     //atlas code preserved
     //this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02').setDepth(-3).setOrigin(0,0);
+    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-3).setOrigin(0,0);
     //this.bgBack.tileScaleX = 2;
     //this.bgBack.tileScaleY = 2;
     
     
     // Scrolling bgFront Planets
-    this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-    
+    //atlas code preserved
+    //this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
+    this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-1).setOrigin(0,0);
+
+
     // Scrolling bgScrollMid Stars (depth is behind planets)
     this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
     //this.bgMid.tileScaleX = 2;
@@ -4420,7 +4423,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
             case "2":
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(30); // Move to Racing levels
                 break;
             case "3":
                 ourPersist.fx.hue(0); // Move to Racing levels
