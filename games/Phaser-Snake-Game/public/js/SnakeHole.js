@@ -1743,6 +1743,12 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('blackholeAnim', '/assets/sprites/blackHoleAnim.png',{ frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('extractHole', '/assets/sprites/extractHole.png',{ frameWidth: 64, frameHeight: 64 });
 
+        //Background Art -- Pre Atlas
+        this.load.image('background02','assets/sprites/background02.png')
+        this.load.image('background02_frame2','assets/sprites/background02.png')
+        this.load.image('background02_4','assets/sprites/background02_4.png')
+        
+
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
         this.load.atlas('uiGlassL', 'assets/sprites/UI_Glass_9SliceLEFT.png', 'assets/9slice/nine-slice.json');
@@ -4010,13 +4016,18 @@ class PersistScene extends Phaser.Scene {
     this.bgTick = 0;
 
     // Furthest BG Object
-    this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+    //atlas code preserved
+    //this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
+    this.bgFurthest = this.add.sprite(X_OFFSET, Y_OFFSET, 'background02_4').setDepth(-4).setOrigin(0,0); 
+
     //this.bgFurthest.tileScaleX = 2;
     //this.bgFurthest.tileScaleY = 2;
 
     
     // Scrolling BG1
-    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+    //atlas code preserved
+    //this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
+    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02').setDepth(-3).setOrigin(0,0);
     //this.bgBack.tileScaleX = 2;
     //this.bgBack.tileScaleY = 2;
     
@@ -4035,7 +4046,7 @@ class PersistScene extends Phaser.Scene {
     this.fx2 = this.bgFurthest.postFX.addColorMatrix();
 
     //this.fx2.hue(90)
-    this.bgFurthest.setPipeline('WaveShaderPipeline');
+    //this.bgFurthest.setPipeline('WaveShaderPipeline');
     //this.fx2 = this.bgFurthest.preFX.addColorMatrix();
 
     this.scrollFactorX = 0;
@@ -4168,34 +4179,43 @@ class PersistScene extends Phaser.Scene {
         this.wavePipeline.set1f('uTime', time / 1000);
         this.renderer.gl.uniform1f(this.wavePipeline.uTimeLocation, time / 1000);
 
+        //removed panning from furthest texture
+        //this.bgFurthest.tilePositionX = (Phaser.Math.Linear(this.bgBack.tilePositionX, 
+        //    (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
+        //this.bgFurthest.tilePositionY = (Phaser.Math.Linear(this.bgBack.tilePositionY, 
+        //    (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
 
-        this.bgFurthest.tilePositionX = (Phaser.Math.Linear(this.bgBack.tilePositionX, 
-            (this.bgCoords.x + this.scrollFactorX), 0.025)) * 0.25;
-        this.bgFurthest.tilePositionY = (Phaser.Math.Linear(this.bgBack.tilePositionY, 
-            (this.bgCoords.y + this.scrollFactorY), 0.025)) * 0.25;
+        this.bgBack.tilePositionX = (Phaser.Math.Linear(this.bgBack.tilePositionX, 
+            (this.bgCoords.x + this.scrollFactorX), 0.0125)) * 0.24;
+        this.bgBack.tilePositionY = (Phaser.Math.Linear(this.bgBack.tilePositionY, 
+            (this.bgCoords.y + this.scrollFactorY), 0.0125)) * 0.24;
 
-        this.bgBack.tilePositionX = (this.bgFurthest.tilePositionX ) * 4;
-        this.bgBack.tilePositionY = (this.bgFurthest.tilePositionY ) * 4;
+        this.bgBack.tilePositionX = (this.bgBack.tilePositionX ) * 4;
+        this.bgBack.tilePositionY = (this.bgBack.tilePositionY ) * 4;
             
-        this.bgFront.tilePositionX = (this.bgFurthest.tilePositionX ) * 8;
-        this.bgFront.tilePositionY = (this.bgFurthest.tilePositionY ) * 8;
+        this.bgFront.tilePositionX = (this.bgBack.tilePositionX ) * 8;
+        this.bgFront.tilePositionY = (this.bgBack.tilePositionY ) * 8;
 
-        this.bgMid.tilePositionX = (this.bgFurthest.tilePositionX ) * 2;
-        this.bgMid.tilePositionY = (this.bgFurthest.tilePositionY ) * 2;
+        this.bgMid.tilePositionX = (this.bgBack.tilePositionX ) * 2;
+        this.bgMid.tilePositionY = (this.bgBack.tilePositionY ) * 2;
 
         this.bgTimer += delta;
 
         if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
             if (this.bgTick === 0) {
+                //reference atlas code
                 this.bgMid.setTexture('megaAtlas', 'background02_3_2.png'); 
-                this.bgBack.setTexture('megaAtlas', 'background02_frame2.png'); 
+                //this.bgBack.setTexture('megaAtlas', 'background02_frame2.png');
+                this.bgBack.setTexture('background02_frame2');  
                 this.bgTick += 1;
             }
 
             if (this.bgTimer >= 2000) {
                 if (this.bgTick === 1) {
+                    //reference atlas code
                     this.bgMid.setTexture('megaAtlas', 'background02_3.png');
-                    this.bgBack.setTexture('megaAtlas','background02.png'); 
+                    //this.bgBack.setTexture('megaAtlas','background02.png'); 
+                    this.bgBack.setTexture('background02'); 
                     this.bgTimer = 0;
                     this.bgTick -=1;
                 }
