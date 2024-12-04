@@ -4057,9 +4057,20 @@ class PersistScene extends Phaser.Scene {
     const p1Quad3 = this.add.image(0, 16, 'bgPlanets', 8); // Top Left
     const p1Quad4 = this.add.image(16, 16, 'bgPlanets', 9); // Top Right
 
-    const compSpritePlanet1 = this.add.container(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, [p1Quad1, p1Quad2, p1Quad3,p1Quad4]);
+    const compSpritePlanet1 = this.add.container(SCREEN_WIDTH / 2, 0, [p1Quad1, p1Quad2, p1Quad3,p1Quad4]);
+    compSpritePlanet1.originalX = compSpritePlanet1.x
+    compSpritePlanet1.originalY = compSpritePlanet1.y
+
+    const p2Quad1 = this.add.image(0, 0, 'bgPlanets', 6);
+    const p2Quad2 = this.add.image(0, 16, 'bgPlanets', 14);
+
+    const compSpritePlanet2 = this.add.container((SCREEN_WIDTH / 2) + GRID * 15, SCREEN_HEIGHT / 2 - GRID * 3, [p2Quad1, p2Quad2]);
+    compSpritePlanet2.originalX = compSpritePlanet2.x
+    compSpritePlanet2.originalY = compSpritePlanet2.y
+
+    this.bgPlanets = this.add.container(X_OFFSET, Y_OFFSET, [compSpritePlanet1,compSpritePlanet2]);
+
     
-    this.bgPlanets = this.add.container(X_OFFSET, Y_OFFSET, [compSpritePlanet1]);
     this.relativeX = 0;
     // Scrolling bgScrollMid Stars (depth is behind planets)
     this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
@@ -4220,12 +4231,16 @@ class PersistScene extends Phaser.Scene {
         this.bgBack.tilePositionY = (this.bgBack.tilePositionY) * 4;
 
         const gameScreenRight =  342;
+        const gameScreenBottom =  300;
+        // Update the X and Y of each background container child object.
         this.bgPlanets.list.forEach(child => {
-            
-            child.x = -(this.bgBack.tilePositionX % gameScreenRight) * 32;
-            var remainder = child.x % gameScreenRight
-            child.x = remainder;
-            console.log('remainder', remainder);
+            child.x = -((this.bgBack.tilePositionX)) * 32 + child.originalX;
+            var remainderX = child.x % gameScreenRight;
+            child.x = remainderX;
+            child.y = -((this.bgBack.tilePositionY)) * 32 + child.originalY;
+            var remainderY = child.y % gameScreenBottom;
+            child.y = remainderY;
+            console.log(child.y)
         });
 
         
