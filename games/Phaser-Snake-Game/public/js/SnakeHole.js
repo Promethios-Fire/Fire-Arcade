@@ -969,7 +969,8 @@ class MusicPlayerScene extends Phaser.Scene {
         //pauses and resumes sound so queued sfx don't play all at once upon resuming
         window.addEventListener('focus', () => {
             
-            this.sound.resumeAll(); //resumes all music instances so old tracks need to be stopped properly
+            this.sound.pauseAll(); // ensures all sounds do NOT play when clicking back into game (prevents unwanted noises)
+            this.music.resume(); //resumes all music instances so old tracks need to be stopped properly
             if (this.playerPaused) {
                 this.music.pause(); //keeps music paused if player clicked pause button
             }
@@ -1222,7 +1223,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             tube.friction = 0; // Set the friction of the tube to 0 
         }
 
-        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 2, 5, 5, {
+        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 10, 5, 5, {
             isSensor: true ,
             isStatic: true
         });
@@ -1243,14 +1244,14 @@ class PlinkoMachineScene extends Phaser.Scene {
     spawnPlinkos (number) {
         
         if (number > 0){
-            var delay = 250;
+            var delay = 275;
             
             // TOP SPAWN
             //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
             var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
                 shape: {
                     type: 'polygon',
-                    radius: 3.5,
+                    radius: 3.7,
                     sides: 4,
                 },
                 //slop:0.8,
@@ -1260,6 +1261,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             plinkoDisc.setOnCollideWith(this.plinkoSensor, pair => {
                 // pair.bodyA
                 // pair.bodyB
+                number;
                 this.zedsToAdd += this.zedIndex;
 
 
@@ -1334,13 +1336,15 @@ class PlinkoMachineScene extends Phaser.Scene {
             }, this);
 
             //plinkoDisc.setCircle(3.33);
+            var friction = Phaser.Math.FloatBetween(0.013, 0.005);
+            var randomDelay = Phaser.Math.Between(0,36);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.01);
+            plinkoDisc.setFrictionAir(friction);
             plinkoDisc.setFixedRotation();
 
             number--;
-            this.time.delayedCall(delay, this.spawnPlinkos, [number], this);
+            this.time.delayedCall(delay - randomDelay, this.spawnPlinkos, [number], this);
         } else {
             console.log('Finished Visual Pinko Spawning');
             return
@@ -7675,12 +7679,6 @@ class GameScene extends Phaser.Scene {
             this.scene.get("MusicPlayerScene").loopButton.setFrame(4);
         }
         this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
-
-        
-        // this prevents old tracks from persisting when resetting
-        this.sound.sounds.forEach((sound) => {
-            sound.stop();
-        });
     }
     
  

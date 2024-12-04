@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_0-1.json",
+    "activeFile": "World_4-5.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -698,8 +698,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.66666666666663,
-                "y": 161.66666666666663
+                "x": 174,
+                "y": 161.66666666666666
             }
         },
         "Tutorial_1.json#tileSheetx12": {
@@ -709,8 +709,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.66666666666663,
-                "y": 161.66666666666663
+                "x": 174,
+                "y": 162.33333333333334
             }
         },
         "Tutorial_2.json#tileSheetx12": {
@@ -720,8 +720,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.66666666666663,
-                "y": 161.66666666666663
+                "x": 174,
+                "y": 162.33333333333334
             }
         },
         "Tutorial_3.json#tileSheetx12": {
@@ -820,8 +820,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 160.75,
-                "y": 179.25
+                "x": 310,
+                "y": 281
             }
         },
         "World_0-1.json#tileSheetx12": {
@@ -831,7 +831,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 8,
             "viewCenter": {
-                "x": 174.1540137536597,
+                "x": 173.9170695172602,
                 "y": 161.8329134608838
             }
         },
@@ -845,7 +845,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.1540137536597,
+                "x": 173.9170695172602,
                 "y": 161.8329134608838
             }
         },
@@ -1240,8 +1240,8 @@
             "scale": 2.997413793103448,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.98331895312052,
-                "y": 161.97296519988492
+                "x": 174.15012942191544,
+                "y": 161.80615473109
             }
         },
         "World_4-5.json#tileSheetx12": {
@@ -1421,7 +1421,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.1540137536597,
+                "x": 173.9170695172602,
                 "y": 161.8329134608838
             }
         },
@@ -1699,7 +1699,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -1710,7 +1710,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -1721,7 +1721,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -1732,7 +1732,7 @@
             "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.5,
+                "x": 174,
                 "y": 161.5
             }
         },
@@ -2694,7 +2694,8 @@
         "r-11-12-3.json",
         "r-11-12-2.json",
         "r-11-12-1.json",
-        "World_8-3_Adv_Portaling.json"
+        "World_8-3_Adv_Portaling.json",
+        "World_4-5.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
@@ -2702,15 +2703,15 @@
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
-        "World_8-3_Adv_Portaling.json",
-        "r-11-12-1.json",
-        "r-11-12-2.json",
-        "r-11-12-3.json",
-        "r-11-12-4.json",
-        "World_1-1.json",
-        "World_1-2.json",
         "World_0-1.json",
-        "World_10-4.json"
+        "World_1-2.json",
+        "World_1-1.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_4-5.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
