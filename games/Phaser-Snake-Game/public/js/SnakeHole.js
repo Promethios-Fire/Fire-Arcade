@@ -1738,7 +1738,9 @@ class StartScene extends Phaser.Scene {
         // Load Tilemap as Sprite sheet to allow conversion to Sprites later.
         // Doesn't need to be GPU optimized unless we use it more regularly.
         this.load.spritesheet('tileSprites', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png'], { frameWidth: GRID, frameHeight: GRID });
-
+        //this.load.image('tileSpritesImage', 'assets/Tiled/tileSheetx12.png');
+        this.load.tilemapTiledJSON('tileMap', `assets/Tiled/World_4-1.json`);
+        this.load.image('tiles', 'assets/Tiled/tileSheetx12.png');
 
         this.load.spritesheet('blackholeAnim', '/assets/sprites/blackHoleAnim.png',{ frameWidth: 64, frameHeight: 64 });
         this.load.spritesheet('extractHole', '/assets/sprites/extractHole.png',{ frameWidth: 64, frameHeight: 64 });
@@ -1748,6 +1750,10 @@ class StartScene extends Phaser.Scene {
         this.load.image('background02_frame2','assets/sprites/background02.png')
         this.load.image('background02_4','assets/sprites/background02_4.png')
         this.load.image('background02_2','assets/sprites/background02_2.png')
+        
+        //Background Container Sprites
+        this.load.spritesheet('bgPlanets', 'assets/sprites/bg_spriteSheet_planets.png',{ frameWidth: 16, frameHeight: 16 });
+
 
         // GameUI
         //this.load.image('boostMeter', 'assets/sprites/boostMeter.png');
@@ -3999,8 +4005,13 @@ class PersistScene extends Phaser.Scene {
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
     
     
+    //this.tileSpriteImage = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'tileSpritesImage');
+    //this.tileSpriteImage.setOrigin(0,0);
+    //const backgroundMap = this.make.tilemap({ key: 'tileMap'});
+    //this.bgFront = backgroundMap.addTilesetImage('tileSheetx12', 'tiles');
     
-
+    //this.backgroundLayer = backgroundMap.createLayer('Wall', this.bgFront, X_OFFSET, Y_OFFSET);
+    //this.backgroundLayer.setOrigin(0,0);
     this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
     
     
@@ -4035,9 +4046,21 @@ class PersistScene extends Phaser.Scene {
     // Scrolling bgFront Planets
     //atlas code preserved
     //this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
-    this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-1).setOrigin(0,0);
+    //this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-1).setOrigin(0,0);
+    //Background Sprite Container
+    //this.bgPlanet = this.add.sprite(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 'bgPlanets',4).setDepth(100);
 
+    // Composite Sprites
+    // Composite Planet 1
+    const p1Quad1 = this.add.image(0, 0, 'bgPlanets', 0); // Top Left
+    const p1Quad2 = this.add.image(16, 0, 'bgPlanets', 1); // Top Right
+    const p1Quad3 = this.add.image(0, 16, 'bgPlanets', 8); // Top Left
+    const p1Quad4 = this.add.image(16, 16, 'bgPlanets', 9); // Top Right
 
+    const compSpritePlanet1 = this.add.container(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, [p1Quad1, p1Quad2, p1Quad3,p1Quad4]);
+    
+    this.bgPlanets = this.add.container(X_OFFSET, Y_OFFSET, [compSpritePlanet1]);
+    this.relativeX = 0;
     // Scrolling bgScrollMid Stars (depth is behind planets)
     this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
     //this.bgMid.tileScaleX = 2;
@@ -4169,7 +4192,7 @@ class PersistScene extends Phaser.Scene {
                     
                     this.bgBack.setMask(geomask1,true)
                     this.bgFurthest.setMask(geomask1,true)
-                    this.bgFront.setMask(geomask1,true)
+                    //this.bgFront.setMask(geomask1,true)
                     this.bgMid.setMask(geomask1,true)
                 }
         });
@@ -4193,12 +4216,50 @@ class PersistScene extends Phaser.Scene {
         this.bgBack.tilePositionY = (Phaser.Math.Linear(this.bgBack.tilePositionY, 
             (this.bgCoords.y + this.scrollFactorY), 0.0125)) * 0.24;
 
-        this.bgBack.tilePositionX = (this.bgBack.tilePositionX ) * 4;
-        this.bgBack.tilePositionY = (this.bgBack.tilePositionY ) * 4;
-            
-        this.bgFront.tilePositionX = (this.bgBack.tilePositionX ) * 8;
-        this.bgFront.tilePositionY = (this.bgBack.tilePositionY ) * 8;
+        this.bgBack.tilePositionX = (this.bgBack.tilePositionX) * 4;
+        this.bgBack.tilePositionY = (this.bgBack.tilePositionY) * 4;
 
+        const gameScreenRight =  342;
+        this.bgPlanets.list.forEach(child => {
+            
+            child.x = -(this.bgBack.tilePositionX % gameScreenRight) * 32;
+            var remainder = child.x % gameScreenRight
+            child.x = remainder;
+            console.log('remainder', remainder);
+        });
+
+        
+        //console.log(this.bgPlanets.x, SCREEN_WIDTH)
+        
+        /*this.bgPlanets.list.forEach(child => {
+            this.relativeX = child.x;
+            
+            console.log('Before update:', this.relativeX);
+            if (this.relativeX > gameScreenRight *2) {
+                child.x -= gameScreenRight
+                 console.log('Updated value:', this.relativeX); // Log the updated value
+                 //console.log('right here')
+                }
+             else if (this.relativeX < -gameScreenRight) {
+                 child.x += gameScreenRight;
+            }
+        });*/
+            
+        /*this.backgroundLayer.x = -(this.bgBack.tilePositionX - 18.25) * 8;
+        this.backgroundLayer.y = -(this.bgBack.tilePositionY - 3) * 8;
+        debugger;
+        
+        
+        
+        if (this.backgroundLayer.x !=146){
+            if (this.backgroundLayer.x > this.backgroundLayer.width) {
+                this.backgroundLayer.x = 146;  
+            }
+            if (this.backgroundLayer.x < 146 - this.backgroundLayer.width) {
+                this.backgroundLayer.x = 146;  
+            } 
+        }
+        console.log(this.backgroundLayer.x,this.backgroundLayer.width)*/
         this.bgMid.tilePositionX = (this.bgBack.tilePositionX ) * 2;
         this.bgMid.tilePositionY = (this.bgBack.tilePositionY ) * 2;
 
@@ -4423,7 +4484,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
             case "2":
-                ourPersist.fx.hue(30); // Move to Racing levels
+                ourPersist.fx.hue(330); // Move to Racing levels
                 break;
             case "3":
                 ourPersist.fx.hue(0); // Move to Racing levels
