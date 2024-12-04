@@ -4041,8 +4041,13 @@ class PersistScene extends Phaser.Scene {
     this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-3).setOrigin(0,0);
     //this.bgBack.tileScaleX = 2;
     //this.bgBack.tileScaleY = 2;
+
     
-    
+    // Scrolling bgScrollMid Stars (depth is behind planets)
+    this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+    //this.bgMid.tileScaleX = 2;
+    //this.bgMid.tileScaleY = 2;
+
     // Scrolling bgFront Planets
     //atlas code preserved
     //this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
@@ -4053,41 +4058,41 @@ class PersistScene extends Phaser.Scene {
     // Composite Sprites -- use multiple sprites to make one larger sprite in its own container
     
     // Composite Planet 1
-    const p1Quad1 = this.add.image(0, 0, 'bgPlanets', 0); // Top Left
-    const p1Quad2 = this.add.image(16, 0, 'bgPlanets', 1); // Top Right
-    const p1Quad3 = this.add.image(0, 16, 'bgPlanets', 8); // Bottom Left
-    const p1Quad4 = this.add.image(16, 16, 'bgPlanets', 9); // Bottom Right
-
-    const compSpritePlanet1 = this.add.container(SCREEN_WIDTH / 2, 0, [p1Quad1, p1Quad2, p1Quad3,p1Quad4]);
-    compSpritePlanet1.originalX = compSpritePlanet1.x
-    compSpritePlanet1.originalY = compSpritePlanet1.y
+    const p1Quad1 = createImage(this, 0, 0, 'bgPlanets', 0); // Top Left
+    const p1Quad2 = createImage(this, 16, 0, 'bgPlanets', 1); // Top Right
+    const p1Quad3 = createImage(this, 0, 16, 'bgPlanets', 8); // Bottom Left
+    const p1Quad4 = createImage(this, 16, 16, 'bgPlanets', 9); // Bottom Right
+    const compSpritePlanet1 = createContainer(this, SCREEN_WIDTH / 2, 0,
+         [p1Quad1, p1Quad2, p1Quad3, p1Quad4]);
 
     // Composite Planet 2
-    const p2Quad1 = this.add.image(0, 0, 'bgPlanets', 6);
-    const p2Quad2 = this.add.image(0, 16, 'bgPlanets', 14);
-
-    const compSpritePlanet2 = this.add.container((SCREEN_WIDTH / 2) + GRID * 15, SCREEN_HEIGHT / 2 - GRID * 3, [p2Quad1, p2Quad2]);
-    compSpritePlanet2.originalX = compSpritePlanet2.x
-    compSpritePlanet2.originalY = compSpritePlanet2.y
+    const p2Quad1 = createImage(this, 0, 0, 'bgPlanets', 6);
+    const p2Quad2 = createImage(this, 0, 16, 'bgPlanets', 14);
+    const compSpritePlanet2 = createContainer(this, (SCREEN_WIDTH / 2) + GRID * 15, SCREEN_HEIGHT / 2 - GRID * 3, [p2Quad1, p2Quad2]);
 
     // Normal Sprite Planets
-    const spritePlanet1 = this.add.sprite(SCREEN_WIDTH / 2,SCREEN_HEIGHT / 2, 'bgPlanets',5)
-    spritePlanet1.originalX = spritePlanet1.x
-    spritePlanet1.originalY = spritePlanet1.y
-
-    const spritePlanet2 = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 4,SCREEN_HEIGHT / 2 - GRID * 4, 'bgPlanets',4)
-    spritePlanet2.originalX = spritePlanet2.x
-    spritePlanet2.originalY = spritePlanet2.y
+    const spritePlanet1 = createImage(this, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 'bgPlanets', 5);
+    const spritePlanet2 = createImage(this, SCREEN_WIDTH / 2 - GRID * 4, SCREEN_HEIGHT / 2 - GRID * 4, 'bgPlanets', 4);
     
     // Background Layer Container for Planets (World 1)
     this.bgPlanets = this.add.container(X_OFFSET, Y_OFFSET, 
         [compSpritePlanet1,compSpritePlanet2,spritePlanet1,spritePlanet2]);
-
     
-    // Scrolling bgScrollMid Stars (depth is behind planets)
-    this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-    //this.bgMid.tileScaleX = 2;
-    //this.bgMid.tileScaleY = 2;
+    
+
+    function createImage(scene, x, y, key, frame) {
+        const image = scene.add.image(x, y, key, frame);
+        image.originalX = x;
+        image.originalY = y;
+        return image;
+    }
+    
+    function createContainer(scene, x, y, children) {
+        const container = scene.add.container(x, y, children);
+        container.originalX = x;
+        container.originalY = y;
+        return container;
+    }
 
     // Hue Shift
 
@@ -4103,28 +4108,9 @@ class PersistScene extends Phaser.Scene {
     this.bgCoords = new Phaser.Math.Vector2(0,0);
 
     const graphics = this.add.graphics();
-        
-    /*this.starterTween = this.tweens.addCounter({ @holden do we still need this?
-        from: 0,
-        to: 600,
-        ease: 'Sine.InOut',
-        duration: 1000,
-        onUpdate: tween =>
-            {   
-                graphics.clear();
-                var value = (tween.getValue());
-                this.shape1 = this.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                var geomask1 = this.shape1.createGeometryMask();
-                
-                this.bgBack.setMask(geomask1,true)
-                this.bgFurthest.setMask(geomask1,true)
-                this.bgFront.setMask(geomask1,true)
-                this.bgMid.setMask(geomask1,true)
-            }
-    });*/
-    
-    
-    
+
+
+
     // Is Zero if there is none.
     var rawZeds = localStorage.getItem(`zeds`);
     // Catch if any reason undefined gets saved to localstorage
@@ -4244,7 +4230,7 @@ class PersistScene extends Phaser.Scene {
 
         const gameScreenRight =  342;
         const gameScreenBottom =  320;
-        // Update the X and Y of each background container child object.
+        // Update the X and Y of each background container's child object.
         this.bgPlanets.list.forEach(child => {
             child.x = -((this.bgBack.tilePositionX)) * 8 + child.originalX;
             var remainderX = child.x % gameScreenRight;
@@ -4264,7 +4250,6 @@ class PersistScene extends Phaser.Scene {
                 remainderY += gameScreenRight;
                 child.y = remainderY;
             }
-            console.log(child.x)
         });
 
         
