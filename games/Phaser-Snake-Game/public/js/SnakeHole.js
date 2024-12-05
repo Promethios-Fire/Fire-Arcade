@@ -8851,7 +8851,7 @@ var StageData = new Phaser.Class({
     calcTotal() {
         var _postMult = this.postMult();
         var _bonkBonus = this.bonkBonus();
-        return _postMult + _bonkBonus + this.comboBonus() + this.boostBonus();
+        return _postMult + _bonkBonus + this.comboBonus(); //+ this.boostBonus();
     }
     
 });
@@ -9374,7 +9374,6 @@ class ScoreScene extends Phaser.Scene {
             scorePartsStyle, {
             })).setHTML(
                 `COMBO BONUS:
-                BOOST BONUS:
                 NO-BONK BONUS:`
         ).setOrigin(1,0).setScale(0.5);
 
@@ -9386,20 +9385,22 @@ class ScoreScene extends Phaser.Scene {
                 
                 `
         ).setOrigin(1, 0).setScale(0.5);
+        
+        /*
         const postAdditiveValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `
-                ${0}
                 `
         ).setOrigin(1, 0).setScale(0.5);
+        */
+
         const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `
-                
                 ${0}`
         ).setOrigin(1, 0);
 
@@ -9420,6 +9421,7 @@ class ScoreScene extends Phaser.Scene {
             }
         });
         
+        /*
         this.tweens.addCounter({
             from: 0,
             to:  this.stageData.boostBonus(),
@@ -9436,6 +9438,7 @@ class ScoreScene extends Phaser.Scene {
             ).setOrigin(1, 0).setScale(0.5);
             }
         });
+        */
         
         this.tweens.addCounter({
             from: 0,
@@ -9473,9 +9476,7 @@ class ScoreScene extends Phaser.Scene {
                 const value = Math.round(tween.getValue());
                 postAdditiveValuesUI3.setHTML(
                     `
-                    
                     +${value}`
-                    
             ).setOrigin(1, 0).setScale(0.5);
             }
             
@@ -9551,7 +9552,7 @@ class ScoreScene extends Phaser.Scene {
             multValuesUI2,
             postAdditiveLablesUI,
             postAdditiveValuesUI1,
-            postAdditiveValuesUI2,
+            //postAdditiveValuesUI2,
             postAdditiveValuesUI3,]
             )
         // #region Rank Sprites
