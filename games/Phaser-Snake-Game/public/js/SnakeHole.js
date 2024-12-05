@@ -152,7 +152,6 @@ var calcStageScore = function (x) {
 
 
     //var _speedBonus = Math.floor(-1* ((x-lm) / ((1/a) * ((x-lm) - (lM - lm)))));
-    debugger
     return Math.floor(result);
 } 
 
@@ -188,12 +187,13 @@ var updateSumOfBest = function(scene) {
         var _scoreTotalClassic;
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
-            _stageDataClassic.zedLevel = calcZedLevel(scene.zeds);
+            _stageDataClassic.zedLevel = calcZedLevel(scene.zeds).level;
             scene.stagesCompleteClassic += 1;
 
             BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
 
             _scoreTotalClassic = _stageDataClassic.calcTotal();
+            debugger
             scene.sumOfBestClassic += _scoreTotalClassic;
         }
         else {
@@ -204,7 +204,7 @@ var updateSumOfBest = function(scene) {
         var _scoreTotalExpert;
         if (tempJSONExpert) {
             var _stageDataExpert = new StageData(tempJSONExpert);
-            _stageDataExpert.zedLevel = calcZedLevel(scene.zeds);
+            _stageDataExpert.zedLevel = calcZedLevel(scene.zeds).level;
             scene.stagesCompleteExpert += 1;
 
             BEST_OF_EXPERT.set(_stageDataExpert.stage, _stageDataExpert);
@@ -239,7 +239,7 @@ var updateSumOfBest = function(scene) {
         var tempJSON = JSON.parse(localStorage.getItem(`${uuid}_best-Tutorial`));
         if (tempJSON != null) {
             var _stageDataTut = new StageData(tempJSON);
-            _stageDataTut.zedLevel = calcZedLevel(scene.zeds);
+            _stageDataTut.zedLevel = calcZedLevel(scene.zeds).level;
             scene.stagesCompleteTut += 1;
 
             BEST_OF_TUTORIAL.set(_stageDataTut.stage, _stageDataTut);
@@ -261,7 +261,7 @@ var tempSumOfBest = function(scene, stageData) {
         var _currentStageTotal;
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
-            _stageDataClassic.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds);
+            _stageDataClassic.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds).level;
 
             _scoreTotalClassic = _stageDataClassic.calcTotal();
 
@@ -282,7 +282,7 @@ var tempSumOfBest = function(scene, stageData) {
         var _scoreTotalExpert
         if (tempJSONExpert) {
             var _stageDataExpert = new StageData(tempJSONExpert);
-            _stageDataExpert.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds);
+            _stageDataExpert.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds).level;
 
             _scoreTotalExpert = _stageDataExpert.calcTotal();
     
@@ -2045,7 +2045,7 @@ class StartScene extends Phaser.Scene {
                     if (localJSON.stage != correctStage) {
                         var logJSON = JSON.parse(localStorage.getItem(`${uuidString}_${keyCheck}`));
                         var stageDataLog = new StageData(logJSON);
-                        stageDataLog.zedLevel = calcZedLevel(ourPersist.zeds);
+                        stageDataLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
                         
                         // Update Stage Name
                         stageDataLog.stage = correctStage;
@@ -2791,6 +2791,8 @@ class StageCodex extends Phaser.Scene {
         }),
             `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
         ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+
+        updateSumOfBest(ourPersist);
 
         if (!checkExpertUnlocked.call(this)) {
             bestOfDisplay = BEST_OF_ALL;
@@ -4117,6 +4119,7 @@ class PersistScene extends Phaser.Scene {
     
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
+    debugger
 
     this.prevSumOfBestClassic = this.sumOfBestClassic;
     this.prevStagesCompleteClassic = this.stagesCompleteClassic;
@@ -5990,7 +5993,7 @@ class GameScene extends Phaser.Scene {
         if (bestLogJSON) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
-            bestLog.zedLevel = calcZedLevel(ourPersist.zeds);
+            bestLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
 
             this.bestBase = bestLog.preAdditive();
         }
