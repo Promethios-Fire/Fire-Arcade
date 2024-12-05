@@ -188,6 +188,7 @@ var updateSumOfBest = function(scene) {
         var _scoreTotalClassic;
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
+            _stageDataClassic.zedLevel = calcZedLevel(scene.zeds);
             scene.stagesCompleteClassic += 1;
 
             BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
@@ -203,6 +204,7 @@ var updateSumOfBest = function(scene) {
         var _scoreTotalExpert;
         if (tempJSONExpert) {
             var _stageDataExpert = new StageData(tempJSONExpert);
+            _stageDataExpert.zedLevel = calcZedLevel(scene.zeds);
             scene.stagesCompleteExpert += 1;
 
             BEST_OF_EXPERT.set(_stageDataExpert.stage, _stageDataExpert);
@@ -237,6 +239,7 @@ var updateSumOfBest = function(scene) {
         var tempJSON = JSON.parse(localStorage.getItem(`${uuid}_best-Tutorial`));
         if (tempJSON != null) {
             var _stageDataTut = new StageData(tempJSON);
+            _stageDataTut.zedLevel = calcZedLevel(scene.zeds);
             scene.stagesCompleteTut += 1;
 
             BEST_OF_TUTORIAL.set(_stageDataTut.stage, _stageDataTut);
@@ -258,6 +261,8 @@ var tempSumOfBest = function(scene, stageData) {
         var _currentStageTotal;
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
+            _stageDataClassic.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds);
+
             _scoreTotalClassic = _stageDataClassic.calcTotal();
 
 
@@ -277,6 +282,8 @@ var tempSumOfBest = function(scene, stageData) {
         var _scoreTotalExpert
         if (tempJSONExpert) {
             var _stageDataExpert = new StageData(tempJSONExpert);
+            _stageDataExpert.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds);
+
             _scoreTotalExpert = _stageDataExpert.calcTotal();
     
         } else {
@@ -2038,6 +2045,7 @@ class StartScene extends Phaser.Scene {
                     if (localJSON.stage != correctStage) {
                         var logJSON = JSON.parse(localStorage.getItem(`${uuidString}_${keyCheck}`));
                         var stageDataLog = new StageData(logJSON);
+                        stageDataLog.zedLevel = calcZedLevel(ourPersist.zeds);
                         
                         // Update Stage Name
                         stageDataLog.stage = correctStage;
@@ -5982,6 +5990,8 @@ class GameScene extends Phaser.Scene {
         if (bestLogJSON) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
+            bestLog.zedLevel = calcZedLevel(ourPersist.zeds);
+
             this.bestBase = bestLog.preAdditive();
         }
         else {
@@ -8965,6 +8975,8 @@ class ScoreScene extends Phaser.Scene {
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
+            bestLog.zedLevel = calcZedLevel(ourPersist.zeds);
+
             var bestLocal = bestLog.calcTotal();
         }
         else {
@@ -9008,6 +9020,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
         var bestLog = new StageData(bestLogJSON);
+        bestLog.zedLevel = calcZedLevel(ourPersist.zeds);
     
         var bestLocal = bestLog.atomTime();
         var bestAve = bestLocal/bestLog.foodLog.length;
@@ -9118,19 +9131,15 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 8, 'div', Object.assign({}, STYLE_DEFAULT,
+        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `ATOM TIME:`
         ).setOrigin(1, 0).setScale(0.5);
 
-        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 11 + 11, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML(
-                `STAGE SCORE:`
-        ).setOrigin(1, 0).setScale(0.5);
+        
 
-        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(0)}`
@@ -9144,12 +9153,16 @@ class ScoreScene extends Phaser.Scene {
         //        `
         //).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 0, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 13 + - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `STAGE SCORE`
+        ).setOrigin(1, 0).setScale(0.5);
+
+        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13 - 5, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore + _speedbonus
-                `
-        
-                ${commaInt(0)}`
+                `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
         var frameTime = 16.667;
@@ -9202,9 +9215,7 @@ class ScoreScene extends Phaser.Scene {
                     yoyo: true,
                 });
                 preAdditiveSpeedScoreUI2.setHTML(
-                    `
-                
-                <hr style="font-size:3px"/><span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(_speedbonus)}</span>`
+                    `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(_speedbonus)}</span>`
             )}
         });
 
