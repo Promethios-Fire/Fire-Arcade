@@ -40,17 +40,37 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
 const DEBUG_SKIP_TO_SCENE = true;
-const DEBUG_SCENE = "QuickMenuScene"
+const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
 //}
 
+/* QuickMenuScene
 const DEBUG_ARGS = {
     menuOptions: QUICK_MENUS.get("adventure-mode"), 
     textPrompt: "MODE SELECTOR",
     cursorIndex: 1,
     sideScenes: false
-}
+}*/
+const DEBUG_ARGS = new Map ([
+
+    ["ScoreScene", {
+        bonks: 1,
+        boostFrames: 5994,
+        cornerTime: 7317,
+        diffBonus: 100,
+        foodLog: [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        medals: {},
+        moveCount: 840,
+        turns: 198,
+        stage: "World_0-1",
+        mode: 3, // MODES.CLASSIC
+        uuid: "723426f7-cfc5-452a-94d9-80341db73c7f",
+        zedLevel: 48,
+        sRank: 16000
+    }],
+]);
+
 
 const DEBUG_FORCE_EXPERT = false;
 const EXPERT_CHOICE = true;
@@ -193,7 +213,6 @@ var updateSumOfBest = function(scene) {
             BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
 
             _scoreTotalClassic = _stageDataClassic.calcTotal();
-            debugger
             scene.sumOfBestClassic += _scoreTotalClassic;
         }
         else {
@@ -2105,7 +2124,19 @@ class StartScene extends Phaser.Scene {
         //this.scene.start("StageCodex");
 
         if (DEBUG_SKIP_TO_SCENE) {
-            this.scene.start(DEBUG_SCENE, DEBUG_ARGS);
+            if (DEBUG_SCENE === "ScoreScene") {
+
+                var dataObj = DEBUG_ARGS.get(DEBUG_SCENE)
+
+                this.scene.start("GameScene", {
+                    stage: dataObj.stage,
+                    mode: dataObj.mode,
+                    startupAnim: false,
+                });
+                
+            } else {
+                this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
+            }
         } else {
             this.scene.start('MainMenuScene', {
                 portalTint: intColor,
@@ -4119,7 +4150,6 @@ class PersistScene extends Phaser.Scene {
     
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
-    debugger
 
     this.prevSumOfBestClassic = this.sumOfBestClassic;
     this.prevStagesCompleteClassic = this.stagesCompleteClassic;
@@ -6070,18 +6100,18 @@ class GameScene extends Phaser.Scene {
 
         // #region UI HUD
         this.UIScoreContainer = this.make.container(0,0)
-       if (this.startupAnim) {
-        this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
+        if (this.startupAnim) {
+            this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
         }
 
 
-       // UI Icons
-       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
+        // UI Icons
+        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
 
 
-       // #region Boost Meter UI
-       const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-       //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
+        // #region Boost Meter UI
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+        //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
         if (ourSpaceBoy.scoreFrame == undefined) {
             ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5).setAlpha(0);
         }
@@ -6672,24 +6702,28 @@ class GameScene extends Phaser.Scene {
             this.helpPanel.setAlpha(this.currentAlpha);
             this.helpText.setAlpha(this.currentAlpha);
         }
-            this.helpText = this.add.dom(0, 0, 'div', {
-                color: 'white',
-                'font-size': '8px',
-                'font-family': 'Oxanium',
-                'font-weight': '200',
-                'text-align': 'left',
-                'letter-spacing': "1px",
-                'width': '86px',
-                'word-wrap': 'break-word'
-            });
-            this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
+        this.helpText = this.add.dom(0, 0, 'div', {
+            color: 'white',
+            'font-size': '8px',
+            'font-family': 'Oxanium',
+            'font-weight': '200',
+            'text-align': 'left',
+            'letter-spacing': "1px",
+            'width': '86px',
+            'word-wrap': 'break-word'
+        });
+        this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
-            //console.log(this.interactLayer);
+        //console.log(this.interactLayer);
 
-            if (STAGE_OVERRIDES.has(this.stage)) {
-                console.log("Running postFix Override on", this.stage);
-                STAGE_OVERRIDES.get(this.stage).postFix(this);
-            }
+        if (STAGE_OVERRIDES.has(this.stage)) {
+            console.log("Running postFix Override on", this.stage);
+            STAGE_OVERRIDES.get(this.stage).postFix(this);
+        }
+
+        if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
+            this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE))
+        }
         
     }
 
@@ -8342,7 +8376,30 @@ class GameScene extends Phaser.Scene {
 
             this.events.off('addScore');
 
-            this.scene.launch('ScoreScene');
+            const ourInputScene = this.scene.get("InputScene");
+            const ourPersist = this.scene.get("PersistScene");
+
+            var stageDataJSON = {
+                bonks: this.bonks,
+                boostFrames: ourInputScene.boostTime,
+                cornerTime: Math.floor(ourInputScene.cornerTime),
+                diffBonus: this.stageDiffBonus,
+                foodHistory: this.foodHistory,
+                foodLog: this.scoreHistory,
+                medals: this.medals,
+                moveCount: ourInputScene.moveCount,
+                moveHistory: ourInputScene.moveHistory,
+                turnInputs: ourInputScene.turnInputs,
+                turns: ourInputScene.turns,
+                stage:this.stage,
+                mode:this.mode,
+                uuid:this.stageUUID,
+                zedLevel: calcZedLevel(ourPersist.zeds).level,
+                zeds: ourPersist.zeds,
+                sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
+            }
+
+            this.scene.launch('ScoreScene', stageDataJSON);
             this.backgroundBlur(true);
             this.setWallsPermeable();
         }
@@ -8887,7 +8944,7 @@ class ScoreScene extends Phaser.Scene {
     preload() {
     }
 
-    create() {
+    create(stageDataJSON) {
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
@@ -8909,26 +8966,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.ScoreContainerL = this.make.container(0,0);
         this.ScoreContainerR = this.make.container(0,0);
-
-        var stageDataJSON = {
-            bonks: ourGame.bonks,
-            boostFrames: ourInputScene.boostTime,
-            cornerTime: Math.floor(ourInputScene.cornerTime),
-            diffBonus: ourGame.stageDiffBonus,
-            foodHistory: ourGame.foodHistory,
-            foodLog: ourGame.scoreHistory,
-            medals: ourGame.medals,
-            moveCount: ourInputScene.moveCount,
-            moveHistory: ourInputScene.moveHistory,
-            turnInputs: ourInputScene.turnInputs,
-            turns: ourInputScene.turns,
-            stage:ourGame.stage,
-            mode:ourGame.mode,
-            uuid:ourGame.stageUUID,
-            zedLevel: calcZedLevel(ourPersist.zeds).level,
-            zeds: ourPersist.zeds,
-            sRank: parseInt(ourGame.tiledProperties.get("sRank")) // NaN if doesn't exist.
-        }
 
 
         this.stageData = new StageData(stageDataJSON);
@@ -10270,7 +10307,11 @@ class ScoreScene extends Phaser.Scene {
 
                 console.log("RollResults:", rollResults);
                 console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
-                ourPersist.zeds += rollResults.get("zedsEarned");
+
+                if (!DEBUG_SKIP_TO_SCENE) {
+                    ourPersist.zeds += rollResults.get("zedsEarned");
+                }
+                
                 plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
@@ -10337,7 +10378,13 @@ class ScoreScene extends Phaser.Scene {
         // #region Space to Continue
         this.input.keyboard.on('keydown-SPACE', function() {
             if (continueText.visible) {
-                onContinue(ourGame);
+
+                if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
+                    this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
+                } else {
+                    onContinue(ourGame);
+                }
+                
             } else {
                 console.log("Not Visible Yet", continueText.visible);
             }
