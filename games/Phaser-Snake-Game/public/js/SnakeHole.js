@@ -9681,7 +9681,7 @@ class ScoreScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             duration: 500,
         });
-        this.tweens.add({
+        var finalScoreTween = this.tweens.add({
             targets: stageScoreUI,
             x: SCREEN_WIDTH/2,
             ease: 'Sine.InOut',
@@ -10040,7 +10040,7 @@ class ScoreScene extends Phaser.Scene {
             //scoreAtomsTween.timeScale = 8;
             //debugger
             this.scoreTimeScale= 0.25;
-        });
+        }, this);
         /*this.input.keyboard.on('keyup-SPACE', function(scoreAtomsTween) { 
             //scoreAtomsTween.timeScale = 1 //doesn't do anything
         });*/
@@ -10094,9 +10094,6 @@ class ScoreScene extends Phaser.Scene {
             }
         )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
-        continueText.setVisible(false);
-
-
         this.tweens.add({
             targets: continueText,
             alpha: { from: 0, to: 1 },
@@ -10105,13 +10102,21 @@ class ScoreScene extends Phaser.Scene {
             repeat: -1,
             yoyo: true
           });
+        
+        continueText.setVisible(false);
+
+        finalScoreTween.on('complete', e=> {
+            debugger
+            continueText.setVisible(true);
+
+        }, this);
 
 
         // Give a few seconds before a player can hit continue
         this.time.delayedCall(3000, function() {
             
 
-            continueText.setVisible(true);
+            //continueText.setVisible(true);
 
         }, [], this);
 
