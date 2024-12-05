@@ -92,10 +92,7 @@ const STAGE_TOTAL = STAGES.size;
 export const PORTAL_PAUSE = 2; 
 
 
-// Speed Multiplier Stats
-const a = 3660; // Average Score 
-const lm = 28; // Minimum score
-const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
+
 
 const RANK_NUM_1 = 617749;
 /* Rank 1 History
@@ -130,11 +127,33 @@ var calcSumOfBestRank = function (sumOfBest) {
     return Math.max(RANK_AMOUNT - counter, 1) 
 }
 
+// Speed Multiplier Stats
+const a = 3660; // Average Score 
+const lm = 28; // Minimum score
+const lM = 3360 ; // Theoretical max score = 28 * MAX_SCORE
 
-var calcBonus = function (scoreInput) {
+var calcStageScore = function (x) {
+    /**
+     * Would be great to put a JSDoc here
+     */
+    // 1 = 1
+    // 50 = 51
+    // 229 = 247
+    // 1633 = 3229    Rank C
+    // 2395 = 8588    Rank B
+    // 2888 = 21855   Rank A
+    // 3007 = 31087   World 0-1 Rank S 
+    // 3119 = 80,816
+    // 3183 = 71,558
     
-    var _speedBonus = Math.floor(-1* ((scoreInput-lm) / ((1/a) * ((scoreInput-lm) - (lM - lm)))));
-    return _speedBonus
+    var result = -1 * (x / 
+        ((1/a) * (x - (lM - lm)))
+    ); 
+
+
+    //var _speedBonus = Math.floor(-1* ((x-lm) / ((1/a) * ((x-lm) - (lM - lm)))));
+    debugger
+    return Math.floor(result);
 } 
 
 var updateSumOfBest = function(scene) {
@@ -6437,7 +6456,7 @@ class GameScene extends Phaser.Scene {
 
             // Calc Level Score
             var baseScore = this.scoreHistory.reduce((a,b) => a + b, 0);
-            var currentScore = calcBonus(baseScore);
+            var currentScore = calcStageScore(baseScore);
 
             var lastAtom = this.scoreHistory.slice(this.scoreHistory.length - 1);
 
@@ -6446,7 +6465,7 @@ class GameScene extends Phaser.Scene {
 
             var prevBase = lastHistory.reduce((a,b) => a + b, 0)
             
-            var lastScore = calcBonus(prevBase);
+            var lastScore = calcStageScore(prevBase);
             
             //var plusBonus = currentScore - lastScore - lastAtom;
             var deltaScore =  currentScore - lastScore;
@@ -8740,7 +8759,7 @@ var StageData = new Phaser.Class({
     
     stageScore() {
         var base = this.atomTime()
-        return calcBonus(base);
+        return calcStageScore(base);
     },
 
     stageRank() {
@@ -8777,7 +8796,7 @@ var StageData = new Phaser.Class({
     },
 
     preAdditive() {
-        return calcBonus(this.atomTime());
+        return calcStageScore(this.atomTime());
     },
 
     zedLevelBonus() {
@@ -9136,7 +9155,7 @@ class ScoreScene extends Phaser.Scene {
         var frameTime = 16.667;
 
         var _baseScore = this.stageData.atomTime();
-        var _speedbonus = calcBonus(this.stageData.atomTime());
+        var _speedbonus = calcStageScore(this.stageData.atomTime());
 
         var atomList = this.stageData.foodLog.slice();
         
