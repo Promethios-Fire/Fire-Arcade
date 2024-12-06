@@ -59,7 +59,8 @@ const DEBUG_ARGS = new Map ([
         boostFrames: 5994,
         cornerTime: 7317,
         diffBonus: 100,
-        foodLog: [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        foodLog: [90,117,114,114,112,109,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        //       [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
         medals: {},
         moveCount: 840,
         turns: 198,
@@ -9817,6 +9818,7 @@ class ScoreScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             duration: 500,
         });
+
         var finalScoreTween = this.tweens.add({
             targets: stageScoreUI,
             x: SCREEN_WIDTH/2,
@@ -9824,6 +9826,7 @@ class ScoreScene extends Phaser.Scene {
             duration: 500,
             delay:2000,
         });
+
         this.tweens.add({
             targets: letterRank,
             x: X_OFFSET + GRID * 3.5,
@@ -10387,6 +10390,8 @@ class ScoreScene extends Phaser.Scene {
                 
             } else {
                 console.log("Not Visible Yet", continueText.visible);
+                debugger
+                finalScoreTween.complete();
             }
         }, this);
 
