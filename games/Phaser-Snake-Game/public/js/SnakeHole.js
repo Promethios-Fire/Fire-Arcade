@@ -1215,7 +1215,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             tube.friction = 0; // Set the friction of the tube to 0 
         }
 
-        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 2, 5, 5, {
+        this.plinkoSensor = this.matter.add.rectangle(GRID * 7 + 6,  GRID * 27 + 10, 5, 5, {
             isSensor: true ,
             isStatic: true
         });
@@ -1236,14 +1236,14 @@ class PlinkoMachineScene extends Phaser.Scene {
     spawnPlinkos (number) {
         
         if (number > 0){
-            var delay = 250;
+            var delay = 275;
             
             // TOP SPAWN
             //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
             var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
                 shape: {
                     type: 'polygon',
-                    radius: 3.5,
+                    radius: 3.7,
                     sides: 4,
                 },
                 //slop:0.8,
@@ -1253,6 +1253,7 @@ class PlinkoMachineScene extends Phaser.Scene {
             plinkoDisc.setOnCollideWith(this.plinkoSensor, pair => {
                 // pair.bodyA
                 // pair.bodyB
+                number;
                 this.zedsToAdd += this.zedIndex;
 
 
@@ -1327,13 +1328,15 @@ class PlinkoMachineScene extends Phaser.Scene {
             }, this);
 
             //plinkoDisc.setCircle(3.33);
+            var friction = Phaser.Math.FloatBetween(0.013, 0.005);
+            var randomDelay = Phaser.Math.Between(0,36);
             plinkoDisc.setBounce(0.0);
             plinkoDisc.setFriction(0.000);
-            plinkoDisc.setFrictionAir(0.01);
+            plinkoDisc.setFrictionAir(friction);
             plinkoDisc.setFixedRotation();
 
             number--;
-            this.time.delayedCall(delay, this.spawnPlinkos, [number], this);
+            this.time.delayedCall(delay - randomDelay, this.spawnPlinkos, [number], this);
         } else {
             console.log('Finished Visual Pinko Spawning');
             return
@@ -10278,158 +10281,165 @@ class ScoreScene extends Phaser.Scene {
         ourPersist.prevStagesCompleteTut = ourPersist.stagesCompleteTut;
         ourPersist.prevPlayerRankTut = calcSumOfBestRank(ourPersist.sumOfBestTut);
 
+        var continue_text = '[SPACE TO CONTINUE]';
+            
+        var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.25,'div', Object.assign({}, STYLE_DEFAULT, {
+            "fontSize":'32px',
+            "font-family": '"Press Start 2P", system-ui',
+            "text-shadow": "4px 4px 0px #000000",
+            //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
+            //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
+            }
+        )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
+
+        continueText.setVisible(false);
+
+
+        this.tweens.add({
+            targets: continueText,
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: -1,
+            yoyo: true
+          });
+
 
         // Give a few seconds before a player can hit continue
-        this.time.delayedCall(900, function() {
-            var continue_text = '[SPACE TO CONTINUE]';
-
-            var gameOver = false;
+        this.time.delayedCall(3000, function() {
             
-            var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.25,'div', Object.assign({}, STYLE_DEFAULT, {
-                "fontSize":'32px',
-                "font-family": '"Press Start 2P", system-ui',
-                "text-shadow": "4px 4px 0px #000000",
-                //"text-shadow": '-2px 0 0 #fdff2a, -4px 0 0 #df4a42, 2px 0 0 #91fcfe, 4px 0 0 #4405fc',
-                //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
-                }
-            )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
- 
-            this.tweens.add({
-                targets: continueText,
-                alpha: { from: 0, to: 1 },
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: -1,
-                yoyo: true
-              });
-
-            const onContinue = function (scene) {
-                console.log('pressing space inside score scene')
-
-                if (ourGame.slowMoTween && ourGame.slowMoTween.isPlaying()){
-                    ourGame.slowMoTween.complete(); //this returns timescale values to 1 so players don't need to wait
-                    // reset snake body segments so it can move immediately
-                    ourGame.snake.body.forEach(segment => {
-                        segment.x = ourGame.snake.head.x;
-                        segment.y = ourGame.snake.head.y;
-                    });
-                }
-
-                
-
-                if (ourGame.stage == 'Tutorial_1') {
-                    ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
-                         Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
-                }
-                //score screen starting arrows
-                ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
-
-                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
-                    ourGame.startingArrowsAnimN2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
-                    ourGame.startingArrowsAnimN2.play('startArrowIdle');
-                }
-                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y +1 * GRID)) {
-                    ourGame.startingArrowsAnimS2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-                    ourGame.startingArrowsAnimS2.flipY = true;
-                    ourGame.startingArrowsAnimS2.play('startArrowIdle');
-                }
-                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
-                    ourGame.startingArrowsAnimE2 = ourGame.add.sprite(ourGame.snake.head.x + GRID * 2, ourGame.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-                    ourGame.startingArrowsAnimE2.angle = 90;
-                    ourGame.startingArrowsAnimE2.play('startArrowIdle');
-                }
-                if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
-                    ourGame.startingArrowsAnimW2 = ourGame.add.sprite(ourGame.snake.head.x - GRID,ourGame.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-                    ourGame.startingArrowsAnimW2.angle = 270;
-                    ourGame.startingArrowsAnimW2.play('startArrowIdle');
-                }
-                
-
-                
-                if (ourGame.mode != MODES.PRACTICE) {
-                    console.log("ZedRolling");
-                    var rollResults = rollZeds(currentLocal);
-
-                    console.log("RollResults:", rollResults);
-                    console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
-                    ourPersist.zeds += rollResults.get("zedsEarned");
-                    
-                    plinkoMachine.zedIndex = 1;
-                    plinkoMachine.zedsToAdd = 0;
-                    plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
-                    //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
-
-                    const zedObject = calcZedLevel(ourPersist.zeds);
-                    ourPersist.zedsUI.setHTML(
-                        `<span style ="color: limegreen;
-                        font-size: 14px;
-                        border: limegreen solid 1px;
-                        border-radius: 5px;
-                        padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
-                    );
-
-                    var extraFields = {
-                        level: zedObject.level,
-                        zedsToNext: zedObject.zedsToNext,
-                        startingScore: ourScoreScene.stageData.calcTotal(),
-                        rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
-                    }
-
-                    localStorage.setItem("zeds", ourPersist.zeds);
-                    gameanalytics.GameAnalytics.addResourceEvent(
-                        gameanalytics.EGAResourceFlowType.Source,
-                        "zeds",
-                        ourScoreScene.difficulty,
-                        "Gameplay",
-                        "CompleteStage",
-                        extraFields.toString(),
-                        );
-
-                }
-                
-                
-                // Turns off score post score screen.
-                ourGame.events.off('addScore');
-
-
-                ourGame.backgroundBlur(false);
-                ourScoreScene.scene.stop();
-
-                    
-                if (!gameOver) {
-                    // Go Back Playing To Select New Stage
-                    ourScoreScene.scene.stop();
-                    ourGame.gState = GState.START_WAIT;
-                    ourGame.bgTween = ourGame.tweens.add({
-                        targets: [ourGame.stageBackGround, ourGame.continueBanner],
-                        alpha: 0,
-                        yoyo: false,
-                        loop: 0,
-                        duration: 200,
-                        ease: 'sine.inout'
-                    });
-
-                    /*ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
-
-                        })).setHTML(
-                            
-                            `Free Play </br>
-                            Press "n" to warp to the next stage.`
-                    ).setOrigin(0.5,0.5);*/
-                } 
-            }
-            // #region Space to Continue
-            this.input.keyboard.on('keydown-SPACE', function() { 
-                onContinue(ourGame);
-            });
-
-            continueText.on('pointerdown', e => {
-                onContinue(ourGame);
-            });
-
+            continueText.setVisible(true);
 
         }, [], this);
+
+        const onContinue = function (scene) {
+            console.log('pressing space inside score scene');
+
+            var gameOver = false;
+
+            if (ourGame.slowMoTween && ourGame.slowMoTween.isPlaying()){
+                ourGame.slowMoTween.complete(); //this returns timescale values to 1 so players don't need to wait
+                // reset snake body segments so it can move immediately
+                ourGame.snake.body.forEach(segment => {
+                    segment.x = ourGame.snake.head.x;
+                    segment.y = ourGame.snake.head.y;
+                });
+            }
+
+            
+
+            if (ourGame.stage == 'Tutorial_1') {
+                ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
+                     Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
+            }
+            //score screen starting arrows
+            ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+
+            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
+                ourGame.startingArrowsAnimN2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
+                ourGame.startingArrowsAnimN2.play('startArrowIdle');
+            }
+            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y +1 * GRID)) {
+                ourGame.startingArrowsAnimS2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+                ourGame.startingArrowsAnimS2.flipY = true;
+                ourGame.startingArrowsAnimS2.play('startArrowIdle');
+            }
+            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
+                ourGame.startingArrowsAnimE2 = ourGame.add.sprite(ourGame.snake.head.x + GRID * 2, ourGame.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+                ourGame.startingArrowsAnimE2.angle = 90;
+                ourGame.startingArrowsAnimE2.play('startArrowIdle');
+            }
+            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
+                ourGame.startingArrowsAnimW2 = ourGame.add.sprite(ourGame.snake.head.x - GRID,ourGame.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+                ourGame.startingArrowsAnimW2.angle = 270;
+                ourGame.startingArrowsAnimW2.play('startArrowIdle');
+            }
+            
+
+            
+            if (ourGame.mode != MODES.PRACTICE) {
+                console.log("ZedRolling");
+                var rollResults = rollZeds(currentLocal);
+
+                console.log("RollResults:", rollResults);
+                console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
+                ourPersist.zeds += rollResults.get("zedsEarned");
+                plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
+                //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
+
+                const zedObject = calcZedLevel(ourPersist.zeds);
+                ourPersist.zedsUI.setHTML(
+                    `<span style ="color: limegreen;
+                    font-size: 14px;
+                    border: limegreen solid 1px;
+                    border-radius: 5px;
+                    padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
+                );
+
+                var extraFields = {
+                    level: zedObject.level,
+                    zedsToNext: zedObject.zedsToNext,
+                    startingScore: ourScoreScene.stageData.calcTotal(),
+                    rollsLeft: ourScoreScene.foodLogSeed.slice(-1).pop() 
+                }
+
+                localStorage.setItem("zeds", ourPersist.zeds);
+                gameanalytics.GameAnalytics.addResourceEvent(
+                    gameanalytics.EGAResourceFlowType.Source,
+                    "zeds",
+                    ourScoreScene.difficulty,
+                    "Gameplay",
+                    "CompleteStage",
+                    extraFields.toString(),
+                    );
+
+            }
+            
+            
+            // Turns off score post score screen.
+            ourGame.events.off('addScore');
+
+
+            ourGame.backgroundBlur(false);
+            ourScoreScene.scene.stop();
+
+                
+            if (!gameOver) {
+                // Go Back Playing To Select New Stage
+                ourScoreScene.scene.stop();
+                ourGame.gState = GState.START_WAIT;
+                ourGame.bgTween = ourGame.tweens.add({
+                    targets: [ourGame.stageBackGround, ourGame.continueBanner],
+                    alpha: 0,
+                    yoyo: false,
+                    loop: 0,
+                    duration: 200,
+                    ease: 'sine.inout'
+                });
+
+                /*ourGame.add.dom(SCREEN_WIDTH / 2, SCREEN_HEIGHT/2, 'div',  Object.assign({}, STYLE_DEFAULT, {
+
+                    })).setHTML(
+                        
+                        `Free Play </br>
+                        Press "n" to warp to the next stage.`
+                ).setOrigin(0.5,0.5);*/
+            } 
+        }
+
+        // #region Space to Continue
+        this.input.keyboard.on('keydown-SPACE', function() {
+            if (continueText.visible) {
+                onContinue(ourGame);
+            } else {
+                console.log("Not Visible Yet", continueText.visible);
+            }
+        }, this);
+
+        continueText.on('pointerdown', e => {
+            onContinue(ourGame);
+        });
 
 
     }
