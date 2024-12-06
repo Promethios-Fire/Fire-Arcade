@@ -9146,6 +9146,179 @@ class ScoreScene extends Phaser.Scene {
             (this.stageData.stage.replaceAll("_", " ") + " CLEAR")
         ).setOrigin(0.5, 0.5).setScale(.5);
 
+
+
+
+        // #region Main Stats
+
+        const scorePartsStyle = {
+            color: "white",
+            //"text-shadow": "2px 2px 4px #000000",
+            "font-size":'16px',
+            "font-weight": 400,
+            "text-align": 'right',
+            "white-space": 'pre-line'
+        }
+        
+        const atomTimeLabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `ATOM TIME:`
+        ).setOrigin(1, 0).setScale(0.5);
+
+        
+
+        var atomTimeValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
+                `${commaInt(0)}`
+        ).setOrigin(1, 0).setScale(0.5);
+
+
+        // #region Atomic Food List
+
+        var atomList = this.stageData.foodLog.slice();
+        var scoreAtoms = [];
+        var scoreCombos= [];
+        var emptySprite = undefined;
+        var frameTime = 16.667;
+        var delayStart = 600;
+        
+        var atomTime = 0;
+
+        var count = 0;
+        
+        for (let i = 0; i < atomList.length; i++) {
+            
+            var logTime = atomList[i];
+            let _x,_y;
+            let anim;
+
+            if (i < 14) {
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 8);
+                _y = GRID * 8.75
+            }
+            else {
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
+                _y = (GRID * 8.75) + 8;
+            }
+
+            switch (true) {
+                case logTime > COMBO_ADD_FLOOR:
+                    anim = "atomScore01";
+                    if (i != 0) { // First Can't Connect
+                        var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
+                        ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
+                        this.ScoreContainerL.add(rectangle)
+                        scoreCombos.push(rectangle)
+                    }
+                    break
+                case logTime > BOOST_ADD_FLOOR:
+                    //console.log(logTime, "Boost", i);
+                    anim = "atomScore02";
+                    scoreCombos.push(emptySprite);
+                    break
+                case logTime > SCORE_FLOOR:
+                    //console.log(logTime, "Boost", i);
+                    anim = "atomScore03";
+                    scoreCombos.push(emptySprite);
+                    break
+                default:
+                    //console.log(logTime, "dud", i);
+                    anim = "atomScore04";
+                    scoreCombos.push(emptySprite);
+                    break
+            }
+
+            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
+            ).play(anim).setDepth(21).setScale(1).setAlpha(0);
+            this.ScoreContainerL.add(this.atomScoreIcon);
+            scoreAtoms.push(this.atomScoreIcon);
+        }
+        var _frame = 0
+        var __frame = 0
+        debugger
+
+        var cursorIndex = -1;
+        
+        var scoreAtomsTween = this.tweens.addCounter({
+            from: 0,
+            to:  atomList.length - 1,
+            delay: delayStart,
+            duration: (frameTime * 12) * atomList.length,
+            ease: 'Linear',
+            onUpdate: _tween =>
+            {
+                
+                const index = Math.floor(_tween.getValue());
+
+                if (index > cursorIndex) {
+                    scoreAtoms[index].setAlpha(1);
+                    if (scoreCombos[index]) {
+                        scoreCombos[index].setAlpha(1);
+                    }
+
+                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
+                    
+
+                    atomTime += atomList[index];
+                    //debugger
+
+                    atomTimeValue.setHTML(`${commaInt(atomTime)}`);
+
+                    cursorIndex = index;
+                }
+
+                
+
+                //__frame += 1
+                //if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
+                //    _frame += 1
+                    //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
+                    
+                //    scoreAtoms[_frame-1].setAlpha(1);
+                //    if (scoreCombos[_frame-1]) {
+                //        scoreCombos[_frame-1].setAlpha(1);
+                //    }
+
+                    //ourGame.atomSounds[_index].play()
+                    
+                //}
+                
+                //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
+            },
+            onComplete: tween => {
+                debugger
+
+                for (let _index = 0; _index < scoreAtoms.length; _index++) {
+                    scoreAtoms[_index].setAlpha(1);
+                    if (scoreCombos[_index]) {
+                        scoreCombos[_index].setAlpha(1);
+                    }
+                }
+
+
+            }
+        });
+
+        var atomsLog = this.stageData.foodLog.slice();
+
+        // #placeholder - james
+        var atomListTween = this.tweens.add({
+            targets: 0,
+            delay: 10,
+            duration: 500,
+            loop: atomsLog.length,
+            "loop": () => {
+                var atomTime = atomsLog.shift();
+                ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
+            }
+
+        });
+
+        // #endregion
+
+
         /*
         this.add.dom(X_OFFSET + GRID * 24, GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
             "text-shadow": "4px 4px 0px #000000",
@@ -9161,30 +9334,7 @@ class ScoreScene extends Phaser.Scene {
         
 
         
-        // #region Main Stats
 
-        const scorePartsStyle = {
-            color: "white",
-            //"text-shadow": "2px 2px 4px #000000",
-            "font-size":'16px',
-            "font-weight": 400,
-            "text-align": 'right',
-            "white-space": 'pre-line'
-        }
-        
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML(
-                `ATOM TIME:`
-        ).setOrigin(1, 0).setScale(0.5);
-
-        
-
-        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
-                `${commaInt(0)}`
-        ).setOrigin(1, 0).setScale(0.5);
 
         //var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
         //    scorePartsStyle, {
@@ -9206,16 +9356,14 @@ class ScoreScene extends Phaser.Scene {
                 `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var frameTime = 16.667;
 
         var _baseScore = this.stageData.atomTime();
         var _speedbonus = calcStageScore(this.stageData.atomTime());
 
-        var atomList = this.stageData.foodLog.slice();
         
-        var delayStart = 600;
+        
 
-        this.tweens.addCounter({
+        /*this.tweens.addCounter({
             from: 0,
             to: _baseScore,
             duration: atomList.length * (frameTime * 4) * this.scoreTimeScale, //66.7ms
@@ -9224,11 +9372,11 @@ class ScoreScene extends Phaser.Scene {
             onUpdate: tween =>
             {
                 const value = Math.round(tween.getValue());
-                preAdditiveBaseScoreUI.setHTML(
+                atomTimeValue.setHTML(
                     `${commaInt(value)}</span>`
             ).setOrigin(1, 0).setScale(0.5);
             }
-        });
+        }); */
 
         this.tweens.addCounter({
             from: 0,
@@ -9592,11 +9740,11 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL.add(
             [this.scorePanelL,
             this.scorePanelLRank,
-            preAdditiveBaseScoreUI,
+            atomTimeValue,
             //preAdditiveSpeedScoreUI1,
             stageScoreUILabel,
             preAdditiveSpeedScoreUI2,
-            preAdditiveLablesUI,
+            atomTimeLabel,
             multLablesUI1,
             multLablesUI2,
             //multLablesUI3,
@@ -9624,7 +9772,7 @@ class ScoreScene extends Phaser.Scene {
             letterRank.setTintFill(COLOR_BONUS_HEX);
         }
         
-        
+    
 
         this.ScoreContainerL.add(letterRank)
         
@@ -9712,92 +9860,7 @@ class ScoreScene extends Phaser.Scene {
         this.spotlight2 = this.lights.addLight(0, 0, 66, lightColor2).setIntensity(1.5); //
         
 
-        // #region Atomic Food List
-       
-        var scoreAtoms = [];
-        var scoreCombos= [];
-        var emptySprite = undefined;
-
-        var count = 0;
         
-        for (let i = 0; i < atomList.length; i++) {
-            
-            var logTime = atomList[i];
-            let _x,_y;
-            let anim;
-
-            if (i < 14) {
-                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 8);
-                _y = GRID * 8.75
-            }
-            else {
-                _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
-                _y = (GRID * 8.75) + 8;
-            }
-
-            switch (true) {
-                case logTime > COMBO_ADD_FLOOR:
-                    anim = "atomScore01";
-                    if (i != 0) { // First Can't Connect
-                        var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
-                        ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
-                        this.ScoreContainerL.add(rectangle)
-                        scoreCombos.push(rectangle)
-                    }
-                    break
-                case logTime > BOOST_ADD_FLOOR:
-                    //console.log(logTime, "Boost", i);
-                    anim = "atomScore02";
-                    scoreCombos.push(emptySprite);
-                    break
-                case logTime > SCORE_FLOOR:
-                    //console.log(logTime, "Boost", i);
-                    anim = "atomScore03";
-                    scoreCombos.push(emptySprite);
-                    break
-                default:
-                    //console.log(logTime, "dud", i);
-                    anim = "atomScore04";
-                    scoreCombos.push(emptySprite);
-                    break
-            }
-
-            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
-            ).play(anim).setDepth(21).setScale(1).setAlpha(0);
-            this.ScoreContainerL.add(this.atomScoreIcon);
-            scoreAtoms.push(this.atomScoreIcon);
-        }
-        var _frame = 0
-        var __frame = 0
-
-        var scoreAtomsTween = this.tweens.addCounter({
-            from: 0,
-            to:  atomList.length,
-            delay: delayStart,
-            duration: (frameTime * 4) * atomList.length,
-            ease: 'Linear',
-            
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                __frame += 1
-                if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
-                    _frame += 1
-                    //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
-                    
-                    scoreAtoms[_frame-1].setAlpha(1);
-                    if (scoreCombos[_frame-1]) {
-                        scoreCombos[_frame-1].setAlpha(1);
-                    }
-
-                    //ourGame.atomSounds[_index].play()
-                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
-                }
-                
-                //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
-            }
-        });
-
         //console.log(scoreAtomsTween.timeScale)
         //debugger;
         //scoreAtomsTween.timeScale = 8;
@@ -10178,7 +10241,7 @@ class ScoreScene extends Phaser.Scene {
             //ourScoreScene.scoreAtomsTween.setTimeScale(8); //doesn't do anything
             //scoreAtomsTween.timeScale = 8;
             //debugger
-            this.scoreTimeScale= 0.25;
+            //this.scoreTimeScale= 0.25;
         }, this);
         /*this.input.keyboard.on('keyup-SPACE', function(scoreAtomsTween) { 
             //scoreAtomsTween.timeScale = 1 //doesn't do anything
@@ -10391,6 +10454,7 @@ class ScoreScene extends Phaser.Scene {
             } else {
                 console.log("Not Visible Yet", continueText.visible);
                 debugger
+                scoreAtomsTween.complete();
                 finalScoreTween.complete();
             }
         }, this);
