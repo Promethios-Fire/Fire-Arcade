@@ -9166,11 +9166,21 @@ class ScoreScene extends Phaser.Scene {
                 `ATOM TIME:`
         ).setOrigin(1, 0).setScale(0.5);
 
-        
-
         var atomTimeValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
+                `${commaInt(0)}`
+        ).setOrigin(1, 0).setScale(0.5);
+
+        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 13 + - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `STAGE SCORE`
+        ).setOrigin(1, 0).setScale(0.5);
+
+        var stageScoreUIValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13 - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML( //_baseScore + _speedbonus
                 `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
@@ -9183,8 +9193,6 @@ class ScoreScene extends Phaser.Scene {
         var emptySprite = undefined;
         var frameTime = 16.667;
         var delayStart = 600;
-        
-        var atomTime = 0;
 
         var count = 0;
         
@@ -9216,17 +9224,17 @@ class ScoreScene extends Phaser.Scene {
                 case logTime > BOOST_ADD_FLOOR:
                     //console.log(logTime, "Boost", i);
                     anim = "atomScore02";
-                    scoreCombos.push(emptySprite);
+                    scoreCombos.push(undefined);
                     break
                 case logTime > SCORE_FLOOR:
                     //console.log(logTime, "Boost", i);
                     anim = "atomScore03";
-                    scoreCombos.push(emptySprite);
+                    scoreCombos.push(undefined);
                     break
                 default:
                     //console.log(logTime, "dud", i);
                     anim = "atomScore04";
-                    scoreCombos.push(emptySprite);
+                    scoreCombos.push(undefined);
                     break
             }
 
@@ -9235,11 +9243,12 @@ class ScoreScene extends Phaser.Scene {
             this.ScoreContainerL.add(this.atomScoreIcon);
             scoreAtoms.push(this.atomScoreIcon);
         }
-        var _frame = 0
-        var __frame = 0
+
         debugger
 
-        var cursorIndex = -1;
+        var atomTime = 0;
+        var stageScore;
+        var cursorIndex = -1; // Plays sound at 0;
         
         var scoreAtomsTween = this.tweens.addCounter({
             from: 0,
@@ -9248,8 +9257,7 @@ class ScoreScene extends Phaser.Scene {
             duration: (frameTime * 12) * atomList.length,
             ease: 'Linear',
             onUpdate: _tween =>
-            {
-                
+            {    
                 const index = Math.floor(_tween.getValue());
 
                 if (index > cursorIndex) {
@@ -9259,43 +9267,46 @@ class ScoreScene extends Phaser.Scene {
                     }
 
                     ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
-                    
 
                     atomTime += atomList[index];
-                    //debugger
-
                     atomTimeValue.setHTML(`${commaInt(atomTime)}`);
+
+                    stageScore = calcStageScore(atomTime);
+                    stageScoreUIValue.setHTML(
+                        `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(stageScore)}</span>`
+                    );
 
                     cursorIndex = index;
                 }
-
-                
-
-                //__frame += 1
-                //if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
-                //    _frame += 1
-                    //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
-                    
-                //    scoreAtoms[_frame-1].setAlpha(1);
-                //    if (scoreCombos[_frame-1]) {
-                //        scoreCombos[_frame-1].setAlpha(1);
-                //    }
-
-                    //ourGame.atomSounds[_index].play()
-                    
-                //}
-                
-                //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
             },
             onComplete: tween => {
                 debugger
+
+                var atomTime = 0;
 
                 for (let _index = 0; _index < scoreAtoms.length; _index++) {
                     scoreAtoms[_index].setAlpha(1);
                     if (scoreCombos[_index]) {
                         scoreCombos[_index].setAlpha(1);
                     }
+                    atomTime += atomList[_index];
                 }
+
+
+                atomTimeValue.setHTML(`${commaInt(atomTime)}`);
+
+
+                this.tweens.add({ 
+                    targets: stageScoreUIValue,
+                    alpha: 0,
+                    ease: 'Linear',
+                    duration: 250,
+                    loop: 0,
+                    yoyo: true,
+                });
+                stageScoreUIValue.setHTML(
+                    `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(calcStageScore(atomTime))}</span>`
+                );
 
 
             }
@@ -9304,18 +9315,7 @@ class ScoreScene extends Phaser.Scene {
         var atomsLog = this.stageData.foodLog.slice();
 
         // #placeholder - james
-        var atomListTween = this.tweens.add({
-            targets: 0,
-            delay: 10,
-            duration: 500,
-            loop: atomsLog.length,
-            "loop": () => {
-                var atomTime = atomsLog.shift();
-                ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
-            }
-
-        });
-
+        
         // #endregion
 
 
@@ -9344,86 +9344,11 @@ class ScoreScene extends Phaser.Scene {
         //        `
         //).setOrigin(1, 0).setScale(0.5);
 
-        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 13 + - 5, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML(
-                `STAGE SCORE`
-        ).setOrigin(1, 0).setScale(0.5);
-
-        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13 - 5, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML( //_baseScore + _speedbonus
-                `${commaInt(0)}`
-        ).setOrigin(1, 0).setScale(0.5);
-
 
         var _baseScore = this.stageData.atomTime();
         var _speedbonus = calcStageScore(this.stageData.atomTime());
 
-        
-        
 
-        /*this.tweens.addCounter({
-            from: 0,
-            to: _baseScore,
-            duration: atomList.length * (frameTime * 4) * this.scoreTimeScale, //66.7ms
-            ease: 'Sine.InOut',
-            delay: delayStart,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                atomTimeValue.setHTML(
-                    `${commaInt(value)}</span>`
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        }); */
-
-        this.tweens.addCounter({
-            from: 0,
-            to:  _speedbonus,
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'Sine.InOut',
-            delay: atomList.length * (frameTime * 4) * this.scoreTimeScale + delayStart, //66.7ms
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                //preAdditiveSpeedScoreUI1.setHTML(
-                //    `
-                //+${commaInt(value)}
-                //`
-                //).setOrigin(1, 0).setScale(0.5);
-            },
-            onComplete: () => {
-                //SFX
-                this.tweens.add({ 
-                    targets: preAdditiveSpeedScoreUI2,
-                    alpha: 0,
-                    ease: 'Linear',
-                    duration: 250,
-                    loop: 0,
-                    yoyo: true,
-                });
-                preAdditiveSpeedScoreUI2.setHTML(
-                    `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(_speedbonus)}</span>`
-            )}
-        });
-
-        /*this.tweens.addCounter({
-            from: 0,
-            to:  _speedbonus,
-            duration: atomList.length * 66.7,
-            ease: 'linear',
-            delay:atomList.length * 100,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                preAdditiveSpeedScoreUI2.setHTML(
-                    `
-                
-                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + value)}</span>`
-            ).setOrigin(1, 0);
-            }
-        });*/
         
 
         var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
@@ -9743,7 +9668,7 @@ class ScoreScene extends Phaser.Scene {
             atomTimeValue,
             //preAdditiveSpeedScoreUI1,
             stageScoreUILabel,
-            preAdditiveSpeedScoreUI2,
+            stageScoreUIValue,
             atomTimeLabel,
             multLablesUI1,
             multLablesUI2,
@@ -10453,7 +10378,9 @@ class ScoreScene extends Phaser.Scene {
                 
             } else {
                 console.log("Not Visible Yet", continueText.visible);
-                debugger
+
+                // Early Complete
+                ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
                 scoreAtomsTween.complete();
                 finalScoreTween.complete();
             }
