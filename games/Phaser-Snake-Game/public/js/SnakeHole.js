@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -3986,13 +3986,22 @@ class PersistScene extends Phaser.Scene {
         this.prevRank = 0;
 
         // List of Background Containers
-        this.bgPlanets = this.add.container(X_OFFSET, Y_OFFSET,);
-        this.bgEmpty = this.add.container(X_OFFSET, Y_OFFSET,);
-        this.bgAsteroidsFar = this.add.container(X_OFFSET, Y_OFFSET,);
-        this.bgAsteroidsClose = this.add.container(X_OFFSET, Y_OFFSET,);
+        this.bgPlanets = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
+        this.bgEmpty = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
+        this.bgAsteroidsFar = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
+        this.bgAsteroidsClose = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
         
         this.currentBackgroundFar = this.bgPlanets;
         this.currentBackgroundClose = this.bgEmpty;
+        //this.currentBackgroundFar = this.bgAsteroidsFar;
+        //this.currentBackgroundClose = this.bgAsteroidsClose;
+
+        // Background Objects' Screen Wrapping Dimensions
+        this.gameScreenRight =  342 + 128;
+        this.gameScreenBottom =  320 + 128;
+
+        this.spriteScrollX = 0;
+        this.spriteScrollY = 0;
     }
     /*preload() {
         this.cache.shader.add(waveShader.key, waveShader);
@@ -4000,19 +4009,15 @@ class PersistScene extends Phaser.Scene {
     
     create() {
 
-
-    
-
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
-    this.add.image(SCREEN_WIDTH/2 - 1,GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
+    this.add.image(SCREEN_WIDTH/2 - 1, GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
     //this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
     //    .setOrigin(0.0,0.0).setDepth(11);
     //this.comboCover.setScrollFactor(0);
     this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
-    
     
     //this.tileSpriteImage = this.add.tileSprite(0, 0, this.scale.width, this.scale.height, 'tileSpritesImage');
     //this.tileSpriteImage.setOrigin(0,0);
@@ -4023,10 +4028,7 @@ class PersistScene extends Phaser.Scene {
     //this.backgroundLayer.setOrigin(0,0);
     this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
     
-    
-
-    //waveshader
-    //this.game.renderer.pipelines.add('waveShader', new WaveShaderPipeline(this.game));;       
+    //waveshader     
     this.wavePipeline = game.renderer.pipelines.get('WaveShaderPipeline');
     
     // # Backgrounds
@@ -4039,33 +4041,28 @@ class PersistScene extends Phaser.Scene {
     //atlas code preserved
     //this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
     this.bgFurthest = this.add.sprite(X_OFFSET, Y_OFFSET, 'background02_4').setDepth(-4).setOrigin(0,0); 
-
-    //this.bgFurthest.tileScaleX = 2;
-    //this.bgFurthest.tileScaleY = 2;
-
     
     // Scrolling BG1
     //atlas code preserved
     //this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
     this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-3).setOrigin(0,0);
-    //this.bgBack.tileScaleX = 2;
-    //this.bgBack.tileScaleY = 2;
 
-    
     // Scrolling bgScrollMid Stars (depth is behind planets)
     this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-    //this.bgMid.tileScaleX = 2;
-    //this.bgMid.tileScaleY = 2;
 
-    // Scrolling bgFront Planets
+    // Scrolling/Wrapping Sprite Layers
     //atlas code preserved
     //this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_2.png').setDepth(-1).setOrigin(0,0);
     //this.bgFront = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-1).setOrigin(0,0);
     //Background Sprite Container
     //this.bgPlanet = this.add.sprite(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 'bgPlanets',4).setDepth(100);
 
-    // Planets
 
+    const CENTER_X = SCREEN_WIDTH / 2;
+    const CENTER_Y = SCREEN_HEIGHT / 2;
+
+
+    // Planets
     // Composite Sprites -- use multiple sprites to make one larger sprite in its own container
     
     // Composite Planet 1
@@ -4073,51 +4070,104 @@ class PersistScene extends Phaser.Scene {
     const p1Quad2 = createImage(this, 16, 0, 'bgPlanets', 1); // Top Right
     const p1Quad3 = createImage(this, 0, 16, 'bgPlanets', 16); // Bottom Left
     const p1Quad4 = createImage(this, 16, 16, 'bgPlanets', 17); // Bottom Right
-    const compSpritePlanet1 = createContainer(this, SCREEN_WIDTH / 2, 0,
+    const compSpritePlanet1 = createContainer(this, CENTER_X, 0,
          [p1Quad1, p1Quad2, p1Quad3, p1Quad4]);
 
     // Composite Planet 2
     const p2Quad1 = createImage(this, 0, 0, 'bgPlanets', 6);
     const p2Quad2 = createImage(this, 0, 16, 'bgPlanets', 22);
-    const compSpritePlanet2 = createContainer(this, (SCREEN_WIDTH / 2) + GRID * 15, SCREEN_HEIGHT / 2 - GRID * 3, [p2Quad1, p2Quad2]);
+    const compSpritePlanet2 = createContainer(this, (CENTER_X) + GRID * 15, CENTER_Y - GRID * 3,
+         [p2Quad1, p2Quad2]);
 
     // Normal Sprite Planets
-    const spritePlanet1 = createImage(this, SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2, 'bgPlanets', 5);
-    const spritePlanet2 = createImage(this, SCREEN_WIDTH / 2 - GRID * 4, SCREEN_HEIGHT / 2 - GRID * 4, 'bgPlanets', 4);
+    const spritePlanet1 = createImage(this, CENTER_X, CENTER_Y, 'bgPlanets', 5);
+    const spritePlanet2 = createImage(this, CENTER_X - GRID * 4, CENTER_Y - GRID * 4, 'bgPlanets', 4);
     
-
     // Asteroids
     // Far Layer
-    const a1Quad1 = createImage(this, 0, 0, 'bgPlanets', 12); // Top Left
-    const a1Quad2 = createImage(this, 16, 0, 'bgPlanets', 13); // Top Right
-    const compSpriteAsteroid1 = createContainer(this, SCREEN_WIDTH / 2 - 40, 90,
-        [a1Quad1,a1Quad2]);
-    const a2Quad1 = createImage(this, 0, 0, 'bgPlanets', 14);
-    const a2Quad2 = createImage(this, 16, 0, 'bgPlanets', 15);
-    const a2Quad3 = createImage(this, 0, 16, 'bgPlanets', 30);
-    const a2Quad4 = createImage(this, 16, 16, 'bgPlanets', 31);
-    const compSpriteAsteroid2 = createContainer(this, SCREEN_WIDTH / 2 + 40, - 90,
-        [a2Quad1,a2Quad2,a2Quad3,a2Quad4]);
-    const a3Quad1 = createImage(this, 0, 0, 'bgPlanets', 9);
-    const a3Quad2 = createImage(this, 0, 16, 'bgPlanets', 25);
-    const a3Quad3 = createImage(this, 16, 16, 'bgPlanets', 26);
-    const compSpriteAsteroid3 = createContainer(this, SCREEN_WIDTH / 2 + 60, - 120,
-        [a3Quad1,a3Quad2,a3Quad3]);
-    // Close Layer
-    const spriteAsteroid1 = createImage(this, SCREEN_WIDTH / 2 - 20, 40, 'bgPlanets', 11);
-    const spriteAsteroid2 = createImage(this, SCREEN_WIDTH / 2 - GRID * 3, GRID * 4, 'bgPlanets', 10);
-    const spriteAsteroid3 = createImage(this, SCREEN_WIDTH / 2 - GRID * 5, GRID * 6, 'bgPlanets', 10);
+    // Composite Sprites
+    const a1Quad1 = createImage(this, 0, 0, 'bgPlanets', 12).setTint(0x8b6d8a); // Top Left
+    const a1Quad2 = createImage(this, 16, 0, 'bgPlanets', 13).setTint(0x8b6d8a); // Top Right
+    const compSpriteAsteroid1 = createContainer(this, CENTER_X - GRID * 30, CENTER_Y - GRID * 12, [a1Quad1,a1Quad2]);
+
+    const a2Quad1 = createImage(this, 0, 0, 'bgPlanets', 14).setTint(0x8b6d8a);
+    const a2Quad2 = createImage(this, 16, 0, 'bgPlanets', 15).setTint(0x8b6d8a);
+    const a2Quad3 = createImage(this, 0, 16, 'bgPlanets', 30).setTint(0x8b6d8a);
+    const a2Quad4 = createImage(this, 16, 16, 'bgPlanets', 31).setTint(0x8b6d8a);
+    const compSpriteAsteroid2 = createContainer(this, CENTER_X - GRID * 45, CENTER_Y - GRID * 18, [a2Quad1,a2Quad2,a2Quad3,a2Quad4]);
+
+    const a3Quad1 = createImage(this, 0, 0, 'bgPlanets', 9).setTint(0x8b6d8a);
+    const a3Quad2 = createImage(this, 0, 16, 'bgPlanets', 25).setTint(0x8b6d8a);
+    const a3Quad3 = createImage(this, 16, 16, 'bgPlanets', 26).setTint(0x8b6d8a);
+    const compSpriteAsteroid3 = createContainer(this, CENTER_X - GRID * 70, CENTER_Y - GRID * 24, [a3Quad1,a3Quad2,a3Quad3]);
+
+    const a4Quad1 = createImage(this, 0, 0, 'bgPlanets', 27).setTint(0x8b6d8a);
+    const a4Quad2 = createImage(this, 16, 0, 'bgPlanets', 28).setTint(0x8b6d8a);
+    const compSpriteAsteroid4 = createContainer(this, CENTER_X - GRID * 60, CENTER_Y - GRID * 36, [a4Quad1,a4Quad2]);
+
+    const dist = 'far'
+    // Create Asteroids
+    function createAsteroid(scene, x, y, frame, dist) {
+        const asteroid = scene.add.image(x, y, 'bgPlanets', frame);
+        asteroid.originalX = x;
+        asteroid.originalY = y;
+        if (dist === 'far') {
+            asteroid.setTint(0x514675); // Further Asteroids
+        } else if (dist === 'close') {
+            asteroid.setTint(0x8b6d8a); // Closer Asteroids
+        }
+        return asteroid;
+    }
+
+    // Asteroid Frames
+    const medAsteroidFrames = [10,11,29,45,44,46,47];
+    const smallAsteroidFrames = [8,24,40,41,42,43];
+
+    // Generate Multiple Asteroids (medium)
+    function generateMedAsteroids(scene, numAsteroids,dist) {
+        const asteroids = [];
+        for (let i = 0; i < numAsteroids; i++) {
+            const x = CENTER_X - GRID * Phaser.Math.Between(1, 60);
+            const y = CENTER_Y - GRID * Phaser.Math.Between(1, 60);
+            const frame = Phaser.Math.RND.pick(medAsteroidFrames);
+            asteroids.push(createAsteroid(scene, x, y, frame,dist));
+        }
+        return asteroids;
+    }
+    // Generate Multiple Asteroids (small)
+    function generateSmallAsteroids(scene, baseX, baseY, numGroups, numPerGroup,dist) {
+        const smallAsteroids = [];
+        for (let i = 0; i < numGroups; i++) {
+            const groupX = baseX + GRID * Phaser.Math.Between(1, 60);
+            const groupY = baseY + GRID * Phaser.Math.Between(1, 60);
+            for (let j = 0; j < numPerGroup; j++) {
+                const x = groupX + GRID * (j % 3);
+                const y = groupY + GRID * Math.floor(j / 3);
+                const frame = Phaser.Math.RND.pick(smallAsteroidFrames);
+                smallAsteroids.push(createAsteroid(scene, x, y, frame,dist));
+            }
+        }
+        return smallAsteroids;
+    }
+    // Create medium asteroids
+    const medAsteroids = generateMedAsteroids(this, 30,'far');
+    const medAsteroidsClose = generateMedAsteroids(this, 15,'close');
+    // Create small asteroids grouped together
+    const smallAsteroidGroups = generateSmallAsteroids(this, CENTER_X, CENTER_Y, 10, 5,'far');
+    const smallAsteroidsClose= generateSmallAsteroids(this,CENTER_X, CENTER_Y, 5, 3,'close');
+
+    // World Background Containers
 
     // Background Layer Container for Planets (World 1)
-    this.bgPlanets.add(
-        [compSpritePlanet1,compSpritePlanet2,spritePlanet1,spritePlanet2,]);
-    
+    this.bgPlanets.add([compSpritePlanet1, compSpritePlanet2, spritePlanet1, spritePlanet2]);
+
     // Background Layers Container for Asteroids (World 2)
-    this.bgAsteroidsFar.add( 
-        [spriteAsteroid1,spriteAsteroid2,spriteAsteroid3]);
-    this.bgAsteroidsClose.add( 
-        [compSpriteAsteroid1,compSpriteAsteroid2,compSpriteAsteroid3]);
-    
+    this.bgAsteroidsFar.add([...medAsteroids,...smallAsteroidGroups,  
+    ]);
+    this.bgAsteroidsClose.add([...medAsteroidsClose, ...smallAsteroidsClose,
+        compSpriteAsteroid1,compSpriteAsteroid2,compSpriteAsteroid3,compSpriteAsteroid4
+    ]);
+
 
     function createImage(scene, x, y, key, frame) {
         const image = scene.add.image(x, y, key, frame);
@@ -4174,11 +4224,7 @@ class PersistScene extends Phaser.Scene {
     this.prevSumOfBestTut = this.sumOfBestTut;
     this.prevStagesCompleteTut = this.stagesCompleteTut;
     this.prevPlayerRankTut = calcSumOfBestRank(this.sumOfBestTut);
-
-    
-
-
-        
+ 
     //this.mapProgressPanelText.setTint(0xffffff); // Set the tint to white to prepare for inversion
     //this.mapProgressPanelText.setBlendMode(Phaser.BlendModes.DIFFERENCE); // Use the difference blend mode to invert colors
 
@@ -4267,28 +4313,29 @@ class PersistScene extends Phaser.Scene {
         this.bgBack.tilePositionX = (this.bgBack.tilePositionX) * 4;
         this.bgBack.tilePositionY = (this.bgBack.tilePositionY) * 4;
 
-        const gameScreenRight =  342;
-        const gameScreenBottom =  320;
+        this.spriteScrollX -= 0.01;
+        this.spriteScrollY -= 0.00;
 
         // Background Layer FAR    
         // Update the X and Y of each background container's child object.
         this.currentBackgroundFar.list.forEach(child => {
-            child.x = -((this.bgBack.tilePositionX)) * 8 + child.originalX;
-            var remainderX = child.x % gameScreenRight;
+            
+            child.x = -((/*this.bgBack.tilePositionX*/ + this.spriteScrollX)) * 8 + child.originalX;
+            var remainderX = (child.x % this.gameScreenRight);
             if (child.x > 0) {
                 child.x = remainderX;
             }
             else{
-                remainderX += gameScreenRight;
+                remainderX += this.gameScreenRight;
                 child.x = remainderX;
             }
-            child.y = -((this.bgBack.tilePositionY)) * 8 + child.originalY;
-            var remainderY = child.y % gameScreenBottom;
+            child.y = -((/*this.bgBack.tilePositionY */ + this.spriteScrollY * 1.5)) * 8 + child.originalY;
+            var remainderY = child.y % this.gameScreenBottom;
             if (child.y > 0) {
                 child.y = remainderY;
             }
             else{
-                remainderY += gameScreenRight;
+                remainderY += this.gameScreenRight;
                 child.y = remainderY;
             }
         });
@@ -4296,22 +4343,22 @@ class PersistScene extends Phaser.Scene {
         // Background Layer CLOSE    
         // Update the X and Y of each background container's child object.
         this.currentBackgroundClose.list.forEach(child => {
-            child.x = -((this.bgBack.tilePositionX)) * 12 + child.originalX;
-            var remainderX = child.x % gameScreenRight;
+            child.x = -((/*this.bgBack.tilePositionX*/ + this.spriteScrollX * 1.5)) * 10 + child.originalX;
+            var remainderX = (child.x % this.gameScreenRight);
             if (child.x > 0) {
                 child.x = remainderX;
             }
             else{
-                remainderX += gameScreenRight;
+                remainderX += (this.gameScreenRight);
                 child.x = remainderX;
             }
-            child.y = -((this.bgBack.tilePositionY)) * 12 + child.originalY;
-            var remainderY = child.y % gameScreenBottom;
+            child.y = -((/*this.bgBack.tilePositionY */ + this.spriteScrollY * 1.5)) * 10 + child.originalY;
+            var remainderY = child.y % this.gameScreenBottom;
             if (child.y > 0) {
                 child.y = remainderY;
             }
             else{
-                remainderY += gameScreenRight;
+                remainderY += this.gameScreenRight;
                 child.y = remainderY;
             }
         });
@@ -4538,6 +4585,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(0); // Move to Origin
                 ourPersist.bgAsteroidsFar.setAlpha(0);
                 ourPersist.bgAsteroidsClose.setAlpha(0);
+                ourPersist.bgPlanets.setAlpha(1);
                 ourPersist.currentBackgroundFar = ourPersist.bgPlanets;
                 ourPersist.currentBackgroundClose = ourPersist.bgEmpty;
                 break;
