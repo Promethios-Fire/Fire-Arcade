@@ -9248,7 +9248,8 @@ class ScoreScene extends Phaser.Scene {
 
         var rankProgressBar = this.add.graphics();
 
-        var rankBarY = Y_OFFSET + GRID * 10;
+        var rankBarY = Y_OFFSET + GRID * 10 + 2;
+        var rankBarX = X_OFFSET + GRID * 6 + 2;
 
         var currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
@@ -9256,7 +9257,7 @@ class ScoreScene extends Phaser.Scene {
                 `D`
         ).setOrigin(1, 0.5).setScale(0.5);
 
-        var nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 5, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        var nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 4, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `C`
@@ -9310,7 +9311,7 @@ class ScoreScene extends Phaser.Scene {
 
                     // Back Fill
                     rankProgressBar.fillStyle(0x2d2d2d);
-                    rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size, 3);
+                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size, 3);
 
                     //C0C0C0
                     //CD7F32
@@ -9324,7 +9325,7 @@ class ScoreScene extends Phaser.Scene {
                             var filled = (stageScore/RANK_BENCHMARKS.get(RANKS.BRONZE));
                         
                             rankProgressBar.fillStyle(0xA1662F);
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * filled, 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * filled, 3);
                             break;
 
                         case stageScore <  RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
@@ -9335,10 +9336,10 @@ class ScoreScene extends Phaser.Scene {
                             currentRankLetter.setHTML("C");
                             nextRankLetter.setHTML("B");
                             rankProgressBar.fillStyle(0xCD7F32);
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / goal), 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
 
                             rankProgressBar.fillStyle(0xA1662F); // Wood
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
                             break;
                         
                         case stageScore < RANK_BENCHMARKS.get(RANKS.GOLD): // In Silver
@@ -9349,13 +9350,13 @@ class ScoreScene extends Phaser.Scene {
                             currentRankLetter.setHTML("B");
                             nextRankLetter.setHTML("A");
                             rankProgressBar.fillStyle(0xC0C0C0);
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / goal), 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
 
                             rankProgressBar.fillStyle(0xCD7F32); // Bronze
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
                             
                             rankProgressBar.fillStyle(0xA1662F); // Wood
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
 
                             break;
 
@@ -9369,16 +9370,16 @@ class ScoreScene extends Phaser.Scene {
                                         nextRankLetter.setHTML("S");
                                         
                                         rankProgressBar.fillStyle(0xd4af37);
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / goal), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
                                         
                                         rankProgressBar.fillStyle(0xC0C0C0); // SILVER
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / goal), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / goal), 3);
 
                                         rankProgressBar.fillStyle(0xCD7F32); // Bronze
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
                                         
                                         rankProgressBar.fillStyle(0xA1662F); // Wood
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
                                         break;
                                     default:
                                         currentRankLetter.setHTML("S");
@@ -9397,19 +9398,19 @@ class ScoreScene extends Phaser.Scene {
                                         
 
                                         rankProgressBar.fillStyle(0xE5E4E2); // Platinum
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / stageScore), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
 
                                         rankProgressBar.fillStyle(0xd4af37); // Gold
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (sRankValue / stageScore), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (sRankValue / stageScore), 3);
                                         
                                         rankProgressBar.fillStyle(0xC0C0C0); // SILVER
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
 
                                         rankProgressBar.fillStyle(0xCD7F32); // Bronze
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
                                         
                                         rankProgressBar.fillStyle(0xA1662F); // Wood
-                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
                                         
                                         break;
                                 }
@@ -9419,16 +9420,16 @@ class ScoreScene extends Phaser.Scene {
                                 nextRankLetter.setHTML(`+`);
                                 
                                 rankProgressBar.fillStyle(0xd4af37); // Gold
-                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / stageScore), 3);
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
                                 
                                 rankProgressBar.fillStyle(0xC0C0C0); // SILVER
-                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
 
                                 rankProgressBar.fillStyle(0xCD7F32); // Bronze
-                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
                                 
                                 rankProgressBar.fillStyle(0xA1662F); // Wood
-                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
                             }
                         
                             
@@ -9437,7 +9438,7 @@ class ScoreScene extends Phaser.Scene {
                         default:
                             
                             rankProgressBar.fillStyle(0x2dff2d);
-                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (atomTime/atomTimeTotal), 3);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (atomTime/atomTimeTotal), 3);
                             debugger // Safety debugger
                             break;
                     }
@@ -9576,14 +9577,14 @@ class ScoreScene extends Phaser.Scene {
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
 
-        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14 - 3, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `x ${0}%
                 `
         ).setOrigin(1, 0).setScale(0.5);
 
-        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14 - 3, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `
