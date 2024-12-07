@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = false;
-const DEBUG_SKIP_TO_SCENE = false;
+const DEBUG_SKIP_TO_SCENE = true;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
@@ -8912,6 +8912,10 @@ var StageData = new Phaser.Class({
                 comboCounter = 1;
             }
         });
+        
+        if (comboCounter === 28) {
+            bestCombo = 100; // Full combo = + 10,000
+        }
     
         return bestCombo * 100;
     },
@@ -9754,10 +9758,16 @@ class ScoreScene extends Phaser.Scene {
 
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
-            })).setHTML(
-                `COMBO BONUS:
-                NO-BONK BONUS:`
-        ).setOrigin(1,0).setScale(0.5);
+        })).setOrigin(1,0).setScale(0.5);
+
+
+        debugger
+        
+        postAdditiveLablesUI.setHTML(
+            `COMBO BONUS:
+            NO-BONK BONUS:`
+        );
+        
 
         const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
@@ -9800,8 +9810,20 @@ class ScoreScene extends Phaser.Scene {
                     
                     `
             ).setOrigin(1, 0).setScale(0.5);
+            },
+            onComplete: tween => {
+                if (this.stageData.comboBonus() > 9000) {
+                    postAdditiveLablesUI.setHTML(
+                        `FULL COMBO:
+                        NO-BONK BONUS:`
+                    );
+                    
+                }
+
             }
         });
+
+        
         
         /*
         this.tweens.addCounter({
