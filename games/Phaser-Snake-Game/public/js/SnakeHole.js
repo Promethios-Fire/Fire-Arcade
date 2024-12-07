@@ -9282,7 +9282,7 @@ class ScoreScene extends Phaser.Scene {
             from: 0,
             to:  atomList.length - 1,
             delay: delayStart,
-            duration: (frameTime * 5) * atomList.length,
+            duration: (frameTime * 4) * atomList.length,
             ease: 'Linear',
             onUpdate: _tween =>
             {    
@@ -9388,7 +9388,6 @@ class ScoreScene extends Phaser.Scene {
                                         var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
 
                                         var sX = Math.trunc(postGold / sRankDelta);
-                                        debugger
 
                                         if (sX > 1 ) {
                                             nextRankLetter.setHTML(`x${sX}`);
@@ -9436,17 +9435,9 @@ class ScoreScene extends Phaser.Scene {
                             break
                     
                         default:
-                            
-                            rankProgressBar.fillStyle(0x2dff2d);
-                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (atomTime/atomTimeTotal), 3);
                             debugger // Safety debugger
                             break;
                     }
-
-                    
-
-                    
-
                     
                 }
             },
@@ -9478,6 +9469,131 @@ class ScoreScene extends Phaser.Scene {
                 stageScoreUIValue.setHTML(
                     `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(calcStageScore(atomTime))}</span>`
                 );
+
+                stageScore = calcStageScore(atomTime);
+
+                const size = 106;
+                switch (true) {
+                    case stageScore <  RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
+
+                        var filled = (stageScore/RANK_BENCHMARKS.get(RANKS.BRONZE));
+                    
+                        rankProgressBar.fillStyle(0xA1662F);
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * filled, 3);
+                        break;
+
+                    case stageScore <  RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
+
+                        //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
+                        var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
+
+                        currentRankLetter.setHTML("C");
+                        nextRankLetter.setHTML("B");
+                        rankProgressBar.fillStyle(0xCD7F32);
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+
+                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                        break;
+                    
+                    case stageScore < RANK_BENCHMARKS.get(RANKS.GOLD): // In Silver
+
+                        //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.SILVER);
+                        var goal =  RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                        currentRankLetter.setHTML("B");
+                        nextRankLetter.setHTML("A");
+                        rankProgressBar.fillStyle(0xC0C0C0);
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+
+                        rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                        
+                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+
+                        break;
+
+                    case stageScore > RANK_BENCHMARKS.get(RANKS.GOLD): // In GOLD     
+                        if (sRankValue != undefined) {
+                            switch (true) {
+                                case stageScore < sRankValue:
+                                    //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
+                                    var goal =  sRankValue;
+                                    currentRankLetter.setHTML("A");
+                                    nextRankLetter.setHTML("S");
+                                    
+                                    rankProgressBar.fillStyle(0xd4af37);
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / goal), 3);
+
+                                    rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xA1662F); // Wood
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                                    break;
+                                default:
+                                    currentRankLetter.setHTML("S");
+
+                                    var sRankDelta = sRankValue - RANK_BENCHMARKS.get(RANKS.GOLD);
+                                    var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                                    var sX = Math.trunc(postGold / sRankDelta);
+
+                                    if (sX > 1 ) {
+                                        nextRankLetter.setHTML(`x${sX}`);
+                                    } else {
+                                        nextRankLetter.setHTML(`+`);
+                                    }
+                                    
+
+                                    rankProgressBar.fillStyle(0xE5E4E2); // Platinum
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
+
+                                    rankProgressBar.fillStyle(0xd4af37); // Gold
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (sRankValue / stageScore), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                                    rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xA1662F); // Wood
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                                    
+                                    break;
+                            }
+                            
+                        } else {
+                            currentRankLetter.setHTML("A");
+                            nextRankLetter.setHTML(`+`);
+                            
+                            rankProgressBar.fillStyle(0xd4af37); // Gold
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
+                            
+                            rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                            rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                            
+                            rankProgressBar.fillStyle(0xA1662F); // Wood
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                        }
+                    
+                        
+                        break
+                
+                    default:
+                        debugger // Safety debugger
+                        break;
+                }
+
+                
 
 
             }
