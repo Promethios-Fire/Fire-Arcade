@@ -9160,25 +9160,25 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const atomTimeLabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const atomTimeLabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `ATOM TIME:`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var atomTimeValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        var atomTimeValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
-        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 13 + - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 11 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `STAGE SCORE`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var stageScoreUIValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13 - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+        var stageScoreUIValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 11 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore + _speedbonus
                 `${commaInt(0)}`
@@ -9217,7 +9217,7 @@ class ScoreScene extends Phaser.Scene {
                     if (i != 0) { // First Can't Connect
                         var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
                         ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
-                        this.ScoreContainerL.add(rectangle)
+                        //this.ScoreContainerL.add(rectangle)
                         scoreCombos.push(rectangle)
                     }
                     break
@@ -9240,21 +9240,48 @@ class ScoreScene extends Phaser.Scene {
 
             this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
             ).play(anim).setDepth(21).setScale(1).setAlpha(0);
-            this.ScoreContainerL.add(this.atomScoreIcon);
+            //this.ScoreContainerL.add(this.atomScoreIcon);
             scoreAtoms.push(this.atomScoreIcon);
         }
 
-        debugger
+        
+
+        var rankProgressBar = this.add.graphics();
+
+        var rankBarY = Y_OFFSET + GRID * 10;
+
+        var currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `D`
+        ).setOrigin(1, 0.5).setScale(0.5);
+
+        var nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 5, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `C`
+        ).setOrigin(0.5, 0.5).setScale(0.5);
 
         var atomTime = 0;
         var stageScore;
         var cursorIndex = -1; // Plays sound at 0;
         
+        var atomTimeTotal = atomList.reduce((a,b) => a + b, 0);
+        var stageCache = this.cache.json.get(`${this.stageData.stage}.properties`);
+
+        var sRankValue = undefined
+        // Could use .some here.
+        stageCache.forEach( probObj => {
+            if (probObj.name === "sRank") {
+                sRankValue = Number(probObj.value);
+            }
+        });
+        
         var scoreAtomsTween = this.tweens.addCounter({
             from: 0,
             to:  atomList.length - 1,
             delay: delayStart,
-            duration: (frameTime * 12) * atomList.length,
+            duration: (frameTime * 5) * atomList.length,
             ease: 'Linear',
             onUpdate: _tween =>
             {    
@@ -9277,10 +9304,153 @@ class ScoreScene extends Phaser.Scene {
                     );
 
                     cursorIndex = index;
+
+                    const size = 106;
+                    rankProgressBar.clear();
+
+                    // Back Fill
+                    rankProgressBar.fillStyle(0x2d2d2d);
+                    rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size, 3);
+
+                    //C0C0C0
+                    //CD7F32
+
+                    
+
+                    
+                    switch (true) {
+                        case stageScore <  RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
+
+                            var filled = (stageScore/RANK_BENCHMARKS.get(RANKS.BRONZE));
+                        
+                            rankProgressBar.fillStyle(0xA1662F);
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * filled, 3);
+                            break;
+
+                        case stageScore <  RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
+
+                            //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
+                            var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
+
+                            currentRankLetter.setHTML("C");
+                            nextRankLetter.setHTML("B");
+                            rankProgressBar.fillStyle(0xCD7F32);
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / goal), 3);
+
+                            rankProgressBar.fillStyle(0xA1662F); // Wood
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                            break;
+                        
+                        case stageScore < RANK_BENCHMARKS.get(RANKS.GOLD): // In Silver
+   
+                            //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.SILVER);
+                            var goal =  RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                            currentRankLetter.setHTML("B");
+                            nextRankLetter.setHTML("A");
+                            rankProgressBar.fillStyle(0xC0C0C0);
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / goal), 3);
+
+                            rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                            
+                            rankProgressBar.fillStyle(0xA1662F); // Wood
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+
+                            break;
+
+                        case stageScore > RANK_BENCHMARKS.get(RANKS.GOLD): // In GOLD     
+                            if (sRankValue != undefined) {
+                                switch (true) {
+                                    case stageScore < sRankValue:
+                                        //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
+                                        var goal =  sRankValue;
+                                        currentRankLetter.setHTML("A");
+                                        nextRankLetter.setHTML("S");
+                                        
+                                        rankProgressBar.fillStyle(0xd4af37);
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / goal), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / goal), 3);
+
+                                        rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                                        break;
+                                    default:
+                                        currentRankLetter.setHTML("S");
+
+                                        var sRankDelta = sRankValue - RANK_BENCHMARKS.get(RANKS.GOLD);
+                                        var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                                        var sX = Math.trunc(postGold / sRankDelta);
+                                        debugger
+
+                                        if (sX > 1 ) {
+                                            nextRankLetter.setHTML(`x${sX}`);
+                                        } else {
+                                            nextRankLetter.setHTML(`+`);
+                                        }
+                                        
+
+                                        rankProgressBar.fillStyle(0xE5E4E2); // Platinum
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / stageScore), 3);
+
+                                        rankProgressBar.fillStyle(0xd4af37); // Gold
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (sRankValue / stageScore), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                                        rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                                        rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                                        
+                                        break;
+                                }
+                                
+                            } else {
+                                currentRankLetter.setHTML("A");
+                                nextRankLetter.setHTML(`+`);
+                                
+                                rankProgressBar.fillStyle(0xd4af37); // Gold
+                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (stageScore / stageScore), 3);
+                                
+                                rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                                rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                
+                                rankProgressBar.fillStyle(0xA1662F); // Wood
+                                rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                            }
+                        
+                            
+                            break
+                    
+                        default:
+                            
+                            rankProgressBar.fillStyle(0x2dff2d);
+                            rankProgressBar.fillRect(X_OFFSET + GRID * 6 + 1, rankBarY - 4, size * (atomTime/atomTimeTotal), 3);
+                            debugger // Safety debugger
+                            break;
+                    }
+
+                    
+
+                    
+
+                    
                 }
             },
             onComplete: tween => {
-                debugger
+                //debugger
 
                 var atomTime = 0;
 
@@ -9319,54 +9489,24 @@ class ScoreScene extends Phaser.Scene {
         // #endregion
 
 
-        /*
-        this.add.dom(X_OFFSET + GRID * 24, GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "text-shadow": "4px 4px 0px #000000",
-            "font-size": '20px',
-            'font-weight': 400,
-            'text-transform': 'uppercase',
-            "font-family": '"Press Start 2P", system-ui',
-            "white-space": 'pre-line'
-        })).setHTML(//✔
-            `CLEAR`
-        ).setOrigin(1, 0).setScale(.5);
-        */
-        
-
-        
-
-
-        //var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
-        //    scorePartsStyle, {
-        //    })).setHTML( //_baseScore
-        //        `
-        //        +${commaInt(0)}
-        //        `
-        //).setOrigin(1, 0).setScale(0.5);
-
 
         var _baseScore = this.stageData.atomTime();
-        var _speedbonus = calcStageScore(this.stageData.atomTime());
-
-
         
 
-        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 14 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
                 `DIFFICULTY +${0}%
 
-
                 `
         ).setOrigin(1,0).setScale(0.5);
-        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 14 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
                 `
                 ZED LVL +${0}%
-
                 `
         ).setOrigin(1,0).setScale(0.5);
        
@@ -9436,14 +9576,14 @@ class ScoreScene extends Phaser.Scene {
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
 
-        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `x ${0}%
                 `
         ).setOrigin(1, 0).setScale(0.5);
 
-        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `
@@ -9678,8 +9818,21 @@ class ScoreScene extends Phaser.Scene {
             postAdditiveLablesUI,
             postAdditiveValuesUI1,
             //postAdditiveValuesUI2,
-            postAdditiveValuesUI3,]
-            )
+            postAdditiveValuesUI3,
+            rankProgressBar,
+            currentRankLetter,
+            nextRankLetter
+         ]
+        )
+
+        for (let index = 0; index < scoreAtoms.length; index++) {
+            if (scoreCombos[index]) {
+                this.ScoreContainerL.add(scoreCombos[index]);
+            }
+
+            this.ScoreContainerL.add(scoreAtoms[index]); 
+        }
+        
         // #region Rank Sprites
 
         this.lights.enable();
@@ -10233,7 +10386,7 @@ class ScoreScene extends Phaser.Scene {
         continueText.setVisible(false);
 
         finalScoreTween.on('complete', e=> {
-            debugger
+            //debugger
             continueText.setVisible(true);
 
         }, this);

@@ -1639,7 +1639,7 @@
             "scale": 0.8018817204301075,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 371.62587998659075,
+                "x": 371.0023466309084,
                 "y": 372.249413342273
             }
         },
@@ -1737,6 +1737,17 @@
             }
         },
         "r-11-12-4.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r-11-30.json": {
+            "scale": 2.983764367816092,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.7737757018346,
+                "y": 161.7084797996822
+            }
+        },
+        "r-11-30.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "r07-14-2.json": {
@@ -1921,6 +1932,28 @@
             }
         },
         "r10-19-grapple.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_11-30-2.json": {
+            "scale": 2.983764367816092,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.7737757018346,
+                "y": 161.7084797996822
+            }
+        },
+        "r_11-30-2.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
+        "r_11-30-4.json": {
+            "scale": 2.983764367816092,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 173.7737757018346,
+                "y": 161.7084797996822
+            }
+        },
+        "r_11-30-4.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "rough-01.json": {
@@ -2694,7 +2727,11 @@
         "r-11-12-3.json",
         "r-11-12-2.json",
         "r-11-12-1.json",
-        "World_8-3_Adv_Portaling.json"
+        "World_8-3_Adv_Portaling.json",
+        "World_4-3.json",
+        "r_11-30-4.json",
+        "r-07-10-4.json",
+        "r-11-30.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
@@ -2702,15 +2739,15 @@
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
+        "r-11-30.json",
+        "r-07-10-4.json",
+        "r_11-30-4.json",
+        "World_4-3.json",
         "World_8-3_Adv_Portaling.json",
         "r-11-12-1.json",
         "r-11-12-2.json",
         "r-11-12-3.json",
-        "r-11-12-4.json",
-        "World_1-1.json",
-        "World_1-2.json",
-        "World_0-1.json",
-        "World_10-4.json"
+        "r-11-12-4.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
