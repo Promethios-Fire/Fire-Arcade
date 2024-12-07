@@ -4626,7 +4626,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
             case "4":
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(330); // Move to Aztec levels
                 break;
             case "5":
                 ourPersist.fx.hue(300); // Move to Racing levels
