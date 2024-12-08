@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
-const DEBUG_SHOW_LOCAL_STORAGE = false;
+const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = true;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
@@ -59,7 +59,7 @@ const DEBUG_ARGS = new Map ([
         boostFrames: 5994,
         cornerTime: 7317,
         diffBonus: 100,
-        foodLog: [90,117,114,114,112,109,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        foodLog: [119,117,115,114,113,109,115,114,115,115,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
         //       [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
         medals: {},
         moveCount: 840,
@@ -581,6 +581,7 @@ const COLOR_FOCUS_HEX = 0xFF00FF;
 const COLOR_BONUS = "limegreen";
 const COLOR_BONUS_HEX = 0x32CD32;
 const COLOR_TERTIARY = "goldenrod";
+const COLOR_TERTIARY_HEX = 0xdaa520;
 
 
 var SOUND_ATOM = [
@@ -9250,18 +9251,18 @@ class ScoreScene extends Phaser.Scene {
 
         
 
-        var rankProgressBar = this.add.graphics();
+        const rankProgressBar = this.add.graphics();
 
         var rankBarY = Y_OFFSET + GRID * 10 + 2;
         var rankBarX = X_OFFSET + GRID * 6 + 2;
 
-        var currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `D`
         ).setOrigin(1, 0.5).setScale(0.5);
 
-        var nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 4, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 4, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `C`
@@ -9519,7 +9520,7 @@ class ScoreScene extends Phaser.Scene {
                         break;
 
                     case stageScore > RANK_BENCHMARKS.get(RANKS.GOLD): // In GOLD     
-                        if (sRankValue != undefined) {
+                        if (sRankValue === undefined) {
                             switch (true) {
                                 case stageScore < sRankValue:
                                     //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
@@ -9759,9 +9760,6 @@ class ScoreScene extends Phaser.Scene {
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
         })).setOrigin(1,0).setScale(0.5);
-
-
-        debugger
         
         postAdditiveLablesUI.setHTML(
             `COMBO BONUS:
@@ -9886,7 +9884,7 @@ class ScoreScene extends Phaser.Scene {
             
         });
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 18.5, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -9897,6 +9895,84 @@ class ScoreScene extends Phaser.Scene {
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `FINAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
         ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+
+        const prevBestBar = this.add.graphics();
+
+        var barSize = 138;
+
+        prevBestBar.fillStyle(0x2d2d2d);
+        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+        
+        prevBestBar.lineStyle(1, 0xffffff, 1.0);
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+
+        const prevBestUI = this.add.dom(X_OFFSET + GRID * 3 + barSize + 2, Y_OFFSET + GRID * 21 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
+            {
+                "font-style": 'bold',
+                "font-weight": '400',
+                "font-size": "18px",
+                "text-align": 'right',
+            })).setHTML(
+                //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                `PREV BEST ↑`
+        ).setOrigin(1, 0).setDepth(20).setScale(0.5);
+
+        
+        this.tweens.addCounter({
+            from: 0,
+            to:  Math.floor(this.stageData.calcTotal()),
+            duration: 3000,
+            ease: 'linear',
+            delay: 1250, //?
+            onUpdate: tween => {
+
+                prevBestBar.clear();
+                
+                var value = tween.getValue();
+                var best = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
+
+                if (best > value) {
+                    prevBestBar.fillStyle(0x2d2d2d);
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+                    
+                    prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize * (value / best), 
+                    10);
+
+                    prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize, 
+                    10);
+
+                    
+                } else {
+                    
+                    prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↑</span>`)
+
+                    prevBestBar.fillStyle(COLOR_BONUS_HEX);
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 11);
+                    
+                    prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize * (best / value) - 2, 
+                    10);
+
+                    prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize * (best / value) - 2, // The - 2 shows more green to make up for the stroke line. 
+                    10);                              // I don't know if it is necessary but needs more testing.
+
+                    prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize, 
+                    10);
+                    
+                }
+                
+            },
+        
+        });
 
         if (ourGame.mode === MODES.PRACTICE) {
             // Show difference in best run to this run.
@@ -9960,7 +10036,8 @@ class ScoreScene extends Phaser.Scene {
             postAdditiveValuesUI3,
             rankProgressBar,
             currentRankLetter,
-            nextRankLetter
+            nextRankLetter,
+            //prevBestBar
          ]
         )
 
