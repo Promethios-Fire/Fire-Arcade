@@ -858,11 +858,11 @@
             "scaleInEditor": 1
         },
         "World_1-3.json": {
-            "scale": 2.983764367816092,
-            "selectedLayer": 3,
+            "scale": 2,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.7737757018346,
-                "y": 161.7084797996822
+                "x": 155.25,
+                "y": 180.25
             }
         },
         "World_1-3.json#tileSheetx12": {
@@ -1273,7 +1273,7 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 180.5,
+                "x": 129.75,
                 "y": 177.25
             }
         },
@@ -1284,7 +1284,7 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 114.5,
+                "x": 63.75,
                 "y": 183.75
             }
         },
@@ -1295,7 +1295,7 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 188,
+                "x": 120.33333333333333,
                 "y": 191.66666666666663
             }
         },
@@ -1396,22 +1396,22 @@
             "scaleInDock": 1
         },
         "World_8-1_Adv_Portaling.json": {
-            "scale": 4.670833333333333,
+            "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.95182872435325,
-                "y": 161.96253345227476
+                "x": 145.5,
+                "y": 132.75
             }
         },
         "World_8-1_Adv_Portaling.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 2
         },
         "World_8-2_Adv_Portaling.json": {
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.68012528086064,
-                "y": 162.30680193368286
+                "x": 173.91706951726016,
+                "y": 162.3068019336829
             }
         },
         "World_8-2_Adv_Portaling.json#tileSheetx12": {
@@ -1421,7 +1421,7 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.68012528086066,
+                "x": 173.91706951726016,
                 "y": 161.8329134608838
             }
         },
@@ -1457,8 +1457,8 @@
             "scale": 2.1102011494252872,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.68012528086064,
-                "y": 162.30680193368286
+                "x": 173.91706951726016,
+                "y": 162.3068019336829
             }
         },
         "World_8-4_Adv_Portaling.json#tileSheetx12": {

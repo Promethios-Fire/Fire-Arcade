@@ -1756,6 +1756,9 @@ class StartScene extends Phaser.Scene {
         this.load.image('background02_4','assets/sprites/background02_4.png')
         this.load.image('background02_2','assets/sprites/background02_2.png')
         
+        this.load.image('background03','assets/sprites/background03.png')
+        this.load.image('background03_frame2','assets/sprites/background03_frame2.png')
+        
         //Background Container Sprites
         this.load.spritesheet('bgPlanets', 'assets/sprites/bg_spriteSheet_planets.png',{ frameWidth: 16, frameHeight: 16 });
 
@@ -4037,7 +4040,7 @@ class PersistScene extends Phaser.Scene {
     // Scrolling BG1
     //atlas code preserved
     //this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_2').setDepth(-3).setOrigin(0,0);
+    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_frame2').setDepth(-3).setOrigin(0,0);
 
     // Scrolling bgScrollMid Stars (depth is behind planets)
     this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
@@ -4385,7 +4388,7 @@ class PersistScene extends Phaser.Scene {
                 //reference atlas code
                 this.bgMid.setTexture('megaAtlas', 'background02_3_2.png'); 
                 //this.bgBack.setTexture('megaAtlas', 'background02_frame2.png');
-                this.bgBack.setTexture('background02_frame2');  
+                this.bgBack.setTexture('background03_frame2');  
                 this.bgTick += 1;
             }
 
@@ -4394,7 +4397,7 @@ class PersistScene extends Phaser.Scene {
                     //reference atlas code
                     this.bgMid.setTexture('megaAtlas', 'background02_3.png');
                     //this.bgBack.setTexture('megaAtlas','background02.png'); 
-                    this.bgBack.setTexture('background02'); 
+                    this.bgBack.setTexture('background03'); 
                     this.bgTimer = 0;
                     this.bgTick -=1;
                 }
