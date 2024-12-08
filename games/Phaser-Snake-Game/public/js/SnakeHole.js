@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
-const DEBUG_SKIP_TO_SCENE = true;
+const DEBUG_SKIP_TO_SCENE = false;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
@@ -9520,7 +9520,7 @@ class ScoreScene extends Phaser.Scene {
                         break;
 
                     case stageScore > RANK_BENCHMARKS.get(RANKS.GOLD): // In GOLD     
-                        if (sRankValue === undefined) {
+                        if (sRankValue != undefined) {
                             switch (true) {
                                 case stageScore < sRankValue:
                                     //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
