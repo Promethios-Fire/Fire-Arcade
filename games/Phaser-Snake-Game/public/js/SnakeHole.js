@@ -4635,10 +4635,10 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(270); // Move to Racing levels
                 break;
             case "8":
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(250); // Move to Advanced Portaling levels
                 break;
             case "9":
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(60); // Move to Final Exams
                 break;
             case "10":
                 ourPersist.fx.hue(0); // Move to Racing levels
