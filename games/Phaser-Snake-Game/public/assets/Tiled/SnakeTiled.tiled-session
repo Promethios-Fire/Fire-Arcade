@@ -921,11 +921,11 @@
             "scaleInDock": 1
         },
         "World_10-2.json": {
-            "scale": 2,
+            "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 179.75,
-                "y": 132.25
+                "x": 203,
+                "y": 115.66666666666663
             }
         },
         "World_10-2.json#tileSheetx12": {
@@ -935,8 +935,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 152.25,
-                "y": 136.25
+                "x": 187.75,
+                "y": 151.25
             }
         },
         "World_10-3.json#tileSheetx12": {
@@ -957,12 +957,12 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 163,
-                "y": 150.99999999999997
+                "x": 140.99999999999997,
+                "y": 98.99999999999997
             }
         },
         "World_10-4.json#tileSheetx12": {
-            "scaleInDock": 2
+            "scaleInDock": 1.5
         },
         "World_10-4_Final_Exams.json": {
             "scale": 2.1102011494252872,
@@ -1502,7 +1502,7 @@
         },
         "World_9-2_Final_Exams.json": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 169.66666666666666,
                 "y": 144.99999999999997
@@ -1515,8 +1515,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 194.75,
-                "y": 172.75
+                "x": 167.75,
+                "y": 153.25
             }
         },
         "World_9-3_Final_Exams.json#tileSheetx12": {
@@ -1526,8 +1526,8 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 189.75,
-                "y": 165.75
+                "x": 182.25,
+                "y": 128.25
             }
         },
         "World_9-4_Final_Exams.json#tileSheetx12": {

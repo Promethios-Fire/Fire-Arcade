@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4641,7 +4641,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(60); // Move to Final Exams
                 break;
             case "10":
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(30); // Move to Racing levels
                 break;
             //if (this.stage === "testingFuturistic") {
             //    ourPersist.fx.hue(330);
