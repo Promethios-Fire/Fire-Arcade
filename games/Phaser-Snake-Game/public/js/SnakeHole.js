@@ -430,7 +430,7 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
 }
 
 const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
-    113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,241,242,243];
+    113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,212,241,242,243];
 const NO_FOOD_TILE = 481;
 
 //  Direction consts
@@ -4629,7 +4629,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx.hue(330); // Move to Aztec levels
                 break;
             case "5":
-                ourPersist.fx.hue(300); // Move to Racing levels
+                ourPersist.fx.hue(270); // Move to Racing levels
                 break;
             case "8":
                 ourPersist.fx.hue(0); // Move to Racing levels
@@ -4831,10 +4831,30 @@ class GameScene extends Phaser.Scene {
 
 
         if (this.map.getLayer('Ground')) {
-            this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET)
-            this.groundLayer.setPipeline('Light2D')
-            //this.groundLayer.setTint(0xaba2d8)
+            this.groundLayer = this.map.createLayer("Ground", [this.tileset], X_OFFSET, Y_OFFSET);
+            this.groundLayer.setPipeline('Light2D');
+        
+            const fadeInTiles = [];
+        
+            this.groundLayer.forEachTile(tile => {
+                if (FADE_OUT_TILES.includes(tile.index)) {
+                    tile.setAlpha(0.0);
+                    fadeInTiles.push(tile);
+                }
+            });
+        
+            // Create tween for each tile to fade in
+            fadeInTiles.forEach(tile => {
+                this.tweens.add({
+                    targets: tile,
+                    alpha: { from: 0.0, to: 1.0 }, // Fade in to full opacity
+                    duration: 1000, // Duration in milliseconds,
+                    delay: 1000,
+                    ease: 'Linear'
+                });
+            });
         }
+        
 
         this.wallLayerShadow = this.mapShadow.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)
         this.wallLayer = this.map.createLayer(this.wallVarient, [this.tileset], X_OFFSET, Y_OFFSET)

@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_2-3.json",
+    "activeFile": "World_5-2_Racing.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -831,8 +831,8 @@
             "scale": 2,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 149,
-                "y": 171.25
+                "x": 174,
+                "y": 161.75
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -1129,8 +1129,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 152.5,
-                "y": 160.75
+                "x": 174,
+                "y": 161.75
             }
         },
         "World_4-1.json#tileSheetx12": {
@@ -1140,8 +1140,8 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 191.5,
-                "y": 169.25
+                "x": 174,
+                "y": 161.75
             }
         },
         "World_4-2.json#tileSheetx12": {
@@ -1184,8 +1184,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 153,
-                "y": 181.25
+                "x": 174,
+                "y": 161.75
             }
         },
         "World_4-3.json#tileSheetx12": {
@@ -1224,10 +1224,10 @@
         },
         "World_4-4.json": {
             "scale": 1.5,
-            "selectedLayer": 4,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 147.99999999999997,
-                "y": 150.33333333333331
+                "x": 174,
+                "y": 161.66666666666663
             }
         },
         "World_4-4.json#tileSheetx12": {
@@ -1240,8 +1240,8 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 92.66666666666664,
-                "y": 204.99999999999997
+                "x": 174,
+                "y": 161.66666666666663
             }
         },
         "World_4-5.json#tileSheetx12": {
@@ -1259,37 +1259,37 @@
             "scaleInDock": 1
         },
         "World_5-1_Racing.json": {
-            "scale": 2.8363505747126436,
-            "selectedLayer": 0,
+            "scale": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.99118585684613,
-                "y": 162.0039511676207
+                "x": 168.5,
+                "y": 138.25
             }
         },
         "World_5-1_Racing.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 1.5
         },
         "World_5-2_Racing.json": {
-            "scale": 2.336781609195402,
-            "selectedLayer": 1,
+            "scale": 2,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.52926709296608,
-                "y": 161.97491392031483
+                "x": 169.5,
+                "y": 214.75
             }
         },
         "World_5-2_Racing.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 2
         },
         "World_5-3_Racing.json": {
-            "scale": 2.8363505747126436,
-            "selectedLayer": 0,
+            "scale": 3,
+            "selectedLayer": -1,
             "viewCenter": {
-                "x": 173.99118585684613,
-                "y": 162.0039511676207
+                "x": 107.66666666666667,
+                "y": 218.49999999999997
             }
         },
         "World_5-3_Racing.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 2
         },
         "World_5-4_Racing.json": {
             "scale": 2,
@@ -2684,47 +2684,31 @@
     "map.lastUsedExportFilter": "All Files (*)",
     "map.lastUsedFormat": "json",
     "openFiles": [
-        "Tutorial_1.json",
-        "Tutorial_2.json",
-        "Tutorial_3.json",
-        "World_0-1.json",
-        "World_1-2.json",
         "World_1-1.json",
-        "r-11-12-4.json",
-        "r-11-12-3.json",
-        "r-11-12-2.json",
-        "r-11-12-1.json",
-        "World_8-3_Adv_Portaling.json",
-        "World_4-5.json",
         "World_4-1.json",
-        "World_2-1.json",
-        "World_9-4_Final_Exams.json",
-        "World_9-3_Final_Exams.json",
-        "World_9-2_Final_Exams.json",
-        "World_8-5_Adv_Portaling.json",
-        "World_5-4_Racing.json",
-        "World_4-4.json",
-        "World_4-3.json",
         "World_4-2.json",
-        "World_2-2.json",
-        "World_2-3.json",
-        "World_2-4.json"
+        "World_4-3.json",
+        "World_4-4.json",
+        "World_4-5.json",
+        "World_5-1_Racing.json",
+        "World_5-2_Racing.json",
+        "World_5-3_Racing.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "string",
     "recentFiles": [
+        "World_1-1.json",
+        "World_4-1.json",
+        "World_4-2.json",
+        "World_4-3.json",
+        "World_4-4.json",
+        "World_4-5.json",
+        "World_5-1_Racing.json",
+        "World_5-3_Racing.json",
+        "World_5-2_Racing.json",
         "Tutorial_1.json",
         "Tutorial_2.json",
-        "Tutorial_3.json",
-        "World_0-1.json",
-        "World_1-2.json",
-        "r-11-12-4.json",
-        "r-11-12-3.json",
-        "r-11-12-2.json",
-        "r-11-12-1.json",
-        "World_8-3_Adv_Portaling.json",
-        "World_4-5.json",
-        "World_2-1.json"
+        "Tutorial_3.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
