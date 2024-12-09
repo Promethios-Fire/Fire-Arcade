@@ -59,7 +59,7 @@ const DEBUG_ARGS = new Map ([
         boostFrames: 5994,
         cornerTime: 7317,
         diffBonus: 100,
-        foodLog: [119,117,115,114,113,109,115,114,115,115,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        foodLog: [119,117,114,114,120,120,120,120,120,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
         //       [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
         medals: {},
         moveCount: 840,
@@ -9904,7 +9904,7 @@ class ScoreScene extends Phaser.Scene {
             
         });
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 18.5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 23, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -9919,28 +9919,42 @@ class ScoreScene extends Phaser.Scene {
         const prevBestBar = this.add.graphics();
 
         var barSize = 138;
+        var bestScore = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
+        var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays
 
         prevBestBar.fillStyle(0x2d2d2d);
         prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
-        
-        prevBestBar.lineStyle(1, 0xffffff, 1.0);
-        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
 
-        const prevBestUI = this.add.dom(X_OFFSET + GRID * 3 + barSize + 2, Y_OFFSET + GRID * 21 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
+        prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+            barSize * (overallAverage / bestScore), 
+        10);
+
+        const ave = this.add.dom(X_OFFSET + GRID * 3 + barSize * (overallAverage / bestScore), Y_OFFSET + GRID * 21 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-weight": '400',
-                "font-size": "18px",
+                "font-size": "14px",
+                "text-align": 'center',
+            })).setHTML(
+                //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                `AVE`
+        ).setOrigin(0.5, 0).setDepth(20).setScale(0.5);
+        
+        prevBestBar.lineStyle(1, 0xffffff, 1.0); // bar outline
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+
+        const prevBestUI = this.add.dom(X_OFFSET + GRID * 3 + barSize + 2, Y_OFFSET + GRID * 19 - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+            {
+                "font-style": 'bold',
+                "font-weight": '400',
+                "font-size": "16px",
                 "text-align": 'right',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `PREV BEST ↑`
+                `PREV BEST ↓`
         ).setOrigin(1, 0).setDepth(20).setScale(0.5);
 
-        var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays
-
-        
-        debugger
         this.tweens.addCounter({
             from: 0,
             to:  Math.floor(this.stageData.calcTotal()),
@@ -9952,18 +9966,27 @@ class ScoreScene extends Phaser.Scene {
                 prevBestBar.clear();
                 
                 var value = tween.getValue();
-                var best = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
 
-                if (best > value) {
+                if (value < bestScore) {
                     prevBestBar.fillStyle(0x2d2d2d);
                     prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
                     
-                    prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
+                    prevBestBar.fillStyle(COLOR_BONUS_HEX); // above average
                     prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (value / best), 
+                        barSize * (value / bestScore), 
+                    10);
+                    
+                    prevBestBar.fillStyle(COLOR_TERTIARY_HEX); // below average
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize * (Math.min(value, overallAverage) / bestScore), 
                     10);
 
-                    prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                    prevBestBar.lineStyle(1, 0xffffff, 2.0); // ave bar
+                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize * (overallAverage / bestScore), 
+                    10);
+
+                    prevBestBar.lineStyle(1, 0xffffff, 2.0); // bar outline
                     prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
                         barSize, 
                     10);
@@ -9971,24 +9994,33 @@ class ScoreScene extends Phaser.Scene {
                     
                 } else {
                     
-                    prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↑</span>`)
+                    prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↓</span>`)
 
-                    prevBestBar.fillStyle(COLOR_BONUS_HEX);
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 11);
+
+                    prevBestBar.fillStyle(COLOR_FOCUS_HEX); // new best
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize, 
+                    11);
+
+                    prevBestBar.fillStyle(COLOR_BONUS_HEX); // All green
+                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        barSize * (bestScore / value), 
+                    10);
                     
                     prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
                     prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (best / value) - 2, 
+                        barSize * (overallAverage / value), 
                     10);
 
-                    prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                    prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
                     prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (best / value) - 2, // The - 2 shows more green to make up for the stroke line. 
-                    10);                              // I don't know if it is necessary but needs more testing.
+                        barSize * (overallAverage / value), 
+                    10);
+                    ave.x = X_OFFSET + GRID * 3 + barSize * (overallAverage / value);
 
                     prevBestBar.lineStyle(1, 0xffffff, 1.0);
                     prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize, 
+                        barSize * (bestScore / value), 
                     10);
                     
                 }
