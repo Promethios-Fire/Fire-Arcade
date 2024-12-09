@@ -1753,6 +1753,7 @@ class StartScene extends Phaser.Scene {
         //Background Art -- Pre Atlas
         this.load.image('background02','assets/sprites/background02.png')
         this.load.image('background03','assets/sprites/background03.png')
+        this.load.image('background05','assets/sprites/background05.png')
         //this.load.image('background02_frame2','assets/sprites/background02.png')
         this.load.image('backgroundMiddleStars_f1','assets/sprites/backgroundMiddleStars_f1.png')
         this.load.image('backgroundMiddleStars_f2','assets/sprites/backgroundMiddleStars_f2.png')
@@ -4662,27 +4663,27 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx3.hue(60);
                 break;
             case "4": // Move to Aztec levels
-                ourPersist.bgBack.setTexture('background04');
-                ourPersist.bgFurthest.setTexture('backgroundFar03');
-
-                ourPersist.fx.hue(270); 
-                ourPersist.fx2.hue(270);
-                ourPersist.fx3.hue(270);
-                break;
-            case "5":  // Move to Racing levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
+
+                ourPersist.fx.hue(300); 
+                ourPersist.fx2.hue(300);
+                ourPersist.fx3.hue(300);
+                break;
+            case "5":  // Move to Racing levels
+                ourPersist.bgBack.setTexture('background02');
+                ourPersist.bgFurthest.setTexture('backgroundFar02');
 
                 ourPersist.fx.hue(270);
                 ourPersist.fx2.hue(270);
                 ourPersist.fx3.hue(270);
                 break;
             case "8":  // Move to Advanced Portaling levels
-                ourPersist.bgBack.setTexture('background03');
-                ourPersist.bgFurthest.setTexture('backgroundFar03');
+                ourPersist.bgBack.setTexture('background05');
+                ourPersist.bgFurthest.setTexture('backgroundFar02');
 
-                ourPersist.fx.hue(250);
-                ourPersist.fx2.hue(250);
+                ourPersist.fx.hue(0);
+                ourPersist.fx2.hue(0);
                 ourPersist.fx3.hue(250);
                 break;
             case "9":  // Move to Final Exams
