@@ -1756,11 +1756,15 @@ class StartScene extends Phaser.Scene {
         //this.load.image('background02_frame2','assets/sprites/background02.png')
         this.load.image('backgroundMiddleStars_f1','assets/sprites/backgroundMiddleStars_f1.png')
         this.load.image('backgroundMiddleStars_f2','assets/sprites/backgroundMiddleStars_f2.png')
+        
+        this.load.image('backgroundBackStars_f1','assets/sprites/backgroundBackStars_f1.png')
+        this.load.image('backgroundBackStars_f2','assets/sprites/backgroundBackStars_f2.png')
+        
         this.load.image('backgroundFar03','assets/sprites/backgroundFar03.png')
         this.load.image('backgroundFar02','assets/sprites/backgroundFar02.png')
         
         this.load.image('background02','assets/sprites/background02.png')
-        this.load.image('background03_frame2','assets/sprites/background03_frame2.png')
+        //this.load.image('background03_frame2','assets/sprites/background03_frame2.png')
         
         //Background Container Sprites
         this.load.spritesheet('bgPlanets', 'assets/sprites/bg_spriteSheet_planets.png',{ frameWidth: 16, frameHeight: 16 });
@@ -4044,7 +4048,7 @@ class PersistScene extends Phaser.Scene {
     //atlas code preserved
     //this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
     this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02').setDepth(-3).setOrigin(0,0);
-
+    this.bgBackStars = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'backgroundBackStars_f1').setDepth(-3).setOrigin(0,0);
     // Scrolling bgScrollMid Stars (depth is behind planets)
     //atlas code preserved
     //this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
@@ -4192,6 +4196,7 @@ class PersistScene extends Phaser.Scene {
     // Hue Shift
     this.fx = this.bgBack.preFX.addColorMatrix();
     this.fx2 = this.bgFurthest.postFX.addColorMatrix();
+    this.fx3 = this.bgBackStars.postFX.addColorMatrix();
 
     //this.fx2.hue(90)
     //this.bgFurthest.setPipeline('WaveShaderPipeline');
@@ -4331,6 +4336,9 @@ class PersistScene extends Phaser.Scene {
 
         this.bgBack.tilePositionX = (this.bgBack.tilePositionX) * 4;
         this.bgBack.tilePositionY = (this.bgBack.tilePositionY) * 4;
+
+        this.bgBackStars.tilePositionX = this.bgBack.tilePositionX;
+        this.bgBackStars.tilePositionY = this.bgBack.tilePositionY;
         
         
 
@@ -4392,7 +4400,7 @@ class PersistScene extends Phaser.Scene {
                 //reference atlas code
                 this.bgMid.setTexture('backgroundMiddleStars_f1'); 
                 //this.bgBack.setTexture('megaAtlas', 'background02_frame2.png');
-                //this.bgBack.setTexture('background02_frame2');  
+                this.bgBackStars.setTexture('backgroundBackStars_f1');  
                 this.bgTick += 1;
             }
 
@@ -4400,7 +4408,7 @@ class PersistScene extends Phaser.Scene {
                 if (this.bgTick === 1) {
                     //reference atlas code
                     this.bgMid.setTexture('backgroundMiddleStars_f2');
-                    //this.bgBack.setTexture('megaAtlas','background02.png'); 
+                    this.bgBackStars.setTexture('backgroundBackStars_f2');
                     //this.bgBack.setTexture('background02'); 
                     this.bgTimer = 0;
                     this.bgTick -=1;
@@ -4599,7 +4607,7 @@ class GameScene extends Phaser.Scene {
         // #region World Style
         var worldID = this.stage.split("-")[0].split("_")[1];
         switch (worldID) {
-            case "0":
+            case "0": // Move to Origin
                 ourPersist.bgBack.setTexture('background02');
                 ourPersist.bgFurthest.setTexture('backgroundFar02');
 
@@ -4609,21 +4617,25 @@ class GameScene extends Phaser.Scene {
                 ourPersist.scrollSpeedY = 0.00;
                 ourPersist.bgRatio = 1;
 
+                ourPersist.fx.hue(0);
+                ourPersist.fx2.hue(0);
+                ourPersist.fx3.hue(0);
 
-                ourPersist.fx.hue(0); // Move to Origin
                 ourPersist.bgAsteroidsFar.setAlpha(0);
                 ourPersist.bgAsteroidsClose.setAlpha(0);
                 ourPersist.bgPlanets.setAlpha(1);
                 ourPersist.currentBackgroundFar = ourPersist.bgPlanets;
                 ourPersist.currentBackgroundClose = ourPersist.bgEmpty;
                 break;
-            case "1":
+            case "1":// Move to default planet levels
                 ourPersist.bgBack.setTexture('background02');
                 ourPersist.bgFurthest.setTexture('backgroundFar02');
                 
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(0);
+                ourPersist.fx2.hue(0);
+                ourPersist.fx3.hue(0); 
                 break;
-            case "2":
+            case "2":// Move to Asteroid levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
                 
@@ -4631,48 +4643,63 @@ class GameScene extends Phaser.Scene {
                 ourPersist.scrollSpeedY = 0.00;
                 ourPersist.bgRatio = 0;
 
-                ourPersist.fx.hue(15); // Move to Asteroid levels
+                ourPersist.fx.hue(15); 
+                ourPersist.fx2.hue(15);
+                ourPersist.fx3.hue(15);
+
                 ourPersist.bgPlanets.setAlpha(0);
                 ourPersist.bgAsteroidsFar.setAlpha(1);
                 ourPersist.bgAsteroidsClose.setAlpha(1);
                 ourPersist.currentBackgroundFar = ourPersist.bgAsteroidsFar;
                 ourPersist.currentBackgroundClose = ourPersist.bgAsteroidsClose;
                 break;
-            case "3":
+            case "3": // Move to Wrap levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
-                ourPersist.fx.hue(0); // Move to Racing levels
+                ourPersist.fx.hue(0);
+                ourPersist.fx2.hue(0);
+                ourPersist.fx3.hue(60);
                 break;
-            case "4":
+            case "4": // Move to Aztec levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
-                ourPersist.fx.hue(330); // Move to Aztec levels
+                ourPersist.fx.hue(270); 
+                ourPersist.fx2.hue(270);
+                ourPersist.fx3.hue(270);
                 break;
-            case "5":
+            case "5":  // Move to Racing levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
-                ourPersist.fx.hue(270); // Move to Racing levels
+                ourPersist.fx.hue(270);
+                ourPersist.fx2.hue(270);
+                ourPersist.fx3.hue(270);
                 break;
-            case "8":
+            case "8":  // Move to Advanced Portaling levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
-                ourPersist.fx.hue(250); // Move to Advanced Portaling levels
+                ourPersist.fx.hue(250);
+                ourPersist.fx2.hue(250);
+                ourPersist.fx3.hue(250);
                 break;
-            case "9":
+            case "9":  // Move to Final Exams
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
-                ourPersist.fx.hue(60); // Move to Final Exams
+                ourPersist.fx.hue(60);
+                ourPersist.fx2.hue(60);
+                ourPersist.fx3.hue(60);
                 break;
-            case "10":
+            case "10":  // Move to Racing levels
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
-                ourPersist.fx.hue(30); // Move to Racing levels
+                ourPersist.fx.hue(30);
+                ourPersist.fx.hue(30);
+                ourPersist.fx.hue(30);
                 break;
             //if (this.stage === "testingFuturistic") {
             //    ourPersist.fx.hue(330);
