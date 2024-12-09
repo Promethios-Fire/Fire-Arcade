@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
-const DEBUG_SKIP_TO_SCENE = true;
+const DEBUG_SKIP_TO_SCENE = false;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
@@ -2637,7 +2637,7 @@ class ExtractTracker extends Phaser.Scene {
                     "fontSize": '24px',
                     "fontWeight": 400,
                 }),
-                    `OVERALL SCORE: ${commaInt(overallScore)}`
+                    `ALL PATHS: ${commaInt(overallScore)}`
                 ).setOrigin(1,0).setScale(0.5).setAlpha(1);
                 console.log(letterCounter);
 
@@ -7597,7 +7597,7 @@ class GameScene extends Phaser.Scene {
                 finalScoreStyle, {
                 })).setHTML(
                     `BEST EXTRACTION TRACKER
-                     AVAILABLE ON EXPERT`
+                     ONLY ON EXPERT`
             ).setOrigin(0.5,0).setScale(0.5);
         }
 
@@ -9952,7 +9952,7 @@ class ScoreScene extends Phaser.Scene {
                 "text-align": 'right',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `PREV BEST ↓`
+                `BEST ↓`
         ).setOrigin(1, 0).setDepth(20).setScale(0.5);
 
         this.tweens.addCounter({
