@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
-const DEBUG_SKIP_TO_SCENE = false;
+const DEBUG_SKIP_TO_SCENE = true;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
@@ -9045,6 +9045,26 @@ class ScoreScene extends Phaser.Scene {
             
         }
 
+        // Update Average Score 
+        
+        var globalStageStats = JSON.parse(localStorage.getItem("stageStats"));
+        if (globalStageStats === null) {
+            globalStageStats = {};
+        }
+
+        if (!globalStageStats[this.stageData.uuid]) {
+            globalStageStats[this.stageData.uuid] = {
+                plays: 1,
+                sum: this.stageData.calcTotal()
+            }
+        } else {
+            globalStageStats[this.stageData.uuid].plays += 1;
+            globalStageStats[this.stageData.uuid].sum += this.stageData.calcTotal();
+        }
+
+        localStorage.setItem("stageStats", JSON.stringify(globalStageStats));
+        
+
         // #endregion
 
         // SOUND
@@ -9917,7 +9937,10 @@ class ScoreScene extends Phaser.Scene {
                 `PREV BEST ↑`
         ).setOrigin(1, 0).setDepth(20).setScale(0.5);
 
+        var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays
+
         
+        debugger
         this.tweens.addCounter({
             from: 0,
             to:  Math.floor(this.stageData.calcTotal()),
