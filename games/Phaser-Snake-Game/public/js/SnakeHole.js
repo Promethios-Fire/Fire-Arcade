@@ -4043,7 +4043,7 @@ class PersistScene extends Phaser.Scene {
     // Furthest BG Object
     //atlas code preserved
     //this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-    this.bgFurthest = this.add.sprite(X_OFFSET, Y_OFFSET, 'backgroundFar02').setDepth(-4).setOrigin(0,0); 
+    this.bgFurthest = this.add.sprite(X_OFFSET, Y_OFFSET, 'backgroundFar03').setDepth(-4).setOrigin(0,0); 
     
     // Scrolling BG1
     //atlas code preserved
@@ -4610,7 +4610,7 @@ class GameScene extends Phaser.Scene {
         switch (worldID) {
             case "0": // Move to Origin
                 ourPersist.bgBack.setTexture('background02');
-                ourPersist.bgFurthest.setTexture('backgroundFar02');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
 
                 ourPersist.spriteScrollX = 0;
                 ourPersist.spriteScrolly = 0;
@@ -4630,7 +4630,7 @@ class GameScene extends Phaser.Scene {
                 break;
             case "1":// Move to default planet levels
                 ourPersist.bgBack.setTexture('background02');
-                ourPersist.bgFurthest.setTexture('backgroundFar02');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
                 
                 ourPersist.fx.hue(0);
                 ourPersist.fx2.hue(0);
@@ -4694,7 +4694,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx2.hue(60);
                 ourPersist.fx3.hue(60);
                 break;
-            case "10":  // Move to Racing levels
+            case "10":  // Move to World 10
                 ourPersist.bgBack.setTexture('background03');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
