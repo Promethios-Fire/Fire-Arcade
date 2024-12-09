@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_5-4_Racing.json",
+    "activeFile": "World_4-5.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1241,8 +1241,8 @@
             "scale": 1.5,
             "selectedLayer": -1,
             "viewCenter": {
-                "x": 142.66666666666666,
-                "y": 162
+                "x": -52,
+                "y": 164.33333333333337
             }
         },
         "World_4-5.json#tileSheetx12": {
@@ -2617,7 +2617,7 @@
         },
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1,
+            "scaleInDock": 2,
             "scaleInEditor": 1.5
         },
         "tileSheetx24.tsx": {
@@ -2708,7 +2708,11 @@
         "World_10-2.json",
         "World_10-3.json",
         "World_10-4.json",
-        "tileSheetx12.tsx"
+        "tileSheetx12.tsx",
+        "World_2-1.json",
+        "World_2-2.json",
+        "World_2-3.json",
+        "World_3-1_Wrap.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
@@ -2718,10 +2722,10 @@
         "World_4-2.json",
         "World_4-3.json",
         "World_4-4.json",
-        "World_4-5.json",
-        "World_5-1_Racing.json",
-        "World_5-2_Racing.json",
-        "World_5-3_Racing.json",
+        "World_3-1_Wrap.json",
+        "World_2-3.json",
+        "World_2-2.json",
+        "World_2-1.json",
         "tileSheetx12.tsx",
         "World_10-4.json",
         "World_10-3.json"

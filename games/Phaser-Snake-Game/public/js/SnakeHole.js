@@ -1752,11 +1752,14 @@ class StartScene extends Phaser.Scene {
 
         //Background Art -- Pre Atlas
         this.load.image('background02','assets/sprites/background02.png')
-        this.load.image('background02_frame2','assets/sprites/background02.png')
-        this.load.image('background02_4','assets/sprites/background02_4.png')
-        this.load.image('background02_2','assets/sprites/background02_2.png')
-        
         this.load.image('background03','assets/sprites/background03.png')
+        //this.load.image('background02_frame2','assets/sprites/background02.png')
+        this.load.image('backgroundMiddleStars_f1','assets/sprites/backgroundMiddleStars_f1.png')
+        this.load.image('backgroundMiddleStars_f2','assets/sprites/backgroundMiddleStars_f2.png')
+        this.load.image('backgroundFar03','assets/sprites/backgroundFar03.png')
+        this.load.image('backgroundFar02','assets/sprites/backgroundFar02.png')
+        
+        this.load.image('background02','assets/sprites/background02.png')
         this.load.image('background03_frame2','assets/sprites/background03_frame2.png')
         
         //Background Container Sprites
@@ -4035,16 +4038,17 @@ class PersistScene extends Phaser.Scene {
     // Furthest BG Object
     //atlas code preserved
     //this.bgFurthest = this.add.tileSprite(X_OFFSET, 36, 348, 324,'megaAtlas', 'background02_4.png').setDepth(-4).setOrigin(0,0); 
-    this.bgFurthest = this.add.sprite(X_OFFSET, Y_OFFSET, 'background02_4').setDepth(-4).setOrigin(0,0); 
+    this.bgFurthest = this.add.sprite(X_OFFSET, Y_OFFSET, 'backgroundFar02').setDepth(-4).setOrigin(0,0); 
     
     // Scrolling BG1
     //atlas code preserved
     //this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02.png').setDepth(-3).setOrigin(0,0);
-    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02_frame2').setDepth(-3).setOrigin(0,0);
+    this.bgBack = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'background02').setDepth(-3).setOrigin(0,0);
 
     // Scrolling bgScrollMid Stars (depth is behind planets)
-    this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
-
+    //atlas code preserved
+    //this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'megaAtlas', 'background02_3.png').setDepth(-2).setOrigin(0,0);
+    this.bgMid = this.add.tileSprite(X_OFFSET, 36, 348, 324, 'backgroundMiddleStars_f1').setDepth(-2).setOrigin(0,0);
     // Scrolling/Wrapping Sprite Layers
 
     //atlas code preserved
@@ -4386,18 +4390,18 @@ class PersistScene extends Phaser.Scene {
         if(this.bgTimer >= 1000){ // TODO: not set this every Frame.
             if (this.bgTick === 0) {
                 //reference atlas code
-                this.bgMid.setTexture('megaAtlas', 'background02_3_2.png'); 
+                this.bgMid.setTexture('backgroundMiddleStars_f1'); 
                 //this.bgBack.setTexture('megaAtlas', 'background02_frame2.png');
-                this.bgBack.setTexture('background03_frame2');  
+                //this.bgBack.setTexture('background02_frame2');  
                 this.bgTick += 1;
             }
 
             if (this.bgTimer >= 2000) {
                 if (this.bgTick === 1) {
                     //reference atlas code
-                    this.bgMid.setTexture('megaAtlas', 'background02_3.png');
+                    this.bgMid.setTexture('backgroundMiddleStars_f2');
                     //this.bgBack.setTexture('megaAtlas','background02.png'); 
-                    this.bgBack.setTexture('background03'); 
+                    //this.bgBack.setTexture('background02'); 
                     this.bgTimer = 0;
                     this.bgTick -=1;
                 }
@@ -4596,6 +4600,9 @@ class GameScene extends Phaser.Scene {
         var worldID = this.stage.split("-")[0].split("_")[1];
         switch (worldID) {
             case "0":
+                ourPersist.bgBack.setTexture('background02');
+                ourPersist.bgFurthest.setTexture('backgroundFar02');
+
                 ourPersist.spriteScrollX = 0;
                 ourPersist.spriteScrolly = 0;
                 ourPersist.scrollSpeedX = 0.00;
@@ -4611,9 +4618,15 @@ class GameScene extends Phaser.Scene {
                 ourPersist.currentBackgroundClose = ourPersist.bgEmpty;
                 break;
             case "1":
+                ourPersist.bgBack.setTexture('background02');
+                ourPersist.bgFurthest.setTexture('backgroundFar02');
+                
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
             case "2":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+                
                 ourPersist.scrollSpeedX = 0.01;
                 ourPersist.scrollSpeedY = 0.00;
                 ourPersist.bgRatio = 0;
@@ -4626,21 +4639,39 @@ class GameScene extends Phaser.Scene {
                 ourPersist.currentBackgroundClose = ourPersist.bgAsteroidsClose;
                 break;
             case "3":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+
                 ourPersist.fx.hue(0); // Move to Racing levels
                 break;
             case "4":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+
                 ourPersist.fx.hue(330); // Move to Aztec levels
                 break;
             case "5":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+
                 ourPersist.fx.hue(270); // Move to Racing levels
                 break;
             case "8":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+
                 ourPersist.fx.hue(250); // Move to Advanced Portaling levels
                 break;
             case "9":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+
                 ourPersist.fx.hue(60); // Move to Final Exams
                 break;
             case "10":
+                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgFurthest.setTexture('backgroundFar03');
+
                 ourPersist.fx.hue(30); // Move to Racing levels
                 break;
             //if (this.stage === "testingFuturistic") {
@@ -4680,11 +4711,11 @@ class GameScene extends Phaser.Scene {
           
 
         // Placeholder Solution; dark grey sprite behind UI components used to mask the lights created from the normal maps
-        this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png'
+        /*this.UIbackground = this.add.sprite(-GRID * 5.15625 , -GRID * 4.65, 'megaAtlas', 'UI_background.png'
             
         ).setDepth(40).setOrigin(0,0);
         this.UIbackground.setScale(32); 
-        this.UIbackground.setVisible(false);
+        this.UIbackground.setVisible(false);*/
 
         // #region TileMap
 
