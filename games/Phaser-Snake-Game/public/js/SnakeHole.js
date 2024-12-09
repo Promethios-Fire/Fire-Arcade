@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4662,7 +4662,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.fx3.hue(60);
                 break;
             case "4": // Move to Aztec levels
-                ourPersist.bgBack.setTexture('background03');
+                ourPersist.bgBack.setTexture('background04');
                 ourPersist.bgFurthest.setTexture('backgroundFar03');
 
                 ourPersist.fx.hue(270); 
