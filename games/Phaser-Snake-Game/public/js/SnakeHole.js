@@ -2834,8 +2834,13 @@ class StageCodex extends Phaser.Scene {
                     break;
             }
         } 
-
+        // checking normal codex list
         if (!practiceMode) {
+
+            var panelCard = this.make.container(0, 0);
+            this.codexContainer.y = this.containerToY;
+
+
             var playerRank = this.add.dom(topLeft, rowY - 4 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 200,
@@ -2872,7 +2877,17 @@ class StageCodex extends Phaser.Scene {
             }),
                 `Stages Complete: ${stagesCompleteDisplay}`
             ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+
+            panelCard.add([playerRank,topPanel,titleText,categoryDom,stages]);
+            
+            this.tweens.add({
+                targets: this.cameras.main,
+                x: { from: -160, to: 0 },
+                duration: 300,
+                ease: 'Power2',
+            });
         }
+        // checking for practice mode
         else{
             var topPanel = this.add.nineslice(SCREEN_WIDTH/2, rowY, 
                 'uiPanelL', 'Glass', 
@@ -2896,17 +2911,7 @@ class StageCodex extends Phaser.Scene {
             }),
                     `Tab to Menu`
             );
-
-            //if (practiceMode) {
-                //exitButton.setAlpha(1);
-                //textElement.setAlpha(1);
-            //}
         }
-
-        
-
-
-
 
         //codexContainer.add([titleText, playerRank, stages]);
 
@@ -3169,28 +3174,29 @@ class StageCodex extends Phaser.Scene {
             this.input.keyboard.on('keydown-RIGHT', e => {
                 console.log("Exiting!");
 
-                //const game = this.scene.get("GameScene");
-                if (originScene.scene.isPaused()) {
-                    originScene.scene.resume();
-                    originScene.scene.setVisible(true);
-                } else {
-                }
-
-                if (originScene.scene.key == "MainMenuScene") {
-                    
-                    debugger
-                    this.scene.wake("MainMenuScene");
-                }
-
-                
-                
-
-                if (codexArgs.fromQuickMenu) {
-                    this.scene.wake('QuickMenuScene');
-                }
-            
-                this.scene.sleep('StageCodex');
-                
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    x: { from: 0, to: -160 },
+                    duration: 300,
+                    ease: 'Power2',
+                    onUpdate: (tween) => {
+                        if (tween.progress >= 0.25) {
+                            //const game = this.scene.get("GameScene");
+                            if (originScene.scene.isPaused()) {
+                                originScene.scene.resume();
+                                originScene.scene.setVisible(true);
+                            } 
+                            if (originScene.scene.key == "MainMenuScene") {
+                                //debugger
+                                this.scene.wake("MainMenuScene");
+                            }
+                            if (codexArgs.fromQuickMenu) {
+                                this.scene.wake('QuickMenuScene');
+                            }
+                            this.scene.sleep('StageCodex');
+                        }
+                    }
+                });
                 }, this
             );
 
@@ -3203,13 +3209,25 @@ class StageCodex extends Phaser.Scene {
 
                 this.input.keyboard.on('keydown-LEFT', e => {
                     var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
-                    this.scene.restart({
-                        stage: this.scene.get("GameScene").stage,
-                        originScene: originScene,
-                        fromQuickMenu: true, 
-                        displayList: displayList,
-                        displayIndex: newIndex
+                    
+                    this.tweens.add({
+                        targets: this.cameras.main,
+                        x: { from: 0, to: 160 },
+                        duration: 300,
+                        ease: 'Power2',
+                        onUpdate: (tween) => {
+                            if (tween.progress >= 0.25) {
+                                this.scene.restart({
+                                    stage: this.scene.get("GameScene").stage,
+                                    originScene: originScene,
+                                    fromQuickMenu: true, 
+                                    displayList: displayList,
+                                    displayIndex: newIndex
+                                });
+                            }
+                        }
                     });
+                    
                     }, this
                 );   
             }                               
