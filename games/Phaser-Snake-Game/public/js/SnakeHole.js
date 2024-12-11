@@ -9412,7 +9412,7 @@ class ScoreScene extends Phaser.Scene {
             8, 8, 8, 8);
         this.scorePanelL.setDepth(10).setOrigin(0,0)
 
-        var rankY = GRID * 11 - 4;
+        var rankY = GRID * 9 - 0;
 
         this.scorePanelLRank = this.add.nineslice(-SCREEN_WIDTH/2, rankY + GRID * 1.5, 
             'uiPanelL', 'Glass', 
@@ -9951,60 +9951,19 @@ class ScoreScene extends Phaser.Scene {
         //        MEDAL +${0}%
         //        `
         //).setOrigin(1,0).setScale(0.5);
-        
-        this.tweens.addCounter({
-            from: 0,
-            to:  ourScoreScene.stageData.diffBonus,
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
-            onUpdate: tween =>
-            {
-                const value1 = Math.round(tween.getValue());
-                multLablesUI1.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                    `DIFFICULTY +${value1}%
 
-                    `
-                
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        this.tweens.addCounter({
-            from: 0,
-            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(2),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
-            onUpdate: tween =>
-            {
-                const value2 = tween.getValue().toFixed(1);
-                multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                    `
-                    ZED LVL +${value2}%
+        var multDuration = 1000;
 
-                    `
-                
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        this.tweens.addCounter({
-            from: 0,
-            to:  ourScoreScene.stageData.medalBonus() * 100,
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
-            onUpdate: tween =>
-            {
-                const value3 = Math.round(tween.getValue());
-                //multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                //    `
-                //
-                //    MEDAL +${value3}%
-                //    `
-                //).setOrigin(1, 0).setScale(0.5);
-            }
-        });
+        var diffMult;
+        var zedMult;
+        var sumMult;
+
+        var postMult = 0;
+        var comboBo = 0;
+        var bonkBo = 0;
+
         
+        var preMult = this.stageData.preAdditive();
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
 
@@ -10022,51 +9981,6 @@ class ScoreScene extends Phaser.Scene {
                 <hr style="font-size:3px"/><span style="font-size:16px">${0}</span>`
         ).setOrigin(1, 0).setScale(0.5);
 
-        this.tweens.addCounter({
-            from: 0,
-            to:  Number(_bonusMult * 100).toFixed(1),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = tween.getValue().toFixed(1);
-                multValuesUI1.setHTML(
-                    `x ${value}%
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
-            },
-            onComplete: () => {
-                multValuesUI2.setHTML(
-                    `
-                    <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
-                this.tweens.add({ 
-                    targets: multValuesUI2,
-                    alpha: 0,
-                    ease: 'Linear',
-                    duration: 250,
-                    loop: 0,
-                    yoyo: true,
-                });
-            }
-        });
-
-        /*this.tweens.addCounter({ //@holden move to reference?
-            from: 0,
-            to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
-            duration: atomList.length * 66.7,
-            ease: 'linear',
-            delay: atomList.length * 133.3,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                multValuesUI2.setHTML(
-                    `
-                    <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
-            ).setOrigin(1, 0);
-            },
-        });*/
-
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
         })).setOrigin(1,0).setScale(0.5);
@@ -10077,7 +9991,7 @@ class ScoreScene extends Phaser.Scene {
         );
         
 
-        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const comboBonusUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
@@ -10096,30 +10010,105 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(1, 0).setScale(0.5);
         */
 
-        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const noBonkBonusUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `
                 ${0}`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
+        
+        scoreAtomsTween.on("complete", () => {
+            this.tweens.addCounter({
+                from: 0,
+                to:  ourScoreScene.stageData.diffBonus,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //133.3ms
+                onUpdate: tween =>
+                {
+                    diffMult = Math.round(tween.getValue());
+                    multLablesUI1.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                        `DIFFICULTY +${diffMult}%
+    
+                        `
+                    );
+                }
+            });
+            
+            var toZed = Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(2);
+            this.tweens.addCounter({
+                from: 0,
+                to:  toZed,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //133.3ms
+                onUpdate: tween =>
+                {
+                    zedMult = tween.getValue().toFixed(1);
+                    multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                        `
+                        ZED LVL +${zedMult}%
+    
+                        `  
+                    );
+                }
+            });
+            this.tweens.addCounter({
+                from: 0,
+                to:  ourScoreScene.stageData.medalBonus() * 100,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //133.3ms
+                onUpdate: tween =>
+                {
+                    const value3 = Math.round(tween.getValue());
+                    //multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                    //    `
+                    //
+                    //    MEDAL +${value3}%
+                    //    `
+                    //).setOrigin(1, 0).setScale(0.5);
+                }
+            });
+            this.tweens.addCounter({
+                from: 0,
+                to:  1, //Number(_bonusMult * 100).toFixed(1),
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //?
+                onUpdate: tween =>
+                {
+                    sumMult = diffMult + Number(zedMult);
+                    postMult = Math.ceil(preMult * (sumMult / 100));
+                    multValuesUI1.setHTML(
+                        `x ${sumMult}%
+                        `
+                ).setOrigin(1, 0).setScale(0.5);
+                },
+                onComplete: () => {
+                    multValuesUI2.setHTML(
+                        `
+                        <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
+                    this.tweens.add({ 
+                        targets: multValuesUI2,
+                        alpha: [1,0],
+                        ease: 'Linear',
+                        duration: 250,
+                        loop: 1,
+                        yoyo: true,
+                    });
+                }
+            });
 
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.comboBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI1.setHTML(
-                    `+${value}
+            this.time.delayedCall(atomList.length * (frameTime * 2) * this.scoreTimeScale + 200, () => {
+                comboBo = this.stageData.comboBonus();
+                comboBonusUI.setHTML(
+                    `+${comboBo}
                     
                     `
-            ).setOrigin(1, 0).setScale(0.5);
-            },
-            onComplete: tween => {
+                ).setOrigin(1, 0).setScale(0.5);
+
                 if (this.stageData.comboBonus() > 9000) {
                     postAdditiveLablesUI.setHTML(
                         `FULL COMBO:
@@ -10127,43 +10116,15 @@ class ScoreScene extends Phaser.Scene {
                     );
                     
                 }
+            }, [], this);
 
-            }
-        });
-
-        
-        
-        /*
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.boostBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI2.setHTML(
+            this.time.delayedCall(atomList.length * (frameTime * 2) * this.scoreTimeScale + 400, () => {
+                bonkBo = this.stageData.bonkBonus();
+                noBonkBonusUI.setHTML(
                     `
-                    +${value}
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        */
-        
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.bonkBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
-            onComplete: () => {
-                letterRank.setAlpha(1);
+                    +${bonkBo}`
+                ).setOrigin(1, 0).setScale(0.5);
 
-                modeScoreContainer.each( item => {
-                    item.setAlpha(1);
-                });
 
                 if(ourGame.mode === MODES.EXPERT) {
 
@@ -10171,7 +10132,7 @@ class ScoreScene extends Phaser.Scene {
 
                     var rankDiff = currentRank - this.scene.get("PersistScene").prevRank;
 
-                    debugger
+                    debugger // leave this until expert mode is debugged.
                     if (rankDiff > 0) {
                         ourPersist.coins += rankDiff;
                         // TO DO. Better Visual this is happening would be nice. Like tween up the value.
@@ -10182,17 +10143,104 @@ class ScoreScene extends Phaser.Scene {
                     }
                     
                 }
-            },
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI3.setHTML(
-                    `
-                    +${value}`
-            ).setOrigin(1, 0).setScale(0.5);
-            }
+            }, [], this);
+
+
+            // This tween needs to end last.
+            this.tweens.addCounter({
+                from: 0,
+                to:  1,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale + 500,
+                ease: 'linear',
+                delay: 0, //?
+                onUpdate: tween => {
+    
+                    prevBestBar.clear();
+                    
+                    var value = postMult + bonkBo + comboBo;
+
+                    stageScoreUI.setHTML(`FINAL SCORE: ${value}`);
+                    
+    
+                    if (value < bestScore) {
+                        prevBestBar.fillStyle(0x2d2d2d);
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+                        
+                        prevBestBar.fillStyle(COLOR_BONUS_HEX); // above average
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (value / bestScore), 
+                        10);
+                        
+                        prevBestBar.fillStyle(COLOR_TERTIARY_HEX); // below average
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (Math.min(value, overallAverage) / bestScore), 
+                        10);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 2.0); // ave bar
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (overallAverage / bestScore), 
+                        10);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 2.0); // bar outline
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize, 
+                        10);
+    
+                        
+                    } else {
+                        
+                        prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↓</span>`)
+    
+    
+                        prevBestBar.fillStyle(COLOR_FOCUS_HEX); // new best
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize, 
+                        11);
+    
+                        prevBestBar.fillStyle(COLOR_BONUS_HEX); // All green
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (bestScore / value), 
+                        10);
+                        
+                        prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (overallAverage / value), 
+                        10);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (overallAverage / value), 
+                        10);
+                        ave.x = X_OFFSET + GRID * 3 + barSize * (overallAverage / value);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                            barSize * (bestScore / value), 
+                        10);
+                        
+                    }
+                    
+                },
+                onComplete: tween => {
+
+                    var value = postMult + bonkBo + comboBo;
+                    stageScoreUI.setHTML(`FINAL SCORE: ${value}`);
+
+                    // make Continue Visible Here
+                    continueText.setVisible(true);
+
+
+                    modeScoreContainer.each( item => {
+                        item.setAlpha(1);
+                    });
+
+                },
             
-        });
+            });
+
+
+
+        }, this);
 
         const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 23, 'div', Object.assign({}, STYLE_DEFAULT,
             {
@@ -10203,7 +10251,7 @@ class ScoreScene extends Phaser.Scene {
                 "text-shadow": '#000000 1px 0 6px',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `FINAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
+                ` `
         ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
 
         const prevBestBar = this.add.graphics();
@@ -10244,80 +10292,77 @@ class ScoreScene extends Phaser.Scene {
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `BEST ↓`
         ).setOrigin(1, 0).setDepth(20).setScale(0.5);
+        
 
+        /*
         this.tweens.addCounter({
             from: 0,
-            to:  Math.floor(this.stageData.calcTotal()),
-            duration: 3000,
+            to:  Number(_bonusMult * 100).toFixed(1),
+            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
             ease: 'linear',
-            delay: 1250, //?
-            onUpdate: tween => {
-
-                prevBestBar.clear();
-                
-                var value = tween.getValue();
-
-                if (value < bestScore) {
-                    prevBestBar.fillStyle(0x2d2d2d);
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
-                    
-                    prevBestBar.fillStyle(COLOR_BONUS_HEX); // above average
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (value / bestScore), 
-                    10);
-                    
-                    prevBestBar.fillStyle(COLOR_TERTIARY_HEX); // below average
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (Math.min(value, overallAverage) / bestScore), 
-                    10);
-
-                    prevBestBar.lineStyle(1, 0xffffff, 2.0); // ave bar
-                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (overallAverage / bestScore), 
-                    10);
-
-                    prevBestBar.lineStyle(1, 0xffffff, 2.0); // bar outline
-                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize, 
-                    10);
-
-                    
-                } else {
-                    
-                    prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↓</span>`)
-
-
-                    prevBestBar.fillStyle(COLOR_FOCUS_HEX); // new best
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize, 
-                    11);
-
-                    prevBestBar.fillStyle(COLOR_BONUS_HEX); // All green
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (bestScore / value), 
-                    10);
-                    
-                    prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
-                    prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (overallAverage / value), 
-                    10);
-
-                    prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
-                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (overallAverage / value), 
-                    10);
-                    ave.x = X_OFFSET + GRID * 3 + barSize * (overallAverage / value);
-
-                    prevBestBar.lineStyle(1, 0xffffff, 1.0);
-                    prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
-                        barSize * (bestScore / value), 
-                    10);
-                    
-                }
-                
+            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
+            onUpdate: tween =>
+            {
+                const value = diffMult + zedMult;
+                multValuesUI1.setHTML(
+                    `x ${value}%
+                    `
+            ).setOrigin(1, 0).setScale(0.5);
             },
+            onComplete: () => {
+                multValuesUI2.setHTML(
+                    `
+                    <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
+                this.tweens.add({ 
+                    targets: multValuesUI2,
+                    alpha: 0,
+                    ease: 'Linear',
+                    duration: 250,
+                    loop: 0,
+                    yoyo: true,
+                });
+            }
+        });*/
+
+        /*this.tweens.addCounter({ //@holden move to reference?
+            from: 0,
+            to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
+            duration: atomList.length * 66.7,
+            ease: 'linear',
+            delay: atomList.length * 133.3,
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                multValuesUI2.setHTML(
+                    `
+                    <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
+            ).setOrigin(1, 0);
+            },
+        });*/
+
+
         
+        
+        /*
+        this.tweens.addCounter({
+            from: 0,
+            to:  this.stageData.boostBonus(),
+            duration: 0,
+            ease: 'linear',
+            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
+            onUpdate: tween =>
+            {
+                const value = Math.round(tween.getValue());
+                postAdditiveValuesUI2.setHTML(
+                    `
+                    +${value}
+                    `
+            ).setOrigin(1, 0).setScale(0.5);
+            }
         });
+        */
+
+        
 
         if (ourGame.mode === MODES.PRACTICE) {
             // Show difference in best run to this run.
@@ -10376,9 +10421,9 @@ class ScoreScene extends Phaser.Scene {
             multValuesUI1,
             multValuesUI2,
             postAdditiveLablesUI,
-            postAdditiveValuesUI1,
+            comboBonusUI,
             //postAdditiveValuesUI2,
-            postAdditiveValuesUI3,
+            noBonkBonusUI,
             rankProgressBar,
             //currentRankLetter,
             nextRankLetter,
@@ -10398,8 +10443,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
-
-        debugger
         
         let rank = this.stageData.stageRank(); // FileNames start at 01.png
         
@@ -10691,6 +10734,7 @@ class ScoreScene extends Phaser.Scene {
 
         var modeScoreContainer = this.add.container();
 
+        debugger
         switch (true) {
             case ourGame.mode === MODES.CLASSIC 
                 || ourGame.mode === MODES.EXPERT
@@ -10957,7 +11001,7 @@ class ScoreScene extends Phaser.Scene {
 
         finalScoreTween.on('complete', e=> {
             //debugger
-            continueText.setVisible(true);
+            //continueText.setVisible(true);
 
         }, this);
 
