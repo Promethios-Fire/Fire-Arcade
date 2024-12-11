@@ -2892,7 +2892,7 @@ class StageCodex extends Phaser.Scene {
             var exitText = this.add.dom(X_OFFSET + GRID * 4.5, Y_OFFSET + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '10px',
                 "fontWeight": 400,
-                "color": "#181818",
+                "color": "white",
             }),
                     `Tab to Menu`
             );
