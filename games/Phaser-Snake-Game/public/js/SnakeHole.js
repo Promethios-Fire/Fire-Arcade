@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
-const DEBUG_SKIP_TO_SCENE = false;
+const DEBUG_SKIP_TO_SCENE = true;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
@@ -59,7 +59,7 @@ const DEBUG_ARGS = new Map ([
         boostFrames: 5994,
         cornerTime: 7317,
         diffBonus: 100,
-        foodLog: [119,117,114,114,120,120,120,120,120,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        foodLog: [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,117,116,110,115,111,117,112,116],
         //       [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
         medals: {},
         moveCount: 840,
@@ -68,7 +68,7 @@ const DEBUG_ARGS = new Map ([
         mode: 3, // MODES.CLASSIC
         uuid: "723426f7-cfc5-452a-94d9-80341db73c7f",
         zedLevel: 48,
-        sRank: 16000
+        sRank: 31000
     }],
 ]);
 
@@ -8690,6 +8690,7 @@ class GameScene extends Phaser.Scene {
                 zeds: ourPersist.zeds,
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
+            debugger
 
             this.scene.launch('ScoreScene', stageDataJSON);
             this.backgroundBlur(true);
@@ -9128,6 +9129,7 @@ var StageData = new Phaser.Class({
         let rank;
         let stageScore = this.preAdditive();
 
+        
         switch (true) {
             case Math.min(...this.foodLog.slice(1,-1)) > RANK_BENCHMARKS.get(RANKS.GRAND_MASTER):
                 if (this.foodLog.length === 28) {
@@ -9410,7 +9412,9 @@ class ScoreScene extends Phaser.Scene {
             8, 8, 8, 8);
         this.scorePanelL.setDepth(10).setOrigin(0,0)
 
-        this.scorePanelLRank = this.add.nineslice(-SCREEN_WIDTH/2, GRID * 17.5 +2, 
+        var rankY = GRID * 11 - 4;
+
+        this.scorePanelLRank = this.add.nineslice(-SCREEN_WIDTH/2, rankY + GRID * 1.5, 
             'uiPanelL', 'Glass', 
             GRID * 3, GRID * 4, 
             8, 8, 8, 8);
@@ -9505,11 +9509,8 @@ class ScoreScene extends Phaser.Scene {
         var atomList = this.stageData.foodLog.slice();
         var scoreAtoms = [];
         var scoreCombos= [];
-        var emptySprite = undefined;
         var frameTime = 16.667;
         var delayStart = 600;
-
-        var count = 0;
         
         for (let i = 0; i < atomList.length; i++) {
             
@@ -9566,11 +9567,11 @@ class ScoreScene extends Phaser.Scene {
         var rankBarY = Y_OFFSET + GRID * 10 + 2;
         var rankBarX = X_OFFSET + GRID * 6 + 2;
 
-        const currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
-            scorePartsStyle, {
-            })).setHTML(
-                `D`
-        ).setOrigin(1, 0.5).setScale(0.5);
+        //const currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        //    scorePartsStyle, {
+        //    })).setHTML(
+        //        ` `
+        //).setOrigin(1, 0.5).setScale(0.5);
 
         const nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 4, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
@@ -9648,7 +9649,7 @@ class ScoreScene extends Phaser.Scene {
                             //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
                             var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
 
-                            currentRankLetter.setHTML("C");
+                            //currentRankLetter.setHTML(" ");
                             nextRankLetter.setHTML("B");
                             rankProgressBar.fillStyle(0xCD7F32);
                             rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
@@ -9662,7 +9663,7 @@ class ScoreScene extends Phaser.Scene {
                             //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.SILVER);
                             var goal =  RANK_BENCHMARKS.get(RANKS.GOLD);
 
-                            currentRankLetter.setHTML("B");
+                            //currentRankLetter.setHTML(" ");
                             nextRankLetter.setHTML("A");
                             rankProgressBar.fillStyle(0xC0C0C0);
                             rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
@@ -9681,7 +9682,7 @@ class ScoreScene extends Phaser.Scene {
                                     case stageScore < sRankValue:
                                         //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
                                         var goal =  sRankValue;
-                                        currentRankLetter.setHTML("A");
+                                        //currentRankLetter.setHTML(" ");
                                         nextRankLetter.setHTML("S");
                                         
                                         rankProgressBar.fillStyle(0xd4af37);
@@ -9697,7 +9698,7 @@ class ScoreScene extends Phaser.Scene {
                                         rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
                                         break;
                                     default:
-                                        currentRankLetter.setHTML("S");
+                                        //currentRankLetter.setHTML(" ");
 
                                         var sRankDelta = sRankValue - RANK_BENCHMARKS.get(RANKS.GOLD);
                                         var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
@@ -9730,7 +9731,7 @@ class ScoreScene extends Phaser.Scene {
                                 }
                                 
                             } else {
-                                currentRankLetter.setHTML("A");
+                                //currentRankLetter.setHTML(" ");
                                 nextRankLetter.setHTML(`+`);
                                 
                                 rankProgressBar.fillStyle(0xd4af37); // Gold
@@ -9802,7 +9803,7 @@ class ScoreScene extends Phaser.Scene {
                         //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
                         var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
 
-                        currentRankLetter.setHTML("C");
+                        //currentRankLetter.setHTML("C");
                         nextRankLetter.setHTML("B");
                         rankProgressBar.fillStyle(0xCD7F32);
                         rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
@@ -9816,7 +9817,7 @@ class ScoreScene extends Phaser.Scene {
                         //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.SILVER);
                         var goal =  RANK_BENCHMARKS.get(RANKS.GOLD);
 
-                        currentRankLetter.setHTML("B");
+                        //currentRankLetter.setHTML("B");
                         nextRankLetter.setHTML("A");
                         rankProgressBar.fillStyle(0xC0C0C0);
                         rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
@@ -9835,7 +9836,7 @@ class ScoreScene extends Phaser.Scene {
                                 case stageScore < sRankValue:
                                     //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
                                     var goal =  sRankValue;
-                                    currentRankLetter.setHTML("A");
+                                    //currentRankLetter.setHTML("A");
                                     nextRankLetter.setHTML("S");
                                     
                                     rankProgressBar.fillStyle(0xd4af37);
@@ -9851,7 +9852,7 @@ class ScoreScene extends Phaser.Scene {
                                     rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
                                     break;
                                 default:
-                                    currentRankLetter.setHTML("S");
+                                    //currentRankLetter.setHTML("S");
 
                                     var sRankDelta = sRankValue - RANK_BENCHMARKS.get(RANKS.GOLD);
                                     var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
@@ -9884,7 +9885,7 @@ class ScoreScene extends Phaser.Scene {
                             }
                             
                         } else {
-                            currentRankLetter.setHTML("A");
+                            //currentRankLetter.setHTML("A");
                             nextRankLetter.setHTML(`+`);
                             
                             rankProgressBar.fillStyle(0xd4af37); // Gold
@@ -9914,13 +9915,12 @@ class ScoreScene extends Phaser.Scene {
             }
         });
 
-        var atomsLog = this.stageData.foodLog.slice();
+        // After Complete
+        
 
         // #placeholder - james
         
         // #endregion
-
-
 
         var _baseScore = this.stageData.atomTime();
         
@@ -10380,7 +10380,7 @@ class ScoreScene extends Phaser.Scene {
             //postAdditiveValuesUI2,
             postAdditiveValuesUI3,
             rankProgressBar,
-            currentRankLetter,
+            //currentRankLetter,
             nextRankLetter,
             //prevBestBar
          ]
@@ -10398,15 +10398,19 @@ class ScoreScene extends Phaser.Scene {
 
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
+
+        debugger
         
         let rank = this.stageData.stageRank(); // FileNames start at 01.png
+        
         //rank = 4; // Temp override.
         if (rank != 5) {
-            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", rank
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         } else {
-            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", 4
+            debugger
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 4
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
             letterRank.setTintFill(COLOR_BONUS_HEX);
         }
@@ -10456,7 +10460,7 @@ class ScoreScene extends Phaser.Scene {
         if(rank >= RANKS.SILVER){
             lightColor = silverLightColor
             lightColor2 = goldLightColor
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0, rankY, "twinkle01Anim", { 
                 x:{min: 0, max: 16},
                 y:{min: 0, max: 34},
                 anim: 'twinkle01',
@@ -10467,7 +10471,7 @@ class ScoreScene extends Phaser.Scene {
         if(rank === RANKS.GOLD){
             lightColor = goldLightColor
             lightColor2 = goldLightColor
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0, rankY, "twinkle02Anim", {
                 x:{min: 0, max: 16},
                 y:{min: 0, max: 34},
                 anim: 'twinkle02',
@@ -10479,7 +10483,7 @@ class ScoreScene extends Phaser.Scene {
             
             lightColor = platLightColor
             lightColor2 = goldLightColor
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5,GRID * 14.5, "twinkle0Anim", {
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5, rankY - GRID * 1.5, "twinkle0Anim", {
                 x:{steps: 8, min: 0, max: 24},
                 y:{steps: 8, min: 24.5, max: 65.5},
                 anim: 'twinkle03',
@@ -10529,26 +10533,31 @@ class ScoreScene extends Phaser.Scene {
             delay:2000,
         });
 
-        this.tweens.add({
-            targets: letterRank,
-            x: X_OFFSET + GRID * 3.5,
-            ease: 'Sine.InOut',
-            duration: 500,
-            delay:2500,
-            onComplete: () =>
-                {
-                    this.rankSounds[rank].play();
-                },
-        });
+        scoreAtomsTween.on("complete", () => {
+            this.tweens.add({
+                targets: letterRank,
+                x: X_OFFSET + GRID * 3.5,
+                ease: 'Sine.InOut',
+                duration: 400,
+                delay:0,
+                onComplete: () =>
+                    {
+                        this.rankSounds[rank].play();
+                    },
+            });
+    
+    
+            this.tweens.add({
+                targets: this.scorePanelLRank,
+                x: X_OFFSET + GRID * 4.5,
+                ease: 'Sine.InOut',
+                duration: 400,
+                delay:0,
+            });
 
+        }, this);
 
-        this.tweens.add({
-            targets: this.scorePanelLRank,
-            x: X_OFFSET + GRID * 4.5,
-            ease: 'Sine.InOut',
-            duration: 500,
-            delay:2500,
-        });
+        
         
 
         // #region Stat Cards (Right Side)
