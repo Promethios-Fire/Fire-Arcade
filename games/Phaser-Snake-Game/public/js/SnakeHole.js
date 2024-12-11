@@ -39,7 +39,7 @@ export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
-const DEBUG_SKIP_TO_SCENE = true;
+const DEBUG_SKIP_TO_SCENE = false;
 const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
@@ -55,19 +55,19 @@ const DEBUG_ARGS = {
 const DEBUG_ARGS = new Map ([
 
     ["ScoreScene", {
-        bonks: 1,
+        bonks: 0,
         boostFrames: 5994,
         cornerTime: 7317,
         diffBonus: 100,
-        foodLog: [100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,100,117,116,110,115,111,117,112,116],
-        //       [119,117,114,114,112,106,115,112,115,111,115,117,115,117,115,111,120,119,111,110,117,116,110,115,111,117,112,116],
+        foodLog: [120,113,115,112,113,110,114,116,117,113,113,111,119,113,111,114,114,118,112,111,114,111,117,110,112,109,119,111],
+        //James 0-1 Best [120,113,115,112,113,110,114,116,117,113,113,111,119,113,111,114,114,118,112,111,114,111,117,110,112,109,119,111],
         medals: {},
         moveCount: 840,
         turns: 198,
         stage: "World_0-1",
         mode: 3, // MODES.CLASSIC
         uuid: "723426f7-cfc5-452a-94d9-80341db73c7f",
-        zedLevel: 48,
+        zedLevel: 84,
         sRank: 31000
     }],
 ]);
@@ -103,7 +103,7 @@ export const Y_OFFSET = 72 / 2;
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
-const NO_BONK_BASE = 1200;
+const NO_BONK_BASE = 2400;
 
 const STAGE_TOTAL = STAGES.size;
 
@@ -9206,7 +9206,7 @@ var StageData = new Phaser.Class({
             }
         });
         
-        if (comboCounter === 28) {
+        if (comboCounter > 27) { // Sometimes it can be 29 if you get the first one fast enough.
             bestCombo = 100; // Full combo = + 10,000
         }
     
@@ -9860,6 +9860,7 @@ class ScoreScene extends Phaser.Scene {
                                     var sX = Math.trunc(postGold / sRankDelta);
 
                                     if (sX > 1 ) {
+                                        nextRankLetter.x  = nextRankLetter.x - 3;
                                         nextRankLetter.setHTML(`x${sX}`);
                                     } else {
                                         nextRankLetter.setHTML(`+`);
@@ -10120,6 +10121,7 @@ class ScoreScene extends Phaser.Scene {
 
             this.time.delayedCall(atomList.length * (frameTime * 2) * this.scoreTimeScale + 400, () => {
                 bonkBo = this.stageData.bonkBonus();
+                
                 noBonkBonusUI.setHTML(
                     `
                     +${bonkBo}`
@@ -10189,7 +10191,7 @@ class ScoreScene extends Phaser.Scene {
                         
                     } else {
                         
-                        prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↓</span>`)
+                        prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↑</span>`)
     
     
                         prevBestBar.fillStyle(COLOR_FOCUS_HEX); // new best
@@ -10756,7 +10758,6 @@ class ScoreScene extends Phaser.Scene {
 
         var modeScoreContainer = this.add.container();
 
-        debugger
         switch (true) {
             case ourGame.mode === MODES.CLASSIC 
                 || ourGame.mode === MODES.EXPERT
@@ -11021,12 +11022,7 @@ class ScoreScene extends Phaser.Scene {
 
 
         // Give a few seconds before a player can hit continue
-        this.time.delayedCall(3000, function() {
-            
-
-            //continueText.setVisible(true);
-
-        }, [], this);
+        
 
         const onContinue = function (scene) {
             console.log('pressing space inside score scene');
@@ -11148,24 +11144,31 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Space to Continue
-        this.input.keyboard.on('keydown-SPACE', function() {
-            if (continueText.visible) {
-
-                if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
-                    this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
+        this.time.delayedCall(250, function() {
+            // Bit of time to not hold space and skip on accident.
+            this.input.keyboard.on('keydown-SPACE', function() {
+                if (continueText.visible) {
+    
+                    if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
+                        this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
+                    } else {
+                        onContinue(ourGame);
+                    }
+                    
                 } else {
-                    onContinue(ourGame);
+                    console.log("Not Visible Yet", continueText.visible);
+                    // Early Complete
+                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
+                    scoreAtomsTween.complete();
+                    //finalScoreTween.complete();
                 }
-                
-            } else {
-                console.log("Not Visible Yet", continueText.visible);
+            }, this);
+            
+            //continueText.setVisible(true);
 
-                // Early Complete
-                ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
-                scoreAtomsTween.complete();
-                //finalScoreTween.complete();
-            }
-        }, this);
+        }, [], this);
+
+        
 
         continueText.on('pointerdown', e => {
             onContinue(ourGame);
