@@ -1844,6 +1844,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
+        this.load.image('UI_maskMenu', 'assets/sprites/UI_maskMenu.png');
 
 
         // Animations
@@ -2663,12 +2664,12 @@ class ExtractTracker extends Phaser.Scene {
             
 
             var selected = this.yMap.get([...this.yMap.keys()][0]);
-            var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+           this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
 
 
             this.tweens.add({
                 targets: trackerContainer,
-                y: containerToY,
+                y: this.containerToY,
                 ease: 'Sine.InOut',
                 duration: 500,
                 onComplete: () => {
@@ -2688,10 +2689,10 @@ class ExtractTracker extends Phaser.Scene {
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
                 
-                containerToY = selected.conY * -1 + nextRow;
+                this.containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
                     targets: trackerContainer,
-                    y: containerToY,
+                    y: this.containerToY,
                     ease: 'Sine.InOut',
                     duration: 500,
                     onComplete: () => {
@@ -2712,10 +2713,10 @@ class ExtractTracker extends Phaser.Scene {
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
                 selected = this.yMap.get(nextSelect);
                 
-                containerToY = selected.conY * -1 + nextRow;
+                this.containerToY = selected.conY * -1 + nextRow;
                 this.tweens.add({
                     targets: trackerContainer,
-                    y: containerToY,
+                    y: this.containerToY,
                     ease: 'Sine.InOut',
                     duration: 500,
                     onComplete: () => {
@@ -2781,43 +2782,19 @@ class StageCodex extends Phaser.Scene {
         var displayCategory = displayList[displayIndex];
         var originScene = codexArgs.originScene;
 
-
-        var exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
-            
-        var textElement = this.add.dom(X_OFFSET + GRID * 0.75, Y_OFFSET + 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "#181818",
-        }),
-                `EXIT`
-        ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
-
-        if (practiceMode) {
-            exitButton.setAlpha(1);
-            textElement.setAlpha(1);
-        }
-
        
-        this.scene.moveBelow("StageCodex", "SpaceBoyScene");
+        this.scene.moveBelow( "SpaceBoyScene","StageCodex",);
         var topLeft = X_OFFSET + GRID * 1.5;
-        var rowY = Y_OFFSET + GRID * 5;
+        var rowY = Y_OFFSET + GRID * 1.5;
         var stageNumber = 0;
         var nextRow = 56;
 
-        var codexContainer = this.make.container(0, 0);
+        this.codexContainer = this.make.container(0, 0);
 
         var bestOfDisplay;
         var sumOfBestDisplay;
         var stagesCompleteDisplay;
         var categoryText;
-
-        var playerRank = this.add.dom(topLeft, rowY - 5, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 200,
-            "color": COLOR_BONUS, 
-        }),
-            `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
-        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
         updateSumOfBest(ourPersist);
 
@@ -2858,35 +2835,78 @@ class StageCodex extends Phaser.Scene {
             }
         } 
 
-        var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY, 
-            'uiPanelL', 'Glass', 
-            GRID * 27.5, GRID * 4, 
-            8, 8, 8, 8);
-        topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+        if (!practiceMode) {
+            var playerRank = this.add.dom(topLeft, rowY - 4 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 200,
+                "color": COLOR_BONUS, 
+            }),
+                `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
+            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
 
-        var bestText = `Best of Codex - Sum of Best = ${commaInt(sumOfBestDisplay.toFixed(0))}`;
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY + GRID, 
+                'uiPanelL', 'Glass', 
+                GRID * 27.5, GRID * 4, 
+                8, 8, 8, 8);
+            topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
+    
+            var bestText = `Sum of Best = ${commaInt(sumOfBestDisplay.toFixed(0))}`;
+    
+            var titleText = this.add.dom(topLeft, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                bestText
+            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+    
+            var categoryDom = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                categoryText
+            ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-        var titleText = this.add.dom(topLeft, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            bestText
-        ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+            var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 3.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                `Stages Complete: ${stagesCompleteDisplay}`
+            ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+        }
+        else{
+            var topPanel = this.add.nineslice(SCREEN_WIDTH/2, rowY, 
+                'uiPanelL', 'Glass', 
+                GRID * 8.25, GRID * 2.25, 
+                8, 8, 8, 8);
+            topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
 
-        var categoryDom = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            categoryText
-        ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+            var practiceText = this.add.dom(SCREEN_WIDTH/2, rowY + GRID * 1 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+            }),
+                `Practice Mode`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
+    
+            var exitButton = this.add.sprite(X_OFFSET + GRID * 1,Y_OFFSET + GRID * 1, 'uiBackButton',0);
+            
+            var exitText = this.add.dom(X_OFFSET + GRID * 4.5, Y_OFFSET + GRID * 1, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '10px',
+                "fontWeight": 400,
+                "color": "#181818",
+            }),
+                    `Tab to Menu`
+            );
 
-//
-        var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-        }),
-            `STAGES: ${stagesCompleteDisplay}`
-        ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+            //if (practiceMode) {
+                //exitButton.setAlpha(1);
+                //textElement.setAlpha(1);
+            //}
+        }
+
+        
+
+
+
 
         //codexContainer.add([titleText, playerRank, stages]);
 
@@ -2896,8 +2916,8 @@ class StageCodex extends Phaser.Scene {
         
             bestOfDisplay.values().forEach( bestOf => {
                 //debugger
-                var topY = rowY + nextRow * stageNumber;
-                const stageTitle = this.add.bitmapText(topLeft, topY, 'mainFontLarge',`${bestOf.stage.toUpperCase()}`,13
+                var topY = rowY + nextRow * stageNumber + GRID * 1.5;
+                const stageTitle = this.add.bitmapText(topLeft, topY + 4, 'mainFontLarge',`${bestOf.stage.toUpperCase()}`,13
                 ).setOrigin(0,0);
 
                 const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`TOTAL SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
@@ -2924,7 +2944,7 @@ class StageCodex extends Phaser.Scene {
                 }
 
 
-                codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
+                this.codexContainer.add([stageTitle,score, speedBonus, rankTitle, rankIcon])
 
                 this.yMap.set(bestOf.stage, {
                     stageTitle:bestOf.stage, 
@@ -2944,7 +2964,7 @@ class StageCodex extends Phaser.Scene {
                     } else {
                         _y = rowY + 34 + (nextRow * stageNumber);
                     }
-                    var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y
+                    var _atom = this.add.sprite((topLeft) + ((foodIndex % 28) * foodSpace), _y + GRID * 1.5
                     ).setOrigin(0,0).setDepth(50)
 
                     switch (true) {
@@ -2971,11 +2991,12 @@ class StageCodex extends Phaser.Scene {
                     
 
                     if (foodIndex > 0 && foodScore > COMBO_ADD_FLOOR) {
-                        var _comboConnect = this.add.rectangle((topLeft) + ((foodIndex % 28) * foodSpace) - 2, _y + 3, 2, 3, 0xFFFF00, 1
+                        var _comboConnect = this.add.rectangle((topLeft) + ((foodIndex % 28) * foodSpace) - 2,
+                         _y + 3 + GRID * 1.5, 2, 3, 0xFFFF00, 1
                         ).setOrigin(0,0).setDepth(51).setAlpha(1);
-                        codexContainer.add([_atom, _comboConnect]);
+                        this.codexContainer.add([_atom, _comboConnect]);
                     } else {
-                        codexContainer.add(_atom);
+                        this.codexContainer.add(_atom);
                     }
 
                     
@@ -3000,19 +3021,41 @@ class StageCodex extends Phaser.Scene {
                 var selected = this.yMap.get(START_STAGE);
             }
 
-            var containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            selected.title.setTintFill(COLOR_FOCUS_HEX);
+
+            this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            
+            this.maskContainerMenu = this.make.container(0, 0);
+            
+            // mask for top of codexContainer
+            var maskMenu = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: 0,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,0.0);
+
+            maskMenu.scaleX = 24;
+            
+            // mask for bottom of codexContainer
+            var maskMenu2 = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT - 42,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,1.0);
+            maskMenu2.scaleX = 24;
+            maskMenu2.scaleY = -1;
+
+
+            this.maskContainerMenu.add([maskMenu, maskMenu2]);
+            this.maskContainerMenu.setVisible(false);
+
+
+            this.codexContainer.mask = new Phaser.Display.Masks.BitmapMask(this, this.maskContainerMenu);
+            this.codexContainer.mask.invertAlpha = true;
             
 
-            this.tweens.add({
-                targets: codexContainer,
-                y: containerToY,
-                ease: 'Sine.InOut',
-                duration: 500,
-                onComplete: () => {
-                    //debugger
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                }
-            }, this);
 
             this.input.keyboard.on('keydown-UP', e => {
 
@@ -3029,25 +3072,26 @@ class StageCodex extends Phaser.Scene {
                     selected = this.yMap.get(nextSelect);
                     ourPersist.prevCodexStageMemory = nextSelect;
                     
-                    containerToY = selected.conY * -1 + nextRow;
-                    this.tweens.add({
-                        targets: codexContainer,
-                        y: containerToY,
+                    this.containerToY = selected.conY * -1 + nextRow;
+
+                    selected.title.setTintFill(COLOR_FOCUS_HEX);
+                    /*this.tweens.add({
+                        targets: this.codexContainer,
+                        y: this.containerToY,
                         ease: 'Sine.InOut',
-                        duration: 500,
+                        duration: 0,
                         onComplete: () => {
                             if (exitButton.frame.name === 0) {
                                 selected.title.setTintFill(COLOR_FOCUS_HEX);
                             }
                         }
-                    }, this);
+                    }, this);*/
                     
                 } else {
                     exitButton.setFrame(1);
-                    
+                    exitText.node.style.color = "red";
                     var firstElement = this.yMap.get([...this.yMap.keys()][0]);
                     firstElement.title.clearTint();
-                    
                 }
                 
             }, this);
@@ -3055,13 +3099,18 @@ class StageCodex extends Phaser.Scene {
             this.input.keyboard.on('keydown-DOWN', e => {
 
                 var dur = 500;
-                if (exitButton.frame.name === 1) {
+                if (exitButton && exitButton.frame.name === 1) {
                     exitButton.setFrame(0);
+                    exitText.node.style.color = "white"
                     var safeIndex = 0;
                     dur = 0;
-                } else {
+                    
+                }
+                else {
                     var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
                 }
+                
+                
 
                 selected.title.clearTint()
      
@@ -3069,16 +3118,17 @@ class StageCodex extends Phaser.Scene {
                 selected = this.yMap.get(nextSelect);
                 ourPersist.prevCodexStageMemory = nextSelect;
                 
-                containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: codexContainer,
-                    y: containerToY,
+                this.containerToY = selected.conY * -1 + nextRow;
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                /*this.tweens.add({
+                    targets: this.codexContainer,
+                    y: this.containerToY,
                     ease: 'Sine.InOut',
-                    duration: dur,
+                    duration: 0,
                     onComplete: () => {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                     }
-                }, this);
+                }, this);*/
             }, this);  
         }
 
@@ -3087,7 +3137,7 @@ class StageCodex extends Phaser.Scene {
                 if (exitButton.frame.name === 1) {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
-                    this.scene.sleep('StageCodex');
+                   this.scene.sleep('StageCodex');
 
                 } else {
                     console.log("Launch Practice!", selected.stageTitle);
@@ -3101,17 +3151,24 @@ class StageCodex extends Phaser.Scene {
                     
                 }
                 
-            }, this); 
+            }, this);
         }
 
-        if (disableArrows) {
-            
-        } else {
+        if (practiceMode) {
+                this.input.keyboard.on('keydown-TAB', e => {
+                    console.log("Exiting!");
+                    this.scene.wake('MainMenuScene');
+                    this.scene.sleep('StageCodex');
+                });
+        } 
+        else {
             var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
                 arrowMenuR.play('arrowMenuIdle').setAlpha(1);
 
             // Default
             this.input.keyboard.on('keydown-RIGHT', e => {
+                console.log("Exiting!");
+
                 //const game = this.scene.get("GameScene");
                 if (originScene.scene.isPaused()) {
                     originScene.scene.resume();
@@ -3157,6 +3214,16 @@ class StageCodex extends Phaser.Scene {
                 );   
             }                               
         }
+    }
+    update() {
+        this.tweens.add({
+            targets: this.codexContainer,
+            y: this.containerToY,
+            ease: 'Linear',
+            duration: 100,
+            repeat: 0,
+            yoyo: true,
+        });  
     }
 }
 
@@ -3454,8 +3521,9 @@ class MainMenuScene extends Phaser.Scene {
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
 
         //menu arrows
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+        // No inventory yet, so no right arrow prompt
+        //var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        //arrowMenuR.play('arrowMenuIdle').setAlpha(0);
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
 
@@ -3594,7 +3662,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
-                arrowMenuL,arrowMenuR,
+                arrowMenuL,//arrowMenuR,
                 ...menuElements,
                 this.exitButton,
                 this.graphics
