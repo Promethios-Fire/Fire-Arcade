@@ -10159,30 +10159,30 @@ class ScoreScene extends Phaser.Scene {
                     
                     var value = postMult + bonkBo + comboBo;
 
-                    stageScoreUI.setHTML(`FINAL SCORE: ${value}`);
+                    finalScoreUI.setHTML(`FINAL SCORE: ${commaInt(value)}`);
                     
     
                     if (value < bestScore) {
                         prevBestBar.fillStyle(0x2d2d2d);
-                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY, barSize, 10);
                         
                         prevBestBar.fillStyle(COLOR_BONUS_HEX); // above average
-                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY, 
                             barSize * (value / bestScore), 
                         10);
                         
                         prevBestBar.fillStyle(COLOR_TERTIARY_HEX); // below average
-                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY, 
                             barSize * (Math.min(value, overallAverage) / bestScore), 
                         10);
     
                         prevBestBar.lineStyle(1, 0xffffff, 2.0); // ave bar
-                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY, 
                             barSize * (overallAverage / bestScore), 
                         10);
     
                         prevBestBar.lineStyle(1, 0xffffff, 2.0); // bar outline
-                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY, 
                             barSize, 
                         10);
     
@@ -10193,28 +10193,28 @@ class ScoreScene extends Phaser.Scene {
     
     
                         prevBestBar.fillStyle(COLOR_FOCUS_HEX); // new best
-                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , 
                             barSize, 
                         11);
     
                         prevBestBar.fillStyle(COLOR_BONUS_HEX); // All green
-                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , 
                             barSize * (bestScore / value), 
                         10);
                         
                         prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
-                        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , 
                             barSize * (overallAverage / value), 
                         10);
     
                         prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
-                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY , 
                             barSize * (overallAverage / value), 
                         10);
                         ave.x = X_OFFSET + GRID * 3 + barSize * (overallAverage / value);
     
                         prevBestBar.lineStyle(1, 0xffffff, 1.0);
-                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY , 
                             barSize * (bestScore / value), 
                         10);
                         
@@ -10224,10 +10224,19 @@ class ScoreScene extends Phaser.Scene {
                 onComplete: tween => {
 
                     var value = postMult + bonkBo + comboBo;
-                    stageScoreUI.setHTML(`FINAL SCORE: ${value}`);
+                    finalScoreUI.setHTML(`FINAL SCORE: ${commaInt(value)}`);
 
                     // make Continue Visible Here
+                    
                     continueText.setVisible(true);
+                    this.tweens.add({
+                        targets: continueText,
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        duration: 1000,
+                        repeat: -1,
+                        yoyo: true
+                      });
 
 
                     modeScoreContainer.each( item => {
@@ -10242,7 +10251,7 @@ class ScoreScene extends Phaser.Scene {
 
         }, this);
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, Y_OFFSET + GRID * 23, 'div', Object.assign({}, STYLE_DEFAULT,
+        const finalScoreUI = this.add.dom(X_OFFSET + GRID * 2, Y_OFFSET + GRID * 17.5 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -10252,23 +10261,24 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 ` `
-        ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+        ).setOrigin(0, 0.5).setDepth(20).setScale(0.5);
 
         const prevBestBar = this.add.graphics();
 
         var barSize = 138;
+        var barY = Y_OFFSET + GRID * 18.5 + 8;
         var bestScore = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
-        var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays
+        var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays;
 
         prevBestBar.fillStyle(0x2d2d2d);
-        prevBestBar.fillRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , barSize, 10);
 
         prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
-        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, 
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY , 
             barSize * (overallAverage / bestScore), 
         10);
 
-        const ave = this.add.dom(X_OFFSET + GRID * 3 + barSize * (overallAverage / bestScore), Y_OFFSET + GRID * 21 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
+        const ave = this.add.dom(X_OFFSET + GRID * 3 + barSize * (overallAverage / bestScore) - 2, barY + 6, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-weight": '400',
@@ -10277,12 +10287,12 @@ class ScoreScene extends Phaser.Scene {
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
                 `AVE`
-        ).setOrigin(0.5, 0).setDepth(20).setScale(0.5);
+        ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
         
         prevBestBar.lineStyle(1, 0xffffff, 1.0); // bar outline
-        prevBestBar.strokeRect(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 20, barSize, 10);
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY, barSize, 10);
 
-        const prevBestUI = this.add.dom(X_OFFSET + GRID * 3 + barSize + 2, Y_OFFSET + GRID * 19 - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const prevBestUI = this.add.dom(X_OFFSET + GRID * 3 + barSize + 2, barY + GRID * 1 + 3, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-weight": '400',
@@ -10290,8 +10300,15 @@ class ScoreScene extends Phaser.Scene {
                 "text-align": 'right',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `BEST ↓`
+                `BEST ↑`
         ).setOrigin(1, 0).setDepth(20).setScale(0.5);
+
+        this.tweens.add({
+            targets: [prevBestBar, prevBestUI, ave],
+            alpha: [0, 1],
+            ease: 'Sine.InOut',
+            duration: 1000,
+        }, this)
         
 
         /*
@@ -10568,13 +10585,13 @@ class ScoreScene extends Phaser.Scene {
             duration: 500,
         });
 
-        var finalScoreTween = this.tweens.add({
-            targets: stageScoreUI,
-            x: SCREEN_WIDTH/2,
-            ease: 'Sine.InOut',
-            duration: 500,
-            delay:2000,
-        });
+        //var finalScoreTween = this.tweens.add({
+        //    targets: finalScoreUI,
+        //    x: SCREEN_WIDTH/2,
+        //    ease: 'Sine.InOut',
+        //    duration: 500,
+        //    delay:2000,
+        //});
 
         scoreAtomsTween.on("complete", () => {
             this.tweens.add({
@@ -10979,7 +10996,7 @@ class ScoreScene extends Phaser.Scene {
 
         var continue_text = '[SPACE TO CONTINUE]';
             
-        var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.25,'div', Object.assign({}, STYLE_DEFAULT, {
+        var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27 + 0,'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'32px',
             "font-family": '"Press Start 2P", system-ui',
             "text-shadow": "4px 4px 0px #000000",
@@ -10988,22 +11005,14 @@ class ScoreScene extends Phaser.Scene {
             }
         )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
-        this.tweens.add({
-            targets: continueText,
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 1000,
-            repeat: -1,
-            yoyo: true
-          });
         
         continueText.setVisible(false);
 
-        finalScoreTween.on('complete', e=> {
+        //finalScoreTween.on('complete', e=> {
             //debugger
             //continueText.setVisible(true);
 
-        }, this);
+        //}, this);
 
 
         // Give a few seconds before a player can hit continue
@@ -11149,7 +11158,7 @@ class ScoreScene extends Phaser.Scene {
                 // Early Complete
                 ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
                 scoreAtomsTween.complete();
-                finalScoreTween.complete();
+                //finalScoreTween.complete();
             }
         }, this);
 
