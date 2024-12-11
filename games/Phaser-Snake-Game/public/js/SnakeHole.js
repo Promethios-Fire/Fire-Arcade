@@ -9573,11 +9573,11 @@ class ScoreScene extends Phaser.Scene {
         //        ` `
         //).setOrigin(1, 0.5).setScale(0.5);
 
-        const nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 4, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 6, rankBarY - 8, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `C`
-        ).setOrigin(0.5, 0.5).setScale(0.5);
+        ).setOrigin(0.5, 0).setScale(0.5).setAlpha(0);
 
         var atomTime = 0;
         var stageScore;
@@ -10598,11 +10598,12 @@ class ScoreScene extends Phaser.Scene {
                 targets: letterRank,
                 x: X_OFFSET + GRID * 3.5,
                 ease: 'Sine.InOut',
-                duration: 400,
+                duration: 250,
                 delay:0,
                 onComplete: () =>
                     {
                         this.rankSounds[rank].play();
+                        nextRankLetter.setAlpha(1);
                     },
             });
     
@@ -10611,9 +10612,13 @@ class ScoreScene extends Phaser.Scene {
                 targets: this.scorePanelLRank,
                 x: X_OFFSET + GRID * 4.5,
                 ease: 'Sine.InOut',
-                duration: 400,
+                duration: 200,
                 delay:0,
             });
+
+
+
+
 
         }, this);
 
