@@ -2377,7 +2377,8 @@ class QuickMenuScene extends Phaser.Scene {
             var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-            var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_CodexLabel')
+            var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,
+                'UI_CodexLabel')
             codexLabel.angle = 90;
   
             var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_StageTrackerLabel')
@@ -2470,15 +2471,16 @@ class ExtractTracker extends Phaser.Scene {
 
     }
     create() {
-
         var _index = 0;
         var topLeft = X_OFFSET + GRID * 8;
-        var rowY = Y_OFFSET + GRID * 12;
+        var rowY = Y_OFFSET + GRID * 1.5;
         var extractNumber = 0;
-        var nextRow = GRID * 3.25;
+        var nextRow = 72;
         var letterOffset = 30;
 
-        var trackerContainer = this.make.container(0, 0);
+        this.trackerContainer = this.make.container(0, 0);
+        this.maskContainerMenu = this.make.container(0, 0);
+
 
         var letterCounter = [0,0,0,0,0,0];
 
@@ -2486,13 +2488,13 @@ class ExtractTracker extends Phaser.Scene {
         if (localStorage.getItem("extractRanks")) {
             var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")));
 
-            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, Y_OFFSET + GRID * 6, 
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY + GRID, 
                 'uiPanelL', 'Glass', 
-                GRID * 24.5, GRID * 4, 
+                GRID * 27.5, GRID * 4, 
                 8, 8, 8, 8);
             topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
 
-            var pathsDiscovered = this.add.dom(X_OFFSET + GRID * 26, Y_OFFSET + GRID * 9 + 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+            var pathsDiscovered = this.add.dom(X_OFFSET + GRID * 27, Y_OFFSET + GRID * 5.5 + 5, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 200,
             }),
@@ -2515,7 +2517,7 @@ class ExtractTracker extends Phaser.Scene {
                     const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH`,13
                     ).setOrigin(0,0).setScale(1);
 
-                    trackerContainer.add(pathTitle);
+                    this.trackerContainer.add(pathTitle);
                     
                     if (bestExtract === "Classic Clear") {
                         
@@ -2527,7 +2529,7 @@ class ExtractTracker extends Phaser.Scene {
                             
                             const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${idArray[index]}`,
                             ).setOrigin(0.5,0);
-                            trackerContainer.add([stageID]);
+                            this.trackerContainer.add([stageID]);
 
                         }
 
@@ -2556,7 +2558,7 @@ class ExtractTracker extends Phaser.Scene {
                             const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`
                             ).setOrigin(0.5,0);
     
-                            trackerContainer.add([bestRank, stageID]);
+                            this.trackerContainer.add([bestRank, stageID]);
                             
                         }
 
@@ -2571,7 +2573,7 @@ class ExtractTracker extends Phaser.Scene {
                         rankSum += finalRankValue + 1; // 1 more so D's count as 1
                         rankCount += 1;
 
-                        trackerContainer.add([finalRank]);
+                        this.trackerContainer.add([finalRank]);
 
                     }
 
@@ -2596,7 +2598,7 @@ class ExtractTracker extends Phaser.Scene {
                         overallScore += scoreValue;
                     }
 
-                    trackerContainer.add([bestScoreTitle, bestScore]);
+                    this.trackerContainer.add([bestScoreTitle, bestScore]);
 
                     
                     this.yMap.set(extractKey, {
@@ -2614,7 +2616,7 @@ class ExtractTracker extends Phaser.Scene {
                     const pathTitle = this.add.bitmapText(topLeft - GRID * 5, rowY + 15, 'mainFontLarge',`PATH - UNDISCOVERED`,13
                     ).setOrigin(0,0).setScale(1).setTintFill(0x454545);
 
-                    trackerContainer.add([pathTitle]);
+                    this.trackerContainer.add([pathTitle]);
                     //debugger
                 }
                 _index += 1;
@@ -2629,7 +2631,7 @@ class ExtractTracker extends Phaser.Scene {
             var hasLetter = letterCounter.some(rank => rank != 0);
 
             if (hasLetter) {
-                var sumOfExtracts = this.add.dom(X_OFFSET + GRID * 26, Y_OFFSET + GRID * 6 + 8, 'div', Object.assign({}, STYLE_DEFAULT, {
+                var sumOfExtracts = this.add.dom(X_OFFSET + GRID * 27, Y_OFFSET + GRID * 2.5 + 8, 'div', Object.assign({}, STYLE_DEFAULT, {
                     "fontSize": '24px',
                     "fontWeight": 400,
                 }),
@@ -2637,14 +2639,14 @@ class ExtractTracker extends Phaser.Scene {
                 ).setOrigin(1,0).setScale(0.5).setAlpha(1);
                 console.log(letterCounter);
 
-                var _x = X_OFFSET + GRID * 3 + 6;
+                var _x = X_OFFSET + GRID * 1.5 + 6;
                 var _offset = GRID + 8;
 
                 for (let index = 0; index < letterCounter.length - 1; index++) {
-                    const rankSprite = this.add.sprite(_x + _offset * index, Y_OFFSET + GRID * 6 + 8, "ranksSpriteSheet", index 
+                    const rankSprite = this.add.sprite(_x + _offset * index, Y_OFFSET + GRID * 2.5 + 8, "ranksSpriteSheet", index 
                     ).setDepth(80).setOrigin(0,0).setScale(0.5);
 
-                    const rankCount = this.add.dom(_x + _offset * index, Y_OFFSET + GRID * 8 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+                    const rankCount = this.add.dom(_x + _offset * index + 2, Y_OFFSET + GRID * 4.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
                         "fontSize": '24px',
                         "fontWeight": 400,
                     }),
@@ -2653,7 +2655,7 @@ class ExtractTracker extends Phaser.Scene {
                      
                 }
 
-                var rankCount = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                var rankCount = this.add.dom(X_OFFSET + GRID * 3, Y_OFFSET + GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
                     "fontSize": '24px',
                     "fontWeight": 200,
                 }),
@@ -2666,11 +2668,42 @@ class ExtractTracker extends Phaser.Scene {
 
             var selected = this.yMap.get([...this.yMap.keys()][0]);
            
-           this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+
+            ////////
+            
+            // mask for top of codexContainer
+            var maskMenu = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: 0,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,0.0);
+
+            maskMenu.scaleX = 24;
+            
+            // mask for bottom of codexContainer
+            var maskMenu2 = this.make.image({
+                x: SCREEN_WIDTH/2,
+                y: SCREEN_HEIGHT - 42,
+                key: 'UI_maskMenu',
+                add: false
+            }).setOrigin(0.5,1.0);
+            maskMenu2.scaleX = 24;
+            maskMenu2.scaleY = -1;
+
+
+            this.maskContainerMenu.add([maskMenu, maskMenu2]);
+            this.maskContainerMenu.setVisible(false);
+
+
+            this.trackerContainer.mask = new Phaser.Display.Masks.BitmapMask(this, this.maskContainerMenu);
+            this.trackerContainer.mask.invertAlpha = true;
+            /////
 
 
             this.tweens.add({
-                targets: trackerContainer,
+                targets: this.trackerContainer,
                 y: this.containerToY,
                 ease: 'Sine.InOut',
                 duration: 500,
@@ -2692,8 +2725,13 @@ class ExtractTracker extends Phaser.Scene {
                 selected = this.yMap.get(nextSelect);
                 
                 this.containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: trackerContainer,
+
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                
+                /*this.tweens.add({
+                    targets: this.trackerContainer,
                     y: this.containerToY,
                     ease: 'Sine.InOut',
                     duration: 500,
@@ -2702,7 +2740,7 @@ class ExtractTracker extends Phaser.Scene {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                         selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
                     }
-                }, this);
+                }, this);*/
             }, this);
 
             this.input.keyboard.on('keydown-DOWN', e => {
@@ -2716,8 +2754,13 @@ class ExtractTracker extends Phaser.Scene {
                 selected = this.yMap.get(nextSelect);
                 
                 this.containerToY = selected.conY * -1 + nextRow;
-                this.tweens.add({
-                    targets: trackerContainer,
+                
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.title.setTintFill(COLOR_FOCUS_HEX);
+                selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
+                
+                /*this.tweens.add({
+                    targets: this.trackerContainer,
                     y: this.containerToY,
                     ease: 'Sine.InOut',
                     duration: 500,
@@ -2726,7 +2769,7 @@ class ExtractTracker extends Phaser.Scene {
                         selected.title.setTintFill(COLOR_FOCUS_HEX);
                         selected.scoreText.setTintFill(COLOR_FOCUS_HEX);
                     }
-                }, this);
+                }, this);*/
             }, this);
 
         } else {
@@ -2735,7 +2778,6 @@ class ExtractTracker extends Phaser.Scene {
                 ,16).setOrigin(0,0).setScale(1);
             // Display something if they have not yet done an extraction on
         }
-
         
         
         
@@ -2754,6 +2796,16 @@ class ExtractTracker extends Phaser.Scene {
             
         }, this);
 
+    }
+    update() {
+        this.tweens.add({
+            targets: this.trackerContainer,
+            y: this.containerToY,
+            ease: 'Linear',
+            duration: 100,
+            repeat: 0,
+            yoyo: true,
+        });  
     }
 
 }
@@ -3045,6 +3097,7 @@ class StageCodex extends Phaser.Scene {
             selected.title.setTintFill(COLOR_FOCUS_HEX);
 
             this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            
             this.maskContainerMenu = this.make.container(0, 0);
             
             // mask for top of codexContainer
@@ -3573,7 +3626,8 @@ class MainMenuScene extends Phaser.Scene {
         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
 
 
-        var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_CodexLabel')
+        var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
+             SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_CodexLabel').setAlpha(0);
         codexLabel.angle = 90;
 
         /*if (this.exitTween) {
@@ -3730,7 +3784,8 @@ class MainMenuScene extends Phaser.Scene {
                 arrowMenuL,//arrowMenuR,
                 ...menuElements,
                 this.exitButton,
-                this.graphics
+                this.graphics,
+                codexLabel,
             ],
             alpha: 1,
             duration: 100,
