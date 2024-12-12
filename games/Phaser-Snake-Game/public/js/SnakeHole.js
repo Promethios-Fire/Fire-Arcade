@@ -11278,7 +11278,6 @@ class InputScene extends Phaser.Scene {
             gameScene.gState = GState.PLAY;
             gameScene.scoreTimer.paused = false;
 
-            debugger
             gameScene.activeArrows.forEach ( arrow => {
                 arrow.setAlpha(0);
             });
