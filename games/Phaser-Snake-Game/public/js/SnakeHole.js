@@ -2994,7 +2994,9 @@ class StageCodex extends Phaser.Scene {
         if (!practiceMode) {
 
             var panelCard = this.make.container(0, 0);
-            this.codexContainer.y = this.containerToY;
+
+            //was used to prevent list from moving, but bugs first time seeing menu
+            //this.codexContainer.y = this.containerToY;
 
 
             var playerRank = this.add.dom(topLeft + GRID * 26, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
