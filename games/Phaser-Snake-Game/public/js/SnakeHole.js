@@ -38,19 +38,40 @@ const GHOST_WALLS = true;
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
-const DEBUG_SHOW_LOCAL_STORAGE = false;
+const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
-const DEBUG_SCENE = "QuickMenuScene"
+const DEBUG_SCENE = "ScoreScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
 //}
 
+/* QuickMenuScene
 const DEBUG_ARGS = {
     menuOptions: QUICK_MENUS.get("adventure-mode"), 
     textPrompt: "MODE SELECTOR",
     cursorIndex: 1,
     sideScenes: false
-}
+}*/
+const DEBUG_ARGS = new Map ([
+
+    ["ScoreScene", {
+        bonks: 0,
+        boostFrames: 5994,
+        cornerTime: 7317,
+        diffBonus: 100,
+        foodLog: [120,113,115,112,113,110,114,116,117,113,113,111,119,113,111,114,114,118,112,111,114,111,117,110,112,109,119,111],
+        //James 0-1 Best [120,113,115,112,113,110,114,116,117,113,113,111,119,113,111,114,114,118,112,111,114,111,117,110,112,109,119,111],
+        medals: {},
+        moveCount: 840,
+        turns: 198,
+        stage: "World_0-1",
+        mode: 3, // MODES.CLASSIC
+        uuid: "723426f7-cfc5-452a-94d9-80341db73c7f",
+        zedLevel: 84,
+        sRank: 31000
+    }],
+]);
+
 
 const DEBUG_FORCE_EXPERT = false;
 const EXPERT_CHOICE = true;
@@ -82,7 +103,7 @@ export const Y_OFFSET = 72 / 2;
 
 const RESET_WAIT_TIME = 500; // Amount of time space needs to be held to reset during recombinating.
 
-const NO_BONK_BASE = 1200;
+const NO_BONK_BASE = 2400;
 
 const STAGE_TOTAL = STAGES.size;
 
@@ -193,7 +214,6 @@ var updateSumOfBest = function(scene) {
             BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
 
             _scoreTotalClassic = _stageDataClassic.calcTotal();
-            debugger
             scene.sumOfBestClassic += _scoreTotalClassic;
         }
         else {
@@ -561,6 +581,7 @@ const COLOR_FOCUS_HEX = 0xFF00FF;
 const COLOR_BONUS = "limegreen";
 const COLOR_BONUS_HEX = 0x32CD32;
 const COLOR_TERTIARY = "goldenrod";
+const COLOR_TERTIARY_HEX = 0xdaa520;
 
 
 var SOUND_ATOM = [
@@ -746,6 +767,32 @@ class SpaceBoyScene extends Phaser.Scene {
                 break;
         }
 
+        // #region UI HUD
+        this.UIScoreContainer = this.make.container(0,0)
+        if (this.startupAnim) {
+            this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
+        }
+
+        // #region Top Right UI
+        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
+        .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`0`,13)
+            .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+
+        // Score Text SET INVISIBLE
+        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
+            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+
+
+        //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
+        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 33 - 1,  GRID * 4 + 7 , 'mainFont',` +`,8)
+        .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+
+        this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
+            this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
+
     }
     setLog(currentStage) {
         // #region Ship Log
@@ -761,7 +808,6 @@ class SpaceBoyScene extends Phaser.Scene {
         var index = 0;
 
         if (persist.stageHistory.length > 0) {
-            
             persist.stageHistory.forEach(stageData => {
                 
                 var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
@@ -771,8 +817,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
                this.navLog.push(_stageText);
                index++;
-            });
-            
+            }); 
         }
 
         var stageID = currentStage.split("_")[1];
@@ -786,13 +831,58 @@ class SpaceBoyScene extends Phaser.Scene {
             ).setOrigin(1,0).setDepth(100).setAlpha(1);
         stageOutLine.setFillStyle(0x000000, 0);
         stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
-
-        
-
         this.navLog.push(stageText, stageOutLine);
 
-    }  
+    }
+    
+    scoreTweenShow(){
+        this.tweens.add({
+            targets: this.UIScoreContainer,
+            y: (0),
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+          });
+          this.tweens.add({
+            targets: [this.bestScoreValue, this.bestScoreLabel],
+            alpha: 1,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+          });
+    }
+    scoreTweenHide(){
+        if (this.UIScoreContainer.y === 0) {
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (- GRID * 2),
+                ease: 'Sine.InOut',
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+            });
+            this.tweens.add({
+                targets: [this.bestScoreValue, this.bestScoreLabel],
+                alpha: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+            });
 
+            this.tweens.add({
+                targets: [this.scoreLabel, this.scoreValue],
+                alpha:1,
+                ease: 'Sine.InOut',
+                delay: 500,
+                duration: 500,
+                repeat: 0,
+                yoyo: false
+            })
+        }
+    }
 }
 
 class MusicPlayerScene extends Phaser.Scene {
@@ -2135,7 +2225,19 @@ class StartScene extends Phaser.Scene {
         //this.scene.start("StageCodex");
 
         if (DEBUG_SKIP_TO_SCENE) {
-            this.scene.start(DEBUG_SCENE, DEBUG_ARGS);
+            if (DEBUG_SCENE === "ScoreScene") {
+
+                var dataObj = DEBUG_ARGS.get(DEBUG_SCENE)
+
+                this.scene.start("GameScene", {
+                    stage: dataObj.stage,
+                    mode: dataObj.mode,
+                    startupAnim: false,
+                });
+                
+            } else {
+                this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
+            }
         } else {
             this.scene.start('MainMenuScene', {
                 portalTint: intColor,
@@ -2635,7 +2737,7 @@ class ExtractTracker extends Phaser.Scene {
                     "fontSize": '24px',
                     "fontWeight": 400,
                 }),
-                    `OVERALL SCORE: ${commaInt(overallScore)}`
+                    `ALL PATHS: ${commaInt(overallScore)}`
                 ).setOrigin(1,0).setScale(0.5).setAlpha(1);
                 console.log(letterCounter);
 
@@ -4458,7 +4560,6 @@ class PersistScene extends Phaser.Scene {
     
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
-    debugger
 
     this.prevSumOfBestClassic = this.sumOfBestClassic;
     this.prevStagesCompleteClassic = this.stagesCompleteClassic;
@@ -5227,29 +5328,23 @@ class GameScene extends Phaser.Scene {
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
-        
 
-        if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
-        }
-        if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
-            this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
-        }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
-        }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
-        }
+        this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
+        this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
 
+        this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+        this.startingArrowsAnimS.flipY = true;
+        this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
 
+        this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+        this.startingArrowsAnimE.angle = 90;
+        this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
+
+        this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+        this.startingArrowsAnimW.angle = 270;
+        this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
+
+        this.startArrows(this.snake.head);
 
         //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
         
@@ -5308,14 +5403,9 @@ class GameScene extends Phaser.Scene {
         });
         
         this.time.delayedCall(3000, event => {
+            // Turns on Arrows after delay. Only on start.
             if (this.gState != GState.PLAY && !this.winned) {
-                ourGameScene.arrowTween =  this.tweens.add({
-                    targets: [this.startingArrowsAnimN,this.startingArrowsAnimS,
-                        this.startingArrowsAnimE,this.startingArrowsAnimW],
-                    alpha: 1,
-                    duration: 500,
-                    ease: 'linear',
-                    });
+                this.startArrows(this.snake.head);
             }
         });
 
@@ -5379,7 +5469,7 @@ class GameScene extends Phaser.Scene {
                     repeat: 0,
                     alpha: 1,
                 });
-                ourGameScene.tempStartingArrows();
+                ourGameScene.startArrows(ourGameScene.snake.head);
                 ourGameScene.gState = GState.WAIT_FOR_INPUT;
                 ourGameScene.snake.direction = DIRS.STOP; 
                 ourGameScene.extractMenuOn = false;
@@ -6487,6 +6577,9 @@ class GameScene extends Phaser.Scene {
             this.bestBase = 0;
         }
 
+        ourSpaceBoyScene.bestScoreValue.setText(`${commaInt(this.bestBase.toString())}`);
+        // #placeholder - james
+
         
         // #region Snake Masks
         /***  
@@ -6550,24 +6643,12 @@ class GameScene extends Phaser.Scene {
 
 
         
-
-        
         // #endregion
 
-        // #region UI HUD
-        this.UIScoreContainer = this.make.container(0,0)
-       if (this.startupAnim) {
-        this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
-        }
 
-
-       // UI Icons
-       //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
-
-
-       // #region Boost Meter UI
-       const ourSpaceBoy = this.scene.get("SpaceBoyScene");
-       //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
+        // #region Boost Meter UI
+        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+        //ourSpaceBoy.scoreFrame is still added to use as a reference point for the electrons transform
         if (ourSpaceBoy.scoreFrame == undefined) {
             ourSpaceBoy.scoreFrame = ourSpaceBoy.add.image(X_OFFSET + GRID * 7 + 6,GRID * 1.5,'atomScoreFrame').setDepth(51).setOrigin(0.5,0.5).setAlpha(0);
         }
@@ -6657,48 +6738,7 @@ class GameScene extends Phaser.Scene {
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
-        
-        var textTint = 0xE7EADE // 0x1f211b
-
-        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
-            .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`${commaInt(this.bestBase.toString())}`,13)
-            .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-
-        // Score Text SET INVISIBLE
-        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
-        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
-            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-    
-    
-    
-    
-        //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 33 - 1,  GRID * 4 + 7 , 'mainFont',` +`,8)
-        .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        
-        
-        
-        
-            //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-        // BELOW SCORE POSISTION
-        //this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 34 - 2,  GRID * 3 + 12 , 'mainFont',` +`,8)
-        //.setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-
-
-
-
-
-   
-        
-
-        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        //).setText(`x ${this.lives}`).setOrigin(0,1);
-
         // Goal UI
-        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         const lengthGoalStyle = {
             "color":'0x1f211b',
             "font-size": '16px',
@@ -6706,18 +6746,11 @@ class GameScene extends Phaser.Scene {
             "text-align": 'right',
         }
         
-                    //this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3, 'mainFont', `${commaInt(this.score.toString())}`, 16)
-            //.setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
         this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 2, GRID * 7, 'mainFont', ``, 8)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 29.25) + 2, GRID * 7, 'mainFont', ``, 8)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
-        //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
- 
-        //snakeBody.scale = .667;
-        //flagGoal.scale = .667;
         
         
         var length = `${this.length}`;
@@ -6770,10 +6803,6 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(1,0.5).setAlpha(0).setScale(.5);
         this.countDown.setScrollFactor(0);
 
-        
-
-        //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
-        //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         if (this.coinsUIIcon == undefined) {
             this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2 + GRID * .5, 'coinPickup01Anim.png'
@@ -6784,8 +6813,6 @@ class GameScene extends Phaser.Scene {
             this.coinsUIIcon.setVisible(true)
         }
         
-
-        //this.coinsUIIcon.setScale(0.5);
         
         this.coinUIText = this.add.dom(X_OFFSET + GRID*21 + 9, 6 + GRID * .5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
@@ -6973,26 +7000,23 @@ class GameScene extends Phaser.Scene {
 
             // Update UI
             //var tempScore = `${this.scoreHistory.reduce((a,b) => a + b, 0)}`
-            this.scoreValue.setText(`${commaInt(currentScore.toString())}`);
+            ourSpaceBoyScene.scoreValue.setText(`${commaInt(currentScore.toString())}`);
 
             //this.deltaScoreUI.x = this.scoreValue.x - this.scoreValue.displayWidth - 1;
             
-            this.deltaScoreUI.setText(
+            ourSpaceBoyScene.deltaScoreUI.setText(
                 `+${deltaScore}`
             )
 
 
             this.tweens.add({
-                targets: this.deltaScoreUI,
+                targets: ourSpaceBoyScene.deltaScoreUI,
                 alpha:{ from: 1, to: 0 },
                 ease: 'Expo.easeInOut',
                 duration: 2000,
             })
             
 
-
-            //this.bestScoreLabel.setText(`BEST`).setAlpha(1).setScrollFactor(0);
-            //this.bestScoreValue.setText(this.bestBase).setAlpha(1).setScrollFactor(0);
 
             
              // Restart Score Timer
@@ -7027,43 +7051,18 @@ class GameScene extends Phaser.Scene {
         //this.runningScore = this.score + calcBonus(baseScore);
         //this.scoreDigitLength = this.runningScore.toString().length;
         
-        /*this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
-            'uiGlassL', 'Glass', 
-            ((42) + (this.scoreDigitLength * 6)), 39, 40, 9, 9, 9);
-        this.scorePanel.setDepth(100).setOrigin(0,0)
-
-
-        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
-             'uiGlassR', 'Glass',
-             57, 29, 9, 29, 9, 9);
-        this.progressPanel.setDepth(100).setOrigin(1,0)*/
-        
-        
-
-        this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
-            this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
-            //this.runningScoreUI, this.runningScoreLabelUI])
-
-        /*if (this.startupAnim) {
-            this.progressPanel.setAlpha(0)
-            this.scorePanel.setAlpha(0)
-        }*/
 
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
 
-        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)*/
         
         if (this.startupAnim) {
             
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
-                    //targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
-                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer],
+                    //targets: [this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                    targets: [this.UIScoreContainer],
                     alpha: 1,
                     duration: 300,
                     ease: 'sine.inout',
@@ -7105,11 +7104,6 @@ class GameScene extends Phaser.Scene {
             group.getChildren().forEach((child,) => {
                 child = this.make.image({},
                     false);
-                /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
-                    ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
-                ) {
-                    child.setAlpha(1).setScale(1);
-                }*/
             });
 
             this.variations = [
@@ -7146,24 +7140,28 @@ class GameScene extends Phaser.Scene {
             this.helpPanel.setAlpha(this.currentAlpha);
             this.helpText.setAlpha(this.currentAlpha);
         }
-            this.helpText = this.add.dom(0, 0, 'div', {
-                color: 'white',
-                'font-size': '8px',
-                'font-family': 'Oxanium',
-                'font-weight': '200',
-                'text-align': 'left',
-                'letter-spacing': "1px",
-                'width': '86px',
-                'word-wrap': 'break-word'
-            });
-            this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
+        this.helpText = this.add.dom(0, 0, 'div', {
+            color: 'white',
+            'font-size': '8px',
+            'font-family': 'Oxanium',
+            'font-weight': '200',
+            'text-align': 'left',
+            'letter-spacing': "1px",
+            'width': '86px',
+            'word-wrap': 'break-word'
+        });
+        this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
-            //console.log(this.interactLayer);
+        //console.log(this.interactLayer);
 
-            if (STAGE_OVERRIDES.has(this.stage)) {
-                console.log("Running postFix Override on", this.stage);
-                STAGE_OVERRIDES.get(this.stage).postFix(this);
-            }
+        if (STAGE_OVERRIDES.has(this.stage)) {
+            console.log("Running postFix Override on", this.stage);
+            STAGE_OVERRIDES.get(this.stage).postFix(this);
+        }
+
+        if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
+            this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE))
+        }
         
     }
 
@@ -7780,29 +7778,40 @@ class GameScene extends Phaser.Scene {
         }, [], this); 
 
 
-
         
     }
-    tempStartingArrows(){
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
-            this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN2.play('startArrowIdle');
+    startArrows(snakeHead){
+
+        var _x = snakeHead.x;
+        var _y = snakeHead.y;
+
+        this.startingArrowsAnimN.setPosition(_x + GRID/2, _y - GRID);
+        this.startingArrowsAnimS.setPosition(_x + GRID/2, _y + GRID * 2);
+        this.startingArrowsAnimE.setPosition(_x + GRID * 2, _y + GRID /2);
+        this.startingArrowsAnimW.setPosition(_x - GRID, _y + GRID/2); 
+
+        this.activeArrows = new Set();
+
+        this.map.getLayer(this.wallVarient);
+        if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
+            this.activeArrows.add(this.startingArrowsAnimN );
         }
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y +1 * GRID)) {
-            this.startingArrowsAnimS2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimS2.flipY = true;
-            this.startingArrowsAnimS2.play('startArrowIdle');
+        if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
+            this.activeArrows.add(this.startingArrowsAnimS );
         }
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
-            this.startingArrowsAnimE2 = this.add.sprite(this.snake.head.x + GRID * 2, this.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimE2.angle = 90;
-            this.startingArrowsAnimE2.play('startArrowIdle');
+        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+            this.activeArrows.add(this.startingArrowsAnimE );
         }
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
-            this.startingArrowsAnimW2 = this.add.sprite(this.snake.head.x - GRID,this.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimW2.angle = 270;
-            this.startingArrowsAnimW2.play('startArrowIdle');
+        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+            this.activeArrows.add(this.startingArrowsAnimW );
         }
+
+        this.tweens.add({
+            targets: [...this.activeArrows],
+            alpha: 1,
+            duration: 500,
+            ease: 'linear',
+            });
     }
 
     // #region .extractPrompt(
@@ -8035,7 +8044,7 @@ class GameScene extends Phaser.Scene {
                 finalScoreStyle, {
                 })).setHTML(
                     `BEST EXTRACTION TRACKER
-                     AVAILABLE ON EXPERT`
+                     ONLY ON EXPERT`
             ).setOrigin(0.5,0).setScale(0.5);
         }
 
@@ -8197,7 +8206,7 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
         this.gState = GState.TRANSITION;
 
-        this.scoreTweenShow();
+        ourSpaceboy.scoreTweenShow();
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
         ourPinball.comboCoverReady.setOrigin(1.0,0)
@@ -8577,73 +8586,6 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    scoreTweenShow(){
-            this.tweens.add({
-                targets: this.UIScoreContainer,
-                y: (0),
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-                this.tweens.add({
-                targets: this.scorePanel,
-                height: 39,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-              this.tweens.add({
-                targets: [this.bestScoreValue, this.bestScoreLabel],
-                alpha: 1,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-    }
-    scoreTweenHide(){
-        if (this.UIScoreContainer.y === 0) {
-            this.tweens.add({
-                targets: this.UIScoreContainer,
-                y: (- GRID * 2),
-                ease: 'Sine.InOut',
-                duration: 800,
-                repeat: 0,
-                yoyo: false
-              });
-            this.tweens.add({
-                targets: this.scorePanel,
-                height: 28,
-                ease: 'Sine.InOut',
-                duration: 800,
-                repeat: 0,
-                yoyo: false
-              });
-            this.tweens.add({
-                targets: [this.bestScoreValue, this.bestScoreLabel],
-                alpha: 0,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-
-            this.tweens.add({
-                targets: [this.scoreLabel, this.scoreValue],
-                alpha:1,
-                ease: 'Sine.InOut',
-                delay: 500,
-                duration: 500,
-                repeat: 0,
-                yoyo: false
-            })
-        }
-
-    }
-
-    
 
     comboBounce(){
         this.tweens.add({
@@ -8747,51 +8689,8 @@ class GameScene extends Phaser.Scene {
             && !this.winned
         ) {
                 console.log("SPACE LONG ENOUGH BRO");
- 
-                //this.events.off('addScore');
-
- 
-                this.lives -= 1;
-                //this.scene.restart( { score: this.stageStartScore, lives: this.lives, });
         }
 
-        
-
-        // #region Bonk and Regroup
-        if (this.gState === GState.BONK) {
-            /***  
-             * Checks for Tween complete on each frame.
-             * on. ("complete") is not run unless it is checked directly. It is not on an event listener
-            ***/ 
-            
-            this.tweenRespawn.on('complete', () => {
-
-                
-                if (this.scene.get("PersistScene").coins > 0) {
-                    this.coinsUIIcon.setVisible(true)
-                }
-
-                // Turn back on arrows
-                //this.startingArrowState = true;
-                if (this.startingArrowsAnimN != undefined){
-                this.startingArrowsAnimN.setAlpha(1)
-                }
-                
-                if (this.startingArrowsAnimS != undefined){
-                this.startingArrowsAnimS.setAlpha(1);
-                }
-                if (this.startingArrowsAnimE != undefined){
-                this.startingArrowsAnimE.setAlpha(1);
-                }
-                if (this.startingArrowsAnimW != undefined){
-                this.startingArrowsAnimW.setAlpha(1);
-                }
-                
-                this.gState = GState.WAIT_FOR_INPUT;
-                this.scoreTimer.paused = true;
-                //console.log(this.gState, "WAIT FOR INPUT");
-            });
-        }
         
         // #region Win State
         if (this.checkWinCon() && !this.winned) {
@@ -8818,7 +8717,30 @@ class GameScene extends Phaser.Scene {
 
             this.events.off('addScore');
 
-            this.scene.launch('ScoreScene');
+            const ourInputScene = this.scene.get("InputScene");
+            const ourPersist = this.scene.get("PersistScene");
+
+            var stageDataJSON = {
+                bonks: this.bonks,
+                boostFrames: ourInputScene.boostTime,
+                cornerTime: Math.floor(ourInputScene.cornerTime),
+                diffBonus: this.stageDiffBonus,
+                foodHistory: this.foodHistory,
+                foodLog: this.scoreHistory,
+                medals: this.medals,
+                moveCount: ourInputScene.moveCount,
+                moveHistory: ourInputScene.moveHistory,
+                turnInputs: ourInputScene.turnInputs,
+                turns: ourInputScene.turns,
+                stage:this.stage,
+                mode:this.mode,
+                uuid:this.stageUUID,
+                zedLevel: calcZedLevel(ourPersist.zeds).level,
+                zeds: ourPersist.zeds,
+                sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
+            }
+
+            this.scene.launch('ScoreScene', stageDataJSON);
             this.backgroundBlur(true);
             this.setWallsPermeable();
         }
@@ -8919,43 +8841,11 @@ class GameScene extends Phaser.Scene {
                 }
             } // End Closest Portal
             
-       
-            if (DEBUG) {
-                
-                if (timeTick < SCORE_FLOOR ) {
-
-                    
-                } else {
-                    this.atoms.forEach( fruit => {
-                        fruit.fruitTimerText.setText(timeTick);
-                    });
-                }
-                
-            }
-            
             
             if (this.gState === GState.PLAY) {
                 var ourGame = this.scene.get("GameScene");
                 const ourPinball = this.scene.get("PinballDisplayScene");
-                // fade out 'GO!'
-                if (!ourGame.goFadeOut) {
-                    ourPinball.comboCoverReady.setTexture('UI_comboGo');
-                    ourPinball.comboCoverReady.setOrigin(1.5,0)
-                    ourGame.goFadeOut = true;
-                    this.tweens.add({
-                        targets: ourPinball.comboCoverReady,
-                        alpha: 0,
-                        duration: 500,
-                        ease: 'sine.inout',
-                    });
-                }
-
-                if (!this.winned) {
-                    this.time.delayedCall(1000, event => {
-                        this.scoreTweenHide(); 
-                    }); 
-                }
-                
+                const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
                 // Move at last second
                 this.snake.move(this);
@@ -8967,8 +8857,6 @@ class GameScene extends Phaser.Scene {
                 }
                 //ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
-                
-
 
 
                 if (this.boostEnergy < 1) {
@@ -9033,9 +8921,6 @@ class GameScene extends Phaser.Scene {
         if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
-
-            this.scoreLabel.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            this.bestScoreLabel.setText(`Best  ${this.score}`);
 
             this.scene.pause();
 
@@ -9255,6 +9140,7 @@ var StageData = new Phaser.Class({
         let rank;
         let stageScore = this.preAdditive();
 
+        
         switch (true) {
             case Math.min(...this.foodLog.slice(1,-1)) > RANK_BENCHMARKS.get(RANKS.GRAND_MASTER):
                 if (this.foodLog.length === 28) {
@@ -9330,6 +9216,10 @@ var StageData = new Phaser.Class({
                 comboCounter = 1;
             }
         });
+        
+        if (comboCounter > 27) { // Sometimes it can be 29 if you get the first one fast enough.
+            bestCombo = 100; // Full combo = + 10,000
+        }
     
         return bestCombo * 100;
     },
@@ -9363,7 +9253,7 @@ class ScoreScene extends Phaser.Scene {
     preload() {
     }
 
-    create() {
+    create(stageDataJSON) {
         const ourInputScene = this.scene.get('InputScene');
         const ourGame = this.scene.get('GameScene');
         const ourScoreScene = this.scene.get('ScoreScene');
@@ -9385,26 +9275,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.ScoreContainerL = this.make.container(0,0);
         this.ScoreContainerR = this.make.container(0,0);
-
-        var stageDataJSON = {
-            bonks: ourGame.bonks,
-            boostFrames: ourInputScene.boostTime,
-            cornerTime: Math.floor(ourInputScene.cornerTime),
-            diffBonus: ourGame.stageDiffBonus,
-            foodHistory: ourGame.foodHistory,
-            foodLog: ourGame.scoreHistory,
-            medals: ourGame.medals,
-            moveCount: ourInputScene.moveCount,
-            moveHistory: ourInputScene.moveHistory,
-            turnInputs: ourInputScene.turnInputs,
-            turns: ourInputScene.turns,
-            stage:ourGame.stage,
-            mode:ourGame.mode,
-            uuid:ourGame.stageUUID,
-            zedLevel: calcZedLevel(ourPersist.zeds).level,
-            zeds: ourPersist.zeds,
-            sRank: parseInt(ourGame.tiledProperties.get("sRank")) // NaN if doesn't exist.
-        }
 
 
         this.stageData = new StageData(stageDataJSON);
@@ -9478,6 +9348,26 @@ class ScoreScene extends Phaser.Scene {
             
         }
 
+        // Update Average Score 
+        
+        var globalStageStats = JSON.parse(localStorage.getItem("stageStats"));
+        if (globalStageStats === null) {
+            globalStageStats = {};
+        }
+
+        if (!globalStageStats[this.stageData.uuid]) {
+            globalStageStats[this.stageData.uuid] = {
+                plays: 1,
+                sum: this.stageData.calcTotal()
+            }
+        } else {
+            globalStageStats[this.stageData.uuid].plays += 1;
+            globalStageStats[this.stageData.uuid].sum += this.stageData.calcTotal();
+        }
+
+        localStorage.setItem("stageStats", JSON.stringify(globalStageStats));
+        
+
         // #endregion
 
         // SOUND
@@ -9533,7 +9423,9 @@ class ScoreScene extends Phaser.Scene {
             8, 8, 8, 8);
         this.scorePanelL.setDepth(10).setOrigin(0,0)
 
-        this.scorePanelLRank = this.add.nineslice(-SCREEN_WIDTH/2, GRID * 17.5 +2, 
+        var rankY = GRID * 9 - 0;
+
+        this.scorePanelLRank = this.add.nineslice(-SCREEN_WIDTH/2, rankY + GRID * 1.5, 
             'uiPanelL', 'Glass', 
             GRID * 3, GRID * 4, 
             8, 8, 8, 8);
@@ -9584,21 +9476,9 @@ class ScoreScene extends Phaser.Scene {
             (this.stageData.stage.replaceAll("_", " ") + " CLEAR")
         ).setOrigin(0.5, 0.5).setScale(.5);
 
-        /*
-        this.add.dom(X_OFFSET + GRID * 24, GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "text-shadow": "4px 4px 0px #000000",
-            "font-size": '20px',
-            'font-weight': 400,
-            'text-transform': 'uppercase',
-            "font-family": '"Press Start 2P", system-ui',
-            "white-space": 'pre-line'
-        })).setHTML(//✔
-            `CLEAR`
-        ).setOrigin(1, 0).setScale(.5);
-        */
-        
 
-        
+
+
         // #region Main Stats
 
         const scorePartsStyle = {
@@ -9610,128 +9490,457 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         }
         
-        const preAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        const atomTimeLabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 10 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `ATOM TIME:`
         ).setOrigin(1, 0).setScale(0.5);
 
-        
-
-        var preAdditiveBaseScoreUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        var atomTimeValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore, then _speedbonus, then _baseScore + _speedbonus
                 `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
-        //var preAdditiveSpeedScoreUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 10.75, 'div', Object.assign({}, STYLE_DEFAULT,
-        //    scorePartsStyle, {
-        //    })).setHTML( //_baseScore
-        //        `
-        //        +${commaInt(0)}
-        //        `
-        //).setOrigin(1, 0).setScale(0.5);
-
-        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 13 + - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+        const stageScoreUILabel = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 11 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `STAGE SCORE`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var preAdditiveSpeedScoreUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13 - 5, 'div', Object.assign({}, STYLE_DEFAULT,
+        var stageScoreUIValue = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 11 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML( //_baseScore + _speedbonus
                 `${commaInt(0)}`
         ).setOrigin(1, 0).setScale(0.5);
 
-        var frameTime = 16.667;
 
-        var _baseScore = this.stageData.atomTime();
-        var _speedbonus = calcStageScore(this.stageData.atomTime());
+        // #region Atomic Food List
 
         var atomList = this.stageData.foodLog.slice();
-        
+        var scoreAtoms = [];
+        var scoreCombos= [];
+        var frameTime = 16.667;
         var delayStart = 600;
+        
+        for (let i = 0; i < atomList.length; i++) {
+            
+            var logTime = atomList[i];
+            let _x,_y;
+            let anim;
 
-        this.tweens.addCounter({
-            from: 0,
-            to: _baseScore,
-            duration: atomList.length * (frameTime * 4) * this.scoreTimeScale, //66.7ms
-            ease: 'Sine.InOut',
-            delay: delayStart,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                preAdditiveBaseScoreUI.setHTML(
-                    `${commaInt(value)}</span>`
-            ).setOrigin(1, 0).setScale(0.5);
+            if (i < 14) {
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 8);
+                _y = GRID * 8.75
+            }
+            else {
+                _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
+                _y = (GRID * 8.75) + 8;
+            }
+
+            switch (true) {
+                case logTime > COMBO_ADD_FLOOR:
+                    anim = "atomScore01";
+                    if (i != 0) { // First Can't Connect
+                        var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
+                        ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
+                        //this.ScoreContainerL.add(rectangle)
+                        scoreCombos.push(rectangle)
+                    }
+                    break
+                case logTime > BOOST_ADD_FLOOR:
+                    //console.log(logTime, "Boost", i);
+                    anim = "atomScore02";
+                    scoreCombos.push(undefined);
+                    break
+                case logTime > SCORE_FLOOR:
+                    //console.log(logTime, "Boost", i);
+                    anim = "atomScore03";
+                    scoreCombos.push(undefined);
+                    break
+                default:
+                    //console.log(logTime, "dud", i);
+                    anim = "atomScore04";
+                    scoreCombos.push(undefined);
+                    break
+            }
+
+            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
+            ).play(anim).setDepth(21).setScale(1).setAlpha(0);
+            //this.ScoreContainerL.add(this.atomScoreIcon);
+            scoreAtoms.push(this.atomScoreIcon);
+        }
+
+        
+
+        const rankProgressBar = this.add.graphics();
+
+        var rankBarY = Y_OFFSET + GRID * 10 + 2;
+        var rankBarX = X_OFFSET + GRID * 6 + 2;
+
+        //const currentRankLetter = this.add.dom(X_OFFSET + GRID * 6 - 2, rankBarY - 2, 'div', Object.assign({}, STYLE_DEFAULT,
+        //    scorePartsStyle, {
+        //    })).setHTML(
+        //        ` `
+        //).setOrigin(1, 0.5).setScale(0.5);
+
+        const nextRankLetter = this.add.dom(X_OFFSET + GRID * 16 - 6, rankBarY - 8, 'div', Object.assign({}, STYLE_DEFAULT,
+            scorePartsStyle, {
+            })).setHTML(
+                `C`
+        ).setOrigin(0.5, 0).setScale(0.5).setAlpha(0);
+
+        var atomTime = 0;
+        var stageScore;
+        var cursorIndex = -1; // Plays sound at 0;
+        
+        var atomTimeTotal = atomList.reduce((a,b) => a + b, 0);
+        var stageCache = this.cache.json.get(`${this.stageData.stage}.properties`);
+
+        var sRankValue = undefined
+        // Could use .some here.
+        stageCache.forEach( probObj => {
+            if (probObj.name === "sRank") {
+                sRankValue = Number(probObj.value);
             }
         });
-
-        this.tweens.addCounter({
+        
+        var scoreAtomsTween = this.tweens.addCounter({
             from: 0,
-            to:  _speedbonus,
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'Sine.InOut',
-            delay: atomList.length * (frameTime * 4) * this.scoreTimeScale + delayStart, //66.7ms
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                //preAdditiveSpeedScoreUI1.setHTML(
-                //    `
-                //+${commaInt(value)}
-                //`
-                //).setOrigin(1, 0).setScale(0.5);
+            to:  atomList.length - 1,
+            delay: delayStart,
+            duration: (frameTime * 4.5) * atomList.length,
+            ease: 'Linear',
+            onUpdate: _tween =>
+            {    
+                const index = Math.floor(_tween.getValue());
+
+                if (index > cursorIndex) {
+                    scoreAtoms[index].setAlpha(1);
+                    if (scoreCombos[index]) {
+                        scoreCombos[index].setAlpha(1);
+                    }
+
+                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
+
+                    atomTime += atomList[index];
+                    atomTimeValue.setHTML(`${commaInt(atomTime)}`);
+
+                    stageScore = calcStageScore(atomTime);
+                    stageScoreUIValue.setHTML(
+                        `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(stageScore)}</span>`
+                    );
+
+                    cursorIndex = index;
+
+                    const size = 106;
+                    rankProgressBar.clear();
+
+                    // Back Fill
+                    rankProgressBar.fillStyle(0x2d2d2d);
+                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size, 3);
+
+                    //C0C0C0
+                    //CD7F32
+
+                    
+
+                    
+                    switch (true) {
+                        case stageScore <  RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
+
+                            var filled = (stageScore/RANK_BENCHMARKS.get(RANKS.BRONZE));
+                        
+                            rankProgressBar.fillStyle(0xA1662F);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * filled, 3);
+                            break;
+
+                        case stageScore <  RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
+
+                            //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
+                            var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
+
+                            //currentRankLetter.setHTML(" ");
+                            nextRankLetter.setHTML("B");
+                            rankProgressBar.fillStyle(0xCD7F32);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+
+                            rankProgressBar.fillStyle(0xA1662F); // Wood
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                            break;
+                        
+                        case stageScore < RANK_BENCHMARKS.get(RANKS.GOLD): // In Silver
+   
+                            //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.SILVER);
+                            var goal =  RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                            //currentRankLetter.setHTML(" ");
+                            nextRankLetter.setHTML("A");
+                            rankProgressBar.fillStyle(0xC0C0C0);
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+
+                            rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                            
+                            rankProgressBar.fillStyle(0xA1662F); // Wood
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+
+                            break;
+
+                        case stageScore > RANK_BENCHMARKS.get(RANKS.GOLD): // In GOLD     
+                            if (sRankValue != undefined) {
+                                switch (true) {
+                                    case stageScore < sRankValue:
+                                        //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
+                                        var goal =  sRankValue;
+                                        //currentRankLetter.setHTML(" ");
+                                        nextRankLetter.setHTML("S");
+                                        
+                                        rankProgressBar.fillStyle(0xd4af37);
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / goal), 3);
+
+                                        rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                                        break;
+                                    default:
+                                        //currentRankLetter.setHTML(" ");
+
+                                        var sRankDelta = sRankValue - RANK_BENCHMARKS.get(RANKS.GOLD);
+                                        var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                                        var sX = Math.trunc(postGold / sRankDelta);
+
+                                        if (sX > 1 ) {
+                                            nextRankLetter.setHTML(`x${sX}`);
+                                        } else {
+                                            nextRankLetter.setHTML(`+`);
+                                        }
+                                        
+
+                                        rankProgressBar.fillStyle(0xE5E4E2); // Platinum
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
+
+                                        rankProgressBar.fillStyle(0xd4af37); // Gold
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (sRankValue / stageScore), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                                        rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                        
+                                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                                        
+                                        break;
+                                }
+                                
+                            } else {
+                                //currentRankLetter.setHTML(" ");
+                                nextRankLetter.setHTML(`+`);
+                                
+                                rankProgressBar.fillStyle(0xd4af37); // Gold
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
+                                
+                                rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                                rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                
+                                rankProgressBar.fillStyle(0xA1662F); // Wood
+                                rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                            }
+                        
+                            
+                            break
+                    
+                        default:
+                            debugger // Safety debugger
+                            break;
+                    }
+                    
+                }
             },
-            onComplete: () => {
-                //SFX
+            onComplete: tween => {
+                //debugger
+
+                var atomTime = 0;
+
+                for (let _index = 0; _index < scoreAtoms.length; _index++) {
+                    scoreAtoms[_index].setAlpha(1);
+                    if (scoreCombos[_index]) {
+                        scoreCombos[_index].setAlpha(1);
+                    }
+                    atomTime += atomList[_index];
+                }
+
+
+                atomTimeValue.setHTML(`${commaInt(atomTime)}`);
+
+
                 this.tweens.add({ 
-                    targets: preAdditiveSpeedScoreUI2,
+                    targets: stageScoreUIValue,
                     alpha: 0,
                     ease: 'Linear',
                     duration: 250,
                     loop: 0,
                     yoyo: true,
                 });
-                preAdditiveSpeedScoreUI2.setHTML(
-                    `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(_speedbonus)}</span>`
-            )}
-        });
+                stageScoreUIValue.setHTML(
+                    `<span style="font-size:16px;color:${COLOR_FOCUS};font-weight:600;">${commaInt(calcStageScore(atomTime))}</span>`
+                );
 
-        /*this.tweens.addCounter({
-            from: 0,
-            to:  _speedbonus,
-            duration: atomList.length * 66.7,
-            ease: 'linear',
-            delay:atomList.length * 100,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                preAdditiveSpeedScoreUI2.setHTML(
-                    `
+                stageScore = calcStageScore(atomTime);
+
+                const size = 106;
+                switch (true) {
+                    case stageScore <  RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
+
+                        var filled = (stageScore/RANK_BENCHMARKS.get(RANKS.BRONZE));
+                    
+                        rankProgressBar.fillStyle(0xA1662F);
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * filled, 3);
+                        break;
+
+                    case stageScore <  RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
+
+                        //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
+                        var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
+
+                        //currentRankLetter.setHTML("C");
+                        nextRankLetter.setHTML("B");
+                        rankProgressBar.fillStyle(0xCD7F32);
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+
+                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                        break;
+                    
+                    case stageScore < RANK_BENCHMARKS.get(RANKS.GOLD): // In Silver
+
+                        //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.SILVER);
+                        var goal =  RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                        //currentRankLetter.setHTML("B");
+                        nextRankLetter.setHTML("A");
+                        rankProgressBar.fillStyle(0xC0C0C0);
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+
+                        rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                        
+                        rankProgressBar.fillStyle(0xA1662F); // Wood
+                        rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+
+                        break;
+
+                    case stageScore > RANK_BENCHMARKS.get(RANKS.GOLD): // In GOLD     
+                        if (sRankValue != undefined) {
+                            switch (true) {
+                                case stageScore < sRankValue:
+                                    //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.GOLD);
+                                    var goal =  sRankValue;
+                                    //currentRankLetter.setHTML("A");
+                                    nextRankLetter.setHTML("S");
+                                    
+                                    rankProgressBar.fillStyle(0xd4af37);
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / goal), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / goal), 3);
+
+                                    rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / goal), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xA1662F); // Wood
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / goal), 3);
+                                    break;
+                                default:
+                                    //currentRankLetter.setHTML("S");
+
+                                    var sRankDelta = sRankValue - RANK_BENCHMARKS.get(RANKS.GOLD);
+                                    var postGold = stageScore - RANK_BENCHMARKS.get(RANKS.GOLD);
+
+                                    var sX = Math.trunc(postGold / sRankDelta);
+
+                                    if (sX > 1 ) {
+                                        nextRankLetter.x  = nextRankLetter.x - 3;
+                                        nextRankLetter.setHTML(`x${sX}`);
+                                    } else {
+                                        nextRankLetter.setHTML(`+`);
+                                    }
+                                    
+
+                                    rankProgressBar.fillStyle(0xE5E4E2); // Platinum
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
+
+                                    rankProgressBar.fillStyle(0xd4af37); // Gold
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (sRankValue / stageScore), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                                    rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                                    
+                                    rankProgressBar.fillStyle(0xA1662F); // Wood
+                                    rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                                    
+                                    break;
+                            }
+                            
+                        } else {
+                            //currentRankLetter.setHTML("A");
+                            nextRankLetter.setHTML(`+`);
+                            
+                            rankProgressBar.fillStyle(0xd4af37); // Gold
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (stageScore / stageScore), 3);
+                            
+                            rankProgressBar.fillStyle(0xC0C0C0); // SILVER
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.GOLD) / stageScore), 3);
+
+                            rankProgressBar.fillStyle(0xCD7F32); // Bronze
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.SILVER) / stageScore), 3);
+                            
+                            rankProgressBar.fillStyle(0xA1662F); // Wood
+                            rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * (RANK_BENCHMARKS.get(RANKS.BRONZE) / stageScore), 3);
+                        }     
+                        break
                 
-                <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(_baseScore + value)}</span>`
-            ).setOrigin(1, 0);
+                    default:
+                        debugger // Safety debugger
+                        break;
+                }
             }
-        });*/
+        });
+        
+        
+        // #endregion
+
+        var _baseScore = this.stageData.atomTime();
         
 
-        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI1 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 14 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
                 `DIFFICULTY +${0}%
 
-
                 `
         ).setOrigin(1,0).setScale(0.5);
-        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 13.625, 'div', Object.assign({}, STYLE_DEFAULT,
+        var multLablesUI2 = this.add.dom(SCREEN_WIDTH/2 - GRID*2.75, GRID * 14 + 1, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 "font-size":'12px'
             })).setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
                 `
                 ZED LVL +${0}%
-
                 `
         ).setOrigin(1,0).setScale(0.5);
        
@@ -9744,130 +9953,47 @@ class ScoreScene extends Phaser.Scene {
         //        MEDAL +${0}%
         //        `
         //).setOrigin(1,0).setScale(0.5);
-        
-        this.tweens.addCounter({
-            from: 0,
-            to:  ourScoreScene.stageData.diffBonus,
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
-            onUpdate: tween =>
-            {
-                const value1 = Math.round(tween.getValue());
-                multLablesUI1.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                    `DIFFICULTY +${value1}%
 
-                    `
-                
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        this.tweens.addCounter({
-            from: 0,
-            to:  Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(2),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
-            onUpdate: tween =>
-            {
-                const value2 = tween.getValue().toFixed(1);
-                multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                    `
-                    ZED LVL +${value2}%
+        var multDuration = 1000;
 
-                    `
-                
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        this.tweens.addCounter({
-            from: 0,
-            to:  ourScoreScene.stageData.medalBonus() * 100,
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 8) * this.scoreTimeScale + delayStart, //133.3ms
-            onUpdate: tween =>
-            {
-                const value3 = Math.round(tween.getValue());
-                //multLablesUI3.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
-                //    `
-                //
-                //    MEDAL +${value3}%
-                //    `
-                //).setOrigin(1, 0).setScale(0.5);
-            }
-        });
+        var diffMult;
+        var zedMult;
+        var sumMult;
+
+        var postMult = 0;
+        var comboBo = 0;
+        var bonkBo = 0;
+
         
+        var preMult = this.stageData.preAdditive();
         var _bonusMult = this.stageData.bonusMult();
         var _postMult = this.stageData.postMult();
 
-        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14 - 3, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `x ${0}%
                 `
         ).setOrigin(1, 0).setScale(0.5);
 
-        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 13.75, 'div', Object.assign({}, STYLE_DEFAULT,
+        const multValuesUI2 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 14 - 3, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
             })).setHTML(
                 `
                 <hr style="font-size:3px"/><span style="font-size:16px">${0}</span>`
         ).setOrigin(1, 0).setScale(0.5);
 
-        this.tweens.addCounter({
-            from: 0,
-            to:  Number(_bonusMult * 100).toFixed(1),
-            duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 12) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = tween.getValue().toFixed(1);
-                multValuesUI1.setHTML(
-                    `x ${value}%
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
-            },
-            onComplete: () => {
-                multValuesUI2.setHTML(
-                    `
-                    <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
-                this.tweens.add({ 
-                    targets: multValuesUI2,
-                    alpha: 0,
-                    ease: 'Linear',
-                    duration: 250,
-                    loop: 0,
-                    yoyo: true,
-                });
-            }
-        });
-
-        /*this.tweens.addCounter({ //@holden move to reference?
-            from: 0,
-            to:  _postMult, //commaInt(Math.ceil(_postMult)) this code doesn't work here for whatever reason
-            duration: atomList.length * 66.7,
-            ease: 'linear',
-            delay: atomList.length * 133.3,
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                multValuesUI2.setHTML(
-                    `
-                    <hr style="font-size:3px"/><span style="font-size:16px">${value}</span>`
-            ).setOrigin(1, 0);
-            },
-        });*/
-
         const postAdditiveLablesUI = this.add.dom(SCREEN_WIDTH/2 - GRID*2, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
-            })).setHTML(
-                `COMBO BONUS:
-                NO-BONK BONUS:`
-        ).setOrigin(1,0).setScale(0.5);
+        })).setOrigin(1,0).setScale(0.5);
+        
+        postAdditiveLablesUI.setHTML(
+            `COMBO BONUS:
+            NO-BONK BONUS:`
+        );
+        
 
-        const postAdditiveValuesUI1 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const comboBonusUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
@@ -9886,62 +10012,106 @@ class ScoreScene extends Phaser.Scene {
         ).setOrigin(1, 0).setScale(0.5);
         */
 
-        const postAdditiveValuesUI3 = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
+        const noBonkBonusUI = this.add.dom(SCREEN_WIDTH/2 + GRID * 1.5, GRID * 16, 'div', Object.assign({}, STYLE_DEFAULT,
             scorePartsStyle, {
                 //"font-size": '18px',
             })).setHTML(
                 `
                 ${0}`
-        ).setOrigin(1, 0);
+        ).setOrigin(1, 0).setScale(0.5);
+        
+        scoreAtomsTween.on("complete", () => {
+            this.tweens.addCounter({
+                from: 0,
+                to:  ourScoreScene.stageData.diffBonus,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //133.3ms
+                onUpdate: tween =>
+                {
+                    diffMult = Math.round(tween.getValue());
+                    multLablesUI1.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                        `DIFFICULTY +${diffMult}%
+    
+                        `
+                    );
+                }
+            });
+            
+            var toZed = Number(ourScoreScene.stageData.zedLevelBonus() * 100).toFixed(2);
+            this.tweens.addCounter({
+                from: 0,
+                to:  toZed,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //133.3ms
+                onUpdate: tween =>
+                {
+                    zedMult = tween.getValue().toFixed(1);
+                    multLablesUI2.setHTML( //this.stageData.diffBonus,Number(this.stageData.zedLevelBonus() * 100.toFixed(1),this.stageData.medalBonus() * 100
+                        `
+                        ZED LVL +${zedMult}%
+    
+                        `  
+                    );
+                }
+            });
 
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.comboBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 14) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI1.setHTML(
-                    `+${value}
+            this.tweens.addCounter({
+                from: 0,
+                to:  1, //Number(_bonusMult * 100).toFixed(1),
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale, //33.3ms
+                ease: 'linear',
+                delay: 0, //?
+                onUpdate: tween =>
+                {
+                    sumMult = diffMult + Number(zedMult);
+                    postMult = Math.ceil(preMult * (sumMult / 100));
+                    multValuesUI1.setHTML(
+                        `x ${sumMult}%
+                        `
+                ).setOrigin(1, 0).setScale(0.5);
+                },
+                onComplete: () => {
+                    multValuesUI2.setHTML(
+                        `
+                        <hr style="font-size:3px"/><span style="font-size:16px">${commaInt(Math.ceil(_postMult))}</span>`)
+                    this.tweens.add({ 
+                        targets: multValuesUI2,
+                        alpha: [1,0],
+                        ease: 'Linear',
+                        duration: 250,
+                        loop: 1,
+                        yoyo: true,
+                    });
+                }
+            });
+
+            this.time.delayedCall(atomList.length * (frameTime * 2) * this.scoreTimeScale + 200, () => {
+                comboBo = this.stageData.comboBonus();
+                comboBonusUI.setHTML(
+                    `+${comboBo}
                     
                     `
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        
-        /*
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.boostBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 15) * this.scoreTimeScale + delayStart, //?
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI2.setHTML(
-                    `
-                    +${value}
-                    `
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-        });
-        */
-        
-        this.tweens.addCounter({
-            from: 0,
-            to:  this.stageData.bonkBonus(),
-            duration: 0,
-            ease: 'linear',
-            delay: atomList.length * (frameTime * 16) * this.scoreTimeScale + delayStart, //?
-            onComplete: () => {
-                letterRank.setAlpha(1);
+                ).setOrigin(1, 0).setScale(0.5);
 
-                modeScoreContainer.each( item => {
-                    item.setAlpha(1);
-                });
+                if (this.stageData.comboBonus() > 9000) {
+                    postAdditiveLablesUI.setHTML(
+                        `FULL COMBO:
+                        NO-BONK BONUS:`
+                    );
+                    
+                }
+            }, [], this);
+
+            this.time.delayedCall(atomList.length * (frameTime * 2) * this.scoreTimeScale + 400, () => {
+                bonkBo = this.stageData.bonkBonus();
+                
+                noBonkBonusUI.setHTML(
+                    `
+                    +${bonkBo}`
+                ).setOrigin(1, 0).setScale(0.5);
+
 
                 if(ourGame.mode === MODES.EXPERT) {
 
@@ -9949,7 +10119,7 @@ class ScoreScene extends Phaser.Scene {
 
                     var rankDiff = currentRank - this.scene.get("PersistScene").prevRank;
 
-                    debugger
+                    debugger // leave this until expert mode is debugged.
                     if (rankDiff > 0) {
                         ourPersist.coins += rankDiff;
                         // TO DO. Better Visual this is happening would be nice. Like tween up the value.
@@ -9960,19 +10130,115 @@ class ScoreScene extends Phaser.Scene {
                     }
                     
                 }
-            },
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                postAdditiveValuesUI3.setHTML(
-                    `
-                    +${value}`
-            ).setOrigin(1, 0).setScale(0.5);
-            }
-            
-        });
+            }, [], this);
 
-        const stageScoreUI = this.add.dom(SCREEN_WIDTH/2, GRID * 22.25, 'div', Object.assign({}, STYLE_DEFAULT,
+
+            // This tween needs to end last.
+            this.tweens.addCounter({
+                from: 0,
+                to:  1,
+                duration: atomList.length * (frameTime * 2) * this.scoreTimeScale + 500,
+                ease: 'linear',
+                delay: 0, //?
+                onUpdate: tween => {
+    
+                    prevBestBar.clear();
+                    
+                    var value = postMult + bonkBo + comboBo;
+
+                    finalScoreUI.setHTML(`FINAL SCORE: ${commaInt(value)}`);
+                    
+    
+                    if (value < bestScore) {
+                        prevBestBar.fillStyle(0x2d2d2d);
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY, barSize, 10);
+                        
+                        prevBestBar.fillStyle(COLOR_BONUS_HEX); // above average
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY, 
+                            barSize * (value / bestScore), 
+                        10);
+                        
+                        prevBestBar.fillStyle(COLOR_TERTIARY_HEX); // below average
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY, 
+                            barSize * (Math.min(value, overallAverage) / bestScore), 
+                        10);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 2.0); // ave bar
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY, 
+                            barSize * (overallAverage / bestScore), 
+                        10);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 2.0); // bar outline
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY, 
+                            barSize, 
+                        10);
+    
+                        
+                    } else {
+                        
+                        prevBestUI.setHTML(`<span style="color:${COLOR_FOCUS}">NEW BEST ↑</span>`)
+    
+    
+                        prevBestBar.fillStyle(COLOR_FOCUS_HEX); // new best
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , 
+                            barSize, 
+                        11);
+    
+                        prevBestBar.fillStyle(COLOR_BONUS_HEX); // All green
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , 
+                            barSize * (bestScore / value), 
+                        10);
+                        
+                        prevBestBar.fillStyle(COLOR_TERTIARY_HEX);
+                        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , 
+                            barSize * (overallAverage / value), 
+                        10);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY , 
+                            barSize * (overallAverage / value), 
+                        10);
+                        ave.x = X_OFFSET + GRID * 3 + barSize * (overallAverage / value);
+    
+                        prevBestBar.lineStyle(1, 0xffffff, 1.0);
+                        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY , 
+                            barSize * (bestScore / value), 
+                        10);
+                        
+                    }
+                    
+                },
+                onComplete: tween => {
+
+                    var value = postMult + bonkBo + comboBo;
+                    finalScoreUI.setHTML(`FINAL SCORE: ${commaInt(value)}`);
+
+                    // make Continue Visible Here
+                    
+                    continueText.setVisible(true);
+                    this.tweens.add({
+                        targets: continueText,
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        duration: 1000,
+                        repeat: -1,
+                        yoyo: true
+                      });
+
+
+                    modeScoreContainer.each( item => {
+                        item.setAlpha(1);
+                    });
+
+                },
+            
+            });
+
+
+
+        }, this);
+
+        const finalScoreUI = this.add.dom(X_OFFSET + GRID * 2, Y_OFFSET + GRID * 17.5 + 4, 'div', Object.assign({}, STYLE_DEFAULT,
             {
                 "font-style": 'bold',
                 "font-size": "28px",
@@ -9981,8 +10247,57 @@ class ScoreScene extends Phaser.Scene {
                 "text-shadow": '#000000 1px 0 6px',
             })).setHTML(
                 //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
-                `FINAL SCORE: ${commaInt(Math.floor(this.stageData.calcTotal()))}`
+                ` `
+        ).setOrigin(0, 0.5).setDepth(20).setScale(0.5);
+
+        const prevBestBar = this.add.graphics();
+
+        var barSize = 138;
+        var barY = Y_OFFSET + GRID * 18.5 + 8;
+        var bestScore = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
+        var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays;
+
+        prevBestBar.fillStyle(0x2d2d2d);
+        prevBestBar.fillRect(X_OFFSET + GRID * 3, barY , barSize, 10);
+
+        prevBestBar.lineStyle(1, 0xffffff, 1.0); // ave bar
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY , 
+            barSize * (overallAverage / bestScore), 
+        10);
+
+        const ave = this.add.dom(X_OFFSET + GRID * 3 + barSize * (overallAverage / bestScore) - 2, barY + 6, 'div', Object.assign({}, STYLE_DEFAULT,
+            {
+                "font-style": 'bold',
+                "font-weight": '400',
+                "font-size": "14px",
+                "text-align": 'center',
+            })).setHTML(
+                //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                `AVE`
         ).setOrigin(1, 0.5).setDepth(20).setScale(0.5);
+        
+        prevBestBar.lineStyle(1, 0xffffff, 1.0); // bar outline
+        prevBestBar.strokeRect(X_OFFSET + GRID * 3, barY, barSize, 10);
+
+        const prevBestUI = this.add.dom(X_OFFSET + GRID * 3 + barSize + 2, barY + GRID * 1 + 3, 'div', Object.assign({}, STYLE_DEFAULT,
+            {
+                "font-style": 'bold',
+                "font-weight": '400',
+                "font-size": "16px",
+                "text-align": 'right',
+            })).setHTML(
+                //`STAGE SCORE: <span style="animation:glow 1s ease-in-out infinite alternate;">${commaInt(Math.floor(this.stageData.calcTotal()))}</span>`
+                `BEST ↑`
+        ).setOrigin(1, 0).setDepth(20).setScale(0.5);
+
+        this.tweens.add({
+            targets: [prevBestBar, prevBestUI, ave],
+            alpha: [0, 1],
+            ease: 'Sine.InOut',
+            duration: 1000,
+        }, this);
+
+        
 
         if (ourGame.mode === MODES.PRACTICE) {
             // Show difference in best run to this run.
@@ -10030,39 +10345,54 @@ class ScoreScene extends Phaser.Scene {
         this.ScoreContainerL.add(
             [this.scorePanelL,
             this.scorePanelLRank,
-            preAdditiveBaseScoreUI,
+            atomTimeValue,
             //preAdditiveSpeedScoreUI1,
             stageScoreUILabel,
-            preAdditiveSpeedScoreUI2,
-            preAdditiveLablesUI,
+            stageScoreUIValue,
+            atomTimeLabel,
             multLablesUI1,
             multLablesUI2,
             //multLablesUI3,
             multValuesUI1,
             multValuesUI2,
             postAdditiveLablesUI,
-            postAdditiveValuesUI1,
+            comboBonusUI,
             //postAdditiveValuesUI2,
-            postAdditiveValuesUI3,]
-            )
+            noBonkBonusUI,
+            rankProgressBar,
+            //currentRankLetter,
+            nextRankLetter,
+         ]
+        )
+
+        for (let index = 0; index < scoreAtoms.length; index++) {
+            if (scoreCombos[index]) {
+                this.ScoreContainerL.add(scoreCombos[index]);
+            }
+
+            this.ScoreContainerL.add(scoreAtoms[index]); 
+        }
+        
         // #region Rank Sprites
 
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
         
         let rank = this.stageData.stageRank(); // FileNames start at 01.png
+        
         //rank = 4; // Temp override.
         if (rank != 5) {
-            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", rank
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", rank
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
 
         } else {
-            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5,GRID * 16.0, "ranksSpriteSheet", 4
+            debugger
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 4
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
             letterRank.setTintFill(COLOR_BONUS_HEX);
         }
         
-        
+    
 
         this.ScoreContainerL.add(letterRank)
         
@@ -10107,7 +10437,7 @@ class ScoreScene extends Phaser.Scene {
         if(rank >= RANKS.SILVER){
             lightColor = silverLightColor
             lightColor2 = goldLightColor
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle01Anim", { 
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0, rankY, "twinkle01Anim", { 
                 x:{min: 0, max: 16},
                 y:{min: 0, max: 34},
                 anim: 'twinkle01',
@@ -10118,7 +10448,7 @@ class ScoreScene extends Phaser.Scene {
         if(rank === RANKS.GOLD){
             lightColor = goldLightColor
             lightColor2 = goldLightColor
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0,GRID * 16.0, "twinkle02Anim", {
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 4.0, rankY, "twinkle02Anim", {
                 x:{min: 0, max: 16},
                 y:{min: 0, max: 34},
                 anim: 'twinkle02',
@@ -10130,7 +10460,7 @@ class ScoreScene extends Phaser.Scene {
             
             lightColor = platLightColor
             lightColor2 = goldLightColor
-            var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5,GRID * 14.5, "twinkle0Anim", {
+            var rankParticles = this.add.particles(X_OFFSET + GRID * 3.5, rankY - GRID * 1.5, "twinkle0Anim", {
                 x:{steps: 8, min: 0, max: 24},
                 y:{steps: 8, min: 24.5, max: 65.5},
                 anim: 'twinkle03',
@@ -10148,106 +10478,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.spotlight = this.lights.addLight(0, 0, 66, lightColor).setIntensity(1.5); //
         this.spotlight2 = this.lights.addLight(0, 0, 66, lightColor2).setIntensity(1.5); //
-        
-
-        // #region Atomic Food List
-       
-        var scoreAtoms = [];
-        var scoreCombos= [];
-        var emptySprite = undefined;
-
-        var count = 0;
-        
-        for (let i = 0; i < atomList.length; i++) {
-            
-            var logTime = atomList[i];
-            let _x,_y;
-            let anim;
-
-            if (i < 14) {
-                _x = X_OFFSET + (GRID * (7.2667 - .25)) + (i * 8);
-                _y = GRID * 8.75
-            }
-            else {
-                _x = X_OFFSET + (GRID * (7.2667 - .25)) + ((i - 14) * 8);
-                _y = (GRID * 8.75) + 8;
-            }
-
-            switch (true) {
-                case logTime > COMBO_ADD_FLOOR:
-                    anim = "atomScore01";
-                    if (i != 0) { // First Can't Connect
-                        var rectangle = this.add.rectangle(_x - 6, _y, 6, 2, 0xFFFF00, 1
-                        ).setOrigin(0,0.5).setDepth(20).setAlpha(0);
-                        this.ScoreContainerL.add(rectangle)
-                        scoreCombos.push(rectangle)
-                    }
-                    break
-                case logTime > BOOST_ADD_FLOOR:
-                    //console.log(logTime, "Boost", i);
-                    anim = "atomScore02";
-                    scoreCombos.push(emptySprite);
-                    break
-                case logTime > SCORE_FLOOR:
-                    //console.log(logTime, "Boost", i);
-                    anim = "atomScore03";
-                    scoreCombos.push(emptySprite);
-                    break
-                default:
-                    //console.log(logTime, "dud", i);
-                    anim = "atomScore04";
-                    scoreCombos.push(emptySprite);
-                    break
-            }
-
-            this.atomScoreIcon = this.add.sprite(_x, _y,'atomicPickupScore'
-            ).play(anim).setDepth(21).setScale(1).setAlpha(0);
-            this.ScoreContainerL.add(this.atomScoreIcon);
-            scoreAtoms.push(this.atomScoreIcon);
-        }
-        var _frame = 0
-        var __frame = 0
-
-        var scoreAtomsTween = this.tweens.addCounter({
-            from: 0,
-            to:  atomList.length,
-            delay: delayStart,
-            duration: (frameTime * 4) * atomList.length,
-            ease: 'Linear',
-            
-            onUpdate: tween =>
-            {
-                const value = Math.round(tween.getValue());
-                __frame += 1
-                if (__frame % 4 === 0 && _frame <= scoreAtoms.length -1) {
-                    _frame += 1
-                    //var _index = Phaser.Math.RND.integerInRange(0, ourGame.atomSounds.length - 1)  
-                    
-                    scoreAtoms[_frame-1].setAlpha(1);
-                    if (scoreCombos[_frame-1]) {
-                        scoreCombos[_frame-1].setAlpha(1);
-                    }
-
-                    //ourGame.atomSounds[_index].play()
-                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
-                }
-                
-                //ourGame.atomSounds[Phaser.Math.RND.integer(0, ourGame.atomSounds.length - 1)].play()
-            }
-        });
-
-        //console.log(scoreAtomsTween.timeScale)
-        //debugger;
-        //scoreAtomsTween.timeScale = 8;
-
-
-        /*this.tweens.add({ //shows score screen atoms one by one
-            targets: scoreAtoms,
-            alpha: 1,
-            ease: 'Linear',
-            duration: 0,
-            delay: this.tweens.stagger(frameTime * 2),
-        });*/
 
         this.ScoreContainerL.x -= SCREEN_WIDTH
         this.tweens.add({ //brings left score container into camera frame
@@ -10256,35 +10486,41 @@ class ScoreScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             duration: 500,
         });
-        this.tweens.add({
-            targets: stageScoreUI,
-            x: SCREEN_WIDTH/2,
-            ease: 'Sine.InOut',
-            duration: 500,
-            delay:2000,
-        });
-        this.tweens.add({
-            targets: letterRank,
-            x: X_OFFSET + GRID * 3.5,
-            ease: 'Sine.InOut',
-            duration: 500,
-            delay:2500,
-            onComplete: () =>
-                {
-                    this.rankSounds[rank].play();
-                },
-        });
 
+        //var finalScoreTween = this.tweens.add({
+        //    targets: finalScoreUI,
+        //    x: SCREEN_WIDTH/2,
+        //    ease: 'Sine.InOut',
+        //    duration: 500,
+        //    delay:2000,
+        //});
 
-        this.tweens.add({
-            targets: this.scorePanelLRank,
-            x: X_OFFSET + GRID * 4.5,
-            ease: 'Sine.InOut',
-            duration: 500,
-            delay:2500,
-        });
+        scoreAtomsTween.on("complete", () => {
+            this.tweens.add({
+                targets: letterRank,
+                x: X_OFFSET + GRID * 3.5,
+                ease: 'Sine.InOut',
+                duration: 250,
+                delay:0,
+                onComplete: () =>
+                    {
+                        this.rankSounds[rank].play();
+                        nextRankLetter.setAlpha(1);
+                    },
+            });
+    
+    
+            this.tweens.add({
+                targets: this.scorePanelLRank,
+                x: X_OFFSET + GRID * 4.5,
+                ease: 'Sine.InOut',
+                duration: 200,
+                delay:0,
+            });
+        }, this);
+
         
-
+        
         // #region Stat Cards (Right Side)
 
         var cornerTimeSec = (ourInputScene.cornerTime/ 1000).toFixed(3)
@@ -10421,6 +10657,7 @@ class ScoreScene extends Phaser.Scene {
                 || ourGame.mode === MODES.EXPERT
                 || ourGame.mode === MODES.TUTORIAL
                 || ourGame.mode === MODES.PRACTICE:
+
                 // #region Adventure
                 var prevStagesComplete;
                 var prevSumOfBest;
@@ -10583,13 +10820,6 @@ class ScoreScene extends Phaser.Scene {
             totalScore += stageData.calcTotal();
         });
 
-        /*const bestRunUI = this.add.dom(SCREEN_WIDTH/2, GRID*25, 'div', Object.assign({}, STYLE_DEFAULT, {
-            width: '500px',
-            'font-size':'22px',
-            'font-weight': 400,
-        })).setText(`Previous Best Run: ${commaInt(bestrun)}`).setOrigin(0.5,0).setDepth(60);*/
-
-
         this.prevZeds = this.scene.get("PersistScene").zeds;
 
 
@@ -10608,17 +10838,7 @@ class ScoreScene extends Phaser.Scene {
         if (bestrun < ourGame.score + ourScoreScene.stageData.calcTotal()) {
             localStorage.setItem('BestFinalScore', ourGame.score + ourScoreScene.stageData.calcTotal());
         }
-        // #endregion
-
-        this.input.keyboard.on('keydown-SPACE', function() { 
-            //ourScoreScene.scoreAtomsTween.setTimeScale(8); //doesn't do anything
-            //scoreAtomsTween.timeScale = 8;
-            //debugger
-            this.scoreTimeScale= 0.25;
-        });
-        /*this.input.keyboard.on('keyup-SPACE', function(scoreAtomsTween) { 
-            //scoreAtomsTween.timeScale = 1 //doesn't do anything
-        });*/
+        // #endregion   
 
         var extraFields = {
             startingScore: ourScoreScene.stageData.calcTotal(),
@@ -10660,7 +10880,7 @@ class ScoreScene extends Phaser.Scene {
 
         var continue_text = '[SPACE TO CONTINUE]';
             
-        var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27.25,'div', Object.assign({}, STYLE_DEFAULT, {
+        var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27 + 0,'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'32px',
             "font-family": '"Press Start 2P", system-ui',
             "text-shadow": "4px 4px 0px #000000",
@@ -10669,26 +10889,9 @@ class ScoreScene extends Phaser.Scene {
             }
         )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
 
-        continueText.setVisible(false);
-
-
-        this.tweens.add({
-            targets: continueText,
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 1000,
-            repeat: -1,
-            yoyo: true
-          });
-
-
-        // Give a few seconds before a player can hit continue
-        this.time.delayedCall(3000, function() {
-            
-
-            continueText.setVisible(true);
-
-        }, [], this);
+        
+        continueText.setVisible(false); 
+        
 
         const onContinue = function (scene) {
             console.log('pressing space inside score scene');
@@ -10713,25 +10916,7 @@ class ScoreScene extends Phaser.Scene {
             //score screen starting arrows
             ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
-                ourGame.startingArrowsAnimN2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimN2.play('startArrowIdle');
-            }
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y +1 * GRID)) {
-                ourGame.startingArrowsAnimS2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimS2.flipY = true;
-                ourGame.startingArrowsAnimS2.play('startArrowIdle');
-            }
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
-                ourGame.startingArrowsAnimE2 = ourGame.add.sprite(ourGame.snake.head.x + GRID * 2, ourGame.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimE2.angle = 90;
-                ourGame.startingArrowsAnimE2.play('startArrowIdle');
-            }
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
-                ourGame.startingArrowsAnimW2 = ourGame.add.sprite(ourGame.snake.head.x - GRID,ourGame.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimW2.angle = 270;
-                ourGame.startingArrowsAnimW2.play('startArrowIdle');
-            }
+            ourGame.startArrows(ourGame.snake.head);
             
 
             
@@ -10741,7 +10926,11 @@ class ScoreScene extends Phaser.Scene {
 
                 console.log("RollResults:", rollResults);
                 console.log("RollsLeft:", rollResults.get("rollsLeft") ); // Rolls after the last zero best zero
-                ourPersist.zeds += rollResults.get("zedsEarned");
+
+                if (!DEBUG_SKIP_TO_SCENE) {
+                    ourPersist.zeds += rollResults.get("zedsEarned");
+                }
+                
                 plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
@@ -10806,17 +10995,32 @@ class ScoreScene extends Phaser.Scene {
         }
 
         // #region Space to Continue
-        this.input.keyboard.on('keydown-SPACE', function() {
-            if (continueText.visible) {
-                onContinue(ourGame);
-            } else {
-                console.log("Not Visible Yet", continueText.visible);
-            }
-        }, this);
+        this.time.delayedCall(250, function() {
+            // Bit of time to not hold space and skip on accident.
+            this.input.keyboard.on('keydown-SPACE', function() {
+                if (continueText.visible) {
+    
+                    if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
+                        this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
+                    } else {
+                        onContinue(ourGame);
+                    }
+                    
+                } else {
+                    console.log("Not Visible Yet", continueText.visible);
+                    // Early Complete
+                    ourGame.sound.play(Phaser.Math.RND.pick(['bubbleBop01','bubbleBopHigh01','bubbleBopLow01']));
+                    scoreAtomsTween.complete();
+                }
+            }, this);
 
-        continueText.on('pointerdown', e => {
-            onContinue(ourGame);
-        });
+            continueText.on('pointerdown', e => {
+                onContinue(ourGame);
+            });
+
+        }, [], this);
+
+        
 
 
     }
@@ -11112,7 +11316,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
             
-                this.setPLAY(gameScene);
+            this.setPLAY(gameScene);
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
             gameScene.snake.direction = DIRS.LEFT;
@@ -11215,51 +11419,39 @@ class InputScene extends Phaser.Scene {
         } 
     }
     setPLAY(gameScene) {
+        if (gameScene.gState === GState.START_WAIT) {
+            const spaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPinball = this.scene.get("PinballDisplayScene");
+            this.time.delayedCall(1000, spaceBoy.scoreTweenHide, [], spaceBoy); 
 
+            // #cleanup - can move to only running when you actively move when game is paused.
+            // fade out 'GO!'
+            if (!gameScene.goFadeOut) { // this is called ever move state
+                ourPinball.comboCoverReady.setTexture('UI_comboGo');
+                ourPinball.comboCoverReady.setOrigin(1.5,0)
+                gameScene.goFadeOut = true;
+                this.tweens.add({
+                    targets: ourPinball.comboCoverReady,
+                    alpha: 0,
+                    duration: 500,
+                    ease: 'sine.inout',
+                });
+            }
+        }
+        
+        if (gameScene.gState === GState.START_WAIT || gameScene.gState === GState.WAIT_FOR_INPUT) {
+            
             // Starting Game State
             gameScene.gState = GState.PLAY;
             gameScene.scoreTimer.paused = false;
-                
-            // turn off arrows and move snake.
-            
-        if (gameScene.arrowTween != undefined) {
-                gameScene.arrowTween.destroy();
-        }
-            
-            //gameScene.startingArrowsAnimN.setAlpha(0);
-            //gameScene.startingArrowsAnimS.setAlpha(0);
- 
-        if (gameScene.startingArrowsAnimE != undefined){
-            gameScene.startingArrowsAnimE.setAlpha(0);
-        }
-        if (gameScene.startingArrowsAnimW != undefined){
-            gameScene.startingArrowsAnimW.setAlpha(0);
-        }
-        if (gameScene.startingArrowsAnimN2) {
-            gameScene.startingArrowsAnimN2.destroy();
-        }
-        if (gameScene.startingArrowsAnimE2) {
-            gameScene.startingArrowsAnimE2.destroy();
-        }
-        if (gameScene.startingArrowsAnimS2) {
-            gameScene.startingArrowsAnimS2.destroy();
-        }
-        if (gameScene.startingArrowsAnimW2) {
-            gameScene.startingArrowsAnimW2.destroy();
-        }
-        
-        
 
+            gameScene.activeArrows.forEach ( arrow => {
+                arrow.setAlpha(0);
+            });
+        }
 
-            //ourInputScene.moveDirection(this, e);
     }
 }
-
-
-
-
-
-
 
  // #region Animations
 function loadSpriteSheetsAndAnims(scene) {

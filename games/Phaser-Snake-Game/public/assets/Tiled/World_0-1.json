@@ -176,7 +176,7 @@
         {
          "name":"sRank",
          "type":"string",
-         "value":"32000"
+         "value":"31000"
         }, 
         {
          "name":"slug",

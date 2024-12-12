@@ -506,6 +506,23 @@ var Snake = new Phaser.Class({
     
             if (ourPersistScene.coins > -1) {
                 scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+            
+                scene.tweenRespawn.on("complete", () => {
+
+                    var ourGame = this.head.scene;
+                    
+                    if (ourGame.scene.get("PersistScene").coins > 0) {
+                        ourGame.coinsUIIcon.setVisible(true)
+                    }
+                    
+                    // Turn back on arrows
+                    ourGame.startArrows(ourGame.snake.head);
+    
+                    ourGame.gState = GState.WAIT_FOR_INPUT;
+                    ourGame.scoreTimer.paused = true;
+                    //console.log(this.gState, "WAIT FOR INPUT");
+
+                });
             }
 
         } else {
