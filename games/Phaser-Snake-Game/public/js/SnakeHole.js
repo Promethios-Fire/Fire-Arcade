@@ -808,7 +808,6 @@ class SpaceBoyScene extends Phaser.Scene {
         var index = 0;
 
         if (persist.stageHistory.length > 0) {
-            
             persist.stageHistory.forEach(stageData => {
                 
                 var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
@@ -818,8 +817,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
                this.navLog.push(_stageText);
                index++;
-            });
-            
+            }); 
         }
 
         var stageID = currentStage.split("_")[1];
@@ -833,9 +831,6 @@ class SpaceBoyScene extends Phaser.Scene {
             ).setOrigin(1,0).setDepth(100).setAlpha(1);
         stageOutLine.setFillStyle(0x000000, 0);
         stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
-
-        
-
         this.navLog.push(stageText, stageOutLine);
 
     }
@@ -857,39 +852,37 @@ class SpaceBoyScene extends Phaser.Scene {
             repeat: 0,
             yoyo: false
           });
-}
-scoreTweenHide(){
-    if (this.UIScoreContainer.y === 0) {
-        this.tweens.add({
-            targets: this.UIScoreContainer,
-            y: (- GRID * 2),
-            ease: 'Sine.InOut',
-            duration: 800,
-            repeat: 0,
-            yoyo: false
-          });
-        this.tweens.add({
-            targets: [this.bestScoreValue, this.bestScoreLabel],
-            alpha: 0,
-            ease: 'Sine.InOut',
-            duration: 1000,
-            repeat: 0,
-            yoyo: false
-          });
-
-        this.tweens.add({
-            targets: [this.scoreLabel, this.scoreValue],
-            alpha:1,
-            ease: 'Sine.InOut',
-            delay: 500,
-            duration: 500,
-            repeat: 0,
-            yoyo: false
-        })
     }
+    scoreTweenHide(){
+        if (this.UIScoreContainer.y === 0) {
+            this.tweens.add({
+                targets: this.UIScoreContainer,
+                y: (- GRID * 2),
+                ease: 'Sine.InOut',
+                duration: 800,
+                repeat: 0,
+                yoyo: false
+            });
+            this.tweens.add({
+                targets: [this.bestScoreValue, this.bestScoreLabel],
+                alpha: 0,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+            });
 
-}
-
+            this.tweens.add({
+                targets: [this.scoreLabel, this.scoreValue],
+                alpha:1,
+                ease: 'Sine.InOut',
+                delay: 500,
+                duration: 500,
+                repeat: 0,
+                yoyo: false
+            })
+        }
+    }
 }
 
 class MusicPlayerScene extends Phaser.Scene {
@@ -8517,12 +8510,6 @@ class GameScene extends Phaser.Scene {
             && !this.winned
         ) {
                 console.log("SPACE LONG ENOUGH BRO");
- 
-                //this.events.off('addScore');
-
- 
-                this.lives -= 1;
-                //this.scene.restart( { score: this.stageStartScore, lives: this.lives, });
         }
 
         
@@ -8573,7 +8560,6 @@ class GameScene extends Phaser.Scene {
                 zeds: ourPersist.zeds,
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
-            debugger
 
             this.scene.launch('ScoreScene', stageDataJSON);
             this.backgroundBlur(true);
@@ -8682,23 +8668,6 @@ class GameScene extends Phaser.Scene {
                 const ourPinball = this.scene.get("PinballDisplayScene");
                 const ourSpaceBoy = this.scene.get("SpaceBoyScene");
 
-                // #cleanup - can move to only running when you actively move when game is paused.
-                // fade out 'GO!'
-                if (!ourGame.goFadeOut) {
-                    ourPinball.comboCoverReady.setTexture('UI_comboGo');
-                    ourPinball.comboCoverReady.setOrigin(1.5,0)
-                    ourGame.goFadeOut = true;
-                    this.tweens.add({
-                        targets: ourPinball.comboCoverReady,
-                        alpha: 0,
-                        duration: 500,
-                        ease: 'sine.inout',
-                    });
-                }
-
-                
-                
-
                 // Move at last second
                 this.snake.move(this);
                 
@@ -8709,8 +8678,6 @@ class GameScene extends Phaser.Scene {
                 }
                 //ourInputScene.moveHistory.push([(this.snake.head.x - X_OFFSET)/GRID, (this.snake.head.y - Y_OFFSET)/GRID , this.moveInterval]);
                 ourInputScene.moveCount += 1;
-                
-
 
 
                 if (this.boostEnergy < 1) {
@@ -11273,7 +11240,28 @@ class InputScene extends Phaser.Scene {
         } 
     }
     setPLAY(gameScene) {
+        if (gameScene.gState === GState.START_WAIT) {
+            const spaceBoy = this.scene.get("SpaceBoyScene");
+            const ourPinball = this.scene.get("PinballDisplayScene");
+            this.time.delayedCall(1000, spaceBoy.scoreTweenHide, [], spaceBoy); 
+
+            // #cleanup - can move to only running when you actively move when game is paused.
+            // fade out 'GO!'
+            if (!gameScene.goFadeOut) { // this is called ever move state
+                ourPinball.comboCoverReady.setTexture('UI_comboGo');
+                ourPinball.comboCoverReady.setOrigin(1.5,0)
+                gameScene.goFadeOut = true;
+                this.tweens.add({
+                    targets: ourPinball.comboCoverReady,
+                    alpha: 0,
+                    duration: 500,
+                    ease: 'sine.inout',
+                });
+            }
+        }
+        
         if (gameScene.gState === GState.START_WAIT || gameScene.gState === GState.WAIT_FOR_INPUT) {
+            
             // Starting Game State
             gameScene.gState = GState.PLAY;
             gameScene.scoreTimer.paused = false;
@@ -11282,14 +11270,9 @@ class InputScene extends Phaser.Scene {
                 arrow.setAlpha(0);
             });
         }
+
     }
 }
-
-
-
-
-
-
 
  // #region Animations
 function loadSpriteSheetsAndAnims(scene) {
