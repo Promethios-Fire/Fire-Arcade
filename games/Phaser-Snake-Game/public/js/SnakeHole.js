@@ -2472,8 +2472,11 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
 
-        // do NOT allow for left and right menus if in MODE SELECTOR menu
-        if (qMenuArgs.textPrompt !== "MODE SELECTOR") {
+        // do NOT allow for left and right menus if in MODE SELECTOR or Gauntlet Mode menu
+        // future menus will also require this
+        if (qMenuArgs.textPrompt !== "MODE SELECTOR" &&
+            qMenuArgs.textPrompt !== "Gauntlet Mode") {
+            
             var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuR.play('arrowMenuIdle').setAlpha(1);
             var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
