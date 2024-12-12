@@ -1847,7 +1847,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_maskMenu', 'assets/sprites/UI_maskMenu.png');
         this.load.image('UI_CodexLabel', 'assets/sprites/UI_CodexLabel.png');
         this.load.image('UI_MainMenuLabel', 'assets/sprites/UI_MainMenuLabel.png');
-
+        this.load.image('UI_StageTrackerLabel', 'assets/sprites/UI_StageTrackerLabel.png');
 
         // Animations
         //this.load.spritesheet('electronCloudAnim', 'assets/sprites/electronCloudAnim.png', { frameWidth: 44, frameHeight: 36 });
@@ -2370,12 +2370,18 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
 
-        //menu arrows
+        // do NOT allow for left and right menus if in MODE SELECTOR menu
         if (qMenuArgs.textPrompt !== "MODE SELECTOR") {
             var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuR.play('arrowMenuIdle').setAlpha(1);
             var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+
+            var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_CodexLabel')
+            codexLabel.angle = 90;
+  
+            var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_StageTrackerLabel')
+            UI_StageTrackerLabel.angle = 90;
 
             this.input.keyboard.on('keydown-LEFT', e => {
 
@@ -2659,6 +2665,7 @@ class ExtractTracker extends Phaser.Scene {
             
 
             var selected = this.yMap.get([...this.yMap.keys()][0]);
+           
            this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
 
 
@@ -3038,7 +3045,6 @@ class StageCodex extends Phaser.Scene {
             selected.title.setTintFill(COLOR_FOCUS_HEX);
 
             this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
-            
             this.maskContainerMenu = this.make.container(0, 0);
             
             // mask for top of codexContainer
@@ -3161,10 +3167,8 @@ class StageCodex extends Phaser.Scene {
                         score: 0,
                         startupAnim: true,
                         mode: MODES.PRACTICE
-                    });
-                    
+                    });   
                 }
-                
             }, this);
         }
 
@@ -3172,7 +3176,7 @@ class StageCodex extends Phaser.Scene {
                 this.input.keyboard.on('keydown-TAB', e => {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
-                    this.scene.sleep('StageCodex');
+                    this.scene.stop('StageCodex');
                 });
         } 
         else {
@@ -3359,8 +3363,7 @@ class MainMenuScene extends Phaser.Scene {
                     originScene: this,
                     fromQuickMenu: false,
                     disableArrows: true,
-                    practiceMode: true,
-                    
+                    practiceMode: true, 
                 });
                 mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
                 mainMenuScene.scene.get("PersistScene").coins = 12;
@@ -3608,7 +3611,6 @@ class MainMenuScene extends Phaser.Scene {
                             this.scene.launch("StageCodex", {
                                 originScene: this,
                                 fromQuickMenu: false,
-                                
                             });
                             tween.complete();
                             this.cameras.main.x = 0;
@@ -3776,8 +3778,6 @@ class MainMenuScene extends Phaser.Scene {
 
         }, this);
 
-        
-        
     }
     update() {
         this.graphics.clear();
