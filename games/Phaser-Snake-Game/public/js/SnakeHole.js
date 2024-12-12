@@ -5368,7 +5368,8 @@ class GameScene extends Phaser.Scene {
             GRID * 18, GRID * 3, 
             8, 8, 8, 8);
         this.openingGoalPanel.setDepth(100).setOrigin(0.475,0).setAlpha(0);
-        this.tweens.add({
+        
+        this.openingGoalTween = this.tweens.add({
             targets: [this.openingGoalText, this.openingGoalPanel],
             x: SCREEN_WIDTH/2,
             ease: 'Sine.easeOutIn',
@@ -5853,6 +5854,13 @@ class GameScene extends Phaser.Scene {
                 this.tabDown = true;
                 const ourQuickMenu = this.scene.get('QuickMenuScene');
                 const ourScoreScene = this.scene.get('ScoreScene');
+                
+                // disable opening goal tween so it can't persist to other menus
+                this.openingGoalTween.stop();
+                this.openingGoalText.setAlpha(0);
+                this.openingGoalPanel.setAlpha(0);
+                this.r2.setAlpha(0);
+                this.stageText.setAlpha(0);
                 
                 if (!this.scene.isActive(ourScoreScene) && !this.scene.isActive('StageCodex')){
                     this.scene.launch("QuickMenuScene", {
