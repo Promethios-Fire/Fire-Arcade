@@ -636,7 +636,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -767,6 +767,32 @@ class SpaceBoyScene extends Phaser.Scene {
                 break;
         }
 
+        // #region UI HUD
+        this.UIScoreContainer = this.make.container(0,0)
+        if (this.startupAnim) {
+            this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
+        }
+
+        // #region Top Right UI
+        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
+        .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`0`,13)
+            .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+
+        // Score Text SET INVISIBLE
+        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
+            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+
+
+        //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
+        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 33 - 1,  GRID * 4 + 7 , 'mainFont',` +`,8)
+        .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+
+        this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
+            this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
+
     }
     setLog(currentStage) {
         // #region Ship Log
@@ -812,7 +838,57 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.navLog.push(stageText, stageOutLine);
 
-    }  
+    }
+    
+    scoreTweenShow(){
+        this.tweens.add({
+            targets: this.UIScoreContainer,
+            y: (0),
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+          });
+          this.tweens.add({
+            targets: [this.bestScoreValue, this.bestScoreLabel],
+            alpha: 1,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+          });
+}
+scoreTweenHide(){
+    if (this.UIScoreContainer.y === 0) {
+        this.tweens.add({
+            targets: this.UIScoreContainer,
+            y: (- GRID * 2),
+            ease: 'Sine.InOut',
+            duration: 800,
+            repeat: 0,
+            yoyo: false
+          });
+        this.tweens.add({
+            targets: [this.bestScoreValue, this.bestScoreLabel],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+          });
+
+        this.tweens.add({
+            targets: [this.scoreLabel, this.scoreValue],
+            alpha:1,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        })
+    }
+
+}
 
 }
 
@@ -5073,29 +5149,23 @@ class GameScene extends Phaser.Scene {
 
         let _x = this.snake.head.x;
         let _y = this.snake.head.y;
-        
 
-        if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
-            this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
-        }
-        if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
-            this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimS.flipY = true;
-            this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
-        }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimE.angle = 90;
-            this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
-        }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
-            this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimW.angle = 270;
-            this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
-        }
+        this.startingArrowsAnimN = this.add.sprite(_x + GRID/2, _y - GRID).setDepth(52).setOrigin(0.5,0.5);
+        this.startingArrowsAnimN.play('startArrowIdle').setAlpha(0);
 
+        this.startingArrowsAnimS = this.add.sprite(_x + GRID/2, _y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
+        this.startingArrowsAnimS.flipY = true;
+        this.startingArrowsAnimS.play('startArrowIdle').setAlpha(0);
 
+        this.startingArrowsAnimE = this.add.sprite(_x + GRID * 2, _y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
+        this.startingArrowsAnimE.angle = 90;
+        this.startingArrowsAnimE.play('startArrowIdle').setAlpha(0);
+
+        this.startingArrowsAnimW = this.add.sprite(_x - GRID, _y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
+        this.startingArrowsAnimW.angle = 270;
+        this.startingArrowsAnimW.play('startArrowIdle').setAlpha(0);
+
+        this.startArrows(this.snake.head);
 
         //var openingGoalText = this.add.text(-SCREEN_WIDTH, GRID * 10, 'GOAL: Collect 28 Atoms',{ font: '24px Oxanium'}).setOrigin(0.5,0);
         
@@ -5154,14 +5224,9 @@ class GameScene extends Phaser.Scene {
         });
         
         this.time.delayedCall(3000, event => {
+            // Turns on Arrows after delay. Only on start.
             if (this.gState != GState.PLAY && !this.winned) {
-                ourGameScene.arrowTween =  this.tweens.add({
-                    targets: [this.startingArrowsAnimN,this.startingArrowsAnimS,
-                        this.startingArrowsAnimE,this.startingArrowsAnimW],
-                    alpha: 1,
-                    duration: 500,
-                    ease: 'linear',
-                    });
+                this.startArrows(this.snake.head);
             }
         });
 
@@ -5225,7 +5290,7 @@ class GameScene extends Phaser.Scene {
                     repeat: 0,
                     alpha: 1,
                 });
-                ourGameScene.tempStartingArrows();
+                ourGameScene.startArrows(ourGameScene.snake.head);
                 ourGameScene.gState = GState.WAIT_FOR_INPUT;
                 ourGameScene.snake.direction = DIRS.STOP; 
                 ourGameScene.extractMenuOn = false;
@@ -6333,6 +6398,9 @@ class GameScene extends Phaser.Scene {
             this.bestBase = 0;
         }
 
+        ourSpaceBoyScene.bestScoreValue.setText(`${commaInt(this.bestBase.toString())}`);
+        // #placeholder - james
+
         
         // #region Snake Masks
         /***  
@@ -6396,19 +6464,7 @@ class GameScene extends Phaser.Scene {
 
 
         
-
-        
         // #endregion
-
-        // #region UI HUD
-        this.UIScoreContainer = this.make.container(0,0)
-        if (this.startupAnim) {
-            this.UIScoreContainer.setAlpha(0).setScrollFactor(0);
-        }
-
-
-        // UI Icons
-        //this.add.sprite(GRID * 21.5, GRID * 1, 'snakeDefault', 0).setOrigin(0,0).setDepth(50);      // Snake Head
 
 
         // #region Boost Meter UI
@@ -6503,48 +6559,7 @@ class GameScene extends Phaser.Scene {
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
-        
-        var textTint = 0xE7EADE // 0x1f211b
-
-        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
-            .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`${commaInt(this.bestBase.toString())}`,13)
-            .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-
-        // Score Text SET INVISIBLE
-        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
-        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
-            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-    
-    
-    
-    
-        //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 33 - 1,  GRID * 4 + 7 , 'mainFont',` +`,8)
-        .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        
-        
-        
-        
-            //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-        // BELOW SCORE POSISTION
-        //this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 34 - 2,  GRID * 3 + 12 , 'mainFont',` +`,8)
-        //.setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-
-
-
-
-
-   
-        
-
-        // this.add.image(GRID * 21.5, GRID * 1, 'ui', 0).setOrigin(0,0);
-        //this.livesUI = this.add.dom(GRID * 22.5, GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, UISTYLE)
-        //).setText(`x ${this.lives}`).setOrigin(0,1);
-
         // Goal UI
-        //this.add.image(GRID * 26.5, GRID * 1, 'ui', 1).setOrigin(0,0);
         const lengthGoalStyle = {
             "color":'0x1f211b',
             "font-size": '16px',
@@ -6552,18 +6567,11 @@ class GameScene extends Phaser.Scene {
             "text-align": 'right',
         }
         
-                    //this.runningScoreLabelUI = this.add.bitmapText(X_OFFSET + GRID * 26.75, GRID * 3, 'mainFont', `${commaInt(this.score.toString())}`, 16)
-            //.setOrigin(0,1).setScale(.5).setTint(0x1f211b).setScrollFactor(0);
 
         this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 2, GRID * 7, 'mainFont', ``, 8)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 29.25) + 2, GRID * 7, 'mainFont', ``, 8)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        //var snakeBody = this.add.sprite(GRID * 29.75, GRID * 0.375, 'snakeDefault', 1).setOrigin(0,0).setDepth(101)//Snake Body
-        //var flagGoal = this.add.sprite(GRID * 29.75, GRID * 1.375, 'ui-blocks', 3).setOrigin(0,0).setDepth(101); // Tried to center flag
- 
-        //snakeBody.scale = .667;
-        //flagGoal.scale = .667;
         
         
         var length = `${this.length}`;
@@ -6616,10 +6624,6 @@ class GameScene extends Phaser.Scene {
         ).setOrigin(1,0.5).setAlpha(0).setScale(.5);
         this.countDown.setScrollFactor(0);
 
-        
-
-        //this.coinsUIIcon = this.physics.add.sprite(GRID*21.5 -7, 8,'megaAtlas', 'coinPickup01Anim.png'
-        //).play('coin01idle').setDepth(101).setOrigin(0,0);
 
         if (this.coinsUIIcon == undefined) {
             this.coinsUIIcon = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 20 + 5, 2 + GRID * .5, 'coinPickup01Anim.png'
@@ -6630,8 +6634,6 @@ class GameScene extends Phaser.Scene {
             this.coinsUIIcon.setVisible(true)
         }
         
-
-        //this.coinsUIIcon.setScale(0.5);
         
         this.coinUIText = this.add.dom(X_OFFSET + GRID*21 + 9, 6 + GRID * .5, 'div', Object.assign({}, STYLE_DEFAULT, {
             color: COLOR_SCORE,
@@ -6819,26 +6821,23 @@ class GameScene extends Phaser.Scene {
 
             // Update UI
             //var tempScore = `${this.scoreHistory.reduce((a,b) => a + b, 0)}`
-            this.scoreValue.setText(`${commaInt(currentScore.toString())}`);
+            ourSpaceBoyScene.scoreValue.setText(`${commaInt(currentScore.toString())}`);
 
             //this.deltaScoreUI.x = this.scoreValue.x - this.scoreValue.displayWidth - 1;
             
-            this.deltaScoreUI.setText(
+            ourSpaceBoyScene.deltaScoreUI.setText(
                 `+${deltaScore}`
             )
 
 
             this.tweens.add({
-                targets: this.deltaScoreUI,
+                targets: ourSpaceBoyScene.deltaScoreUI,
                 alpha:{ from: 1, to: 0 },
                 ease: 'Expo.easeInOut',
                 duration: 2000,
             })
             
 
-
-            //this.bestScoreLabel.setText(`BEST`).setAlpha(1).setScrollFactor(0);
-            //this.bestScoreValue.setText(this.bestBase).setAlpha(1).setScrollFactor(0);
 
             
              // Restart Score Timer
@@ -6873,43 +6872,25 @@ class GameScene extends Phaser.Scene {
         //this.runningScore = this.score + calcBonus(baseScore);
         //this.scoreDigitLength = this.runningScore.toString().length;
         
-        /*this.scorePanel = this.add.nineslice(X_OFFSET, 0, 
-            'uiGlassL', 'Glass', 
-            ((42) + (this.scoreDigitLength * 6)), 39, 40, 9, 9, 9);
-        this.scorePanel.setDepth(100).setOrigin(0,0)
 
 
         this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
              'uiGlassR', 'Glass',
              57, 29, 9, 29, 9, 9);
-        this.progressPanel.setDepth(100).setOrigin(1,0)*/
+        this.progressPanel.setDepth(100).setOrigin(1,0)
         
-        
-
-        this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
-            this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
-            //this.runningScoreUI, this.runningScoreLabelUI])
-
-        /*if (this.startupAnim) {
-            this.progressPanel.setAlpha(0)
-            this.scorePanel.setAlpha(0)
-        }*/
 
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
 
-        /*const text = this.add.text(SCREEN_WIDTH/2, 192, goalText, { font: '32px Oxanium'});
-        text.setOrigin(0.5, 0.5);
-        text.setScale(0)
-        text.setDepth(101)*/
         
         if (this.startupAnim) {
             
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
-                    //targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
-                    targets: [this.scorePanel,this.progressPanel,this.UIScoreContainer],
+                    //targets: [this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
+                    targets: [this.progressPanel,this.UIScoreContainer],
                     alpha: 1,
                     duration: 300,
                     ease: 'sine.inout',
@@ -6951,11 +6932,6 @@ class GameScene extends Phaser.Scene {
             group.getChildren().forEach((child,) => {
                 child = this.make.image({},
                     false);
-                /*if (child.x <= this.scorePanel.x || child.x >= this.scorePanel.width
-                    ||child.y <= this.scorePanel.y || child.y >= (this.scorePanel.y + this.scorePanel.height)
-                ) {
-                    child.setAlpha(1).setScale(1);
-                }*/
             });
 
             this.variations = [
@@ -7630,29 +7606,40 @@ class GameScene extends Phaser.Scene {
         }, [], this); 
 
 
-
         
     }
-    tempStartingArrows(){
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y -1 * GRID)) {
-            this.startingArrowsAnimN2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
-            this.startingArrowsAnimN2.play('startArrowIdle');
+    startArrows(snakeHead){
+
+        var _x = snakeHead.x;
+        var _y = snakeHead.y;
+
+        this.startingArrowsAnimN.setPosition(_x + GRID/2, _y - GRID);
+        this.startingArrowsAnimS.setPosition(_x + GRID/2, _y + GRID * 2);
+        this.startingArrowsAnimE.setPosition(_x + GRID * 2, _y + GRID /2);
+        this.startingArrowsAnimW.setPosition(_x - GRID, _y + GRID/2); 
+
+        this.activeArrows = new Set();
+
+        this.map.getLayer(this.wallVarient);
+        if (!this.map.hasTileAtWorldXY(_x, _y -1 * GRID)) {
+            this.activeArrows.add(this.startingArrowsAnimN );
         }
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x, this.snake.head.y +1 * GRID)) {
-            this.startingArrowsAnimS2 = this.add.sprite(this.snake.head.x + GRID/2, this.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimS2.flipY = true;
-            this.startingArrowsAnimS2.play('startArrowIdle');
+        if (!this.map.hasTileAtWorldXY(_x, _y +1 * GRID)) {
+            this.activeArrows.add(this.startingArrowsAnimS );
         }
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
-            this.startingArrowsAnimE2 = this.add.sprite(this.snake.head.x + GRID * 2, this.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimE2.angle = 90;
-            this.startingArrowsAnimE2.play('startArrowIdle');
+        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+            this.activeArrows.add(this.startingArrowsAnimE );
         }
-        if (!this.map.hasTileAtWorldXY(this.snake.head.x + 1 * GRID, this.snake.head.y)) {
-            this.startingArrowsAnimW2 = this.add.sprite(this.snake.head.x - GRID,this.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-            this.startingArrowsAnimW2.angle = 270;
-            this.startingArrowsAnimW2.play('startArrowIdle');
+        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+            this.activeArrows.add(this.startingArrowsAnimW );
         }
+
+        this.tweens.add({
+            targets: [...this.activeArrows],
+            alpha: 1,
+            duration: 500,
+            ease: 'linear',
+            });
     }
 
     // #region .extractPrompt(
@@ -8047,7 +8034,7 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
         this.gState = GState.TRANSITION;
 
-        this.scoreTweenShow();
+        ourSpaceboy.scoreTweenShow();
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
         ourPinball.comboCoverReady.setOrigin(1.0,0)
@@ -8427,73 +8414,6 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    scoreTweenShow(){
-            this.tweens.add({
-                targets: this.UIScoreContainer,
-                y: (0),
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-                this.tweens.add({
-                targets: this.scorePanel,
-                height: 39,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-              this.tweens.add({
-                targets: [this.bestScoreValue, this.bestScoreLabel],
-                alpha: 1,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-    }
-    scoreTweenHide(){
-        if (this.UIScoreContainer.y === 0) {
-            this.tweens.add({
-                targets: this.UIScoreContainer,
-                y: (- GRID * 2),
-                ease: 'Sine.InOut',
-                duration: 800,
-                repeat: 0,
-                yoyo: false
-              });
-            this.tweens.add({
-                targets: this.scorePanel,
-                height: 28,
-                ease: 'Sine.InOut',
-                duration: 800,
-                repeat: 0,
-                yoyo: false
-              });
-            this.tweens.add({
-                targets: [this.bestScoreValue, this.bestScoreLabel],
-                alpha: 0,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                repeat: 0,
-                yoyo: false
-              });
-
-            this.tweens.add({
-                targets: [this.scoreLabel, this.scoreValue],
-                alpha:1,
-                ease: 'Sine.InOut',
-                delay: 500,
-                duration: 500,
-                repeat: 0,
-                yoyo: false
-            })
-        }
-
-    }
-
-    
 
     comboBounce(){
         this.tweens.add({
@@ -8605,43 +8525,6 @@ class GameScene extends Phaser.Scene {
                 //this.scene.restart( { score: this.stageStartScore, lives: this.lives, });
         }
 
-        
-
-        // #region Bonk and Regroup
-        if (this.gState === GState.BONK) {
-            /***  
-             * Checks for Tween complete on each frame.
-             * on. ("complete") is not run unless it is checked directly. It is not on an event listener
-            ***/ 
-            
-            this.tweenRespawn.on('complete', () => {
-
-                
-                if (this.scene.get("PersistScene").coins > 0) {
-                    this.coinsUIIcon.setVisible(true)
-                }
-
-                // Turn back on arrows
-                //this.startingArrowState = true;
-                if (this.startingArrowsAnimN != undefined){
-                this.startingArrowsAnimN.setAlpha(1)
-                }
-                
-                if (this.startingArrowsAnimS != undefined){
-                this.startingArrowsAnimS.setAlpha(1);
-                }
-                if (this.startingArrowsAnimE != undefined){
-                this.startingArrowsAnimE.setAlpha(1);
-                }
-                if (this.startingArrowsAnimW != undefined){
-                this.startingArrowsAnimW.setAlpha(1);
-                }
-                
-                this.gState = GState.WAIT_FOR_INPUT;
-                this.scoreTimer.paused = true;
-                //console.log(this.gState, "WAIT FOR INPUT");
-            });
-        }
         
         // #region Win State
         if (this.checkWinCon() && !this.winned) {
@@ -8793,24 +8676,13 @@ class GameScene extends Phaser.Scene {
                 }
             } // End Closest Portal
             
-       
-            if (DEBUG) {
-                
-                if (timeTick < SCORE_FLOOR ) {
-
-                    
-                } else {
-                    this.atoms.forEach( fruit => {
-                        fruit.fruitTimerText.setText(timeTick);
-                    });
-                }
-                
-            }
-            
             
             if (this.gState === GState.PLAY) {
                 var ourGame = this.scene.get("GameScene");
                 const ourPinball = this.scene.get("PinballDisplayScene");
+                const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+
+                // #cleanup - can move to only running when you actively move when game is paused.
                 // fade out 'GO!'
                 if (!ourGame.goFadeOut) {
                     ourPinball.comboCoverReady.setTexture('UI_comboGo');
@@ -8824,11 +8696,7 @@ class GameScene extends Phaser.Scene {
                     });
                 }
 
-                if (!this.winned) {
-                    this.time.delayedCall(1000, event => {
-                        this.scoreTweenHide(); 
-                    }); 
-                }
+                
                 
 
                 // Move at last second
@@ -8907,9 +8775,6 @@ class GameScene extends Phaser.Scene {
         if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
             // Temp Code for bonus level
             console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
-
-            this.scoreLabel.setText(`Stage ${this.scoreHistory.reduce((a,b) => a + b, 0)}`);
-            this.bestScoreLabel.setText(`Best  ${this.score}`);
 
             this.scene.pause();
 
@@ -10905,25 +10770,7 @@ class ScoreScene extends Phaser.Scene {
             //score screen starting arrows
             ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y -1 * GRID)) {
-                ourGame.startingArrowsAnimN2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y - GRID).setDepth(52).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimN2.play('startArrowIdle');
-            }
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x, ourGame.snake.head.y +1 * GRID)) {
-                ourGame.startingArrowsAnimS2 = ourGame.add.sprite(ourGame.snake.head.x + GRID/2, ourGame.snake.head.y + GRID * 2).setDepth(103).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimS2.flipY = true;
-                ourGame.startingArrowsAnimS2.play('startArrowIdle');
-            }
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
-                ourGame.startingArrowsAnimE2 = ourGame.add.sprite(ourGame.snake.head.x + GRID * 2, ourGame.snake.head.y + GRID /2).setDepth(103).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimE2.angle = 90;
-                ourGame.startingArrowsAnimE2.play('startArrowIdle');
-            }
-            if (!ourGame.map.hasTileAtWorldXY(ourGame.snake.head.x + 1 * GRID, ourGame.snake.head.y)) {
-                ourGame.startingArrowsAnimW2 = ourGame.add.sprite(ourGame.snake.head.x - GRID,ourGame.snake.head.y + GRID/2).setDepth(103).setOrigin(0.5,0.5);
-                ourGame.startingArrowsAnimW2.angle = 270;
-                ourGame.startingArrowsAnimW2.play('startArrowIdle');
-            }
+            ourGame.startArrows(ourGame.snake.head);
             
 
             
@@ -11323,7 +11170,7 @@ class InputScene extends Phaser.Scene {
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
             gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
             
-                this.setPLAY(gameScene);
+            this.setPLAY(gameScene);
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
             gameScene.snake.direction = DIRS.LEFT;
@@ -11426,43 +11273,16 @@ class InputScene extends Phaser.Scene {
         } 
     }
     setPLAY(gameScene) {
-
+        if (gameScene.gState === GState.START_WAIT || gameScene.gState === GState.WAIT_FOR_INPUT) {
             // Starting Game State
             gameScene.gState = GState.PLAY;
             gameScene.scoreTimer.paused = false;
-                
-            // turn off arrows and move snake.
-            
-        if (gameScene.arrowTween != undefined) {
-                gameScene.arrowTween.destroy();
-        }
-            
-            //gameScene.startingArrowsAnimN.setAlpha(0);
-            //gameScene.startingArrowsAnimS.setAlpha(0);
- 
-        if (gameScene.startingArrowsAnimE != undefined){
-            gameScene.startingArrowsAnimE.setAlpha(0);
-        }
-        if (gameScene.startingArrowsAnimW != undefined){
-            gameScene.startingArrowsAnimW.setAlpha(0);
-        }
-        if (gameScene.startingArrowsAnimN2) {
-            gameScene.startingArrowsAnimN2.destroy();
-        }
-        if (gameScene.startingArrowsAnimE2) {
-            gameScene.startingArrowsAnimE2.destroy();
-        }
-        if (gameScene.startingArrowsAnimS2) {
-            gameScene.startingArrowsAnimS2.destroy();
-        }
-        if (gameScene.startingArrowsAnimW2) {
-            gameScene.startingArrowsAnimW2.destroy();
-        }
-        
-        
 
-
-            //ourInputScene.moveDirection(this, e);
+            debugger
+            gameScene.activeArrows.forEach ( arrow => {
+                arrow.setAlpha(0);
+            });
+        }
     }
 }
 

@@ -644,7 +644,7 @@
             "scale": 0.8618951612903225,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 371.854970760234,
+                "x": 372.43508771929834,
                 "y": 373.01520467836264
             }
         },
@@ -700,7 +700,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 173.66666666666669,
-                "y": 161.66666666666663
+                "y": 161.66666666666669
             }
         },
         "Tutorial_1.json#tileSheetx12": {
@@ -711,7 +711,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 173.66666666666669,
-                "y": 161.66666666666663
+                "y": 161.66666666666669
             }
         },
         "Tutorial_2.json#tileSheetx12": {
@@ -722,7 +722,7 @@
             "selectedLayer": 2,
             "viewCenter": {
                 "x": 173.66666666666669,
-                "y": 161.66666666666663
+                "y": 161.66666666666669
             }
         },
         "Tutorial_3.json#tileSheetx12": {
@@ -830,7 +830,7 @@
         },
         "World_1-1.json": {
             "scale": 2.1102011494252872,
-            "selectedLayer": 8,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.15401375365974,
                 "y": 161.8329134608838
@@ -933,11 +933,11 @@
             "scaleInDock": 1
         },
         "World_10-3.json": {
-            "scale": 3,
-            "selectedLayer": 0,
+            "scale": 2.1102011494252872,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 196.16666666666669,
-                "y": 155.83333333333331
+                "x": 173.68012528086064,
+                "y": 162.30680193368286
             }
         },
         "World_10-3.json#tileSheetx12": {
@@ -1003,7 +1003,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 173.95182872435325,
-                "y": 161.96253345227476
+                "y": 192.36396074933097
             }
         },
         "World_2-2.json#tileSheetx12": {
@@ -1183,7 +1183,7 @@
         },
         "World_4-3.json": {
             "scale": 4.670833333333333,
-            "selectedLayer": 1,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 173.95182872435325,
                 "y": 161.96253345227476
@@ -1224,11 +1224,11 @@
             "scaleInDock": 1
         },
         "World_4-4.json": {
-            "scale": 3,
-            "selectedLayer": 2,
+            "scale": 1.9733024691358025,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 259.1666666666667,
-                "y": 162.16666666666666
+                "x": 173.56690388675997,
+                "y": 161.4045514976147
             }
         },
         "World_4-4.json#tileSheetx12": {
@@ -1640,8 +1640,8 @@
             "scale": 0.8018817204301075,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 372.2494133422729,
-                "y": 195.16594032852834
+                "x": 371.0023466309084,
+                "y": 372.249413342273
             }
         },
         "r-07-10-4.json#tileSheetx24": {
@@ -1744,8 +1744,8 @@
             "scale": 2.983764367816092,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.10892281022777,
-                "y": 162.0436269080753
+                "x": 173.7737757018346,
+                "y": 161.70847979968215
             }
         },
         "r-11-30.json#tileSheetx12": {
@@ -1950,8 +1950,8 @@
             "scale": 2.983764367816092,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174.10892281022777,
-                "y": 162.0436269080753
+                "x": 173.7737757018346,
+                "y": 161.70847979968215
             }
         },
         "r_11-30-4.json#tileSheetx12": {
@@ -2740,15 +2740,15 @@
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
+        "World_0-1.json",
+        "World_1-2.json",
+        "World_1-3.json",
+        "World_2-1.json",
+        "World_2-2.json",
+        "World_5-4_Racing.json",
         "r-11-30.json",
         "r-07-10-4.json",
-        "r_11-30-4.json",
-        "World_4-3.json",
-        "World_8-3_Adv_Portaling.json",
-        "r-11-12-1.json",
-        "r-11-12-2.json",
-        "r-11-12-3.json",
-        "r-11-12-4.json"
+        "r_11-30-4.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,
