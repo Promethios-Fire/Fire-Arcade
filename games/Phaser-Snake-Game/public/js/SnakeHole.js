@@ -636,7 +636,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -6866,13 +6866,6 @@ class GameScene extends Phaser.Scene {
         //this.scoreDigitLength = this.runningScore.toString().length;
         
 
-
-        this.progressPanel = this.add.nineslice((SCREEN_WIDTH - X_OFFSET), 0,
-             'uiGlassR', 'Glass',
-             57, 29, 9, 29, 9, 9);
-        this.progressPanel.setDepth(100).setOrigin(1,0)
-        
-
         const goalText = [
             'GOAL : COLLECT 28 ATOMS',
         ];
@@ -6883,7 +6876,7 @@ class GameScene extends Phaser.Scene {
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
                     //targets: [this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
-                    targets: [this.progressPanel,this.UIScoreContainer],
+                    targets: [this.UIScoreContainer],
                     alpha: 1,
                     duration: 300,
                     ease: 'sine.inout',
@@ -9430,7 +9423,7 @@ class ScoreScene extends Phaser.Scene {
             from: 0,
             to:  atomList.length - 1,
             delay: delayStart,
-            duration: (frameTime * 5) * atomList.length,
+            duration: (frameTime * 4.5) * atomList.length,
             ease: 'Linear',
             onUpdate: _tween =>
             {    
