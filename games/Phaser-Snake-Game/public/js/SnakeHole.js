@@ -1845,6 +1845,8 @@ class StartScene extends Phaser.Scene {
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
         this.load.image('UI_maskMenu', 'assets/sprites/UI_maskMenu.png');
+        this.load.image('UI_CodexLabel', 'assets/sprites/UI_CodexLabel.png');
+        this.load.image('UI_MainMenuLabel', 'assets/sprites/UI_MainMenuLabel.png');
 
 
         // Animations
@@ -2369,92 +2371,85 @@ class QuickMenuScene extends Phaser.Scene {
 
 
         //menu arrows
-        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuR.play('arrowMenuIdle').setAlpha(1);
-        var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
+        if (qMenuArgs.textPrompt !== "MODE SELECTOR") {
+            var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+            var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+            arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-        this.input.keyboard.on('keydown-LEFT', e => {
+            this.input.keyboard.on('keydown-LEFT', e => {
 
-            const ourGame = this.scene.get("GameScene");
-
-            
-            var displayList;
-            switch (ourGame.mode) {
-                case MODES.CLASSIC:
-                    displayList = ["Classic", "Overall", "Expert"];
-                    break;
-                case MODES.EXPERT:
-                    displayList = ["Expert", "Overall", "Classic"];
-                    break;
-                case MODES.TUTORIAL:
-                    displayList = ["Tutorial"];
-                    break;
-                case MODES.GAUNTLET:
-                    displayList = ["Overall", "Classic", "Expert"];
-                    break;
-                default:
-                    break;
-            }
-
-            if (!this.scene.isSleeping("StageCodex")) {
-                this.scene.launch('StageCodex', {
-                    stage: this.scene.get("GameScene").stage,
-                    originScene: this.scene.get("GameScene"),
-                    fromQuickMenu: true,
-                    displayList: displayList,
-                    displayIndex: 0
-                    //category: this.scene.get("GameScene").mode
-                });
-                this.scene.sleep("QuickMenuScene");
-            } else {
-                this.scene.wake("StageCodex");
-                this.scene.sleep("QuickMenuScene");
-            }
-
-            ourGame.scene.pause();
-            ourGame.scene.setVisible(false);
-            
-            /***
-             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-             * DON't USE UNLESS YOU FIGURE THAT OUT
-             * //this.scene.sleep('GameScene');
-             */
-        }, this);
-
-        this.input.keyboard.on('keydown-RIGHT', e => {
-
-            const ourGame = this.scene.get("GameScene");
-
-            if (!this.scene.isSleeping('ExtractTracker')) {
-                this.scene.sleep("QuickMenuScene");
-                this.scene.launch('ExtractTracker', {
-                    stage: this.scene.get("GameScene").stage
-                });
-            } else {
-                this.scene.wake('ExtractTracker');
-                this.scene.sleep("QuickMenuScene");
-            }
-
-            ourGame.scene.pause();
-            ourGame.scene.setVisible(false);
-            
-            /***
-             * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
-             * DON't USE UNLESS YOU FIGURE THAT OUT
-             * //this.scene.sleep('GameScene');
-             */
-        }, this);
-            
-        
-
-        
-
-        
-
+                const ourGame = this.scene.get("GameScene");
+    
+                
+                var displayList;
+                switch (ourGame.mode) {
+                    case MODES.CLASSIC:
+                        displayList = ["Classic", "Overall", "Expert"];
+                        break;
+                    case MODES.EXPERT:
+                        displayList = ["Expert", "Overall", "Classic"];
+                        break;
+                    case MODES.TUTORIAL:
+                        displayList = ["Tutorial"];
+                        break;
+                    case MODES.GAUNTLET:
+                        displayList = ["Overall", "Classic", "Expert"];
+                        break;
+                    default:
+                        break;
+                }
+    
+                if (!this.scene.isSleeping("StageCodex")) {
+                    this.scene.launch('StageCodex', {
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: this.scene.get("GameScene"),
+                        fromQuickMenu: true,
+                        displayList: displayList,
+                        displayIndex: 0
+                        //category: this.scene.get("GameScene").mode
+                    });
+                    this.scene.sleep("QuickMenuScene");
+                } else {
+                    this.scene.wake("StageCodex");
+                    this.scene.sleep("QuickMenuScene");
+                }
+    
+                ourGame.scene.pause();
+                ourGame.scene.setVisible(false);
+                
+                /***
+                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+                 * DON't USE UNLESS YOU FIGURE THAT OUT
+                 * //this.scene.sleep('GameScene');
+                 */
+            }, this);
+    
+            this.input.keyboard.on('keydown-RIGHT', e => {
+    
+                const ourGame = this.scene.get("GameScene");
+    
+                if (!this.scene.isSleeping('ExtractTracker')) {
+                    this.scene.sleep("QuickMenuScene");
+                    this.scene.launch('ExtractTracker', {
+                        stage: this.scene.get("GameScene").stage
+                    });
+                } else {
+                    this.scene.wake('ExtractTracker');
+                    this.scene.sleep("QuickMenuScene");
+                }
+    
+                ourGame.scene.pause();
+                ourGame.scene.setVisible(false);
+                
+                /***
+                 * SLEEP DOESN"T STOP TIMER EVENTS AND CAN ERROR
+                 * DON't USE UNLESS YOU FIGURE THAT OUT
+                 * //this.scene.sleep('GameScene');
+                 */
+            }, this);
+        }
         // #endregion
-
-
     }
 }
 // #region Extract Tracker
@@ -2841,35 +2836,45 @@ class StageCodex extends Phaser.Scene {
             this.codexContainer.y = this.containerToY;
 
 
-            var playerRank = this.add.dom(topLeft, rowY - 4 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+            var playerRank = this.add.dom(topLeft + GRID * 26, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 200,
                 "color": COLOR_BONUS, 
             }),
                 `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
-            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+            ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
-            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2, rowY + GRID, 
+            var topPanel = this.add.nineslice(SCREEN_WIDTH / 2 + GRID * 0.75, rowY + GRID, 
                 'uiPanelL', 'Glass', 
-                GRID * 27.5, GRID * 4, 
+                GRID * 26, GRID * 4, 
                 8, 8, 8, 8);
             topPanel.setDepth(50).setOrigin(0.5,0).setScrollFactor(0);
     
             var bestText = `Sum of Best = ${commaInt(sumOfBestDisplay.toFixed(0))}`;
     
-            var titleText = this.add.dom(topLeft, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+            var titleText = this.add.dom(topLeft + GRID * 1.5, rowY + GRID * 3.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 400,
             }),
                 bestText
             ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
     
-            var categoryDom = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
+
+
+            var categoryDom = this.add.dom(topLeft + GRID * 1.5, rowY + GRID * 2 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
                 "fontWeight": 400,
             }),
                 categoryText
-            ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
+            ).setOrigin(0,0.5).setScale(0.5).setAlpha(1);
+
+            if (categoryText === "Expert") {
+                categoryDom.node.style.color = "red";
+            }
+            if (categoryText === "Classic") {
+                categoryDom.node.style.color = "#4d9be6";
+            }
+
 
             var stages = this.add.dom(X_OFFSET + GRID * 27.5, rowY + GRID * 3.5 + 2, 'div', Object.assign({}, STYLE_DEFAULT, {
                 "fontSize": '24px',
@@ -2880,12 +2885,12 @@ class StageCodex extends Phaser.Scene {
 
             panelCard.add([playerRank,topPanel,titleText,categoryDom,stages]);
             
-            this.tweens.add({
+            /*this.tweens.add({
                 targets: this.cameras.main,
                 x: { from: -160, to: 0 },
                 duration: 300,
                 ease: 'Power2',
-            });
+            });*/
         }
         // checking for practice mode
         else{
@@ -2922,16 +2927,20 @@ class StageCodex extends Phaser.Scene {
             bestOfDisplay.values().forEach( bestOf => {
                 //debugger
                 var topY = rowY + nextRow * stageNumber + GRID * 1.5;
-                const stageTitle = this.add.bitmapText(topLeft, topY + 4, 'mainFontLarge',`${bestOf.stage.toUpperCase()}`,13
+                const stageTitle = this.add.bitmapText(topLeft, topY + 4, 'mainFontLarge',
+                    `${bestOf.stage.toUpperCase()}`,13
                 ).setOrigin(0,0);
 
-                const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',`TOTAL SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
+                const score = this.add.bitmapText(topLeft , topY + 21, 'mainFont',
+                    `TOTAL SCORE: ${commaInt(bestOf.calcTotal().toFixed(0))}`,16
                 ).setOrigin(0,0).setScale(0.5);
 
-                const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5, topY + 21, 'mainFont',`STAGE SCORE: ${commaInt(bestOf.preAdditive())} =>`,16
+                const speedBonus = this.add.bitmapText(topLeft + GRID * 21.5 - 4, topY + 21, 'mainFont',
+                    `STAGE SCORE: ${commaInt(bestOf.preAdditive())} =>`,16
                 ).setOrigin(1,0).setScale(0.5);
 
-                const rankTitle = this.add.bitmapText(topLeft + GRID * 24, topY + 21, 'mainFont',`RANK:`,16
+                const rankTitle = this.add.bitmapText(topLeft + GRID * 24 - 6, topY + 21, 'mainFont',
+                    `RANK:`,16
                 ).setOrigin(1,0).setScale(0.5);
 
                 var _rank = bestOf.stageRank();
@@ -2939,11 +2948,11 @@ class StageCodex extends Phaser.Scene {
                 
 
                 if (_rank != 5) {
-                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
                     ).setDepth(80).setOrigin(0,0).setScale(1);
                     
                 } else {
-                    var rankIcon = this.add.sprite(topLeft + GRID * 24 + 2 , topY - 4, "ranksSpriteSheet", 4
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 4
                     ).setDepth(80).setOrigin(0,0).setScale(1);
                     rankIcon.setTintFill(COLOR_BONUS_HEX);
                 }
@@ -3169,9 +3178,14 @@ class StageCodex extends Phaser.Scene {
         else {
             var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
                 arrowMenuR.play('arrowMenuIdle').setAlpha(1);
+            var mainMenuLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2 + 1,
+                'UI_MainMenuLabel');
+            mainMenuLabel.angle = 90;
 
             // Default
             this.input.keyboard.on('keydown-RIGHT', e => {
+                const ourMenuScene = this.scene.get('MainMenuScene');
+                ourMenuScene.exitButton.setAlpha(1);
                 console.log("Exiting!");
 
                 this.tweens.add({
@@ -3181,7 +3195,7 @@ class StageCodex extends Phaser.Scene {
                     ease: 'Power2',
                     onUpdate: (tween) => {
                         if (tween.progress >= 0.25) {
-                            //const game = this.scene.get("GameScene");
+                            tween.complete();
                             if (originScene.scene.isPaused()) {
                                 originScene.scene.resume();
                                 originScene.scene.setVisible(true);
@@ -3193,6 +3207,7 @@ class StageCodex extends Phaser.Scene {
                             if (codexArgs.fromQuickMenu) {
                                 this.scene.wake('QuickMenuScene');
                             }
+                            this.cameras.main.x = 0;
                             this.scene.sleep('StageCodex');
                         }
                     }
@@ -3204,13 +3219,21 @@ class StageCodex extends Phaser.Scene {
                 // Haven't unlocked Expert Mode
                 
             } else {
-                var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+                var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, Y_OFFSET + GRID * 4.5)
                         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
                 this.input.keyboard.on('keydown-LEFT', e => {
                     var newIndex = Phaser.Math.Wrap(displayIndex + 1, 0, displayList.length);
                     
-                    this.tweens.add({
+                    this.scene.restart({
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: originScene,
+                        fromQuickMenu: true, 
+                        displayList: displayList,
+                        displayIndex: newIndex
+                    });
+
+                    /*this.tweens.add({
                         targets: this.cameras.main,
                         x: { from: 0, to: 160 },
                         duration: 300,
@@ -3226,7 +3249,7 @@ class StageCodex extends Phaser.Scene {
                                 });
                             }
                         }
-                    });
+                    });*/
                     
                     }, this
                 );   
@@ -3534,7 +3557,8 @@ class MainMenuScene extends Phaser.Scene {
         this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
         this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0).setOrigin(0,0).setAlpha(0);
+        this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
         
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
 
@@ -3544,6 +3568,16 @@ class MainMenuScene extends Phaser.Scene {
         //arrowMenuR.play('arrowMenuIdle').setAlpha(0);
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
+
+
+        var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_CodexLabel')
+        codexLabel.angle = 90;
+
+        /*if (this.exitTween) {
+            this.exitTween.reverse();
+        }*/
+        
+        
 
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
@@ -3562,15 +3596,26 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-LEFT', e => {
             if (this.pressedSpace ) {
+                this.exitButton.setAlpha(0);
                 //this.cameras.main.scrollX -= SCREEN_WIDTH
-
-                this.scene.launch("StageCodex", {
-                    originScene: this,
-                    fromQuickMenu: false,
-                    
-                });
-                this.scene.sleep('MainMenuScene');
-                
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    x: { from: 0, to: 160 },
+                    duration: 300,
+                    ease: 'Power2',
+                    onUpdate: (tween) => {
+                        if (tween.progress >= 0.25) {
+                            this.scene.launch("StageCodex", {
+                                originScene: this,
+                                fromQuickMenu: false,
+                                
+                            });
+                            tween.complete();
+                            this.cameras.main.x = 0;
+                            this.scene.sleep('MainMenuScene');
+                        }
+                    }
+                });  
             }
         }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
