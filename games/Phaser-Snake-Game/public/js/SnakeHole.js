@@ -209,7 +209,7 @@ var updateSumOfBest = function(scene) {
         var _scoreTotalClassic;
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
-            _stageDataClassic.zedLevel = calcZedLevel(scene.zeds).level;
+            _stageDataClassic.zedLevel = calcZedObj(scene.zeds).level;
             scene.stagesCompleteClassic += 1;
 
             BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
@@ -225,7 +225,7 @@ var updateSumOfBest = function(scene) {
         var _scoreTotalExpert;
         if (tempJSONExpert) {
             var _stageDataExpert = new StageData(tempJSONExpert);
-            _stageDataExpert.zedLevel = calcZedLevel(scene.zeds).level;
+            _stageDataExpert.zedLevel = calcZedObj(scene.zeds).level;
             scene.stagesCompleteExpert += 1;
 
             BEST_OF_EXPERT.set(_stageDataExpert.stage, _stageDataExpert);
@@ -260,7 +260,7 @@ var updateSumOfBest = function(scene) {
         var tempJSON = JSON.parse(localStorage.getItem(`${uuid}_best-Tutorial`));
         if (tempJSON != null) {
             var _stageDataTut = new StageData(tempJSON);
-            _stageDataTut.zedLevel = calcZedLevel(scene.zeds).level;
+            _stageDataTut.zedLevel = calcZedObj(scene.zeds).level;
             scene.stagesCompleteTut += 1;
 
             BEST_OF_TUTORIAL.set(_stageDataTut.stage, _stageDataTut);
@@ -282,7 +282,7 @@ var tempSumOfBest = function(scene, stageData) {
         var _currentStageTotal;
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
-            _stageDataClassic.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds).level;
+            _stageDataClassic.zedLevel = calcZedObj(scene.scene.get("PersistScene").zeds).level;
 
             _scoreTotalClassic = _stageDataClassic.calcTotal();
 
@@ -303,7 +303,7 @@ var tempSumOfBest = function(scene, stageData) {
         var _scoreTotalExpert
         if (tempJSONExpert) {
             var _stageDataExpert = new StageData(tempJSONExpert);
-            _stageDataExpert.zedLevel = calcZedLevel(scene.scene.get("PersistScene").zeds).level;
+            _stageDataExpert.zedLevel = calcZedObj(scene.scene.get("PersistScene").zeds).level;
 
             _scoreTotalExpert = _stageDataExpert.calcTotal();
     
@@ -458,7 +458,7 @@ var intToBinHash = function (input) {
 const ZED_CONSTANT = 16;
 const ZEDS_LEVEL_SCALAR = 0.02;
 const ZEDS_OVERLEVEL_SCALAR = 0.8;
-var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
+var calcZedObj = function (remainingZeds, reqZeds=0, level=0) {
     // Would be nice to put tests here.
 
     let nextLevelZeds;
@@ -474,19 +474,23 @@ var calcZedLevel = function (remainingZeds, reqZeds=0, level=0) {
     if (remainingZeds > nextLevelZeds - 1) {
         level += 1;
         remainingZeds = remainingZeds - nextLevelZeds;
-        zedsLevel = calcZedLevel(remainingZeds, nextLevelZeds, level);
+        zedsLevel = calcZedObj(remainingZeds, nextLevelZeds, level);
     }
     else {
-        remainingZeds = nextLevelZeds - remainingZeds
-        zedsLevel = {level:level, zedsToNext: remainingZeds}
+        remainingZeds = nextLevelZeds - remainingZeds;
+        zedsLevel = {
+            level:level, 
+            zedsToNext: remainingZeds, 
+            zedsRequired: nextLevelZeds, 
+            zedsThisLevel: nextLevelZeds - remainingZeds}
     }
 
     return zedsLevel;
 }
 
 
-var zedtest = calcZedLevel(114476);
-var zedtest2 = calcZedLevel(2306 * 120);
+var zedtest = calcZedObj(114476);
+var zedtest2 = calcZedObj(2306 * 120);
 
 const FADE_OUT_TILES = [104,17,18,19,20,49,50,51,52,81,82,83,84,
     113,114,115,116,145,146,147,148,177,178,179,180,209,210,211,212,215,241,242,243,244,247];
@@ -712,6 +716,7 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     init() {
         this.navLog = [];
+        //this.zedBar = this.add.graphics();
     }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
@@ -723,6 +728,36 @@ class SpaceBoyScene extends Phaser.Scene {
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
+
+        
+
+
+        this.zedSegments = [];
+
+        var deltaX = 4;
+        var startX = GRID * 7 + 3;
+        var barY = GRID * 28 + 7;
+        var segments = 13;
+
+        var zedBarOutline = this.add.graphics().setDepth(90);
+        zedBarOutline.lineStyle(2, 0x1F211B, 1); // ave bar
+        zedBarOutline.strokeRect(startX - 2, barY - 1, 
+            segments * deltaX + 2 , 5
+        );
+
+        zedBarOutline.fillStyle(0x869D54);
+        zedBarOutline.fillRect(startX - 1, barY - 2 + 1, 
+            segments * deltaX + 1, 5
+        );
+        
+        for (let index = 0; index < segments; index++) {
+
+            var zedSeg = this.add.sprite(startX + deltaX * index, barY, 'zedBarSegment', 1
+
+            ).setDepth(91).setOrigin(0,0);
+            this.zedSegments.push(zedSeg);
+            
+        }
 
 
         // Middle UI
@@ -797,6 +832,54 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
             this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
+
+        this.updateZedDisplay(persist.zeds);
+
+    }
+    updateZedDisplay(zeds) {
+        
+        const zobj = calcZedObj(zeds);
+
+        var segments = this.zedSegments.length;
+
+        this.zedSegments.forEach( seg => {
+            seg.setFrame(2);
+        });
+
+        var maxBin = (2 ** segments) - 1;
+
+        var progress = parseInt(maxBin * ( 1 * (zobj.zedsThisLevel / zobj.zedsRequired)));
+
+        var progBin = progress.toString(2);
+
+        var reversed = progBin.split("").reverse().join("");
+
+        for (let index = 0; index < reversed.length; index++) {
+            switch (reversed[index]) {
+                case "0":
+                    this.zedSegments[index].setFrame(0);
+                    break;
+                case "1":
+                    this.zedSegments[index].setFrame(1);
+                    break;
+            
+                default:
+                    debugger // safety switch
+                    break;
+            } 
+        }
+
+        progBin.length;
+        //this.zedBar.clear();
+        //this.zedBar.setDepth(200);
+
+        //this.zedBar.lineStyle(1, 0xFFFFFF, 2);
+        //this.zedBar.strokeRect(GRID * 5 , barY, 5, 5);
+        //this.zedBar.lineStyle(2, 0xffffff, 1); // ave bar
+        //this.zedBar.strokeRect(X_OFFSET + GRID * 1, barY, 
+        //    5, 
+        //5);
+
 
     }
     setLog(currentStage) {
@@ -1119,6 +1202,7 @@ class MusicPlayerScene extends Phaser.Scene {
              // check that a song isn't already playing so we don't add more than 1
             // when looping back to the main menu
             if (!this.music.isPlaying && !this.playerPaused) {
+                this.startedOnce = true; // Place holder until I fix track 86
                 if (!this.startedOnce) {
                     console.log('music playing from startMusic()')
                     this.music = this.sound.add(`track_86`,{
@@ -1354,15 +1438,9 @@ class PlinkoMachineScene extends Phaser.Scene {
             isStatic: true
         });
 
-        this.zedSum = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
-            color: COLOR_BONUS,
-            //'color': '#FCFFB2',
-            'font-weight': '400',
-            'text-shadow': '0 0 4px #FF9405, 0 0 12px #000000',
-            'font-size': '22px',
-            'font-family': 'Oxanium',
-            'padding': '3px 8px 0px 0px',
-        })).setOrigin(1,0).setScale(.5);
+        this.zedSum = this.add.bitmapText(GRID * 15 , GRID * 27 + 6, 'mainFont', 
+            'ZEDS', 
+        8).setOrigin(1,0);
 
         
         this.spawnPlinkos(2);
@@ -1452,14 +1530,22 @@ class PlinkoMachineScene extends Phaser.Scene {
                         repeat: 0,
                         yoyo: false,
                         onComplete: () => {
-                            this.zedSum.setText(" ");
+                            const spaceBoy = this.scene.get("SpaceBoyScene");
+                            const persist = this.scene.get("PersistScene");
+
+                            this.zedSum.setText('ZEDS');
                             sineTween.stop();
                             this.zedSum.setAlpha(1);
+
+                            debugger
+                            spaceBoy.updateZedDisplay(persist.zeds);
                         }
-                    });
+                    }, this);
                 }
                 // Do something
             }, this);
+            
+
 
             //plinkoDisc.setCircle(3.33);
             var friction = Phaser.Math.FloatBetween(0.013, 0.005);
@@ -1861,14 +1947,15 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
 
-        this.load.image('electronParticle','assets/sprites/electronParticle.png')
-        this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
-        this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png')
-        this.load.image('plinkoBoardBG','assets/sprites/plinkoBoardBG.png')
-        this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png')
-        this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png')
-        this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png')
-        this.load.image('comboBG','assets/sprites/UI_comboBG.png')
+        this.load.image('electronParticle','assets/sprites/electronParticle.png');
+        this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
+        this.load.spritesheet('zedBarSegment', 'assets/sprites/zedbar.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png');
+        this.load.image('plinkoBoardBG','assets/sprites/plinkoBoardBG.png');
+        this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png');
+        this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png');
+        this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png');
+        this.load.image('comboBG','assets/sprites/UI_comboBG.png');
         
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png']);
@@ -2106,13 +2193,12 @@ class StartScene extends Phaser.Scene {
 
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
+        this.scene.launch('PersistScene');
         this.scene.launch('PlinkoMachineScene');
         this.scene.launch('PinballDisplayScene');
         this.scene.launch('SpaceBoyScene');
         this.scene.launch('MusicPlayerScene');
         this.scene.launch('GalaxyMapScene');
-        this.scene.launch('PersistScene');
-        
         this.scene.bringToTop('SpaceBoyScene');
         this.scene.bringToTop('MusicPlayerScene');
         
@@ -2170,7 +2256,7 @@ class StartScene extends Phaser.Scene {
                     if (localJSON.stage != correctStage) {
                         var logJSON = JSON.parse(localStorage.getItem(`${uuidString}_${keyCheck}`));
                         var stageDataLog = new StageData(logJSON);
-                        stageDataLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
+                        stageDataLog.zedLevel = calcZedObj(ourPersist.zeds).level;
                         
                         // Update Stage Name
                         stageDataLog.stage = correctStage;
@@ -4628,7 +4714,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     this.zeds = Number(JSON.parse(rawZeds));
-    var zedsObj = calcZedLevel(this.zeds);
+    var zedsObj = calcZedObj(this.zeds);
     
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
@@ -6649,7 +6735,7 @@ class GameScene extends Phaser.Scene {
         if (bestLogJSON) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogJSON);
-            bestLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
+            bestLog.zedLevel = calcZedObj(ourPersist.zeds).level;
 
             this.bestBase = bestLog.preAdditive();
         }
@@ -8815,7 +8901,7 @@ class GameScene extends Phaser.Scene {
                 stage:this.stage,
                 mode:this.mode,
                 uuid:this.stageUUID,
-                zedLevel: calcZedLevel(ourPersist.zeds).level,
+                zedLevel: calcZedObj(ourPersist.zeds).level,
                 zeds: ourPersist.zeds,
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
@@ -9412,7 +9498,7 @@ class ScoreScene extends Phaser.Scene {
         if (bestLogRaw) {
             // is false if best log has never existed
             var bestLog = new StageData(bestLogRaw);
-            bestLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
+            bestLog.zedLevel = calcZedObj(ourPersist.zeds).level;
 
             var bestLocal = bestLog.calcTotal();
         }
@@ -9477,7 +9563,7 @@ class ScoreScene extends Phaser.Scene {
         }
 
         var bestLog = new StageData(bestLogJSON);
-        bestLog.zedLevel = calcZedLevel(ourPersist.zeds).level;
+        bestLog.zedLevel = calcZedObj(ourPersist.zeds).level;
     
         var bestLocal = bestLog.atomTime();
         var bestAve = bestLocal/bestLog.foodLog.length;
@@ -9888,6 +9974,7 @@ class ScoreScene extends Phaser.Scene {
                 stageScore = calcStageScore(atomTime);
 
                 const size = 106;
+                // #region rankBar
                 switch (true) {
                     case stageScore <  RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
 
@@ -10230,6 +10317,7 @@ class ScoreScene extends Phaser.Scene {
                 delay: 0, //?
                 onUpdate: tween => {
     
+                    // #region bestBar
                     prevBestBar.clear();
                     
                     var value = postMult + bonkBo + comboBo;
@@ -10910,7 +10998,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.prevZeds = this.scene.get("PersistScene").zeds;
 
-
         // #region Save Best Run
         var sumOfBase = 0;
         var _histLog = [];
@@ -11022,7 +11109,7 @@ class ScoreScene extends Phaser.Scene {
                 plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
-                const zedObject = calcZedLevel(ourPersist.zeds);
+                const zedObject = calcZedObj(ourPersist.zeds);
                 ourPersist.zedsUI.setHTML(
                     `<span style ="color: limegreen;
                     font-size: 14px;
