@@ -2482,17 +2482,17 @@ class QuickMenuScene extends Phaser.Scene {
             var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
 
-            var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,
-                'UI_CodexLabel')
-            codexLabel.angle = 90;
-  
-            var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1, SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_StageTrackerLabel')
-            UI_StageTrackerLabel.angle = 90;
+            var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
+                SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_CodexLabel').setOrigin(0,0.5);
+                codexLabel.angle = 90;
+   
+            var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
+                SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setOrigin(0,0.5);
+                UI_StageTrackerLabel.angle = 90;
 
             this.input.keyboard.on('keydown-LEFT', e => {
 
                 const ourGame = this.scene.get("GameScene");
-    
                 
                 var displayList;
                 switch (ourGame.mode) {
@@ -2528,6 +2528,7 @@ class QuickMenuScene extends Phaser.Scene {
                 }
     
                 ourGame.scene.pause();
+                //culprit bug code that keeps game scene invisible when it's not supposed to
                 ourGame.scene.setVisible(false);
                 
                 /***
@@ -2542,16 +2543,19 @@ class QuickMenuScene extends Phaser.Scene {
                 const ourGame = this.scene.get("GameScene");
     
                 if (!this.scene.isSleeping('ExtractTracker')) {
-                    this.scene.sleep("QuickMenuScene");
                     this.scene.launch('ExtractTracker', {
-                        stage: this.scene.get("GameScene").stage
+                        stage: this.scene.get("GameScene").stage,
+                        originScene: this.scene.get("GameScene"),
+                        fromQuickMenu: true,
                     });
+                    this.scene.sleep("QuickMenuScene");
                 } else {
                     this.scene.wake('ExtractTracker');
                     this.scene.sleep("QuickMenuScene");
                 }
     
                 ourGame.scene.pause();
+                //culprit bug code that keeps game scene invisible when it's not supposed to
                 ourGame.scene.setVisible(false);
                 
                 /***
@@ -2575,13 +2579,17 @@ class ExtractTracker extends Phaser.Scene {
         this.selected = {};
 
     }
-    create() {
+    create(codexArgs) {
         var _index = 0;
         var topLeft = X_OFFSET + GRID * 8;
         var rowY = Y_OFFSET + GRID * 1.5;
         var extractNumber = 0;
         var nextRow = 72;
         var letterOffset = 30;
+
+        console.log(codexArgs)
+        var originScene = codexArgs.originScene;
+        console.log(originScene)
 
         this.trackerContainer = this.make.container(0, 0);
         this.maskContainerMenu = this.make.container(0, 0);
@@ -2889,7 +2897,38 @@ class ExtractTracker extends Phaser.Scene {
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
             arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(1);
             
+
         this.input.keyboard.on('keydown-LEFT', e => {
+
+            this.tweens.add({
+                targets: this.cameras.main,
+                x: { from: 0, to: 160 },
+                duration: 300,
+                ease: 'Power2',
+                onUpdate: (tween) => {
+                    if (tween.progress >= 0.25) {
+                        tween.complete();
+                        if (originScene.scene.isPaused()) {
+                            originScene.scene.resume();
+                            originScene.scene.setVisible(true);
+                        } 
+                        if (originScene.scene.key == "MainMenuScene") {
+                            this.scene.wake("MainMenuScene");
+                        }
+                        if (codexArgs.fromQuickMenu) {
+                            this.scene.wake('QuickMenuScene');
+                        }
+                        this.cameras.main.x = 0;
+                        this.scene.sleep('ExtractTracker');
+                    }
+                }
+            });
+
+
+
+
+
+            /*
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             //this.cameras.main.scrollX += SCREEN_WIDTH;
             const game = this.scene.get("GameScene");
@@ -2897,7 +2936,7 @@ class ExtractTracker extends Phaser.Scene {
             game.scene.setVisible(true);
 
             this.scene.wake('QuickMenuScene');
-            this.scene.sleep('ExtractTracker');
+            this.scene.sleep('ExtractTracker');*/
             
         }, this);
 
@@ -2939,7 +2978,9 @@ class StageCodex extends Phaser.Scene {
         var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageMemory;
 
         var displayCategory = displayList[displayIndex];
+        console.log(codexArgs)
         var originScene = codexArgs.originScene;
+        console.log(originScene)
 
        
         this.scene.moveBelow( "SpaceBoyScene","StageCodex",);
@@ -3372,6 +3413,7 @@ class StageCodex extends Phaser.Scene {
                                 this.scene.wake('QuickMenuScene');
                             }
                             this.cameras.main.x = 0;
+                            // might need to stop scene instead
                             this.scene.sleep('StageCodex');
                         }
                     }
@@ -3726,16 +3768,21 @@ class MainMenuScene extends Phaser.Scene {
         var menuSelector = this.add.sprite(SCREEN_WIDTH / 2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0.25,'snakeDefault').setAlpha(0)
 
         //menu arrows
-        // No inventory yet, so no right arrow prompt
-        //var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
-        //arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+
+        var arrowMenuR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
+        arrowMenuR.play('arrowMenuIdle').setAlpha(0);
+
         var arrowMenuL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5, SCREEN_HEIGHT/2 + GRID * 2)
         arrowMenuL.play('arrowMenuIdle').setFlipX(true).setAlpha(0);
 
 
         var codexLabel = this.add.sprite(SCREEN_WIDTH/2 - GRID * 13.5 -1,
-             SCREEN_HEIGHT/2 + GRID * 2 + 5,'UI_CodexLabel').setAlpha(0);
+             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_CodexLabel').setAlpha(0).setOrigin(0,0.5);
         codexLabel.angle = 90;
+
+        var UI_StageTrackerLabel = this.add.sprite(SCREEN_WIDTH/2 + GRID * 13.5 -1,
+             SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5);
+            UI_StageTrackerLabel.angle = 90;
 
         /*if (this.exitTween) {
             this.exitTween.reverse();
@@ -3761,7 +3808,6 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-LEFT', e => {
             if (this.pressedSpace ) {
                 this.exitButton.setAlpha(0);
-                //this.cameras.main.scrollX -= SCREEN_WIDTH
                 this.tweens.add({
                     targets: this.cameras.main,
                     x: { from: 0, to: 160 },
@@ -3783,11 +3829,27 @@ class MainMenuScene extends Phaser.Scene {
         }, this);
         this.input.keyboard.on('keydown-RIGHT', e => {
             if (this.pressedSpace) {
+                this.exitButton.setAlpha(0);
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    x: { from: 0, to: -160 },
+                    duration: 300,
+                    ease: 'Power2',
+                    onUpdate: (tween) => {
+                        if (tween.progress >= 0.25) {
+                            this.scene.launch("ExtractTracker", {
+                                originScene: this,
+                                fromQuickMenu: false,
+                            });
+                            tween.complete();
+                            this.cameras.main.x = 0;
+                            this.scene.sleep('MainMenuScene');
+                        }
+                    }
+                });  
                 //this.cameras.main.scrollX += SCREEN_WIDTH
                 //ourMap.cameras.main.scrollX += SCREEN_WIDTH
                 //mainMenuScene.scene.wake('MainMenuScene');
-                
-                ;
             }
         });
     
@@ -3888,11 +3950,11 @@ class MainMenuScene extends Phaser.Scene {
                 this.endlessButton,this.endlessIcon,this.extrasButton,this.extrasIcon,
                 this.optionsButton,this.optionsIcon,menuSelector,
                 this.descriptionPanel,this.descriptionText,
-                arrowMenuL,//arrowMenuR,
+                arrowMenuL,arrowMenuR,
                 ...menuElements,
                 this.exitButton,
                 this.graphics,
-                codexLabel,
+                codexLabel,UI_StageTrackerLabel,
             ],
             alpha: 1,
             duration: 100,
