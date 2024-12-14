@@ -1227,7 +1227,7 @@ class PinballDisplayScene extends Phaser.Scene {
 
         // pinball display snake face
         this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
-        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
+        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0).setAlpha(0);
 
         // combo letters
         this.letterC = this.make.image({
@@ -1300,7 +1300,17 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboCover.mask.invertAlpha = true;
     }
     resetPinball(){
+        this.comboMasks.forEach((element) => {
+            if (element !== this.comboCoverSnake) {
+                element.setAlpha(0);
+            }
+        });
         
+    }
+    resetPinballFull(){
+        this.comboMasks.forEach((element) => {
+            element.setAlpha(0);
+        });
     }
 }
 
@@ -4989,7 +4999,6 @@ class GameScene extends Phaser.Scene {
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
-        
 
 
         if (this.stage == 'Tutorial_3') { // TODO @holden Move to customLevels.js
@@ -5218,10 +5227,16 @@ class GameScene extends Phaser.Scene {
                 repeat: 0,
                 onComplete: () => {
                     ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 0)
+                },
+                onStart: () =>{
+                    ourPinball.comboCoverSnake.setAlpha(1);
                 }
             });  
         } 
         // fade in 'READY?' for pinball display
+        ourPinball.comboCoverReady.setOrigin(1.0,0)
+        ourPinball.comboCoverReady.setTexture('UI_comboReady')
+
         this.tweens.add({
             targets: ourPinball.comboCoverReady,
             alpha: {from: 0, to: 1},
@@ -8272,7 +8287,7 @@ class GameScene extends Phaser.Scene {
             log = null;
         }
 
-
+        this.scene.get("PinballDisplayScene").resetPinball()
 
     }
     gameSceneFullCleanup() {
@@ -8294,6 +8309,8 @@ class GameScene extends Phaser.Scene {
             this.scene.get("MusicPlayerScene").loopButton.setFrame(4);
         }
         this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
+
+        this.scene.get("PinballDisplayScene").resetPinballFull();
     }
     
  
@@ -8307,8 +8324,6 @@ class GameScene extends Phaser.Scene {
         ourSpaceboy.scoreTweenShow();
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
-        ourPinball.comboCoverReady.setOrigin(1.0,0)
-        ourPinball.comboCoverReady.setTexture('UI_comboReady')
 
         if (this.helpPanel) {
             this.tweens.add({
@@ -8620,7 +8635,7 @@ class GameScene extends Phaser.Scene {
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
-        var ourGame = this.scene.get("GameScene");
+        const ourGame = this.scene.get("GameScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
         ourPersist.loseCoin();
         this.coinsUIIcon.setVisible(false);
@@ -8644,6 +8659,13 @@ class GameScene extends Phaser.Scene {
                 ourPinball.comboCoverBONK.x = GRID * 17.5
                 ourPinball.comboCoverBONK.setAlpha(0);
             },
+            onStart: () => {
+                if (ourGame.comboFadeTween) {
+                    ourGame.comboFadeTween.destroy();
+                    ourGame.comboHide();
+                }
+                
+            }
         }); 
 
         //if (this.UI_bonkTween.isPlaying()) {
@@ -8715,7 +8737,7 @@ class GameScene extends Phaser.Scene {
         }
     comboFade(){
         const ourPinball = this.scene.get('PinballDisplayScene');
-        this.tweens.add({
+        this.comboFadeTween = this.tweens.add({
             targets: [ourPinball.letterC,ourPinball.letterO,
                 ourPinball.letterM, ourPinball.letterB, 
                 ourPinball.letterO2, ourPinball.letterExplanationPoint], 
@@ -8724,6 +8746,19 @@ class GameScene extends Phaser.Scene {
             duration: 500,
             repeat: 0,
         });
+        this.comboActive = false;
+        this.comboCounter = 0;
+    }
+    // Used when another element needs to take precedence such as bonking
+    comboHide(){
+        const ourPinball = this.scene.get('PinballDisplayScene');
+        ourPinball.letterC.setAlpha(0);
+        ourPinball.letterO.setAlpha(0);
+        ourPinball.letterM.setAlpha(0);
+        ourPinball.letterB.setAlpha(0);
+        ourPinball.letterO2.setAlpha(0);
+        ourPinball.letterExplanationPoint.setAlpha(0);
+
         this.comboActive = false;
         this.comboCounter = 0;
     }
