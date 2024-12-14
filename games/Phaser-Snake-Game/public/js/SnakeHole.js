@@ -4764,16 +4764,6 @@ class PersistScene extends Phaser.Scene {
         "text-align": 'right',
     }   
 
-    
-    this.zedsUI = this.add.dom(2, SCREEN_HEIGHT - 2, 'div', Object.assign({}, STYLE_DEFAULT, 
-        styleBottomText
-        )).setHTML(
-            `<span style ="color: limegreen;
-            font-size: 14px;
-            border: limegreen solid 1px;
-            border-radius: 5px;
-            padding: 1px 4px;">L${zedsObj.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedsObj.zedsToNext)} to Next Level.</span>`
-    ).setOrigin(0, 1).setScale(.5);
 
 
     this.gameVersionUI = this.add.dom(SCREEN_WIDTH, SCREEN_HEIGHT, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -11135,13 +11125,6 @@ class ScoreScene extends Phaser.Scene {
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
                 const zedObject = calcZedObj(ourPersist.zeds);
-                ourPersist.zedsUI.setHTML(
-                    `<span style ="color: limegreen;
-                    font-size: 14px;
-                    border: limegreen solid 1px;
-                    border-radius: 5px;
-                    padding: 1px 4px;">L${zedObject.level}</span> ZEDS : <span style ="color:${COLOR_BONUS}">${commaInt(zedObject.zedsToNext)} to Next Level.</span>`
-                );
 
                 var extraFields = {
                     level: zedObject.level,
