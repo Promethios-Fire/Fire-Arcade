@@ -720,6 +720,8 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
+
+        const spaceboyFontColorHex = 0x1f211b;
         const persist = this.scene.get("PersistScene");
 
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
@@ -727,16 +729,26 @@ class SpaceBoyScene extends Phaser.Scene {
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "", 
-            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
+            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(spaceboyFontColorHex);
 
         
+        this.zedTitle = this.add.bitmapText(GRID * 7 - 1 , GRID * 27 + 8, 'mainFont', 
+            'ZEDS', 
+        8).setOrigin(0,0).setDepth(91).setTintFill(spaceboyFontColorHex);
+
+        var zedLevel = calcZedObj(persist.zeds).level;
+        debugger
+
+        this.zedLevel = this.add.bitmapText(GRID * 11 - 1, GRID * 27 + 8, 'mainFont',
+            zedLevel,
+        8).setOrigin(0,0).setDepth(91).setTintFill(0x869D54);
 
 
         this.zedSegments = [];
 
         var deltaX = 4;
         var startX = GRID * 7 + 3;
-        var barY = GRID * 28 + 7;
+        var barY = GRID * 28 + 8;
         var segments = 13;
 
         var zedBarOutline = this.add.graphics().setDepth(90);
@@ -1438,14 +1450,17 @@ class PlinkoMachineScene extends Phaser.Scene {
             isStatic: true
         });
 
-        this.zedSum = this.add.bitmapText(GRID * 15 , GRID * 27 + 6, 'mainFont', 
-            'ZEDS', 
-        8).setOrigin(1,0);
+        
 
         
+        const spaceBoy = this.scene.get("SpaceBoyScene");
+        debugger
+        spaceBoy.zedTitle.setText('+0');
         this.spawnPlinkos(2);
     }
     spawnPlinkos (number) {
+        const spaceBoy = this.scene.get("SpaceBoyScene");
+        const persist = this.scene.get("PersistScene");
         
         if (number > 0){
             var delay = 275;
@@ -1493,7 +1508,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                 });
 
                 zedText.setText(`+${this.zedIndex}`);
-                this.zedSum.setText(this.zedsToAdd);
+                spaceBoy.zedTitle.setText(`+${this.zedsToAdd}`);
 
 
 
@@ -1504,7 +1519,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                     // On final plinko's collision
 
                     var sineTween = this.tweens.add({
-                        targets: this.zedSum,
+                        targets: spaceBoy.zedTitle,
                         alpha: { from: 0, to: 1 },
                         ease: 'Sine.InOut',
                         duration: 90,
@@ -1522,7 +1537,7 @@ class PlinkoMachineScene extends Phaser.Scene {
 
                     //debugger
                     this.tweens.add({
-                        targets: this.zedSum,
+                        targets: spaceBoy.zedTitle,
                         alpha: { from: 1, to: 0.0 },
                         ease: 'Sine.InOut',
                         duration: 1200,
@@ -1530,12 +1545,11 @@ class PlinkoMachineScene extends Phaser.Scene {
                         repeat: 0,
                         yoyo: false,
                         onComplete: () => {
-                            const spaceBoy = this.scene.get("SpaceBoyScene");
-                            const persist = this.scene.get("PersistScene");
-
-                            this.zedSum.setText('ZEDS');
+                            spaceBoy.zedTitle.setText('ZEDS');
                             sineTween.stop();
-                            this.zedSum.setAlpha(1);
+                            spaceBoy.zedTitle.setAlpha(1);
+
+                            this.zedsToAdd = 0;
 
                             debugger
                             spaceBoy.updateZedDisplay(persist.zeds);
@@ -2194,9 +2208,9 @@ class StartScene extends Phaser.Scene {
         // Load all animations once for the whole game.
         loadSpriteSheetsAndAnims(this);
         this.scene.launch('PersistScene');
+        this.scene.launch('SpaceBoyScene');
         this.scene.launch('PlinkoMachineScene');
         this.scene.launch('PinballDisplayScene');
-        this.scene.launch('SpaceBoyScene');
         this.scene.launch('MusicPlayerScene');
         this.scene.launch('GalaxyMapScene');
         this.scene.bringToTop('SpaceBoyScene');
@@ -11106,6 +11120,7 @@ class ScoreScene extends Phaser.Scene {
                     ourPersist.zeds += rollResults.get("zedsEarned");
                 }
                 
+                ourSpaceBoy.zedTitle.setText('+0');
                 plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
