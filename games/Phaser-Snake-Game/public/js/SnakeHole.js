@@ -3420,6 +3420,7 @@ class StageCodex extends Phaser.Scene {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
                    this.scene.sleep('StageCodex');
+                   this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
 
                 } else {
                     console.log("Launch Practice!", selected.stageTitle);
@@ -3439,6 +3440,7 @@ class StageCodex extends Phaser.Scene {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
                     this.scene.stop('StageCodex');
+                    this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
                 });
         } 
         else {
@@ -3639,6 +3641,8 @@ class MainMenuScene extends Phaser.Scene {
                 
                 
                 this.scene.get("StartScene").UUID_MAP.size;
+
+                mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("ADVENTURE");
                 
                 if (EXPERT_CHOICE && checkExpertUnlocked.call(this)) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get(`adventure-mode`);
@@ -8342,6 +8346,7 @@ class GameScene extends Phaser.Scene {
         this.scene.get("PinballDisplayScene").resetPinballFull();
 
         this.scene.get("SpaceBoyScene").scoreTweenVanish();
+        this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
     }
     
  

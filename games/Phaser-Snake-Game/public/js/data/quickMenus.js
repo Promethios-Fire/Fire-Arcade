@@ -17,6 +17,7 @@ export const QUICK_MENUS = new Map([
     */
     ["adventure-mode", new Map([
         ["Tab to Menu", function () {
+            this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
             this.scene.wake('MainMenuScene');
             this.scene.stop("QuickMenuScene");
 
