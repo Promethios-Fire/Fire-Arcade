@@ -937,6 +937,7 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     init() {
         this.startedOnce = false;
+        this.musicOpacity = 0;
 
         this.shuffledTracks = Phaser.Math.RND.shuffle([...TRACKS.keys()]);
         this.startTrack = this.shuffledTracks.pop();
@@ -956,24 +957,26 @@ class MusicPlayerScene extends Phaser.Scene {
         // Start volume at 50%
         this.soundManager.volume = 0.5;
 
-        // Create an invisible interactive zone for volume dial
+        // Create an invisible interactive zone for volume dial and the music player zone
         this.volumeControlZone = this.add.zone(X_OFFSET + GRID * 36, GRID * 1.5,
-             24, 36).setInteractive().setOrigin(0,0);
+             24, 36).setInteractive().setOrigin(0,0).setDepth(1);
+        this.musicPlayerZone = this.add.zone(X_OFFSET + GRID * 34, GRID * 0.5,
+            64, 104).setInteractive().setOrigin(0,0).setDepth(0);;
         // debugging bounding box
-        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.volumeControlZone);
+        //this.add.graphics().lineStyle(2, 0xff0000).strokeRectShape(this.musicPlayerZone);
 
         // speaker icon above slider
         this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 2.5, 'uiVolumeIcon',0).setDepth(100);
+            GRID * 2.5, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
         // volume slider icon
         this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75, 'uiVolumeSlider').setDepth(100);
+            GRID * 5.75, 'uiVolumeSlider').setDepth(100).setAlpha(0);
         // mask sprite
         this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
             GRID * 5.75, 'uiVolumeSliderWidget').setDepth(101);
         // rendered sprite
         this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75, 'uiVolumeSliderWidgetRendered').setDepth(101);
+            GRID * 5.75, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
 
         const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
         this.volumeSlider.setMask(volumeMask)
@@ -986,11 +989,23 @@ class MusicPlayerScene extends Phaser.Scene {
         this.volumeControlZone.on('pointerover', () => {
             this.input.setDefaultCursor('pointer');
             this.isVolumeControlActive = true;
+            this.musicOpacity = 1;
         });
         this.volumeControlZone.on('pointerout', () => {
             this.input.setDefaultCursor('default');
             this.isVolumeControlActive = false
         }); 
+
+        this.musicPlayerZone.on('pointerover', () => {
+            this.musicOpacity = 1;
+            //this.showPlayer();
+        });
+        this.musicPlayerZone.on('pointerout', () => {
+            //this.musicOpacity = 0
+            if (this.isVolumeControlActive === false) {
+                this.musicOpacity = 0;
+            }
+        });
 
         // Listen for mouse wheel events
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
@@ -1040,7 +1055,7 @@ class MusicPlayerScene extends Phaser.Scene {
         var columnX = X_OFFSET + GRID * 36 + 1;
 
         this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
-        ).setOrigin(1,0).setScale(1).setAlpha(1).setScrollFactor(0).setTintFill(0x1f211b);
+        ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
 
@@ -1120,6 +1135,7 @@ class MusicPlayerScene extends Phaser.Scene {
         // checks whether cursor is over any button and then changes cursor to hand
         function setupButtonCursor(button, scene) {
             button.on('pointerover', () => {
+                scene.musicOpacity = 1;
                 scene.input.setDefaultCursor('pointer');
             });
             button.on('pointerout', () => {
@@ -1147,7 +1163,39 @@ class MusicPlayerScene extends Phaser.Scene {
             this.pauseButton.setFrame(1);
             this.sound.pauseAll(); // this prevents sound from being able to resume
         });
+
     }
+    update () {
+        let targetOpacity = Phaser.Math.Interpolation.Linear(
+            [this.volumeIcon.alpha, this.musicOpacity], 0.25);
+        console.log(targetOpacity)
+
+        this.volumeIcon.alpha = targetOpacity;
+        this.volumeSlider.alpha = targetOpacity;
+        this.volumeSliderWidgetReal.alpha = targetOpacity;
+    }
+
+    /*showPlayer() {
+        this.tweens.add({
+            targets: [this.volumeIcon,this.volumeSlider,this.volumeSliderWidgetReal],
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+            yoyo: false,
+        });
+    }
+    
+    hidePlayer() {
+        this.tweens.add({
+            targets: [this.volumeIcon,this.volumeSlider,this.volumeSliderWidgetReal],
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+            yoyo: false,
+        });
+    }*/
 
     stopMusic() {
         this.sound.sounds.forEach((sound) => {
