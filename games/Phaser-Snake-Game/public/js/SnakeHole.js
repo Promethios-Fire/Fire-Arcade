@@ -8321,7 +8321,6 @@ class GameScene extends Phaser.Scene {
         }
 
         this.scene.get("PinballDisplayScene").resetPinball()
-        this.scene.get("SpaceBoyScene").scoreTweenHide();
     }
     gameSceneFullCleanup() {
         // Put end of run clean up loop.
