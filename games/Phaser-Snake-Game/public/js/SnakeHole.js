@@ -779,15 +779,19 @@ class SpaceBoyScene extends Phaser.Scene {
         }
 
         // #region Top Right UI
-        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1, 'mainFont',`BEST SCORE:`,8)
+        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1,
+             'mainFontLarge',`BEST:`,13)
         .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 , 'mainFontLarge',`0`,13)
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 ,
+             'mainFontLarge',`0`,13)
             .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
 
         // Score Text SET INVISIBLE
-        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1, 'mainFont',`STAGE SCORE:`,8)
+        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1,
+            'mainFontLarge',`SCORE:`,13)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2, 'mainFontLarge',`0`, 13)
+        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2,
+            'mainFontLarge',`0`, 13)
             .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
 
@@ -849,6 +853,15 @@ class SpaceBoyScene extends Phaser.Scene {
             repeat: 0,
             yoyo: false
           });
+          this.tweens.add({
+            targets: [this.scoreLabel, this.scoreValue],
+            alpha:0,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        })
           this.tweens.add({
             targets: [this.bestScoreValue, this.bestScoreLabel],
             alpha: 1,
@@ -1207,9 +1220,11 @@ class PinballDisplayScene extends Phaser.Scene {
         // pinball display/combo cover
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
         .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+
         // 'READY?' text sprite
         this.comboCoverReady = this.add.sprite(GRID * 15, 2, 'UI_comboReady', 0
         ).setOrigin(1,0.0).setDepth(100).setScrollFactor(0).setAlpha(0);
+
         // pinball display snake face
         this.comboCoverSnake = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnake', 0
         ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0);
@@ -1283,6 +1298,9 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
         this.comboCover.mask.invertAlpha = true;
+    }
+    resetPinball(){
+        
     }
 }
 
@@ -8668,9 +8686,11 @@ class GameScene extends Phaser.Scene {
 
 
     comboBounce(){
+        const ourPinball = this.scene.get('PinballDisplayScene');
         this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
+            targets: [ourPinball.letterC,ourPinball.letterO,
+                ourPinball.letterM, ourPinball.letterB, 
+                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
             y: { from: GRID * 1.25, to: GRID * 0 },
             ease: 'Sine.InOut',
             duration: 200,
@@ -8680,10 +8700,12 @@ class GameScene extends Phaser.Scene {
             });
     }
     comboAppear(){
-        //console.log("appearing");
+        const ourPinball = this.scene.get('PinballDisplayScene');
+        console.log('appearing')
         this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
+            targets: [ourPinball.letterC,ourPinball.letterO,
+                ourPinball.letterM, ourPinball.letterB, 
+                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
             alpha: { from: 0, to: 1 },
             ease: 'Sine.InOut',
             duration: 300,
@@ -8692,10 +8714,11 @@ class GameScene extends Phaser.Scene {
         this.comboActive = true;
         }
     comboFade(){
-        //console.log("fading")
+        const ourPinball = this.scene.get('PinballDisplayScene');
         this.tweens.add({
-            targets: [this.letterC,this.letterO, this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint], 
+            targets: [ourPinball.letterC,ourPinball.letterO,
+                ourPinball.letterM, ourPinball.letterB, 
+                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 500,
