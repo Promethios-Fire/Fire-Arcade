@@ -737,7 +737,6 @@ class SpaceBoyScene extends Phaser.Scene {
         8).setOrigin(0,0).setDepth(91).setTintFill(spaceboyFontColorHex);
 
         var zedLevel = calcZedObj(persist.zeds).level;
-        debugger
 
         this.zedLevel = this.add.bitmapText(GRID * 11 - 1, GRID * 27 + 8, 'mainFont',
             zedLevel,
@@ -1450,13 +1449,9 @@ class PlinkoMachineScene extends Phaser.Scene {
             isStatic: true
         });
 
-        
-
-        
         const spaceBoy = this.scene.get("SpaceBoyScene");
-        debugger
-        spaceBoy.zedTitle.setText('+0');
-        this.spawnPlinkos(2);
+        //spaceBoy.zedTitle.setText('+0');
+        //this.spawnPlinkos(12);
     }
     spawnPlinkos (number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
@@ -1510,51 +1505,66 @@ class PlinkoMachineScene extends Phaser.Scene {
                 zedText.setText(`+${this.zedIndex}`);
                 spaceBoy.zedTitle.setText(`+${this.zedsToAdd}`);
 
-
-
                 console.log("Add", this.zedIndex, " Zeds for a total", this.zedsToAdd);
                 this.zedIndex += 1;
 
                 if (number === 0) {
                     // On final plinko's collision
-
-                    var sineTween = this.tweens.add({
+                    var sineChain = this.tweens.chain({
                         targets: spaceBoy.zedTitle,
-                        alpha: { from: 0, to: 1 },
-                        ease: 'Sine.InOut',
-                        duration: 90,
-                        delay: 500,
-                        //loop: 10,
-                        repeat: -1,
-                        yoyo: true,
-                        onComplete: () => {
+                        //paused: true,
+                        tweens: [
+                            {
+                                alpha: { from: 0, to: 1 },
+                                duration: 300,
+                                delay: 300
+                            },
+                            {
+                                alpha: { from: 1, to: 0 },
+                                ease: 'Sine.InOut',
+                                duration: 500, //600
+                                loop: 2, // 3
+                                yoyo: true
+                            },
+                            {
+                                alpha: { from: 1, to: 1 },
+                                ease: 'Sine.InOut',
+                                duration: 300,
+                                //delay: 100,
+                                repeat: 0,
+                                yoyo: false,
+                            }
+                        ]
+                    });
+                    
+                    sineChain.on("complete", function() {
 
-                        }
+                        this.tweens.addCounter({
+                            from: this.zedsToAdd,
+                            to: 0,
+                            duration: 120 * this.zedsToAdd,
+                            ease: 'linear',
+                            onUpdate: tween => {
+                                tween.getValue();
+                                spaceBoy.zedTitle.setText(`+${parseInt(tween.getValue())}`)
+                                spaceBoy.updateZedDisplay(persist.zeds - tween.getValue());
+
+                            },
+                            onComplete: tween => {
+                                debugger
+                                spaceBoy.zedTitle.setText('ZEDS');
+                                spaceBoy.zedTitle.setAlpha(1);
+                                spaceBoy.updateZedDisplay(persist.zeds);
+                                this.zedsToAdd = 0;
+                                this.zedIndex = 1;
+                            }  
+                        });
+
+                        
+
+                        //spaceBoy.updateZedDisplay(persist.zeds);
                     }, this);
-
-                    //tween.on('complete', () => {
-                    //});
-
-                    //debugger
-                    this.tweens.add({
-                        targets: spaceBoy.zedTitle,
-                        alpha: { from: 1, to: 0.0 },
-                        ease: 'Sine.InOut',
-                        duration: 1200,
-                        delay: 2400,
-                        repeat: 0,
-                        yoyo: false,
-                        onComplete: () => {
-                            spaceBoy.zedTitle.setText('ZEDS');
-                            sineTween.stop();
-                            spaceBoy.zedTitle.setAlpha(1);
-
-                            this.zedsToAdd = 0;
-
-                            debugger
-                            spaceBoy.updateZedDisplay(persist.zeds);
-                        }
-                    }, this);
+                    
                 }
                 // Do something
             }, this);
@@ -11119,7 +11129,7 @@ class ScoreScene extends Phaser.Scene {
                 if (!DEBUG_SKIP_TO_SCENE) {
                     ourPersist.zeds += rollResults.get("zedsEarned");
                 }
-                
+
                 ourSpaceBoy.zedTitle.setText('+0');
                 plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
