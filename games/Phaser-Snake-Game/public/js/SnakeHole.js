@@ -749,7 +749,7 @@ class SpaceBoyScene extends Phaser.Scene {
         var deltaX = 4;
         var startX = GRID * 7 + 3;
         var barY = GRID * 28 + 8;
-        var segments = 8;
+        var segments = 13;
 
         this.maxBin = (2 ** segments) - 1;
 
