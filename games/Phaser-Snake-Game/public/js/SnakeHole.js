@@ -781,10 +781,10 @@ class SpaceBoyScene extends Phaser.Scene {
         // #region Top Right UI
         this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1,
              'mainFontLarge',`BEST:`,13)
-        .setOrigin(0,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
         this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 ,
              'mainFontLarge',`0`,13)
-            .setOrigin(1,0).setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+            .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
         // Score Text SET INVISIBLE
         this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1,
@@ -900,6 +900,34 @@ class SpaceBoyScene extends Phaser.Scene {
                 yoyo: false
             })
         }
+    }
+    scoreTweenVanish(){
+        this.tweens.add({
+            targets: this.UIScoreContainer,
+            y: (- GRID * 2),
+            ease: 'Sine.InOut',
+            duration: 800,
+            repeat: 0,
+            yoyo: false
+        });
+        this.tweens.add({
+            targets: [this.bestScoreValue, this.bestScoreLabel],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            duration: 1000,
+            repeat: 0,
+            yoyo: false
+        });
+
+        this.tweens.add({
+            targets: [this.scoreLabel, this.scoreValue],
+            alpha:0,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        })
     }
 }
 
@@ -5216,6 +5244,7 @@ class GameScene extends Phaser.Scene {
 
         // show snake pan across pinball display
         if (this.stage == START_STAGE) {
+            this.scene.get('SpaceBoyScene').scoreTweenShow();
             ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
             this.tweens.add({
                 targets: ourPinball.comboCoverSnake,
@@ -8288,7 +8317,7 @@ class GameScene extends Phaser.Scene {
         }
 
         this.scene.get("PinballDisplayScene").resetPinball()
-
+        this.scene.get("SpaceBoyScene").scoreTweenHide();
     }
     gameSceneFullCleanup() {
         // Put end of run clean up loop.
@@ -8311,6 +8340,8 @@ class GameScene extends Phaser.Scene {
         this.scene.get("MusicPlayerScene").nextButton.setFrame(2);
 
         this.scene.get("PinballDisplayScene").resetPinballFull();
+
+        this.scene.get("SpaceBoyScene").scoreTweenVanish();
     }
     
  
@@ -8721,6 +8752,7 @@ class GameScene extends Phaser.Scene {
             yoyo: true
             });
     }
+
     comboAppear(){
         const ourPinball = this.scene.get('PinballDisplayScene');
         console.log('appearing')
@@ -8734,7 +8766,8 @@ class GameScene extends Phaser.Scene {
             repeat: 0,
         });
         this.comboActive = true;
-        }
+    }
+
     comboFade(){
         const ourPinball = this.scene.get('PinballDisplayScene');
         this.comboFadeTween = this.tweens.add({
@@ -8749,6 +8782,7 @@ class GameScene extends Phaser.Scene {
         this.comboActive = false;
         this.comboCounter = 0;
     }
+    
     // Used when another element needs to take precedence such as bonking
     comboHide(){
         const ourPinball = this.scene.get('PinballDisplayScene');
