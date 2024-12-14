@@ -455,9 +455,9 @@ var intToBinHash = function (input) {
     return (input >>> 0).toString(2).padStart(32, '0');
 }
 
-const ZED_CONSTANT = 16;
+const ZED_CONSTANT = 64;
 const ZEDS_LEVEL_SCALAR = 0.02;
-const ZEDS_OVERLEVEL_SCALAR = 0.8;
+const ZEDS_OVERLEVEL_SCALAR = 0.7;
 var calcZedObj = function (remainingZeds, reqZeds=0, level=0) {
     // Would be nice to put tests here.
 
@@ -749,7 +749,7 @@ class SpaceBoyScene extends Phaser.Scene {
         var deltaX = 4;
         var startX = GRID * 7 + 3;
         var barY = GRID * 28 + 8;
-        var segments = 13;
+        var segments = 8;
 
         this.maxBin = (2 ** segments) - 1;
 
@@ -862,6 +862,16 @@ class SpaceBoyScene extends Phaser.Scene {
 
         var progress = parseInt(this.maxBin * ( 1 * (zobj.zedsThisLevel / zobj.zedsRequired)));
 
+        if (progress < 0) {
+            // Next Level
+            this.zedLevel
+            var thisLevel = Number(this.zedLevel.text);
+            thisLevel += 1;
+
+            this.zedLevel.setText(thisLevel);            
+            debugger
+        }
+        
         var progBin = progress.toString(2);
 
         var reversed = progBin.split("").reverse().join("");
@@ -1451,8 +1461,8 @@ class PlinkoMachineScene extends Phaser.Scene {
         });
 
         const spaceBoy = this.scene.get("SpaceBoyScene");
-        spaceBoy.zedTitle.setText('+0');
-        this.spawnPlinkos(12);
+        //spaceBoy.zedTitle.setText('+0');
+        //this.spawnPlinkos(12);
     }
     spawnPlinkos (number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
@@ -1541,21 +1551,24 @@ class PlinkoMachineScene extends Phaser.Scene {
                     
                     sineChain.on("complete", function() {
 
+                        this.zedIndex = 1;
+
                         var zedsRequired = calcZedObj(persist.zeds).zedsRequired;
                         
 
                         var zedsPerSegment = spaceBoy.maxBin / zedsRequired;
-        
-                        debugger
+    
 
                         this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration: 100 * this.zedsToAdd * zedsPerSegment,
+                            duration: 99 * this.zedsToAdd * zedsPerSegment,
                             ease: 'linear',
                             onUpdate: tween => {
                                 tween.getValue();
-                                spaceBoy.zedTitle.setText(`+${parseInt(tween.getValue())}`)
+                                spaceBoy.zedTitle.setText(`+${Math.ceil(tween.getValue())}`)
+
+                                spaceBoy.zedLevel.setText(calcZedObj(persist.zeds - tween.getValue()).level);
                                 spaceBoy.updateZedDisplay(persist.zeds - tween.getValue());
 
                             },
@@ -1565,7 +1578,6 @@ class PlinkoMachineScene extends Phaser.Scene {
                                 spaceBoy.zedTitle.setAlpha(1);
                                 spaceBoy.updateZedDisplay(persist.zeds);
                                 this.zedsToAdd = 0;
-                                this.zedIndex = 1;
                             }  
                         });
 
