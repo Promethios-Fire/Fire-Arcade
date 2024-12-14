@@ -716,6 +716,7 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     init() {
         this.navLog = [];
+        this.maxBin = 0;
         //this.zedBar = this.add.graphics();
     }
     create() {
@@ -750,6 +751,8 @@ class SpaceBoyScene extends Phaser.Scene {
         var barY = GRID * 28 + 8;
         var segments = 13;
 
+        this.maxBin = (2 ** segments) - 1;
+
         var zedBarOutline = this.add.graphics().setDepth(90);
         zedBarOutline.lineStyle(2, 0x1F211B, 1); // ave bar
         zedBarOutline.strokeRect(startX - 2, barY - 1, 
@@ -769,6 +772,8 @@ class SpaceBoyScene extends Phaser.Scene {
             this.zedSegments.push(zedSeg);
             
         }
+
+        
 
 
         // Middle UI
@@ -851,15 +856,11 @@ class SpaceBoyScene extends Phaser.Scene {
         
         const zobj = calcZedObj(zeds);
 
-        var segments = this.zedSegments.length;
-
         this.zedSegments.forEach( seg => {
             seg.setFrame(2);
         });
 
-        var maxBin = (2 ** segments) - 1;
-
-        var progress = parseInt(maxBin * ( 1 * (zobj.zedsThisLevel / zobj.zedsRequired)));
+        var progress = parseInt(this.maxBin * ( 1 * (zobj.zedsThisLevel / zobj.zedsRequired)));
 
         var progBin = progress.toString(2);
 
@@ -1450,12 +1451,13 @@ class PlinkoMachineScene extends Phaser.Scene {
         });
 
         const spaceBoy = this.scene.get("SpaceBoyScene");
-        //spaceBoy.zedTitle.setText('+0');
-        //this.spawnPlinkos(12);
+        spaceBoy.zedTitle.setText('+0');
+        this.spawnPlinkos(12);
     }
     spawnPlinkos (number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
         const persist = this.scene.get("PersistScene");
+
         
         if (number > 0){
             var delay = 275;
@@ -1539,10 +1541,17 @@ class PlinkoMachineScene extends Phaser.Scene {
                     
                     sineChain.on("complete", function() {
 
+                        var zedsRequired = calcZedObj(persist.zeds).zedsRequired;
+                        
+
+                        var zedsPerSegment = spaceBoy.maxBin / zedsRequired;
+        
+                        debugger
+
                         this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration: 120 * this.zedsToAdd,
+                            duration: 100 * this.zedsToAdd * zedsPerSegment,
                             ease: 'linear',
                             onUpdate: tween => {
                                 tween.getValue();
