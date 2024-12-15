@@ -716,6 +716,7 @@ class SpaceBoyScene extends Phaser.Scene {
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
         const persist = this.scene.get("PersistScene");
+        const ourGame = this.scene.get("GameScene");
 
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
@@ -801,6 +802,24 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
             this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
+
+        // Length/Goal UI
+        const lengthGoalStyle = {
+            "color":'0x1f211b',
+            "font-size": '16px',
+            "font-weight": 400,
+            "text-align": 'right',
+        }
+
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
+        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
+        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
+        ).setAlpha(0).setDepth(101).setOrigin(0,0).setScrollFactor(0);
+        
+        //var length = 0;
+        //this.lengthGoal = LENGTH_GOAL;
+        //var length = `${ourGame.length}`;
+
 
     }
     setLog(currentStage) {
@@ -928,6 +947,15 @@ class SpaceBoyScene extends Phaser.Scene {
             repeat: 0,
             yoyo: false
         })
+        this.tweens.add({
+            targets: [this.lengthGoalUI, this.lengthGoalUILabel],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        });
     }
 }
 
@@ -5297,6 +5325,7 @@ class GameScene extends Phaser.Scene {
 
         // show snake pan across pinball display
         if (this.stage == START_STAGE) {
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             this.scene.get('SpaceBoyScene').scoreTweenShow();
             ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
             this.tweens.add({
@@ -5314,6 +5343,17 @@ class GameScene extends Phaser.Scene {
                     ourPinball.comboCoverSnake.setAlpha(1);
                 }
             });  
+            if (ourSpaceBoy.lengthGoalUI.alpha === 0) {
+                this.tweens.add({
+                    targets: [ourSpaceBoy.lengthGoalUI, ourSpaceBoy.lengthGoalUILabel],
+                    alpha:  1,
+                    ease: 'Sine.InOut',
+                    duration: 1000,
+                    repeat: 0,
+                    yoyo: false
+                });
+            }
+            
         } 
         // fade in 'READY?' for pinball display
         ourPinball.comboCoverReady.setOrigin(1.0,0)
@@ -6933,45 +6973,25 @@ class GameScene extends Phaser.Scene {
         // Store the Current Version in Cookies
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
-        // Goal UI
-        const lengthGoalStyle = {
-            "color":'0x1f211b',
-            "font-size": '16px',
-            "font-weight": 400,
-            "text-align": 'right',
-        }
-        
+        var length = 0;
+        this.lengthGoal = LENGTH_GOAL;
+        var length = `${ourGame.length}`;
 
-        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
-        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        //this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 30.0), GRID * 6.5, 'mainFont', ``, 8)
-        //.setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
-        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
-        ).setAlpha(1).setDepth(101).setOrigin(0,0).setScrollFactor(0);
-        
-        var length = `${this.length}`;
         if (this.lengthGoal != 0) {
-            this.lengthGoalUI.setText(
+            ourSpaceBoy.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
-            ).setOrigin(0,0).setAlpha(1);
-            //this.lengthGoalUILabel.setText(
-            //`ATOM\nGOAL`
-            //).setOrigin(0,0).setAlpha(0);
-            //this.lengthGoalUILabel.setLineSpacing(8)
-            this.lengthGoalUI.setLineSpacing(6)
+            ).setOrigin(0,0).setAlpha(0);
+            ourSpaceBoy.lengthGoalUI.setLineSpacing(6)
+            ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
         }
         else {
             // Special Level
-            this.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
             .setAlpha(0);
-            this.lengthGoalUI.x = GRID * 27
+            ourSpaceBoy.lengthGoalUI.x = GRID * 27
+            ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
         }
 
-        // TODO: move this to spaceboy scene and make transition logic for tween fade
-        if (this.startupAnim) {
-            this.lengthGoalUI.setAlpha(1);
-            this.lengthGoalUILabel.setAlpha(1);
-        }
         
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
 
@@ -7258,7 +7278,6 @@ class GameScene extends Phaser.Scene {
             
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
-                    //targets: [this.progressPanel,this.UIScoreContainer,this.lengthGoalUI, this.lengthGoalUILabel],
                     targets: [this.UIScoreContainer],
                     alpha: 1,
                     duration: 300,

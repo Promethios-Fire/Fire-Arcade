@@ -81,7 +81,7 @@ var Snake = new Phaser.Class({
     // #region Grow
     grow: function (scene)
     {
-        
+        const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
         scene.length += 1;
         scene.globalFruitCount += 1; // Run Wide Counter
 
@@ -89,15 +89,15 @@ var Snake = new Phaser.Class({
         
         // Exception for Bonus Levels when the Length Goal = 0
         if (LENGTH_GOAL != 0) {
-            scene.lengthGoalUI.setAlpha(1);
-            scene.lengthGoalUI.setText(
+            ourSpaceBoy.lengthGoalUI.setAlpha(0);
+            ourSpaceBoy.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
             )
             
         }
         else {
-            scene.lengthGoalUI.setAlpha(0);
-            scene.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+            ourSpaceBoy.lengthGoalUI.setAlpha(0);
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
         }
 
         //scene.scale.gameSize.height += 24;
