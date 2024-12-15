@@ -863,13 +863,8 @@ class SpaceBoyScene extends Phaser.Scene {
         var progress = parseInt(this.maxBin * ( 1 * (zobj.zedsThisLevel / zobj.zedsRequired)));
 
         if (progress < 0) {
-            // Next Level
-            this.zedLevel
-            var thisLevel = Number(this.zedLevel.text);
-            thisLevel += 1;
-
-            this.zedLevel.setText(thisLevel);            
-            debugger
+            progress = this.maxBin;  
+            debugger        
         }
         
         var progBin = progress.toString(2);
