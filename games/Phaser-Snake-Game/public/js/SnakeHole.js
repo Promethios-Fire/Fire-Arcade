@@ -737,44 +737,15 @@ class SpaceBoyScene extends Phaser.Scene {
             'ZEDS', 
         8).setOrigin(0,0).setDepth(91).setTintFill(spaceboyFontColorHex);
 
-        var zedLevel = calcZedObj(persist.zeds).level;
+        var zobj = calcZedObj(persist.zeds);
+
+        debugger
 
         this.zedLevel = this.add.bitmapText(GRID * 11 - 1, GRID * 27 + 8, 'mainFont',
-            zedLevel,
+            zobj.level,
         8).setOrigin(0,0).setDepth(91).setTintFill(0x869D54);
 
-
-        this.zedSegments = [];
-
-        var deltaX = 4;
-        var startX = GRID * 7 + 3;
-        var barY = GRID * 28 + 8;
-        var segments = 13;
-
-        this.maxBin = (2 ** segments) - 1;
-
-        var zedBarOutline = this.add.graphics().setDepth(90);
-        zedBarOutline.lineStyle(2, 0x1F211B, 1); // ave bar
-        zedBarOutline.strokeRect(startX - 2, barY - 1, 
-            segments * deltaX + 2 , 5
-        );
-
-        zedBarOutline.fillStyle(0x869D54);
-        zedBarOutline.fillRect(startX - 1, barY - 2 + 1, 
-            segments * deltaX + 1, 5
-        );
-        
-        for (let index = 0; index < segments; index++) {
-
-            var zedSeg = this.add.sprite(startX + deltaX * index, barY, 'zedBarSegment', 1
-
-            ).setDepth(91).setOrigin(0,0);
-            this.zedSegments.push(zedSeg);
-            
-        }
-
-        
-
+        this.updateZedSegments(zobj.zedsRequired);
 
         // Middle UI
         this.CapSpark = this.add.sprite(X_OFFSET + GRID * 9 -2, GRID * 1.5).play(`CapSpark${Phaser.Math.Between(0,9)}`).setOrigin(.5,.5)
@@ -852,6 +823,63 @@ class SpaceBoyScene extends Phaser.Scene {
         this.updateZedDisplay(persist.zeds);
 
     }
+    updateZedSegments(maxZeds) {
+        this.zedSegments = [];
+
+        var segments;
+        
+        switch (true) { // ALL NEED TO BE BALANCED
+            case maxZeds < 750:
+                segments = 6; // 127
+                break;
+            case maxZeds < 1500:
+                segments = 8; // 511
+                break
+            case maxZeds < 6000:
+                segments = 10; // 2_047
+                break
+            case maxZeds < 10000:
+                segments = 13 // 16_383
+                break
+            case maxZeds < 20000: // Over leveled here?
+                segments = 16; // 131_071
+                break
+            case maxZeds < 30000: // Over leveled here?
+                segments = 24; // 33_554_431
+                break
+            default:
+                segments = 26 // 134_217_727
+                break;
+        }
+
+        var deltaX = 4;
+        var startX = GRID * 7 + 3;
+        var barY = GRID * 28 + 8;
+        //var segments = 13;
+
+        this.maxBin = (2 ** segments) - 1;
+
+        var zedBarOutline = this.add.graphics().setDepth(90);
+        zedBarOutline.lineStyle(2, 0x1F211B, 1); // ave bar
+        zedBarOutline.strokeRect(startX - 2, barY - 1, 
+            segments * deltaX + 2 , 5
+        );
+
+        zedBarOutline.fillStyle(0x869D54);
+        zedBarOutline.fillRect(startX - 1, barY - 2 + 1, 
+            segments * deltaX + 1, 5
+        );
+        
+        for (let index = 0; index < segments; index++) {
+
+            var zedSeg = this.add.sprite(startX + deltaX * index, barY, 'zedBarSegment', 1
+
+            ).setDepth(91).setOrigin(0,0);
+            this.zedSegments.push(zedSeg);
+            
+        }
+
+    }
     updateZedDisplay(zeds) {
         
         const zobj = calcZedObj(zeds);
@@ -864,7 +892,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
         if (progress < 0) {
             progress = this.maxBin;  
-            debugger        
+            //debugger        
         }
         
         var progBin = progress.toString(2);
@@ -1561,11 +1589,13 @@ class PlinkoMachineScene extends Phaser.Scene {
                             ease: 'linear',
                             onUpdate: tween => {
                                 tween.getValue();
-                                spaceBoy.zedTitle.setText(`+${Math.ceil(tween.getValue())}`)
+                                spaceBoy.zedTitle.setText(`+${Math.ceil(tween.getValue())}`);
 
-                                spaceBoy.zedLevel.setText(calcZedObj(persist.zeds - tween.getValue()).level);
+                                var zorb = calcZedObj(persist.zeds - tween.getValue());
+
+                                spaceBoy.zedLevel.setText(zorb.level);
+                                spaceBoy.updateZedSegments(zorb.zedsRequired);
                                 spaceBoy.updateZedDisplay(persist.zeds - tween.getValue());
-
                             },
                             onComplete: tween => {
                                 debugger
