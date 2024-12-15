@@ -1168,7 +1168,7 @@ class MusicPlayerScene extends Phaser.Scene {
     update () {
         let targetOpacity = Phaser.Math.Interpolation.Linear(
             [this.volumeIcon.alpha, this.musicOpacity], 0.25);
-        console.log(targetOpacity)
+        //.log(targetOpacity)
 
         this.volumeIcon.alpha = targetOpacity;
         this.volumeSlider.alpha = targetOpacity;
@@ -1964,6 +1964,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
+        this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -6941,22 +6942,23 @@ class GameScene extends Phaser.Scene {
         }
         
 
-        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 2, GRID * 7, 'mainFont', ``, 8)
-        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 29.25) + 2, GRID * 7, 'mainFont', ``, 8)
-        .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
+        .setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        //this.lengthGoalUILabel = this.add.bitmapText((X_OFFSET + GRID * 30.0), GRID * 6.5, 'mainFont', ``, 8)
+        //.setAlpha(1).setScrollFactor(0).setTint(0x1f211b);
+        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
+        ).setAlpha(1).setDepth(101).setOrigin(0,0).setScrollFactor(0);
         
         var length = `${this.length}`;
         if (this.lengthGoal != 0) {
             this.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
-            ).setOrigin(0,0).setAlpha(0);
-            this.lengthGoalUILabel.setText(
-            `LENGTH\nGOAL`
-            ).setOrigin(0,0).setAlpha(0);
-            this.lengthGoalUILabel.setLineSpacing(3)
-            this.lengthGoalUI.setLineSpacing(3)
+            ).setOrigin(0,0).setAlpha(1);
+            //this.lengthGoalUILabel.setText(
+            //`ATOM\nGOAL`
+            //).setOrigin(0,0).setAlpha(0);
+            //this.lengthGoalUILabel.setLineSpacing(8)
+            this.lengthGoalUI.setLineSpacing(6)
         }
         else {
             // Special Level
@@ -6965,9 +6967,10 @@ class GameScene extends Phaser.Scene {
             this.lengthGoalUI.x = GRID * 27
         }
 
+        // TODO: move this to spaceboy scene and make transition logic for tween fade
         if (this.startupAnim) {
-            this.lengthGoalUI.setAlpha(0);
-            this.lengthGoalUILabel.setAlpha(0);
+            this.lengthGoalUI.setAlpha(1);
+            this.lengthGoalUILabel.setAlpha(1);
         }
         
         //this.add.image(SCREEN_WIDTH - 12, GRID * 1, 'ui', 3).setOrigin(1,0);
