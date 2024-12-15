@@ -739,8 +739,6 @@ class SpaceBoyScene extends Phaser.Scene {
 
         var zobj = calcZedObj(persist.zeds);
 
-        debugger
-
         this.zedLevel = this.add.bitmapText(GRID * 11 - 1, GRID * 27 + 8, 'mainFont',
             zobj.level,
         8).setOrigin(0,0).setDepth(91).setTintFill(0x869D54);
@@ -1598,7 +1596,6 @@ class PlinkoMachineScene extends Phaser.Scene {
                                 spaceBoy.updateZedDisplay(persist.zeds - tween.getValue());
                             },
                             onComplete: tween => {
-                                debugger
                                 spaceBoy.zedTitle.setText('ZEDS');
                                 spaceBoy.zedTitle.setAlpha(1);
                                 spaceBoy.updateZedDisplay(persist.zeds);
