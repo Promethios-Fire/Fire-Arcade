@@ -804,12 +804,6 @@ class SpaceBoyScene extends Phaser.Scene {
             this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
 
         // Length/Goal UI
-        const lengthGoalStyle = {
-            "color":'0x1f211b',
-            "font-size": '16px',
-            "font-weight": 400,
-            "text-align": 'right',
-        }
 
         this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
@@ -889,6 +883,15 @@ class SpaceBoyScene extends Phaser.Scene {
             repeat: 0,
             yoyo: false
           });
+          this.tweens.add({
+            targets: [this.lengthGoalUI, this.lengthGoalUILabel],
+            alpha: 1,
+            ease: 'Sine.InOut',
+            delay: 500,
+            duration: 500,
+            repeat: 0,
+            yoyo: false
+        });
     }
     scoreTweenHide(){
         if (this.UIScoreContainer.y === 0) {
@@ -5343,18 +5346,20 @@ class GameScene extends Phaser.Scene {
                     ourPinball.comboCoverSnake.setAlpha(1);
                 }
             });  
-            if (ourSpaceBoy.lengthGoalUI.alpha === 0) {
-                this.tweens.add({
-                    targets: [ourSpaceBoy.lengthGoalUI, ourSpaceBoy.lengthGoalUILabel],
-                    alpha:  1,
-                    ease: 'Sine.InOut',
-                    duration: 1000,
-                    repeat: 0,
-                    yoyo: false
-                });
-            }
-            
-        } 
+            this.tweens.add({
+                targets: [ourSpaceBoy.lengthGoalUI, ourSpaceBoy.lengthGoalUILabel],
+                alpha:  1,
+                ease: 'Sine.InOut',
+                duration: 1000,
+                repeat: 0,
+                yoyo: false
+            });
+        }
+        else{
+            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+            ourSpaceBoy.lengthGoalUI.setAlpha(1);
+            ourSpaceBoy.lengthGoalUILabel.setAlpha(1);
+        }
         // fade in 'READY?' for pinball display
         ourPinball.comboCoverReady.setOrigin(1.0,0)
         ourPinball.comboCoverReady.setTexture('UI_comboReady')
@@ -6980,16 +6985,15 @@ class GameScene extends Phaser.Scene {
         if (this.lengthGoal != 0) {
             ourSpaceBoy.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${this.lengthGoal.toString().padStart(2, "0")}`
-            ).setOrigin(0,0).setAlpha(0);
+            ).setOrigin(0,0);
             ourSpaceBoy.lengthGoalUI.setLineSpacing(6)
-            ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
+            //ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
         }
         else {
             // Special Level
-            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0)
-            .setAlpha(0);
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`).setOrigin(0,0);
             ourSpaceBoy.lengthGoalUI.x = GRID * 27
-            ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
+            //ourSpaceBoy.lengthGoalUILabel.setAlpha(0);
         }
 
         

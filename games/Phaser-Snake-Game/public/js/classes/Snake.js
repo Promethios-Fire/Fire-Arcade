@@ -89,14 +89,14 @@ var Snake = new Phaser.Class({
         
         // Exception for Bonus Levels when the Length Goal = 0
         if (LENGTH_GOAL != 0) {
-            ourSpaceBoy.lengthGoalUI.setAlpha(0);
+            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
             ourSpaceBoy.lengthGoalUI.setText(
                 `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
             )
             
         }
         else {
-            ourSpaceBoy.lengthGoalUI.setAlpha(0);
+            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
             ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
         }
 
