@@ -859,6 +859,15 @@ class SpaceBoyScene extends Phaser.Scene {
         this.navLog.push(stageText, stageOutLine);
 
     }
+    shiftLightsDim(){
+        this.tweens.add({
+            targets: [this.shiftLight1,this.shiftLight2,this.shiftLight3],
+            alpha: 0,
+            ease: 'Sine.InOut',
+            duration: 500,
+        });
+    }
+
     
     scoreTweenShow(){
         this.tweens.add({
@@ -1239,6 +1248,7 @@ class MusicPlayerScene extends Phaser.Scene {
             yoyo: false,
         });
     }*/
+
    showTrackID(){
     this.tweens.add({
         targets: [this.trackIDLabel,this.trackID, this.volumeIcon],
@@ -5692,9 +5702,6 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
-                ourSpaceBoy.shiftLight1.setAlpha(0);
-                ourSpaceBoy.shiftLight2.setAlpha(0);
-                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("YES");
                 
                 ourGameScene.extractMenuOn = false;
@@ -5740,9 +5747,6 @@ class GameScene extends Phaser.Scene {
                 });
                 ourGameScene.extractPromptText.setAlpha(0);
                 ourGameScene.extractPanel.setAlpha(0);
-                ourSpaceBoy.shiftLight1.setAlpha(0);
-                ourSpaceBoy.shiftLight2.setAlpha(0);
-                ourSpaceBoy.shiftLight3.setAlpha(0);
                 console.log("LOOP");
                 ourGameScene.extractMenuOn = false;
 
@@ -8415,6 +8419,8 @@ class GameScene extends Phaser.Scene {
         }
 
         this.scene.get("PinballDisplayScene").resetPinball()
+
+        ourSpaceBoy.shiftLightsDim();
     }
     gameSceneFullCleanup() {
         // Put end of run clean up loop.
