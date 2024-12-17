@@ -810,11 +810,14 @@ class SpaceBoyScene extends Phaser.Scene {
         this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
         ).setAlpha(0).setDepth(101).setOrigin(0,0).setScrollFactor(0);
         
-        //var length = 0;
-        //this.lengthGoal = LENGTH_GOAL;
-        //var length = `${ourGame.length}`;
+        this.lengthGoalUIMaskSprite = this.add.sprite(X_OFFSET + GRID * 24,
+            27, 'UI_goalLabelMask').setDepth(101).setOrigin(0,0);
 
-
+        const lengthGoalUIMask = new Phaser.Display.Masks.BitmapMask(this,this.lengthGoalUIMaskSprite );
+    
+        this.lengthGoalUILabel.setMask(lengthGoalUIMask)
+        this.lengthGoalUIMaskSprite.visible = false;
+        this.lengthGoalUILabel.mask.invertAlpha = true;
     }
     setLog(currentStage) {
         // #region Ship Log
@@ -983,6 +986,8 @@ class MusicPlayerScene extends Phaser.Scene {
         this.playerLooped = false;
     }
     create() {
+        const ourGame = this.scene.get("GameScene");
+
         this.soundManager = this.sound;
 
         // Start volume at 50%
@@ -1014,13 +1019,15 @@ class MusicPlayerScene extends Phaser.Scene {
         this.volumeSliderWidgetMask.visible = false;
         this.volumeSlider.mask.invertAlpha = true;
 
-        // is mouse hovering over volume wheel?
+        // is mouse hovering over volume wheel OR the entire music player area?
         this.isVolumeControlActive = false;
 
         this.volumeControlZone.on('pointerover', () => {
             this.input.setDefaultCursor('pointer');
             this.isVolumeControlActive = true;
             this.musicOpacity = 1;
+            var show = true;
+            ourGame.musicPlayerDisplay(show);
         });
         this.volumeControlZone.on('pointerout', () => {
             this.input.setDefaultCursor('default');
@@ -1029,10 +1036,12 @@ class MusicPlayerScene extends Phaser.Scene {
 
         this.musicPlayerZone.on('pointerover', () => {
             this.musicOpacity = 1;
-            //this.showPlayer();
+            var show = true;
+            ourGame.musicPlayerDisplay(show);
         });
         this.musicPlayerZone.on('pointerout', () => {
-            //this.musicOpacity = 0
+            var show = false;
+            ourGame.musicPlayerDisplay(show);
             if (this.isVolumeControlActive === false) {
                 this.musicOpacity = 0;
             }
@@ -1085,7 +1094,9 @@ class MusicPlayerScene extends Phaser.Scene {
         // Buttons
         var columnX = X_OFFSET + GRID * 36 + 1;
 
-        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75, 'mainFont', `000`, 8
+        this.trackIDLabel = this.add.bitmapText(columnX - GRID * 4 -5, GRID * 2 + 1, 'mainFont', `TRACK`, 8
+        ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 2 + 1, 'mainFont', `000`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
@@ -1168,6 +1179,8 @@ class MusicPlayerScene extends Phaser.Scene {
             button.on('pointerover', () => {
                 scene.musicOpacity = 1;
                 scene.input.setDefaultCursor('pointer');
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
             });
             button.on('pointerout', () => {
                 scene.input.setDefaultCursor('default');
@@ -1198,10 +1211,9 @@ class MusicPlayerScene extends Phaser.Scene {
     }
     update () {
         let targetOpacity = Phaser.Math.Interpolation.Linear(
-            [this.volumeIcon.alpha, this.musicOpacity], 0.25);
+            [this.volumeSlider.alpha, this.musicOpacity], 0.25);
         //.log(targetOpacity)
 
-        this.volumeIcon.alpha = targetOpacity;
         this.volumeSlider.alpha = targetOpacity;
         this.volumeSliderWidgetReal.alpha = targetOpacity;
     }
@@ -1227,6 +1239,17 @@ class MusicPlayerScene extends Phaser.Scene {
             yoyo: false,
         });
     }*/
+   showTrackID(){
+    this.tweens.add({
+        targets: [this.trackIDLabel,this.trackID, this.volumeIcon],
+        alpha: 1,
+        ease: 'Sine.InOut',
+        duration: 750,
+        repeat: 0,
+        yoyo: false,
+    });
+
+   }
 
     stopMusic() {
         this.sound.sounds.forEach((sound) => {
@@ -1996,6 +2019,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
         this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
+        this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
@@ -4139,7 +4163,8 @@ class MainMenuScene extends Phaser.Scene {
                 mainMenuScene.pressToPlay.setAlpha(0)
                 mainMenuScene.pressedSpace = true;
                 titleTween.resume();
-                menuFadeTween.resume();            
+                menuFadeTween.resume();
+                this.scene.get("MusicPlayerScene").showTrackID();   
             }
             else{
                 menuOptions.get(menuList[cursorIndex]).call(this);
@@ -7891,11 +7916,6 @@ class GameScene extends Phaser.Scene {
             ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
             }
         }
-            
-
-            
-
-        
 
         /*this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
             x:{min: 0, max: SCREEN_WIDTH},
@@ -8897,6 +8917,51 @@ class GameScene extends Phaser.Scene {
                 });
             }
         }); 
+    }
+
+    musicPlayerDisplay(show){
+        const ourSpaceboy = this.scene.get('SpaceBoyScene');
+        let _offset = 36;
+        if (show === true) {
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUI,
+                x: X_OFFSET + GRID * 32.25 + 3 - _offset,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUILabel,
+                x: X_OFFSET + GRID * 29.0 + 6 - _offset,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+        }
+        else if (show === false) {
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUI,
+                x: X_OFFSET + GRID * 32.25 + 3,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+            this.tweens.add({
+                targets: ourSpaceboy.lengthGoalUILabel,
+                x: X_OFFSET + GRID * 29.0 + 6,
+                ease: 'power2',
+                duration: 800,
+                completeDelay: 1000,
+                repeat: 0,
+            }); 
+        }
+            
+        
+        this.lengthGoalUI
+        this.lengthGoalUILabel
     }
 
     // #region Game Update
