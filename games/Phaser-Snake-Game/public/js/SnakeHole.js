@@ -1193,6 +1193,9 @@ class MusicPlayerScene extends Phaser.Scene {
             });
             button.on('pointerout', () => {
                 scene.input.setDefaultCursor('default');
+                scene.musicOpacity = 0;
+                var show = false;
+                ourGame.musicPlayerDisplay(show);
             });
         }
         setupButtonCursor(this.loopButton, this);
