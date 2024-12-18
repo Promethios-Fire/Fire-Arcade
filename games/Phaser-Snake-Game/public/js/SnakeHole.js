@@ -717,6 +717,7 @@ class SpaceBoyScene extends Phaser.Scene {
     init() {
         this.navLog = [];
         this.maxBin = 0;
+        this.prevZedLevel = 0;
         //this.zedBar = this.add.graphics();
     }
     create() {
@@ -742,6 +743,9 @@ class SpaceBoyScene extends Phaser.Scene {
         this.zedLevel = this.add.bitmapText(GRID * 11 - 1, GRID * 27 + 8, 'mainFont',
             zobj.level,
         8).setOrigin(0,0).setDepth(91).setTintFill(0x869D54);
+
+        this.prevZedLevel = zobj.level;
+        this.zedBarGraphics = this.add.graphics().setDepth(90);
 
         this.updateZedSegments(zobj.zedsRequired);
 
@@ -818,11 +822,12 @@ class SpaceBoyScene extends Phaser.Scene {
         this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
             this.bestScoreLabel,this.bestScoreValue, this.deltaScoreUI ]);
 
-        this.updateZedDisplay(persist.zeds);
+        this.updateZedDisplay(calcZedObj(persist.zeds));
 
     }
     updateZedSegments(maxZeds) {
         this.zedSegments = [];
+        this.zedBarGraphics.clear();
 
         var segments;
         
@@ -857,14 +862,14 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.maxBin = (2 ** segments) - 1;
 
-        var zedBarOutline = this.add.graphics().setDepth(90);
-        zedBarOutline.lineStyle(2, 0x1F211B, 1); // ave bar
-        zedBarOutline.strokeRect(startX - 2, barY - 1, 
+       
+        this.zedBarGraphics.lineStyle(2, 0x1F211B, 1); // ave bar
+        this.zedBarGraphics.strokeRect(startX - 2, barY - 1, 
             segments * deltaX + 2 , 5
         );
 
-        zedBarOutline.fillStyle(0x869D54);
-        zedBarOutline.fillRect(startX - 1, barY - 2 + 1, 
+        this.zedBarGraphics.fillStyle(0x869D54);
+        this.zedBarGraphics.fillRect(startX - 1, barY - 2 + 1, 
             segments * deltaX + 1, 5
         );
         
@@ -878,10 +883,8 @@ class SpaceBoyScene extends Phaser.Scene {
         }
 
     }
-    updateZedDisplay(zeds) {
-        
-        const zobj = calcZedObj(zeds);
-
+    updateZedDisplay(zobj) {
+    
         this.zedSegments.forEach( seg => {
             seg.setFrame(2);
         });
@@ -1575,30 +1578,38 @@ class PlinkoMachineScene extends Phaser.Scene {
                         this.zedIndex = 1;
 
                         var zedsRequired = calcZedObj(persist.zeds).zedsRequired;
-                        
-
                         var zedsPerSegment = spaceBoy.maxBin / zedsRequired;
+
+                        var zedCache = 0;
     
 
                         this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration: 99 * this.zedsToAdd * zedsPerSegment,
+                            duration: 60 * this.zedsToAdd * zedsPerSegment,
                             ease: 'linear',
                             onUpdate: tween => {
-                                tween.getValue();
                                 spaceBoy.zedTitle.setText(`+${Math.ceil(tween.getValue())}`);
 
-                                var zorb = calcZedObj(persist.zeds - tween.getValue());
+                                var zeds = persist.zeds - tween.getValue();
 
-                                spaceBoy.zedLevel.setText(zorb.level);
-                                spaceBoy.updateZedSegments(zorb.zedsRequired);
-                                spaceBoy.updateZedDisplay(persist.zeds - tween.getValue());
+                                if (zedCache != zeds) {
+                                    var displayedZorb = calcZedObj(zeds);
+                                    zedCache = zeds;
+                                }
+
+                                if (this.prevZedLevel != displayedZorb.level) {
+                                    spaceBoy.zedLevel.setText(displayedZorb.level);
+                                    spaceBoy.updateZedSegments(displayedZorb.zedsRequired);
+                                    this.prevZedLevel = displayedZorb.level;
+                                }
+
+                                spaceBoy.updateZedDisplay(displayedZorb);
                             },
                             onComplete: tween => {
                                 spaceBoy.zedTitle.setText('ZEDS');
                                 spaceBoy.zedTitle.setAlpha(1);
-                                spaceBoy.updateZedDisplay(persist.zeds);
+                                spaceBoy.updateZedDisplay(calcZedObj(persist.zeds));
                                 this.zedsToAdd = 0;
                             }  
                         });
