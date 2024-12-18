@@ -916,14 +916,16 @@ class SpaceBoyScene extends Phaser.Scene {
 
             case maxZeds < 16000: // Over leveled here?
                 segments = 16; // 131_071   
-                var xOffsets = [0, 4, 7, 10, 14, 17, 20, 23, 27, 30, 33, 35, 39, 42, 45, 48];
+                var xOffsets = [1, 4, 7,10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46];
+                this.add.sprite(startX + 0, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
+                this.add.sprite(startX + 50, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
                 for (let index = 0; index < segments; index++) {
                     var zedSeg;
-                    if (index === 0 || index === 3 || index === 7 || index === 11 || index === 15) {
-                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
+                    if (index === 15) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
                         ).setDepth(91).setOrigin(0,0);
                     } else {
-                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg2', 1
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
                         ).setDepth(91).setOrigin(0,0);
                     }
                     this.zedSegments.push(zedSeg);
@@ -1589,8 +1591,8 @@ class PlinkoMachineScene extends Phaser.Scene {
                 number;
                 this.zedsToAdd += this.zedIndex;
 
-                persist.zeds += 300; // Critical DO DELETE.
-                this.zedsToAdd = 300;
+                persist.zeds += 500; // Critical DO DELETE.
+                this.zedsToAdd = 500;
 
 
                 var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1664,7 +1666,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         this.countDownTween = this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration: 500 * this.zedsToAdd * zedsPerSegment, // 50
+                            duration:33 * this.zedsToAdd * zedsPerSegment, // 50
                             ease: 'linear',
                             onUpdate: tween => {
                                 this.zedsToAdd = parseInt(tween.getValue());
@@ -2107,6 +2109,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
         //this.load.spritesheet('zedBarSeg13', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg1', 'assets/sprites/zedbarSeg1.png', { frameWidth: 1, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg2', 'assets/sprites/zedbarSeg2.png', { frameWidth: 2, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg3', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg4', 'assets/sprites/zedbarSeg4.png', { frameWidth: 4, frameHeight: 3 });
