@@ -457,7 +457,7 @@ var intToBinHash = function (input) {
 
 const ZED_CONSTANT = 64;
 const ZEDS_LEVEL_SCALAR = 0.015;
-const ZEDS_OVERLEVEL_SCALAR = 0.2;
+const ZEDS_OVERLEVEL_SCALAR = 0.15;
 var calcZedObj = function (remainingZeds, reqZeds=0, level=0) {
     // Would be nice to put tests here.
 
@@ -902,7 +902,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 }
                 break
 
-            case maxZeds < 17157:
+            case maxZeds < 14245:
                 segments = 13 // 16_383
                 var deltaX = 4;
                 for (let index = 0; index < segments; index++) {
@@ -914,7 +914,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 break
 
-            case maxZeds > 17157: // Over leveled.
+            case maxZeds > 14245: // Over leveled.
                 segments = 15; // 131_071   
                 var xOffsets = [1, 3, 6,9, 12, 15, 18, 21, 24, 27, 30, 33, 37, 42, 47];
                 this.add.sprite(startX + 0, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
@@ -2122,7 +2122,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('zedBarSeg2', 'assets/sprites/zedbarSeg2.png', { frameWidth: 2, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg3', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg3Cap', 'assets/sprites/zedbarSeg3Cap.png', { frameWidth: 3, frameHeight: 3 });
-        this.load.spritesheet('zedBarSegEnd', 'assets/sprites/zedbarSeg3End.png', { frameWidth: 4, frameHeight: 3 });
+        this.load.spritesheet('zedBarSegEnd', 'assets/sprites/zedbarSegEnd.png', { frameWidth: 4, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg4', 'assets/sprites/zedbarSeg4.png', { frameWidth: 4, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg6', 'assets/sprites/zedbarSeg6.png', { frameWidth: 6, frameHeight: 3 });
