@@ -858,7 +858,6 @@ class SpaceBoyScene extends Phaser.Scene {
                 segments = 8; // 511
                 var xOffsets = [0, 7, 14, 20, 26, 32, 38, 45];
                 for (let index = 0; index < segments; index++) {
-
                     var zedSeg;
                     if (index === 0 || index === 1 || index === 6 || index === 7) {
                         zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg6', 1
@@ -869,11 +868,22 @@ class SpaceBoyScene extends Phaser.Scene {
                     }
                     this.zedSegments.push(zedSeg);
                 }
-
                 break
 
             case maxZeds < 4000:
                 segments = 10; // 2_047
+                var xOffsets = [0, 6, 12, 18, 24, 29, 35, 41, 47];
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 4) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
                 break
 
             case maxZeds < 8000:
@@ -2069,7 +2079,9 @@ class StartScene extends Phaser.Scene {
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
-        this.load.spritesheet('zedBarSeg13', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        //this.load.spritesheet('zedBarSeg13', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg3', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg4', 'assets/sprites/zedbarSeg4.png', { frameWidth: 4, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg6', 'assets/sprites/zedbarSeg6.png', { frameWidth: 6, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg7', 'assets/sprites/zedbarSeg7.png', { frameWidth: 7, frameHeight: 3 });
