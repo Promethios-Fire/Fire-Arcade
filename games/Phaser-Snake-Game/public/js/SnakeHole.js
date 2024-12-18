@@ -902,7 +902,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 }
                 break
 
-            case maxZeds < 13999:
+            case maxZeds < 17157:
                 segments = 13 // 16_383
                 var deltaX = 4;
                 for (let index = 0; index < segments; index++) {
@@ -914,7 +914,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 break
 
-            case maxZeds > 14000: // Over leveled.
+            case maxZeds > 17157: // Over leveled.
                 segments = 16; // 131_071   
                 var xOffsets = [1, 4, 7,10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46];
                 this.add.sprite(startX + 0, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
@@ -922,7 +922,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 for (let index = 0; index < segments; index++) {
                     var zedSeg;
                     if (index === 15) {
-                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg5', 1
                         ).setDepth(91).setOrigin(0,0);
                     } else {
                         zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
@@ -1591,8 +1591,8 @@ class PlinkoMachineScene extends Phaser.Scene {
                 number;
                 this.zedsToAdd += this.zedIndex;
 
-                persist.zeds += 1000; // Critical DO DELETE.
-                this.zedsToAdd = 1000;
+                persist.zeds += 1200; // Critical DO DELETE.
+                this.zedsToAdd = 1200;
 
 
                 var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
