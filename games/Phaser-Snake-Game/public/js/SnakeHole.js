@@ -722,13 +722,94 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
              'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
+        this.UI_SpaceBoi.setPipeline('Light2D');
 
-        //var light = this.add.graphics({ fillStyle: { color: 0xffff00 } }); // Yellow light var lightRadius = 10
+        var light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
+        var lightRadius = 10; // Radius of the light
+        //light.fillCircle(lightRadius, SCREEN_HEIGHT / 2, lightRadius);
 
+
+        this.lights.enable().setAmbientColor(0x555555);
         // for black screen before game is presented
         var graphics = this.add.graphics();
         graphics.fillStyle(0x161616, 1);
         graphics.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(100);
+
+        // Define the parabolic path function 
+        function parabolicPath(t) {
+            var a = 0.002;
+            var h = SCREEN_WIDTH / 4 ;
+            var k = SCREEN_HEIGHT / 4.5;
+            return a * Math.pow(t - h, 2) + k;
+        }
+        /*function updateLightColor(light, progress) {
+            // Create a color based on the progress (0 to 1)
+            var color = Phaser.Display.Color.Interpolate.RGBWithRGB(255, 0, 0, 0, 0, 255, 100, progress * 100);
+            var colorValue = Phaser.Display.Color.GetColor(color.r, color.g, color.b);
+            light.setColor(colorValue);
+        }*/
+
+        //this.hsv = Phaser.Display.Color.HSVColorWheel();
+        //const spectrum = Phaser.Display.Color.ColorSpectrum(360);
+        //var color = spectrum;
+
+
+        ////////
+/*
+                        this.fxBoost = this.boostBar.preFX.addColorMatrix();
+
+                        this.tweens.addCounter({
+                            from: 0,
+                            to: 360,
+                            duration: 3000,
+                            loop: -1,
+                            onUpdate: (tween) => {
+                                let hueValue = tween.getValue();
+                                this.fxBoost.hue(hueValue);
+                        
+                                // Update each segment's tint with an offset and apply pastel effect
+                                this.snake.body.forEach((part, index) => {
+                                    // Add an offset to the hue for each segment
+                                    let partHueValue = (hueValue + index * 12.41) % 360;
+                        
+                                    // Reduce saturation and increase lightness
+                                    let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+                        
+                                    if (color) {// only update color when it's not null
+                                        part.setTint(color.color);
+                                    }
+                                });
+                            }
+                        });*/
+        ///////
+
+        this.tweens.add({
+            targets: light,
+            x: SCREEN_WIDTH, // Move across the screen width
+            ease: 'Linear', // Linear horizontal movement
+            duration: 5000, // Duration of the tween in milliseconds 
+            onUpdate: function (tween, target) {
+                // Update the vertical position based on the parabolic path 
+                var t = target.x;
+                target.y = parabolicPath(t); // Clear and redraw the light
+                },
+            repeat: -1, // Repeat indefinitely 
+            yoyo: true // Bounce back and forth
+        });
+
+        const hsv = Phaser.Display.Color.HSVColorWheel();
+        this.tweens.addCounter({
+            from: 0,
+            to: 359, // 360 colors, index from 0 to 359
+            duration: 2000,
+            loop: -1,
+            onUpdate: (tween) => {
+                const i = Math.floor(tween.getValue());
+                let color = hsv[i].color;
+                light.setColor(color);
+            }
+        });
+
 
 
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
