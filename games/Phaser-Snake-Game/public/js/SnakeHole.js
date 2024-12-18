@@ -456,8 +456,8 @@ var intToBinHash = function (input) {
 }
 
 const ZED_CONSTANT = 64;
-const ZEDS_LEVEL_SCALAR = 0.02;
-const ZEDS_OVERLEVEL_SCALAR = 0.7;
+const ZEDS_LEVEL_SCALAR = 0.015;
+const ZEDS_OVERLEVEL_SCALAR = 0.2;
 var calcZedObj = function (remainingZeds, reqZeds=0, level=0) {
     // Would be nice to put tests here.
 
@@ -902,7 +902,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 }
                 break
 
-            case maxZeds < 8000:
+            case maxZeds < 13999:
                 segments = 13 // 16_383
                 var deltaX = 4;
                 for (let index = 0; index < segments; index++) {
@@ -914,11 +914,11 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 break
 
-            case maxZeds < 16000: // Over leveled here?
+            case maxZeds > 14000: // Over leveled.
                 segments = 16; // 131_071   
                 var xOffsets = [1, 4, 7,10, 13, 16, 19, 22, 25, 28, 31, 34, 37, 40, 43, 46];
                 this.add.sprite(startX + 0, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
-                this.add.sprite(startX + 50, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
+                //this.add.sprite(startX + 50, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
                 for (let index = 0; index < segments; index++) {
                     var zedSeg;
                     if (index === 15) {
@@ -932,9 +932,9 @@ class SpaceBoyScene extends Phaser.Scene {
                 }
                 break
 
-            case maxZeds < 20000: // Over leveled here?
-                segments = 24; // 33_554_431
-                break
+            //case maxZeds < 20000: // Over leveled here?
+            //    segments = 24; // 33_554_431
+            //    break
 
             default:
                 segments = 26 // 134_217_727
@@ -1591,8 +1591,8 @@ class PlinkoMachineScene extends Phaser.Scene {
                 number;
                 this.zedsToAdd += this.zedIndex;
 
-                persist.zeds += 500; // Critical DO DELETE.
-                this.zedsToAdd = 500;
+                persist.zeds += 1000; // Critical DO DELETE.
+                this.zedsToAdd = 1000;
 
 
                 var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
