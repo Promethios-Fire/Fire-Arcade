@@ -915,14 +915,23 @@ class SpaceBoyScene extends Phaser.Scene {
                 break
 
             case maxZeds > 17157: // Over leveled.
-                segments = 16; // 131_071   
-                var xOffsets = [1, 3, 6,9, 12, 15, 18, 21, 24, 27, 30, 33, 36, 40, 44, 48];
+                segments = 15; // 131_071   
+                var xOffsets = [1, 3, 6,9, 12, 15, 18, 21, 24, 27, 30, 33, 37, 42, 47];
                 this.add.sprite(startX + 0, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
                 //this.add.sprite(startX + 50, barY, 'zedBarSeg1', 1).setDepth(91).setOrigin(0,0);
                 for (let index = 0; index < segments; index++) {
                     var zedSeg;
                     if (index === 0) {
                         zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg2', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else if (index === 11) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3Cap', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else if (index === 12 || index === 13) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSegEnd', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else if (index === 14) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSegEnd', 1
                         ).setDepth(91).setOrigin(0,0);
                     } else {
                         zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
@@ -2112,6 +2121,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('zedBarSeg1', 'assets/sprites/zedbarSeg1.png', { frameWidth: 1, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg2', 'assets/sprites/zedbarSeg2.png', { frameWidth: 2, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg3', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg3Cap', 'assets/sprites/zedbarSeg3Cap.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSegEnd', 'assets/sprites/zedbarSeg3End.png', { frameWidth: 4, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg4', 'assets/sprites/zedbarSeg4.png', { frameWidth: 4, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg6', 'assets/sprites/zedbarSeg6.png', { frameWidth: 6, frameHeight: 3 });
