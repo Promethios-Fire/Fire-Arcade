@@ -12366,6 +12366,7 @@ var tempHeightDiff = 16;
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
     multiTexture: true,
+    //seed: 100, fixes randomness
     backgroundColor: '#bbbbbb', //'#4488aa'
     width: 640, 
     height: 360,// + tempHeightDiff * GRID,
