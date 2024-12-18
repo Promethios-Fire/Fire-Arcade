@@ -711,18 +711,32 @@ class SpaceBoyScene extends Phaser.Scene {
         super({key: 'SpaceBoyScene', active: false});
     }
     init() {
+        this.spaceBoyPowered = false;
         this.navLog = [];
     }
     create() {
         //this.sound.mute = true; //TEMP MUTE SOUND
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
+        
+        
+        
+        // Create an invisible interactive zone for volume dial and the music player zone
 
+        this.powerButtonZone = this.add.zone(GRID * 2.25, GRID * 6.5,
+            36, 36).setInteractive().setOrigin(0,0).setDepth(100); 
+        // debugging bounding box for powerButtonZone
+        this.add.graphics().lineStyle(2, 0xff0000)
+        .strokeRectShape(this.powerButtonZone).setDepth(102);
+        this.UI_PowerSwitch = this.add.sprite(GRID * 3.5 + 1, GRID * 6.5,
+            'UI_PowerSwitch').setOrigin(0.0,0.0).setDepth(105);
 
+        
 
         this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
              'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
         this.UI_SpaceBoi.setPipeline('Light2D');
+
 
         var light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
         var lightRadius = 10; // Radius of the light
@@ -735,6 +749,35 @@ class SpaceBoyScene extends Phaser.Scene {
         var graphics = this.add.graphics();
         graphics.fillStyle(0x161616, 1);
         graphics.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
+
+        this.spaceBoiMaskSprite = this.add.sprite(SCREEN_WIDTH/2 + GRID * 10.5,
+            SCREEN_HEIGHT/2, 'UI_goalLabelMask').setDepth(101).setOrigin(1,0.5);
+        this.spaceBoiMaskSprite.scaleX = 4;
+
+        const spaceBoiMask = new Phaser.Display.Masks.BitmapMask(this,this.spaceBoiMaskSprite);
+
+        this.UI_SpaceBoi.setMask(spaceBoiMask)
+        this.spaceBoiMaskSprite.visible = false;
+        this.UI_SpaceBoi.mask.invertAlpha = true;
+
+
+        this.tweens.add({
+            targets: this.spaceBoiMaskSprite,
+            scaleX: 0,
+            duration: 400,
+            ease: 'Sine.Out',
+            delay: 200,
+            onComplete: () =>{
+                const UI_SpaceBoiFX = this.UI_SpaceBoi.postFX.addShine(1.5, .5, 10);
+                this.tweens.add({
+                    targets: this.UI_SpaceBoi,
+                    alpha: 0,
+                    duration: 1000,
+                    ease: 'Sine.Out',
+                    delay: 1400,
+                });
+            },
+        });
 
         // Define the parabolic path function 
         function parabolicPath(t) {
@@ -755,9 +798,6 @@ class SpaceBoyScene extends Phaser.Scene {
                 var t = target.x;
                 target.y = parabolicPath(t);
                 },
-            onComplete: () =>{
-                const UI_SpaceBoiFX = this.UI_SpaceBoi.postFX.addShine(1.5, .5, 10);
-            },
             repeat: 0,
             yoyo: false
         });
@@ -2107,7 +2147,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
         this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
         this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
-
+        this.load.image('UI_PowerSwitch', 'assets/sprites/UI_PowerSwitch.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
