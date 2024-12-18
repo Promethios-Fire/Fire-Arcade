@@ -1423,6 +1423,7 @@ class PlinkoMachineScene extends Phaser.Scene {
     init() {
         this.zedIndex = 1;
         this.zedsToAdd = 0;
+        this.countDownTween = null;
     }
     create() {
         var matterJSON = this.cache.json.get('collisionData');
@@ -1539,6 +1540,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                 });
 
                 zedText.setText(`+${this.zedIndex}`);
+                debugger
                 spaceBoy.zedTitle.setText(`+${this.zedsToAdd}`);
 
                 console.log("Add", this.zedIndex, " Zeds for a total", this.zedsToAdd);
@@ -1583,7 +1585,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         var zedCache = 0;
     
 
-                        this.tweens.addCounter({
+                        this.countDownTween = this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
                             duration: 60 * this.zedsToAdd * zedsPerSegment,
@@ -11172,7 +11174,12 @@ class ScoreScene extends Phaser.Scene {
                     ourPersist.zeds += rollResults.get("zedsEarned");
                 }
 
-                ourSpaceBoy.zedTitle.setText('+0');
+                ourSpaceBoy.zedTitle.setText(`+${plinkoMachine.zedsToAdd}`);
+                if (plinkoMachine.countDownTween != null && plinkoMachine.countDownTween.isPlaying()) {
+                    debugger
+                    plinkoMachine.zedIndex = 1;
+                    plinkoMachine.countDownTween.pause();
+                }
                 plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
