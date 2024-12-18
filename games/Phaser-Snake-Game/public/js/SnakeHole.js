@@ -1588,7 +1588,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         this.countDownTween = this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration: 60 * this.zedsToAdd * zedsPerSegment,
+                            duration: 50 * this.zedsToAdd * zedsPerSegment,
                             ease: 'linear',
                             onUpdate: tween => {
                                 this.zedsToAdd = parseInt(tween.getValue());
