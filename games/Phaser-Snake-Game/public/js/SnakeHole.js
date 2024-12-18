@@ -712,6 +712,7 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     init() {
         this.spaceBoyPowered = false;
+        this.spaceBoyReady = false;
         this.navLog = [];
     }
     create() {
@@ -726,29 +727,121 @@ class SpaceBoyScene extends Phaser.Scene {
         this.powerButtonZone = this.add.zone(GRID * 2.25, GRID * 6.5,
             36, 36).setInteractive().setOrigin(0,0).setDepth(100); 
         // debugging bounding box for powerButtonZone
-        this.add.graphics().lineStyle(2, 0xff0000)
-        .strokeRectShape(this.powerButtonZone).setDepth(102);
+        //this.add.graphics().lineStyle(2, 0xff0000)
+        //.strokeRectShape(this.powerButtonZone).setDepth(102);
+        
         this.UI_PowerSwitch = this.add.sprite(GRID * 3.5 + 1, GRID * 6.5,
             'UI_PowerSwitch').setOrigin(0.0,0.0).setDepth(105);
 
-        
+        this.powerButtonZone.on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
 
+        });
+        this.powerButtonZone.on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+
+        }); 
+
+        this.powerButtonZone.on('pointerdown', () => {   
+            if (this.spaceBoyPowered === false) {
+                this.spaceBoyPowered = true;
+                this.UI_PowerSwitch.y -= 24;
+                this.powerButtonZone.y -= 24;
+                
+                this.tweens.add({
+                    targets: this.spaceBoyLight,
+                    alpha: {from: 0, to: 1},
+                    duration: 600,
+                    ease: 'Sine.Out',
+                    delay: 0,
+                });
+
+                this.tweens.add({
+                    targets: light,
+                    x: SCREEN_WIDTH,
+                    ease: 'Phaser.Math.Easing.Circular.InOut',
+                    duration: 1800,
+                    delay: 0,
+                    onUpdate: function (tween, target) {
+                        // Update the vertical position based on the parabolic path 
+                        var t = target.x;
+                        target.y = parabolicPath(t);
+                        },
+                    repeat: 0,
+                    yoyo: false
+                });
+                this.tweens.add({
+                    targets: this.spaceBoiMaskSprite,
+                    scaleX: 0,
+                    duration: 400,
+                    ease: 'Sine.Out',
+                    delay: 200,
+                    onComplete: () =>{
+                        const UI_SpaceBoiFX = this.UI_SpaceBoi.postFX.addShine(1.5, .5, 10);
+                        this.tweens.add({
+                            targets: this.UI_SpaceBoi,
+                            alpha: 0,
+                            duration: 1000,
+                            ease: 'Sine.Out',
+                            delay: 1400,
+                            onComplete: () =>{
+                                this.blankScreen.destroy();
+                                this.spaceBoyReady = true;
+                                this.scene.get("MainMenuScene").pressToPlayTween.play();
+                            }
+                        });  
+                    },
+                });
+                this.tweens.addCounter({
+                    from: 0,
+                    to: 359, // 360 colors, index from 0 to 359
+                    duration: 2000,
+                    loop: 0,
+                    onUpdate: (tween) => {
+                        const i = Math.floor(tween.getValue());
+                
+                        // Update the light color
+                        let color = hsv[i].color;
+                        light.setColor(color);
+                
+                        // Calculate the progress of the tween
+                        const progress = tween.progress;
+                
+                        // Calculate the ambient light color transition from 0x555555 to 0xFFFFFF
+                        const startColor = Phaser.Display.Color.ValueToColor(0x161616);
+                        const endColor = Phaser.Display.Color.ValueToColor(0xFFFFFF);
+                        const r = Phaser.Math.Interpolation.Linear([startColor.red, endColor.red], progress);
+                        const g = Phaser.Math.Interpolation.Linear([startColor.green, endColor.green], progress);
+                        const b = Phaser.Math.Interpolation.Linear([startColor.blue, endColor.blue], progress);
+                
+                        const ambientColor = Phaser.Display.Color.GetColor(r, g, b);
+                        this.lights.setAmbientColor(ambientColor);
+                    }
+                });
+            }
+            else{
+                //temporary solution for resetting the game -- doesn't preserve object permanence
+                window.location.reload();
+            }
+        });
+        
+        
+        
+        
         this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
              'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
         this.UI_SpaceBoi.setPipeline('Light2D');
 
 
         var light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
-        var lightRadius = 10; // Radius of the light
-        //light.fillCircle(lightRadius, SCREEN_HEIGHT / 2, lightRadius);
-
+        var lightRadius = 10;
 
         this.lights.enable().setAmbientColor(0x555555);
         
         // for black screen before game is presented
-        var graphics = this.add.graphics();
-        graphics.fillStyle(0x161616, 1);
-        graphics.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
+        this.blankScreen = this.add.graphics();
+        this.blankScreen .fillStyle(0x161616, 1);
+        this.blankScreen .fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
 
         this.spaceBoiMaskSprite = this.add.sprite(SCREEN_WIDTH/2 + GRID * 10.5,
             SCREEN_HEIGHT/2, 'UI_goalLabelMask').setDepth(101).setOrigin(1,0.5);
@@ -761,23 +854,7 @@ class SpaceBoyScene extends Phaser.Scene {
         this.UI_SpaceBoi.mask.invertAlpha = true;
 
 
-        this.tweens.add({
-            targets: this.spaceBoiMaskSprite,
-            scaleX: 0,
-            duration: 400,
-            ease: 'Sine.Out',
-            delay: 200,
-            onComplete: () =>{
-                const UI_SpaceBoiFX = this.UI_SpaceBoi.postFX.addShine(1.5, .5, 10);
-                this.tweens.add({
-                    targets: this.UI_SpaceBoi,
-                    alpha: 0,
-                    duration: 1000,
-                    ease: 'Sine.Out',
-                    delay: 1400,
-                });
-            },
-        });
+        
 
         // Define the parabolic path function 
         function parabolicPath(t) {
@@ -786,51 +863,9 @@ class SpaceBoyScene extends Phaser.Scene {
             var k = SCREEN_HEIGHT / 4.5;
             return a * Math.pow(t - h, 2) + k;
         }
-        
-        this.tweens.add({
-            targets: light,
-            x: SCREEN_WIDTH,
-            ease: 'Phaser.Math.Easing.Circular.InOut',
-            duration: 1800,
-            delay: 0,
-            onUpdate: function (tween, target) {
-                // Update the vertical position based on the parabolic path 
-                var t = target.x;
-                target.y = parabolicPath(t);
-                },
-            repeat: 0,
-            yoyo: false
-        });
 
         const hsv = Phaser.Display.Color.HSVColorWheel();
-        this.tweens.addCounter({
-            from: 0,
-            to: 359, // 360 colors, index from 0 to 359
-            duration: 2000,
-            loop: 0,
-            onUpdate: (tween) => {
-                const i = Math.floor(tween.getValue());
         
-                // Update the light color
-                let color = hsv[i].color;
-                light.setColor(color);
-        
-                // Calculate the progress of the tween
-                const progress = tween.progress;
-        
-                // Calculate the ambient light color transition from 0x555555 to 0xFFFFFF
-                const startColor = Phaser.Display.Color.ValueToColor(0x161616);
-                const endColor = Phaser.Display.Color.ValueToColor(0xFFFFFF);
-                const r = Phaser.Math.Interpolation.Linear([startColor.red, endColor.red], progress);
-                const g = Phaser.Math.Interpolation.Linear([startColor.green, endColor.green], progress);
-                const b = Phaser.Math.Interpolation.Linear([startColor.blue, endColor.blue], progress);
-        
-                const ambientColor = Phaser.Display.Color.GetColor(r, g, b);
-                this.lights.setAmbientColor(ambientColor);
-            }
-        });
-        
-
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
@@ -855,14 +890,6 @@ class SpaceBoyScene extends Phaser.Scene {
         
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
         setOrigin(0,0).setDepth(102).setAlpha(0);
-
-        this.tweens.add({
-            targets: this.spaceBoyLight,
-            alpha: {from: 0, to: 1},
-            duration: 600,
-            ease: 'Sine.Out',
-            delay: 500,
-            });
 
 
         switch (persist.mode) {
@@ -1146,10 +1173,13 @@ class MusicPlayerScene extends Phaser.Scene {
 
         this.volumeControlZone.on('pointerover', () => {
             this.input.setDefaultCursor('pointer');
-            this.isVolumeControlActive = true;
-            this.musicOpacity = 1;
-            var show = true;
-            ourGame.musicPlayerDisplay(show);
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                this.isVolumeControlActive = true;
+                this.musicOpacity = 1;
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
+            }
+            
         });
         this.volumeControlZone.on('pointerout', () => {
             this.input.setDefaultCursor('default');
@@ -1157,9 +1187,12 @@ class MusicPlayerScene extends Phaser.Scene {
         }); 
 
         this.musicPlayerZone.on('pointerover', () => {
-            this.musicOpacity = 1;
-            var show = true;
-            ourGame.musicPlayerDisplay(show);
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                this.musicOpacity = 1;
+                var show = true;
+                ourGame.musicPlayerDisplay(show);
+            }
+            
         });
         this.musicPlayerZone.on('pointerout', () => {
             var show = false;
@@ -1171,48 +1204,49 @@ class MusicPlayerScene extends Phaser.Scene {
 
         // Listen for mouse wheel events
         this.input.on('wheel', (pointer, gameObjects, deltaX, deltaY, deltaZ) => {
-            if (this.isVolumeControlActive){
-                let volumeChange;
-                //checks for mouse scroll up or down
-                if (deltaY > 0) {
-                    volumeChange = -0.125; 
-                } 
-                else {
-                    volumeChange = 0.125; 
-                }
-                // clamp volume from 0-1
-                this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
-                this.updatedVolume = this.soundManager.volume + volumeChange
-                
-                // y values for adjusting the volumeSliderWidget and Mask
-                const minY = 46;
-                const maxY = 105;
-                const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
-                
-                // this console log is one event call behind hence this.updatedVolume
-                //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                if (this.isVolumeControlActive){
+                    let volumeChange;
+                    //checks for mouse scroll up or down
+                    if (deltaY > 0) {
+                        volumeChange = -0.125; 
+                    } 
+                    else {
+                        volumeChange = 0.125; 
+                    }
+                    // clamp volume from 0-1
+                    this.soundManager.volume = Phaser.Math.Clamp(this.soundManager.volume + volumeChange, 0, 1);
+                    this.updatedVolume = this.soundManager.volume + volumeChange
+                    
+                    // y values for adjusting the volumeSliderWidget and Mask
+                    const minY = 46;
+                    const maxY = 105;
+                    const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
+                    
+                    // this console log is one event call behind hence this.updatedVolume
+                    //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
 
-                // set volume icon based on volume level
-                if (newY >= 46 && newY <= 105) {
-                    this.volumeSliderWidgetMask.y = newY;
-                    this.volumeSliderWidgetReal.y = newY;
+                    // set volume icon based on volume level
+                    if (newY >= 46 && newY <= 105) {
+                        this.volumeSliderWidgetMask.y = newY;
+                        this.volumeSliderWidgetReal.y = newY;
 
-                    if (this.updatedVolume === 0) {
-                        this.volumeIcon.setFrame(3);
+                        if (this.updatedVolume === 0) {
+                            this.volumeIcon.setFrame(3);
+                        }
+                        else if (this.updatedVolume > 0 && this.updatedVolume <= 0.33) {
+                            this.volumeIcon.setFrame(2);
+                        }
+                        else if (this.updatedVolume > 0.33 && this.updatedVolume <= 0.66) {
+                            this.volumeIcon.setFrame(1);
+                        }
+                        else if (this.updatedVolume > 0.66)
+                            this.volumeIcon.setFrame(0);
+                        }
                     }
-                    else if (this.updatedVolume > 0 && this.updatedVolume <= 0.33) {
-                        this.volumeIcon.setFrame(2);
-                    }
-                    else if (this.updatedVolume > 0.33 && this.updatedVolume <= 0.66) {
-                        this.volumeIcon.setFrame(1);
-                    }
-                    else if (this.updatedVolume > 0.66)
-                        this.volumeIcon.setFrame(0);
-                    }
-                }
-
-                
+                }      
         });
+        
         // Buttons
         var columnX = X_OFFSET + GRID * 36 + 1;
 
@@ -1227,64 +1261,71 @@ class MusicPlayerScene extends Phaser.Scene {
         this.loopButton = this.add.sprite(columnX , GRID * 7.75, 'mediaButtons', 4
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
+        
         this.loopButton.on('pointerdown', () => {
-            if (!this.playerLooped) {
-                this.playerLooped = true;
-                this.loopButton.setFrame(5);
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                if (!this.playerLooped) {
+                    this.playerLooped = true;
+                    this.loopButton.setFrame(5);
+                }
+                else{
+                    this.playerLooped = false;
+                    this.loopButton.setFrame(4);
+                }
             }
-            else{
-                this.playerLooped = false;
-                this.loopButton.setFrame(4);
-            }
-            
-            
         }, this);
+        
     
         // Pause Button
         this.pauseButton = this.add.sprite(columnX , GRID * 4.75, 'mediaButtons', 0
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
         
-        
+
         this.pauseButton.on('pointerdown', () => {
-            // is music playing?
-            if (this.music.isPlaying) {
-                this.pauseButton.setFrame(1);
-                this.music.pause();
-                this.playerPaused = true;
-            }  
-            // does music exist? and if so is it paused?
-            else if (this.music.isPaused) {
-                this.pauseButton.setFrame(0);
-                this.playerPaused = false;
-                this.music.resume();
-            } 
-            // this will unpause the player and queue a new song if
-            // entered game scene in a paused state
-            else {
-                this.pauseButton.setFrame(0);
-                this.playerPaused = false;
-                this.nextSong();
-            }   
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                // is music playing?
+                if (this.music.isPlaying) {
+                    this.pauseButton.setFrame(1);
+                    this.music.pause();
+                    this.playerPaused = true;
+                }  
+                // does music exist? and if so is it paused?
+                else if (this.music.isPaused) {
+                    this.pauseButton.setFrame(0);
+                    this.playerPaused = false;
+                    this.music.resume();
+                } 
+                // this will unpause the player and queue a new song if
+                // entered game scene in a paused state
+                else {
+                    this.pauseButton.setFrame(0);
+                    this.playerPaused = false;
+                    this.nextSong();
+                }   
+            }
         }, this);
 
         // Next Button
         this.nextButton = this.add.sprite(columnX , GRID * 6.25, 'mediaButtons', 2
         ).setOrigin(0.5,0).setDepth(80).setScale(1).setInteractive();
+
         this.nextButton.on('pointerdown', () => {
-            // if looping enabled, disable
-            if (this.playerLooped) {
-                this.playerLooped = false;
-                this.loopButton.setFrame(4);
-            }
-            this.nextButton.setFrame(3);
-            this.music.stop();
-            this.nextSong();
-            if (this.pauseButton.frame.name === 1) {
-                console.log('working')
-                this.pauseButton.setFrame(0)
-            }
-            
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                // if looping enabled, disable
+                if (this.playerLooped) {
+                    this.playerLooped = false;
+                    this.loopButton.setFrame(4);
+                }
+                this.nextButton.setFrame(3);
+                this.music.stop();
+                this.nextSong();
+                if (this.pauseButton.frame.name === 1) {
+                    console.log('working')
+                    this.pauseButton.setFrame(0)
+                }
+            } 
         }, this);
+        
 
         // on mouse click up, only nextButton resets to unpressed state
         this.input.on('pointerup', function(pointer){
@@ -1299,8 +1340,8 @@ class MusicPlayerScene extends Phaser.Scene {
         // checks whether cursor is over any button and then changes cursor to hand
         function setupButtonCursor(button, scene) {
             button.on('pointerover', () => {
-                scene.musicOpacity = 1;
                 scene.input.setDefaultCursor('pointer');
+                scene.musicOpacity = 1;
                 var show = true;
                 ourGame.musicPlayerDisplay(show);
             });
@@ -1317,30 +1358,33 @@ class MusicPlayerScene extends Phaser.Scene {
          
         //pauses and resumes sound so queued sfx don't play all at once upon resuming
         window.addEventListener('focus', () => {
-            
-            this.sound.pauseAll(); // ensures all sounds do NOT play when clicking back into game (prevents unwanted noises)
-            this.music.resume(); //resumes all music instances so old tracks need to be stopped properly
-            if (this.playerPaused) {
-                this.music.pause(); //keeps music paused if player clicked pause button
-            }
-            else{
-                this.pauseButton.setFrame(0);
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                this.sound.pauseAll(); // ensures all sounds do NOT play when clicking back into game (prevents unwanted noises)
+                this.music.resume(); //resumes all music instances so old tracks need to be stopped properly
+                if (this.playerPaused) {
+                    this.music.pause(); //keeps music paused if player clicked pause button
+                }
+                else{
+                    this.pauseButton.setFrame(0);
+                }
             }
         });
         
         window.addEventListener('blur', () => {
-            this.pauseButton.setFrame(1);
-            this.sound.pauseAll(); // this prevents sound from being able to resume
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                this.pauseButton.setFrame(1);
+                this.sound.pauseAll(); // this prevents sound from being able to resume
+            }
         });
 
     }
     update () {
-        let targetOpacity = Phaser.Math.Interpolation.Linear(
-            [this.volumeSlider.alpha, this.musicOpacity], 0.25);
-        //.log(targetOpacity)
-
-        this.volumeSlider.alpha = targetOpacity;
-        this.volumeSliderWidgetReal.alpha = targetOpacity;
+        if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+            let targetOpacity = Phaser.Math.Interpolation.Linear(
+                [this.volumeSlider.alpha, this.musicOpacity], 0.25);
+            this.volumeSlider.alpha = targetOpacity;
+            this.volumeSliderWidgetReal.alpha = targetOpacity;
+        }
     }
 
     /*showPlayer() {
@@ -1649,7 +1693,7 @@ class PlinkoMachineScene extends Phaser.Scene {
         })).setOrigin(1,0).setScale(.5);
 
         
-        this.spawnPlinkos(2);
+        //this.spawnPlinkos(2);
     }
     spawnPlinkos (number) {
         
@@ -4269,34 +4313,38 @@ class MainMenuScene extends Phaser.Scene {
 
         }),
                 `Press Space`
-        ).setOrigin(0.5,0.5).setScale(0.5);
+        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
         this.pressToPlayTween = this.tweens.add({
             targets: this.pressToPlay,
-            alpha: 0,
+            alpha: 1,
             duration: 1000,
             ease: 'Sine.InOut',
             yoyo: true,
             repeat: -1,
+            paused: true
         });
 
         this.input.keyboard.on('keydown-SPACE', function() {
-            if (!mainMenuScene.pressedSpace) {
+            if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                if (!mainMenuScene.pressedSpace) {
 
-                if (!this.scene.get("MusicPlayerScene").hasStarted) {
-                    this.scene.get("MusicPlayerScene").startMusic();
-                } 
+                    if (!this.scene.get("MusicPlayerScene").hasStarted) {
+                        this.scene.get("MusicPlayerScene").startMusic();
+                    } 
+    
+                    mainMenuScene.pressToPlayTween.stop();
+                    mainMenuScene.pressToPlay.setAlpha(0)
+                    mainMenuScene.pressedSpace = true;
+                    titleTween.resume();
+                    menuFadeTween.resume();
+                    this.scene.get("MusicPlayerScene").showTrackID();   
+                }
+                else{
+                    menuOptions.get(menuList[cursorIndex]).call(this);
+                }
+            }
 
-                mainMenuScene.pressToPlayTween.stop();
-                mainMenuScene.pressToPlay.setAlpha(0)
-                mainMenuScene.pressedSpace = true;
-                titleTween.resume();
-                menuFadeTween.resume();
-                this.scene.get("MusicPlayerScene").showTrackID();   
-            }
-            else{
-                menuOptions.get(menuList[cursorIndex]).call(this);
-            }
 
         }, this);
 
