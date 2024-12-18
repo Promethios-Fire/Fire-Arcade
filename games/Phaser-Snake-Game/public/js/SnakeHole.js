@@ -718,6 +718,7 @@ class SpaceBoyScene extends Phaser.Scene {
         this.navLog = [];
         this.maxBin = 0;
         this.prevZedLevel = 0;
+        this.zedSegments = [];
         //this.zedBar = this.add.graphics();
     }
     create() {
@@ -826,6 +827,15 @@ class SpaceBoyScene extends Phaser.Scene {
 
     }
     updateZedSegments(maxZeds) {
+
+        if (this.zedSegments.length > 0) {
+            this.zedSegments.forEach( seg => {
+                seg.destroy();
+            });
+            this.zedSegments = [];
+        } else {
+            this.zedSegments = [];
+        }
         this.zedSegments = [];
         this.zedBarGraphics.clear();
 
@@ -1571,8 +1581,8 @@ class PlinkoMachineScene extends Phaser.Scene {
         });
 
         const spaceBoy = this.scene.get("SpaceBoyScene");
-        spaceBoy.zedTitle.setText('+0');
-        this.spawnPlinkos(1);
+        //spaceBoy.zedTitle.setText('+0');
+        //this.spawnPlinkos(1);
     }
     spawnPlinkos (number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
@@ -1599,9 +1609,6 @@ class PlinkoMachineScene extends Phaser.Scene {
                 // pair.bodyB
                 number;
                 this.zedsToAdd += this.zedIndex;
-
-                persist.zeds += 1200; // Critical DO DELETE.
-                this.zedsToAdd = 1200;
 
 
                 var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -1675,7 +1682,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         this.countDownTween = this.tweens.addCounter({
                             from: this.zedsToAdd,
                             to: 0,
-                            duration:33 * this.zedsToAdd * zedsPerSegment, // 50
+                            duration: 66 * this.zedsToAdd * zedsPerSegment, // 50
                             ease: 'linear',
                             onUpdate: tween => {
                                 this.zedsToAdd = parseInt(tween.getValue());
