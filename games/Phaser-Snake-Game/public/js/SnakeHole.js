@@ -871,12 +871,28 @@ class SpaceBoyScene extends Phaser.Scene {
                 break
 
             case maxZeds < 4000:
-                segments = 10; // 2_047
+                segments = 9; // 2_047
                 var xOffsets = [0, 6, 12, 18, 24, 29, 35, 41, 47];
                 for (let index = 0; index < segments; index++) {
                     var zedSeg;
                     if (index === 4) {
                         zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
+                break
+
+            case maxZeds < 6000:
+                segments = 10; // 2_047
+                var xOffsets = [0, 6, 11, 16, 21, 26, 31, 36, 41, 46];
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 0 || index === 9) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg5', 1
                         ).setDepth(91).setOrigin(0,0);
                     } else {
                         zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg4', 1
