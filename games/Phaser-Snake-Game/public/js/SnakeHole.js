@@ -905,7 +905,6 @@ class SpaceBoyScene extends Phaser.Scene {
             case maxZeds < 8000:
                 segments = 13 // 16_383
                 var deltaX = 4;
-                debugger
                 for (let index = 0; index < segments; index++) {
                     var zedSeg = this.add.sprite(startX + deltaX * index, barY, 'zedBarSeg3', 1
         
@@ -917,6 +916,18 @@ class SpaceBoyScene extends Phaser.Scene {
 
             case maxZeds < 16000: // Over leveled here?
                 segments = 16; // 131_071   
+                var xOffsets = [0, 4, 7, 10, 14, 17, 20, 23, 27, 30, 33, 35, 39, 42, 45, 48];
+                for (let index = 0; index < segments; index++) {
+                    var zedSeg;
+                    if (index === 0 || index === 3 || index === 7 || index === 11 || index === 15) {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg3', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    } else {
+                        zedSeg = this.add.sprite(startX + xOffsets[index], barY, 'zedBarSeg2', 1
+                        ).setDepth(91).setOrigin(0,0);
+                    }
+                    this.zedSegments.push(zedSeg);
+                }
                 break
 
             case maxZeds < 20000: // Over leveled here?
@@ -2096,6 +2107,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
         //this.load.spritesheet('zedBarSeg13', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
+        this.load.spritesheet('zedBarSeg2', 'assets/sprites/zedbarSeg2.png', { frameWidth: 2, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg3', 'assets/sprites/zedbarSeg3.png', { frameWidth: 3, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg4', 'assets/sprites/zedbarSeg4.png', { frameWidth: 4, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
