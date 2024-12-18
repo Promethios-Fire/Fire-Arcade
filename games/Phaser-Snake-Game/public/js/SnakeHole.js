@@ -7204,15 +7204,11 @@ class GameScene extends Phaser.Scene {
             
             var lastScore = calcStageScore(prevBase);
             
-            //var plusBonus = currentScore - lastScore - lastAtom;
             var deltaScore =  currentScore - lastScore;
 
-            console.log("Current Score:", currentScore, "+Δ" , deltaScore, "Length:", this.length);
+            //console.log("Current Score:", currentScore, "+Δ" , deltaScore, "Length:", this.length);
 
             //this.runningScore = this.score + calcBonus(baseScore);
-            
-
-            
 
             //this.runningScoreLabelUI.setText(
             //    `${commaInt(this.runningScore.toString())}`
@@ -12246,6 +12242,7 @@ var tempHeightDiff = 16;
 // #region Config
 var config = {
     type: Phaser.AUTO,  //Phaser.WEBGL breaks CSS TEXT in THE UI
+    multiTexture: true,
     backgroundColor: '#bbbbbb', //'#4488aa'
     width: 640, 
     height: 360,// + tempHeightDiff * GRID,
