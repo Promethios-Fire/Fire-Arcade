@@ -730,10 +730,11 @@ class SpaceBoyScene extends Phaser.Scene {
 
 
         this.lights.enable().setAmbientColor(0x555555);
+        
         // for black screen before game is presented
         var graphics = this.add.graphics();
         graphics.fillStyle(0x161616, 1);
-        graphics.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(100);
+        graphics.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
 
         // Define the parabolic path function 
         function parabolicPath(t) {
@@ -742,59 +743,23 @@ class SpaceBoyScene extends Phaser.Scene {
             var k = SCREEN_HEIGHT / 4.5;
             return a * Math.pow(t - h, 2) + k;
         }
-        /*function updateLightColor(light, progress) {
-            // Create a color based on the progress (0 to 1)
-            var color = Phaser.Display.Color.Interpolate.RGBWithRGB(255, 0, 0, 0, 0, 255, 100, progress * 100);
-            var colorValue = Phaser.Display.Color.GetColor(color.r, color.g, color.b);
-            light.setColor(colorValue);
-        }*/
-
-        //this.hsv = Phaser.Display.Color.HSVColorWheel();
-        //const spectrum = Phaser.Display.Color.ColorSpectrum(360);
-        //var color = spectrum;
-
-
-        ////////
-/*
-                        this.fxBoost = this.boostBar.preFX.addColorMatrix();
-
-                        this.tweens.addCounter({
-                            from: 0,
-                            to: 360,
-                            duration: 3000,
-                            loop: -1,
-                            onUpdate: (tween) => {
-                                let hueValue = tween.getValue();
-                                this.fxBoost.hue(hueValue);
-                        
-                                // Update each segment's tint with an offset and apply pastel effect
-                                this.snake.body.forEach((part, index) => {
-                                    // Add an offset to the hue for each segment
-                                    let partHueValue = (hueValue + index * 12.41) % 360;
-                        
-                                    // Reduce saturation and increase lightness
-                                    let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
-                        
-                                    if (color) {// only update color when it's not null
-                                        part.setTint(color.color);
-                                    }
-                                });
-                            }
-                        });*/
-        ///////
-
+        
         this.tweens.add({
             targets: light,
-            x: SCREEN_WIDTH, // Move across the screen width
-            ease: 'Linear', // Linear horizontal movement
-            duration: 5000, // Duration of the tween in milliseconds 
+            x: SCREEN_WIDTH,
+            ease: 'Phaser.Math.Easing.Circular.InOut',
+            duration: 1800,
+            delay: 0,
             onUpdate: function (tween, target) {
                 // Update the vertical position based on the parabolic path 
                 var t = target.x;
-                target.y = parabolicPath(t); // Clear and redraw the light
+                target.y = parabolicPath(t);
                 },
-            repeat: -1, // Repeat indefinitely 
-            yoyo: true // Bounce back and forth
+            onComplete: () =>{
+                const UI_SpaceBoiFX = this.UI_SpaceBoi.postFX.addShine(1.5, .5, 10);
+            },
+            repeat: 0,
+            yoyo: false
         });
 
         const hsv = Phaser.Display.Color.HSVColorWheel();
@@ -802,15 +767,29 @@ class SpaceBoyScene extends Phaser.Scene {
             from: 0,
             to: 359, // 360 colors, index from 0 to 359
             duration: 2000,
-            loop: -1,
+            loop: 0,
             onUpdate: (tween) => {
                 const i = Math.floor(tween.getValue());
+        
+                // Update the light color
                 let color = hsv[i].color;
                 light.setColor(color);
+        
+                // Calculate the progress of the tween
+                const progress = tween.progress;
+        
+                // Calculate the ambient light color transition from 0x555555 to 0xFFFFFF
+                const startColor = Phaser.Display.Color.ValueToColor(0x161616);
+                const endColor = Phaser.Display.Color.ValueToColor(0xFFFFFF);
+                const r = Phaser.Math.Interpolation.Linear([startColor.red, endColor.red], progress);
+                const g = Phaser.Math.Interpolation.Linear([startColor.green, endColor.green], progress);
+                const b = Phaser.Math.Interpolation.Linear([startColor.blue, endColor.blue], progress);
+        
+                const ambientColor = Phaser.Display.Color.GetColor(r, g, b);
+                this.lights.setAmbientColor(ambientColor);
             }
         });
-
-
+        
 
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
