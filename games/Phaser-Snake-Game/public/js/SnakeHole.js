@@ -1591,6 +1591,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                             duration: 60 * this.zedsToAdd * zedsPerSegment,
                             ease: 'linear',
                             onUpdate: tween => {
+                                this.zedsToAdd = parseInt(tween.getValue());
                                 spaceBoy.zedTitle.setText(`+${Math.ceil(tween.getValue())}`);
 
                                 var zeds = persist.zeds - tween.getValue();
