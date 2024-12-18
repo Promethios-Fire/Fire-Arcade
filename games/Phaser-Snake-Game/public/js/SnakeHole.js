@@ -718,6 +718,19 @@ class SpaceBoyScene extends Phaser.Scene {
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
 
+
+
+        this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
+             'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
+
+        //var light = this.add.graphics({ fillStyle: { color: 0xffff00 } }); // Yellow light var lightRadius = 10
+
+        // for black screen before game is presented
+        var graphics = this.add.graphics();
+        graphics.fillStyle(0x161616, 1);
+        graphics.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(100);
+
+
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
@@ -2033,6 +2046,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
         this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
         this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
+        this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
+
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png')
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png')
