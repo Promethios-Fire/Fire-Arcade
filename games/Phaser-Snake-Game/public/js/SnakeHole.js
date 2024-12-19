@@ -999,7 +999,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
 
         //var scoreHeight = this.scoreValue.x + GRID * 2.7 - 2;
-        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 33 - 1,  GRID * 4 + 7 , 'mainFont',` +`,8)
+        this.deltaScoreUI = this.add.bitmapText(X_OFFSET + GRID * 34 - 4,  GRID * 4 + 5 , 'mainFont',` +`,8)
         .setOrigin(1,1).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
         this.UIScoreContainer.add([this.scoreLabel,this.scoreValue,
@@ -2048,6 +2048,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         zedText.removeElement();
                     }
                 });
+
 
                 zedText.setText(`+${this.zedIndex}`);
                 spaceBoy.zedTitle.setText(`+${this.zedsToAdd}`);
