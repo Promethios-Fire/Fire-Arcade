@@ -918,7 +918,7 @@ class SpaceBoyScene extends Phaser.Scene {
         
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "", 
-            8).setOrigin(1.0,0.0).setDepth(100).setTintFill(spaceboyFontColorHex);
+            8).setOrigin(1.0,0.0).setDepth(100).setAlpha(0).setTintFill(spaceboyFontColorHex);
 
         
         this.zedTitle = this.add.bitmapText(GRID * 7 - 1 , GRID * 27 + 8, 'mainFont', 
@@ -4684,6 +4684,7 @@ class MainMenuScene extends Phaser.Scene {
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
+                this.scene.get("SpaceBoyScene").mapProgressPanelText.setAlpha(1);
                 if (!mainMenuScene.pressedSpace) {
 
                     if (!this.scene.get("MusicPlayerScene").hasStarted) {
