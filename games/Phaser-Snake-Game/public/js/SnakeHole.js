@@ -3512,9 +3512,18 @@ class ExtractTracker extends Phaser.Scene {
                     "fontSize": '24px',
                     "fontWeight": 200,
                 }),
-                    `MEDAL COUNT: ${rankCount} — RANK SCORE: ${rankSum}`
+                    `MEDAL COUNT: ${rankCount} — RANK SCORE: ${rankSum} `
                 ).setOrigin(0,0).setScale(0.5).setAlpha(1);
 
+                if (checkExpertUnlocked()) {
+                    var expertRank = this.add.dom(X_OFFSET + GRID * 28, Y_OFFSET + GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
+                        "fontSize": '24px',
+                        "fontWeight": 200,
+                        "color": COLOR_BONUS,
+                    }),
+                        `TOP: ${calcExpertRank(rankSum)}%`
+                    ).setOrigin(1,0).setScale(0.5).setAlpha(1);
+                }
             }
 
             
