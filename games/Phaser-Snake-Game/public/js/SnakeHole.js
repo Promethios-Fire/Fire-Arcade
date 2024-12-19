@@ -122,12 +122,18 @@ const RANK_NUM_1 = 2000000;
 617,749 = James 11/12
 1,629,617 = James 12-13
 */
+
+
 const RANK_AMOUNT = 100;
 const RANK_STEP = RANK_NUM_1 / RANK_AMOUNT;
 
+const EXPERT_RANK_HIGHEST = 256;
+const EXPERT_RANK_STEP = EXPERT_RANK_HIGHEST / RANK_AMOUNT;
+
+
 // #region Utils Functions
 
-// move to unlock Criteria
+// move to unlock Criteria?
 var checkExpertUnlocked = function () {
     return (
         checkRankGlobal(STAGES.get("9-4"), RANKS.WOOD)
@@ -135,7 +141,7 @@ var checkExpertUnlocked = function () {
     );
 }
 
-var calcSumOfBestRank = function (sumOfBest) {
+var calcPlayerRank = function (sumOfBest) {
     var testVal = 0;
     var counter = 0;
     // Later use actual distribution data.
@@ -148,6 +154,20 @@ var calcSumOfBestRank = function (sumOfBest) {
 
     return Math.max(RANK_AMOUNT - counter, 1) 
 }
+
+var calcExpertRank = function (rankScore) {
+    var testVal = 0;
+    var counter = 0;
+
+    do {
+        testVal += EXPERT_RANK_STEP;
+        counter += 1;
+    } while (testVal < rankScore);
+
+    return Math.max(RANK_AMOUNT - counter, 1)
+
+}
+
 
 // Speed Multiplier Stats
 const a = 3660; // Average Score 
@@ -175,7 +195,45 @@ var calcStageScore = function (x) {
 
     //var _speedBonus = Math.floor(-1* ((x-lm) / ((1/a) * ((x-lm) - (lM - lm)))));
     return Math.floor(result);
-} 
+}
+
+var calcRankScore = function() {
+
+    var letterAccumulator = [0,0,0,0,0,0];
+    var expertRank = 0;
+
+    if (localStorage.getItem("extractRanks")) {
+        var bestExtractions = new Map(JSON.parse(localStorage.getItem("extractRanks")));
+
+        EXTRACT_CODES.forEach( extractKey => {
+            if (bestExtractions.has(extractKey)) {
+                var bestExtract = bestExtractions.get(extractKey);
+                var cumulative = 0;
+                
+                if (bestExtract != "Classic Clear") {
+                    
+                    for (let index = 0; index < bestExtract.length; index++) {
+                        var _rank = bestExtract[index][0];
+                        cumulative += _rank;
+                        letterAccumulator[_rank] += 1;
+                    }
+
+                    var bestExtractRank = cumulative / bestExtract.length; 
+                    var extractRank = Math.floor(bestExtractRank);
+                    letterAccumulator[extractRank] += 1;
+                }
+            }
+        });
+    }
+
+    for (let index = 0; index < letterAccumulator.length; index++) {
+        expertRank += letterAccumulator[index] * (2 ** index);
+    }
+
+    return expertRank;
+}
+
+
 
 var updateSumOfBest = function(scene) {
     /***
@@ -195,7 +253,6 @@ var updateSumOfBest = function(scene) {
     BEST_OF_EXPERT = new Map ();
     BEST_OF_TUTORIAL = new Map ();
 
-    var ignoreSet = new Set(STAGE_OVERRIDES.keys());
 
     scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
         var tempJSONClassic = JSON.parse(localStorage.getItem(`${uuid}_best-Classic`));
@@ -3343,13 +3400,12 @@ class ExtractTracker extends Phaser.Scene {
                             bestSum += _rank;
         
                             var _x = topLeft + index * letterOffset;
-    
                             
                             const bestRank = this.add.sprite(_x , rowY, "ranksSpriteSheet", _rank
                             ).setDepth(80).setOrigin(0.5,0).setScale(0.5);
 
                             letterCounter[_rank] += 1;
-                            rankSum += _rank + 1; // 1 more so D's count as 1
+                            rankSum += 2 ** _rank; // Each rank is twice as hard to get as the previous.
                             rankCount += 1;
     
                             const stageID = this.add.bitmapText(_x, rowY + 19, 'mainFont',`${_id}`
@@ -3367,7 +3423,7 @@ class ExtractTracker extends Phaser.Scene {
                         const finalRank = this.add.sprite(_x + GRID * .5, rowY - 2, "ranksSpriteSheet", Math.floor(finalRankValue)
                         ).setDepth(80).setOrigin(0.5,0).setScale(1);
                         letterCounter[finalRankValue] += 1;
-                        rankSum += finalRankValue + 1; // 1 more so D's count as 1
+                        rankSum += 2 ** finalRankValue;
                         rankCount += 1;
 
                         this.trackerContainer.add([finalRank]);
@@ -3726,7 +3782,7 @@ class StageCodex extends Phaser.Scene {
                 "fontWeight": 200,
                 "color": COLOR_BONUS, 
             }),
-                `Player Rank: TOP ${calcSumOfBestRank(ourPersist.sumOfBestAll)}%`
+                `Player Rank: TOP ${calcPlayerRank(ourPersist.sumOfBestAll)}%`
             ).setOrigin(1,0.5).setScale(0.5).setAlpha(1);
 
             var topPanel = this.add.nineslice(SCREEN_WIDTH / 2 + GRID * 0.75, rowY + GRID, 
@@ -5317,15 +5373,15 @@ class PersistScene extends Phaser.Scene {
 
     this.prevSumOfBestAll = this.sumOfBestAll;
     this.prevStagesCompleteAll = this.stagesCompleteAll;
-    this.prevPlayerRank = calcSumOfBestRank(this.sumOfBestAll);
+    this.prevPlayerRank = calcPlayerRank(this.sumOfBestAll);
 
     this.prevSumOfBestExpert = this.sumOfBestExpert;
     this.prevStagesCompleteExpert = this.stagesCompleteExpert;
-    this.prevPlayerRankExpert = calcSumOfBestRank(this.sumOfBestExpert);
+    this.prevPlayerRankExpert = calcPlayerRank(this.sumOfBestExpert);
 
     this.prevSumOfBestTut = this.sumOfBestTut;
     this.prevStagesCompleteTut = this.stagesCompleteTut;
-    this.prevPlayerRankTut = calcSumOfBestRank(this.sumOfBestTut);
+    this.prevPlayerRankTut = calcPlayerRank(this.sumOfBestTut);
  
     //this.mapProgressPanelText.setTint(0xffffff); // Set the tint to white to prepare for inversion
     //this.mapProgressPanelText.setBlendMode(Phaser.BlendModes.DIFFERENCE); // Use the difference blend mode to invert colors
@@ -5387,13 +5443,12 @@ class PersistScene extends Phaser.Scene {
     
     update(time, delta) {
 
-        if (parseInt(time) % 300 === 0) {
+        if (parseInt(time) % 1000 === 0) {
             var objMap = new Map();
             
             this.scene.manager.scenes.forEach( scene => {
                 objMap.set(scene.scene.key, scene.children.list.length);
             })
-            debugger
             console.log("Scene Game Objects", objMap);
     
         }
@@ -11513,7 +11568,7 @@ class ScoreScene extends Phaser.Scene {
                         prevPlayerRank = ourPersist.prevPlayerRank;
 
                         totalLevels = Math.min(ourPersist.stagesCompleteAll + Math.ceil(ourPersist.stagesCompleteAll / 4), STAGE_TOTAL);
-                        newRank = calcSumOfBestRank(ourPersist.sumOfBestAll);
+                        newRank = calcPlayerRank(ourPersist.sumOfBestAll);
                         stagesComplete = ourPersist.stagesCompleteAll;
                         sumOfBest = ourPersist.sumOfBestAll;
 
@@ -11541,28 +11596,17 @@ class ScoreScene extends Phaser.Scene {
                         break;
                     case MODES.EXPERT:
                         prevStagesComplete = ourPersist.prevStagesCompleteExpert;
-                        prevPlayerRank = ourPersist.prevPlayerRankExpert;
+
+                        var rankScore = calcRankScore();
+                        var expertRank = calcExpertRank(rankScore);
 
                         totalLevels = BEST_OF_ALL.size;
-                        newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
                         stagesComplete = ourPersist.stagesCompleteExpert;
 
                         bestOfTitle = `Expert`;
 
-                        if (prevSumOfBest < sumOfBest) {
-                            var bestIncrease = sumOfBest - prevSumOfBest;
-                            var goalContent = `RANK MEDALS : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;"> + ${commaInt(bestIncrease.toFixed(0))}</span>`
-                        } else {
-                            var goalContent = `RANK MEDALS : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(sumOfBest.toFixed(0))}</span>`
-                        }
-        
-                        if (prevPlayerRank > newRank) {
-        
-                            var rankIncrease = prevPlayerRank - newRank;
-                            var rankContent = `EXPERT RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span> <span style="color:${COLOR_BONUS};font-style:italic;font-weight:bold;">+ ${rankIncrease}</span>`
-                        } else {
-                            var rankContent = `EXPERT RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${newRank}%</span>`
-                        }
+                        var goalContent = `CUMULATIVE RANKS : <span style="color:goldenrod;font-style:italic;font-weight:bold;">${commaInt(rankScore)}</span>`
+                        var rankContent = `EXPERT RANK : <span style="color:goldenrod;font-style:italic;font-weight:bold;"> TOP ${expertRank}%</span>`
                         
                         break;
                     
@@ -11572,7 +11616,7 @@ class ScoreScene extends Phaser.Scene {
                         prevPlayerRank = ourPersist.prevPlayerRankTut;
 
                         totalLevels = Math.min(ourPersist.stagesCompleteTut + Math.ceil(ourPersist.stagesCompleteTut / 4), STAGE_TOTAL);
-                        newRank = calcSumOfBestRank(ourPersist.sumOfBestTut);
+                        newRank = calcPlayerRank(ourPersist.sumOfBestTut);
                         stagesComplete = ourPersist.stagesCompleteTut;
                         sumOfBest = ourPersist.sumOfBestTut;
 
@@ -11599,7 +11643,7 @@ class ScoreScene extends Phaser.Scene {
 
                         // Show temporary + if you had done it in Classic or Expert.
                         totalLevels = Math.min(ourPersist.stagesCompleteAll + Math.ceil(ourPersist.stagesCompleteAll / 4), STAGE_TOTAL);
-                        newRank = calcSumOfBestRank(ourPersist.sumOfBestAll);
+                        newRank = calcPlayerRank(ourPersist.sumOfBestAll);
                         stagesComplete = ourPersist.stagesCompleteAll;
                         sumOfBest = ourPersist.prevSumOfBestAll;
 
@@ -11765,15 +11809,15 @@ class ScoreScene extends Phaser.Scene {
 
         ourPersist.prevSumOfBestAll = ourPersist.sumOfBestAll;
         ourPersist.prevStagesCompleteAll = ourPersist.stagesCompleteAll;
-        ourPersist.prevPlayerRank = calcSumOfBestRank(ourPersist.sumOfBestAll);
+        ourPersist.prevPlayerRank = calcPlayerRank(ourPersist.sumOfBestAll);
 
         ourPersist.prevSumOfBestExpert = ourPersist.sumOfBestExpert;
         ourPersist.prevStagesCompleteExpert = ourPersist.stagesCompleteExpert;
-        ourPersist.prevPlayerRankExpert = calcSumOfBestRank(ourPersist.sumOfBestExpert);
+        ourPersist.prevPlayerRankExpert = calcPlayerRank(ourPersist.sumOfBestExpert);
 
         ourPersist.prevSumOfBestTut = ourPersist.sumOfBestTut;
         ourPersist.prevStagesCompleteTut = ourPersist.stagesCompleteTut;
-        ourPersist.prevPlayerRankTut = calcSumOfBestRank(ourPersist.sumOfBestTut);
+        ourPersist.prevPlayerRankTut = calcPlayerRank(ourPersist.sumOfBestTut);
 
         var continue_text = '[SPACE TO CONTINUE]';
             
