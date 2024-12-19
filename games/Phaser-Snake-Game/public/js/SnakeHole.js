@@ -3192,16 +3192,16 @@ class QuickMenuScene extends Phaser.Scene {
                 var displayList;
                 switch (ourGame.mode) {
                     case MODES.CLASSIC:
-                        displayList = ["Classic", "Overall", "Expert"];
+                        displayList = ["Overall", "Expert"];
                         break;
                     case MODES.EXPERT:
-                        displayList = ["Expert", "Overall", "Classic"];
+                        displayList = ["Expert", "Overall"];
                         break;
                     case MODES.TUTORIAL:
                         displayList = ["Tutorial"];
                         break;
                     case MODES.GAUNTLET:
-                        displayList = ["Overall", "Classic", "Expert"];
+                        displayList = ["Overall", "Expert"];
                         break;
                     default:
                         break;
@@ -3667,7 +3667,7 @@ class StageCodex extends Phaser.Scene {
         var disableArrows = codexArgs.disableArrows ?? false;
         var practiceMode = codexArgs.practiceMode ?? false;
 
-        var displayList = codexArgs.displayList ?? ["Overall", "Classic", "Expert"];
+        var displayList = codexArgs.displayList ?? ["Overall", "Expert"];
         var displayIndex = codexArgs.displayIndex ?? 0;
 
         var stageDisplay = codexArgs.stage ?? ourPersist.prevCodexStageMemory;
@@ -3706,12 +3706,6 @@ class StageCodex extends Phaser.Scene {
                     sumOfBestDisplay = ourPersist.sumOfBestTut;
                     stagesCompleteDisplay = ourPersist.stagesCompleteTut;
                     categoryText = "Tutorial";
-                    break;
-                case "Classic":
-                    bestOfDisplay = BEST_OF_CLASSIC;
-                    sumOfBestDisplay = ourPersist.sumOfBestClassic;
-                    stagesCompleteDisplay = ourPersist.stagesCompleteClassic;
-                    categoryText = "Classic";
                     break;
                 case "Expert":
                     bestOfDisplay = BEST_OF_EXPERT;
@@ -3773,7 +3767,7 @@ class StageCodex extends Phaser.Scene {
             if (categoryText === "Expert") {
                 categoryDom.node.style.color = "red";
             }
-            if (categoryText === "Classic") {
+            if (categoryText === "Overall") {
                 categoryDom.node.style.color = "#4d9be6";
             }
 
