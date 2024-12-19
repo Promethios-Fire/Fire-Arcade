@@ -737,30 +737,8 @@ class SpaceBoyScene extends Phaser.Scene {
             .setOrigin(0, 0).setDepth(0).setTint(0x555555);
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel')
             .setOrigin(0, 0).setDepth(0).setTint(0x555555);
-
-        // Tween to remove the dark tint and transition back to default
-        this.tweens.add({
-            targets: { value: 0 }, // Tween a dummy value
-            value: 100, // End dummy value
-            ease: 'Linear', // Easing function
-            duration: 1000, // Duration of the tween
-            onUpdate: (tween) => {
-                const progress = tween.getValue() / 100;
-
-                const startTint = Phaser.Display.Color.ValueToColor(0x555555);
-                const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
-
-                const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
-                const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
-                const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
-
-                const tintValue = Phaser.Display.Color.GetColor(r, g, b);
-
-                this.UI_ScorePanel.setTint(tintValue);
-                this.UI_StagePanel.setTint(tintValue);
-            },
-            onUpdateScope: this // Ensure 'this' refers to the scene
-        });
+        //this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG')
+        //.setDepth(10).setOrigin(0.0,0.0).setTint(0x555555);
 
 
 
@@ -830,8 +808,35 @@ class SpaceBoyScene extends Phaser.Scene {
                                 this.blankScreen.destroy();
                                 this.spaceBoyReady = true;
                                 this.scene.get("MainMenuScene").pressToPlayTween.play();
+                                this.scene.get("PinballDisplayScene").pinballballPowerOn();
+                            // Tween to remove the dark tint and transition back to default
+                            this.tweens.add({
+                                targets: { value: 0 }, // Tween a dummy value
+                                value: 100, // End dummy value
+                                ease: 'Linear', // Easing function
+                                duration: 500, // Duration of the tween
+                                onUpdate: (tween) => {
+                                    const progress = tween.getValue() / 100;
+
+                                    const startTint = Phaser.Display.Color.ValueToColor(0x555555);
+                                    const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
+
+                                    const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
+                                    const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
+                                    const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
+
+                                    const tintValue = Phaser.Display.Color.GetColor(r, g, b);
+
+                                    this.UI_ScorePanel.setTint(tintValue);
+                                    this.UI_StagePanel.setTint(tintValue);
+                                    //this.comboBG.setTint(tintValue);
+                                },
+                                onUpdateScope: this // Ensure 'this' refers to the scene
+                            });
+
                             }
                         });  
+                        
                     },
                 });
                 this.tweens.addCounter({
@@ -1772,11 +1777,16 @@ class PinballDisplayScene extends Phaser.Scene {
     init() {
     }
     create() {
+        //this.scene.bringToTop('PinballDisplayScene');
+
         //const ourGame = this.scene.get("GameScene");
 
-        // pinball display/combo cover
-        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0,'comboCover')
-        .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0);
+        // pinball display/combo cover comboCover comboBG
+        this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0 + 2,'comboBG')
+        .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0).setAlpha(1).setTint(0x555555);
+
+        this.comboCoverFG = this.add.sprite(GRID * 6.75, GRID * 0 + 2,'comboCover')
+        .setOrigin(0.0,0.0).setDepth(53).setScrollFactor(0).setAlpha(0);
 
         // 'READY?' text sprite
         this.comboCoverReady = this.add.sprite(GRID * 15, 2, 'UI_comboReady', 0
@@ -1835,6 +1845,8 @@ class PinballDisplayScene extends Phaser.Scene {
             add: false,
             alpha: 0,
         });
+
+        
         
         // 'BONK!!!' text sprite
         this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
@@ -1852,10 +1864,53 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboMasksContainer.setVisible(false);
 
 
-        this.comboCover.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
+        this.comboCoverFG.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
-        this.comboCover.mask.invertAlpha = true;
+        this.comboCoverFG.mask.invertAlpha = true;
     }
+
+    pinballballFGOn(){
+        this.tweens.add({
+            targets: this.comboCoverFG,
+            alpha: 1,
+            ease: 'Linear',
+            duration: 500,
+        })
+    }
+    pinballballFGOff(){
+        this.tweens.add({
+            targets: this.comboCoverFG,
+            alpha: 0,
+            ease: 'Linear',
+            duration: 500,
+        })
+    }
+
+    //power the screen on
+    pinballballPowerOn(){
+        this.tweens.add({
+            targets: { value: 0 }, // Tween a dummy value
+            value: 100, // End dummy value
+            ease: 'Linear', // Easing function
+            duration: 500, // Duration of the tween
+            onUpdate: (tween) => {
+                const progress = tween.getValue() / 100;
+
+                const startTint = Phaser.Display.Color.ValueToColor(0x555555);
+                const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
+
+                const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
+                const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
+                const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
+
+                const tintValue = Phaser.Display.Color.GetColor(r, g, b);
+
+                this.comboCover.setTint(tintValue);
+            },
+            onUpdateScope: this // Ensure 'this' refers to the scene
+        });
+    }
+
     resetPinball(){
         this.comboMasks.forEach((element) => {
             if (element !== this.comboCoverSnake) {
@@ -5070,8 +5125,7 @@ class PersistScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(0x111111);
     this.add.image(SCREEN_WIDTH/2 - 1, GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
     
-    this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
-    //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
+
    
     
     
@@ -5625,8 +5679,9 @@ class GameScene extends Phaser.Scene {
         }
 
         
-
-        
+        if (this.scene.get("PinballDisplayScene").comboCoverFG) {
+            this.scene.get("PinballDisplayScene").pinballballFGOn();
+        }
 
         this.graphics = this.add.graphics();
 
@@ -8895,6 +8950,7 @@ class GameScene extends Phaser.Scene {
         //    log = null;
         //}
         this.gameSceneCleanup();
+        this.scene.get("PinballDisplayScene").pinballballFGOff();
 
         this.scene.get("PersistScene").prevRank = 0;
 
