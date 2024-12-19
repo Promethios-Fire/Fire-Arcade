@@ -729,7 +729,7 @@ class SpaceBoyScene extends Phaser.Scene {
         const spaceboyFontColorHex = 0x1f211b;
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
-        //herehere
+
         
         // Create the sprites and apply initial dark tint
         // Initial Setup
@@ -737,6 +737,9 @@ class SpaceBoyScene extends Phaser.Scene {
             .setOrigin(0, 0).setDepth(0).setTint(0x555555);
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel')
             .setOrigin(0, 0).setDepth(0).setTint(0x555555);
+        this.UI_InventoryBG = this.add.sprite(X_OFFSET + GRID * 29 +1, GRID * 10, 'UI_InventoryBG')
+        .setOrigin(0, 0).setDepth(0);
+            
         //this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG')
         //.setDepth(10).setOrigin(0.0,0.0).setTint(0x555555);
 
@@ -806,6 +809,7 @@ class SpaceBoyScene extends Phaser.Scene {
                             delay: 1400,
                             onComplete: () =>{
                                 this.blankScreen.destroy();
+                                this.blankScreenInventory.destroy();
                                 this.spaceBoyReady = true;
                                 this.scene.get("MainMenuScene").pressToPlayTween.play();
                                 this.scene.get("PinballDisplayScene").pinballballPowerOn();
@@ -887,8 +891,12 @@ class SpaceBoyScene extends Phaser.Scene {
         
         // for black screen before game is presented
         this.blankScreen = this.add.graphics();
-        this.blankScreen .fillStyle(0x161616, 1);
-        this.blankScreen .fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
+        this.blankScreen.fillStyle(0x161616, 1);
+        this.blankScreen.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
+
+        this.blankScreenInventory = this.add.graphics();
+        this.blankScreenInventory.fillStyle(0x161616, 1);
+        this.blankScreenInventory.fillRect(X_OFFSET + 346, Y_OFFSET + GRID * 6, GRID * 8, GRID * 21).setDepth(51);
 
         this.spaceBoiMaskSprite = this.add.sprite(SCREEN_WIDTH/2 + GRID * 10.5,
             SCREEN_HEIGHT/2, 'UI_goalLabelMask').setDepth(101).setOrigin(1,0.5);
@@ -1939,10 +1947,12 @@ class PlinkoMachineScene extends Phaser.Scene {
         var matterJSON = this.cache.json.get('collisionData');
 
 
-        this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(52);
+        this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25,
+            'plinkoBoard').setOrigin(0,0).setDepth(52).setTint(0x555555);
         this.plinkoBoardMatterShape = this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
 
-        this.plinkoBoardBG = this.add.sprite(GRID * 6 + 7, GRID * 21.5, 'plinkoBoardBG').setOrigin(0,0).setDepth(40);
+        this.plinkoBoardBG = this.add.sprite(GRID * 6 + 7, GRID * 21.5,
+            'plinkoBoardBG').setOrigin(0,0).setDepth(40);
 
         var tubeData = [
             // Starting Top Tube
@@ -2541,6 +2551,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
         this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
         this.load.image('UI_PowerSwitch', 'assets/sprites/UI_PowerSwitch.png');
+        this.load.image('UI_InventoryBG', 'assets/sprites/UI_InventoryBG.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
