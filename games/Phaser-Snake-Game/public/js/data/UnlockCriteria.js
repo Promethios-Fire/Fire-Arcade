@@ -1,7 +1,7 @@
 
-import { BEST_OF_CLASSIC, BEST_OF_EXPERT, PLAYER_STATS, RANKS, MODES } from "../SnakeHole.js";
+import { BEST_OF_ALL, BEST_OF_EXPERT, PLAYER_STATS, RANKS, MODES } from "../SnakeHole.js";
 
-import { BEST_OF_ALL} from "../SnakeHole.js"
+//import { BEST_OF_ALL} from "../SnakeHole.js"
 
 export var checkRankGlobal = function(stageName, targetRank) {
     if (BEST_OF_ALL.get(stageName) != undefined ) {
@@ -22,9 +22,9 @@ export var checkRank = function(stageName, targetRank) {
     
     switch (this.scene.get("GameScene").mode) {
         case MODES.CLASSIC:
-            if (BEST_OF_CLASSIC.get(stageName) != undefined ) {
+            if (BEST_OF_ALL.get(stageName) != undefined ) {
                 
-                var resultRank = BEST_OF_CLASSIC.get(stageName).stageRank()
+                var resultRank = BEST_OF_ALL.get(stageName).stageRank()
                 var bool = resultRank >= targetRank
                 return  bool;
             } else {
@@ -34,7 +34,7 @@ export var checkRank = function(stageName, targetRank) {
             break;
 
         case MODES.EXPERT:
-            if (BEST_OF_CLASSIC.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
+            if (BEST_OF_ALL.get(stageName) != undefined && BEST_OF_EXPERT.get(stageName) != undefined) {
                 var resultRank = BEST_OF_EXPERT.get(stageName).stageRank()
                 var bool = resultRank >= targetRank
                 return  bool;

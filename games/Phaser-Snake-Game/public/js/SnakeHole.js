@@ -183,18 +183,15 @@ var updateSumOfBest = function(scene) {
      *  That is used to check if a black hole should be spawned to a new level.
      */
     let entries = Object.entries(localStorage);
-    scene.stagesCompleteClassic = 0;
     scene.stagesCompleteExpert = 0;
     scene.stagesCompleteAll = 0;
     scene.stagesCompleteTut = 0;
 
-    scene.sumOfBestClassic = 0;
     scene.sumOfBestExpert = 0;
     scene.sumOfBestAll = 0;
     scene.sumOfBestTut = 0;
 
     BEST_OF_ALL = new Map();
-    BEST_OF_CLASSIC = new Map ();
     BEST_OF_EXPERT = new Map ();
     BEST_OF_TUTORIAL = new Map ();
 
@@ -210,12 +207,7 @@ var updateSumOfBest = function(scene) {
         if (tempJSONClassic) { // False if not played stage before.
             var _stageDataClassic = new StageData(tempJSONClassic);
             _stageDataClassic.zedLevel = calcZedObj(scene.zeds).level;
-            scene.stagesCompleteClassic += 1;
-
-            BEST_OF_CLASSIC.set(_stageDataClassic.stage, _stageDataClassic);
-
             _scoreTotalClassic = _stageDataClassic.calcTotal();
-            scene.sumOfBestClassic += _scoreTotalClassic;
         }
         else {
             _scoreTotalClassic = 0;
@@ -286,8 +278,6 @@ var tempSumOfBest = function(scene, stageData) {
 
             _scoreTotalClassic = _stageDataClassic.calcTotal();
 
-
-            
             if (_stageDataClassic.stage === stageData.stage) {
                 _currentStageTotal = stageData.calcTotal();
             } else {
@@ -433,7 +423,6 @@ var rollZeds = function(score) {
 
 
 export var BEST_OF_ALL = new Map (); // STAGE DATA TYPE
-export var BEST_OF_CLASSIC = new Map ();
 export var BEST_OF_EXPERT = new Map ();
 var BEST_OF_TUTORIAL = new Map ();
 
@@ -5326,9 +5315,9 @@ class PersistScene extends Phaser.Scene {
     // This is an important step, don't leave it out.
     updateSumOfBest(this);
 
-    this.prevSumOfBestClassic = this.sumOfBestClassic;
-    this.prevStagesCompleteClassic = this.stagesCompleteClassic;
-    this.prevPlayerRankClassic = calcSumOfBestRank(this.sumOfBestClassic);
+    this.prevSumOfBestAll = this.sumOfBestAll;
+    this.prevStagesCompleteAll = this.stagesCompleteAll;
+    this.prevPlayerRank = calcSumOfBestRank(this.sumOfBestAll);
 
     this.prevSumOfBestExpert = this.sumOfBestExpert;
     this.prevStagesCompleteExpert = this.stagesCompleteExpert;
@@ -11495,7 +11484,6 @@ class ScoreScene extends Phaser.Scene {
             "fontSize":'18px',
         })).setOrigin(.5, 0).setScale(0.5).setAlpha(0);
 
-
     
         // important updates interal variables 
         updateSumOfBest(ourPersist);
@@ -11520,25 +11508,25 @@ class ScoreScene extends Phaser.Scene {
 
                 switch (ourGame.mode) {
                     case MODES.CLASSIC:
-                        prevStagesComplete = ourPersist.prevStagesCompleteClassic;
-                        prevSumOfBest = ourPersist.prevSumOfBestClassic;
-                        prevPlayerRank = ourPersist.prevPlayerRankClassic;
+                        prevStagesComplete = ourPersist.prevStagesCompleteAll;
+                        prevSumOfBest = ourPersist.prevSumOfBestAll;
+                        prevPlayerRank = ourPersist.prevPlayerRank;
 
-                        totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
-                        newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
-                        stagesComplete = ourPersist.stagesCompleteClassic;
-                        sumOfBest = ourPersist.sumOfBestClassic;
+                        totalLevels = Math.min(ourPersist.stagesCompleteAll + Math.ceil(ourPersist.stagesCompleteAll / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestAll);
+                        stagesComplete = ourPersist.stagesCompleteAll;
+                        sumOfBest = ourPersist.sumOfBestAll;
                         
                         break;
                     case MODES.EXPERT:
                         prevStagesComplete = ourPersist.prevStagesCompleteExpert;
-                        prevSumOfBest = ourPersist.prevSumOfBestExpert;
+                        //prevSumOfBest = ourPersist.prevSumOfBestExpert;
                         prevPlayerRank = ourPersist.prevPlayerRankExpert;
 
-                        totalLevels = BEST_OF_CLASSIC.size;
+                        totalLevels = BEST_OF_ALL.size;
                         newRank = calcSumOfBestRank(ourPersist.sumOfBestExpert);
                         stagesComplete = ourPersist.stagesCompleteExpert;
-                        sumOfBest = ourPersist.sumOfBestExpert;
+                        //sumOfBest = ourPersist.sumOfBestExpert;
                         break;
                     
                     case MODES.TUTORIAL:
@@ -11552,15 +11540,15 @@ class ScoreScene extends Phaser.Scene {
                         sumOfBest = ourPersist.sumOfBestTut;
                         break
                     case MODES.PRACTICE:
-                        prevStagesComplete = ourPersist.prevStagesCompleteClassic;
-                        prevSumOfBest = ourPersist.prevSumOfBestClassic;
-                        prevPlayerRank = ourPersist.prevPlayerRankClassic;
+                        prevStagesComplete = ourPersist.prevStagesCompleteAll;
+                        prevSumOfBest = ourPersist.prevSumOfBestAll;
+                        prevPlayerRank = ourPersist.prevPlayerRank;
 
                         // Show temporary + if you had done it in Classic or Expert.
-                        totalLevels = Math.min(ourPersist.stagesCompleteClassic + Math.ceil(ourPersist.stagesCompleteClassic / 4), STAGE_TOTAL);
-                        newRank = calcSumOfBestRank(ourPersist.sumOfBestClassic);
-                        stagesComplete = ourPersist.stagesCompleteClassic;
-                        sumOfBest = ourPersist.prevSumOfBestClassic;
+                        totalLevels = Math.min(ourPersist.stagesCompleteAll + Math.ceil(ourPersist.stagesCompleteAll / 4), STAGE_TOTAL);
+                        newRank = calcSumOfBestRank(ourPersist.sumOfBestAll);
+                        stagesComplete = ourPersist.stagesCompleteAll;
+                        sumOfBest = ourPersist.prevSumOfBestAll;
                         break
                     
                     default:
@@ -11715,9 +11703,9 @@ class ScoreScene extends Phaser.Scene {
         // END
         // #region prev tracker
 
-        ourPersist.prevSumOfBestClassic = ourPersist.sumOfBestClassic;
-        ourPersist.prevStagesCompleteClassic = ourPersist.stagesCompleteClassic;
-        ourPersist.prevPlayerRankClassic = calcSumOfBestRank(ourPersist.sumOfBestClassic);
+        ourPersist.prevSumOfBestAll = ourPersist.sumOfBestAll;
+        ourPersist.prevStagesCompleteAll = ourPersist.stagesCompleteAll;
+        ourPersist.prevPlayerRank = calcSumOfBestRank(ourPersist.sumOfBestAll);
 
         ourPersist.prevSumOfBestExpert = ourPersist.sumOfBestExpert;
         ourPersist.prevStagesCompleteExpert = ourPersist.stagesCompleteExpert;
