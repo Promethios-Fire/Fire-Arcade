@@ -719,9 +719,41 @@ class SpaceBoyScene extends Phaser.Scene {
         //this.sound.mute = true; //TEMP MUTE SOUND
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
+        //herehere
         
-        
-        
+        // Create the sprites and apply initial dark tint
+        // Initial Setup
+        this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5, 0, 'UI_ScorePanel')
+            .setOrigin(0, 0).setDepth(0).setTint(0x555555);
+        this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel')
+            .setOrigin(0, 0).setDepth(0).setTint(0x555555);
+
+        // Tween to remove the dark tint and transition back to default
+        this.tweens.add({
+            targets: { value: 0 }, // Tween a dummy value
+            value: 100, // End dummy value
+            ease: 'Linear', // Easing function
+            duration: 1000, // Duration of the tween
+            onUpdate: (tween) => {
+                const progress = tween.getValue() / 100;
+
+                const startTint = Phaser.Display.Color.ValueToColor(0x555555);
+                const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
+
+                const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
+                const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
+                const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
+
+                const tintValue = Phaser.Display.Color.GetColor(r, g, b);
+
+                this.UI_ScorePanel.setTint(tintValue);
+                this.UI_StagePanel.setTint(tintValue);
+            },
+            onUpdateScope: this // Ensure 'this' refers to the scene
+        });
+
+
+
         // Create an invisible interactive zone for volume dial and the music player zone
 
         this.powerButtonZone = this.add.zone(GRID * 2.25, GRID * 6.5,
@@ -868,7 +900,7 @@ class SpaceBoyScene extends Phaser.Scene {
         
         this.spaceBoyBase = this.add.sprite(0,0, 'spaceBoyBase').setOrigin(0,0).setDepth(52);
 
-        this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel').setOrigin(0,0).setDepth(50);
+        
         this.mapProgressPanelText = this.add.bitmapText(GRID * 11, GRID * 4.125 + Y_OFFSET, 'mainFont', 
             "", 
             8).setOrigin(1.0,0.0).setDepth(100).setTintFill(0x1f211b);
@@ -4762,7 +4794,7 @@ class PersistScene extends Phaser.Scene {
     }
     
     create() {
-
+    //herehere
     // #region Persist Scene
 
     this.cameras.main.setBackgroundColor(0x111111);
@@ -4770,8 +4802,8 @@ class PersistScene extends Phaser.Scene {
     
     this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG').setDepth(10).setOrigin(0.0,0.0);
     //this.comboBG.preFX.addBloom(0xffffff, 1, 1, 1.2, 1.2);
+   
     
-    this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5,0, 'UI_ScorePanel').setOrigin(0,0).setDepth(51);
     
     //waveshader     
     this.wavePipeline = game.renderer.pipelines.get('WaveShaderPipeline');
