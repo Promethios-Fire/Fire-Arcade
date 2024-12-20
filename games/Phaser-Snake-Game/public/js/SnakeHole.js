@@ -856,6 +856,7 @@ class SpaceBoyScene extends Phaser.Scene {
                             onComplete: () =>{
                                 this.blankScreen.destroy();
                                 this.blankScreenInventory.destroy();
+                                this.blankScreenBoost.destroy();
                                 this.spaceBoyReady = true;
                                 this.scene.get("MainMenuScene").pressToPlayTween.play();
                                 this.scene.get("PinballDisplayScene").pinballballPowerOn();
@@ -942,7 +943,13 @@ class SpaceBoyScene extends Phaser.Scene {
 
         this.blankScreenInventory = this.add.graphics();
         this.blankScreenInventory.fillStyle(0x161616, 1);
-        this.blankScreenInventory.fillRect(X_OFFSET + 346, Y_OFFSET + GRID * 6, GRID * 8, GRID * 21).setDepth(51);
+        this.blankScreenInventory.fillRect(X_OFFSET + 346, Y_OFFSET + GRID * 6, GRID * 8,
+             GRID * 21).setDepth(51);
+
+        this.blankScreenBoost = this.add.graphics();
+        this.blankScreenBoost.fillStyle(0x161616, 1);
+        this.blankScreenBoost.fillRect(SCREEN_WIDTH/2 - 62,GRID * 1.5 - 8,
+            124,16).setDepth(51);
 
         this.spaceBoiMaskSprite = this.add.sprite(SCREEN_WIDTH/2 + GRID * 10.5,
             SCREEN_HEIGHT/2, 'UI_goalLabelMask').setDepth(101).setOrigin(1,0.5);
