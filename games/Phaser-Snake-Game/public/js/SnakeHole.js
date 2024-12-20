@@ -2643,7 +2643,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png');
         this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png');
         this.load.image('comboBG','assets/sprites/UI_comboBG.png');
-        this.load.image('wishlistButton1','assets/sprites/UI_WishlistButton1.png');
+        this.load.spritesheet('wishlistButton1','assets/sprites/UI_WishlistButton1.png', { frameWidth: 101, frameHeight: 58 });
         
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png']);
@@ -4592,10 +4592,18 @@ class MainMenuScene extends Phaser.Scene {
              SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5);
             UI_StageTrackerLabel.angle = 90;
 
-        var wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9,
-            SCREEN_HEIGHT/2 + GRID * 12,'wishlistButton1').setAlpha(0).setOrigin(0.5,0.5);
+        var wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9.5,
+            SCREEN_HEIGHT/2 + GRID * 12,'wishlistButton1',0)
+            .setAlpha(0).setOrigin(0.5,0.5).setInteractive();
 
-
+        wishlistButton1.on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+            wishlistButton1.play('wListOn');
+        });
+        wishlistButton1.on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+            wishlistButton1.play('wListOff');
+        });
 
 
         var selected = menuElements[cursorIndex];
@@ -12643,6 +12651,20 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1
     });
+
+    scene.anims.create({
+        key: 'wListOn',
+        frames: scene.anims.generateFrameNumbers('wishlistButton1',{ frames: [0,1,2]}),
+        frameRate: 32,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'wListOff',
+        frames: scene.anims.generateFrameNumbers('wishlistButton1',{ frames: [2,1,0]}),
+        frameRate: 12,
+        repeat: 0
+    });
+    
     
     scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 16, frameHeight: 16,
         frame: 'UI_ArrowDownAnim.png'
