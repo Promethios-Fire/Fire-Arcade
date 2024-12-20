@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -4247,17 +4247,26 @@ class MainMenuScene extends Phaser.Scene {
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
 
     }
+    init(props){
+        var { startingAnimation = "default" } = props;
+        this.startingAnimation = startingAnimation;
+    }
     create(props) {
 
-        var { startingAnimation = "default" } = props;
+        //var { startingAnimation = "default" } = props;
 
         var { portalTint = parseInt("0xFFFFFF", 16)} = props;
         var { portalFrame = 0 } = props;
-        
-        
+
+        console.log(this.startingAnimation)
+
         
 
-        if (startingAnimation === "default") {
+        
+
+        if (this.startingAnimation === "default") {
+            console.log('going straight to default')
+            this.pressedSpace = false;
             var titleContainer = this.add.container().setDepth(51);
 
             var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
@@ -4276,9 +4285,27 @@ class MainMenuScene extends Phaser.Scene {
                 duration: 750,
                 ease: 'Sine.InOut',
             });
-            
-        } else if (startinAnimation === "menuReturn") {
+            var fadeInDuration = 500;
+        }
+        if (this.startingAnimation === "menuReturn") {
+            console.log('passing main menu skip')
+            this.pressedSpace = true;
 
+            var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 6,
+                'titleLogo').setDepth(60).setAlpha(0);
+            var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,
+                Y_OFFSET +  GRID * 6.0,).setAlpha(0);
+        
+            titlePortal.setTint(portalTint).setScale(1.25);
+            titlePortal.play('portalIdle', {startFrame: portalFrame} );
+
+            var titleTween = this.tweens.add({
+                targets: [titleLogo,titlePortal],
+                alpha: 1,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            var fadeInDuration = 0;
         }
 
 
@@ -4287,7 +4314,7 @@ class MainMenuScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
-        this.pressedSpace = false;
+        
 
 
 
@@ -4722,32 +4749,37 @@ class MainMenuScene extends Phaser.Scene {
                 codexLabel,UI_StageTrackerLabel,
             ],
             alpha: 1,
-            duration: 100,
-            delay: 500,
+            duration: 300,
+            delay: fadeInDuration,
             ease: 'linear',
         });
-        titleTween.pause();
-        menuFadeTween.pause();
+        if (this.startingAnimation === "default") {
+            titleTween.pause();
+            menuFadeTween.pause();
+
+            this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+                "color": "white",
+                "textAlign": 'center'
+    
+            }),
+                    `Press Space`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+    
+            this.pressToPlayTween = this.tweens.add({
+                targets: this.pressToPlay,
+                alpha: 1,
+                duration: 1000,
+                ease: 'Sine.InOut',
+                yoyo: true,
+                repeat: -1,
+                paused: true
+            });
+        }
+
         
-        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "white",
-            "textAlign": 'center'
 
-        }),
-                `Press Space`
-        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
-
-        this.pressToPlayTween = this.tweens.add({
-            targets: this.pressToPlay,
-            alpha: 1,
-            duration: 1000,
-            ease: 'Sine.InOut',
-            yoyo: true,
-            repeat: -1,
-            paused: true
-        });
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
@@ -4761,8 +4793,10 @@ class MainMenuScene extends Phaser.Scene {
                     mainMenuScene.pressToPlayTween.stop();
                     mainMenuScene.pressToPlay.setAlpha(0)
                     mainMenuScene.pressedSpace = true;
-                    titleTween.resume();
-                    menuFadeTween.resume();
+                    if (this.startingAnimation === "default") {
+                        titleTween.resume();
+                        menuFadeTween.resume();
+                    }
                     this.scene.get("MusicPlayerScene").showTrackID();   
                 }
                 else{
@@ -6296,7 +6330,9 @@ class GameScene extends Phaser.Scene {
                 console.log("YES");
                 
                 ourGameScene.extractMenuOn = false;
-                ourGameScene.finalScore("MainMenuScene", {});
+                ourGameScene.finalScore("MainMenuScene", {
+                    startingAnimation : "menuReturn"
+                });
                 // play small victory fanfare here perhaps
                 return true;
             },
@@ -8974,7 +9010,10 @@ class GameScene extends Phaser.Scene {
             delay: 1000,
             onComplete: () =>{
                 //TODO: reset back to stage 1
-                this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
+                this.scene.start('MainMenuScene', {
+                    startingAnimation : "menuReturn"
+                });//start shuts down this scene and runs the given one
+                
             }
         });
         
