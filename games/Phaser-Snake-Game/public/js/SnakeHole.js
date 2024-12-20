@@ -1084,6 +1084,25 @@ class SpaceBoyScene extends Phaser.Scene {
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
     }
+
+    loseCoin(){
+        // Create the new coin with Matter physics
+        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2, 'megaAtlas', 'coinPickup01Anim.png', {
+            //frictionAir: 0.1, //frictionAir bugs when repeatedly bonking
+        }).play('coin01idle').setDepth(101).setOrigin(0, 0);
+    
+        // Set the initial velocity for the new coin
+        this.coinsUICopy.setVelocity(
+            Phaser.Math.Between(-2, 1), // x velocity
+            Phaser.Math.Between(-2, -4)  // y velocity
+        );
+
+        //this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        //this.coinsUICopy.setGravity(0,400)
+        //TODO add coin flip here
+        //TODO trigger UI coin loader animation here
+    }
+
     updateZedSegments(maxZeds) {
 
         if (this.zedSegments.length > 0) {
@@ -5467,19 +5486,7 @@ class PersistScene extends Phaser.Scene {
 
     this.graphics = this.add.graphics();
     }
-    loseCoin(){ // 
-        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png',
-            {
-                frictionAir:.1
-            }
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        var randomVec2 = new Phaser.Math.Vector2(Phaser.Math.Between(-2,1),Phaser.Math.Between(-2,5))
-        this.coinsUICopy.applyForce(randomVec2)
-        //this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        //this.coinsUICopy.setGravity(0,400)
-        //TODO add coin flip here
-        //TODO trigger UI coin loader animation here
-    }
+    
     closingTween(){
         this.tweens.addCounter({
             from: 600,
@@ -9397,9 +9404,11 @@ class GameScene extends Phaser.Scene {
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
+        const ourSpaceboy = this.scene.get('SpaceBoyScene');
+
         const ourGame = this.scene.get("GameScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
-        ourPersist.loseCoin();
+        ourSpaceboy.loseCoin();
         this.coinsUIIcon.setVisible(false);
         ourPersist.coins += -1;
         this.coinUIText.setHTML(
