@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -6683,8 +6683,9 @@ class GameScene extends Phaser.Scene {
          
             this.lights.enable();
             if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
-                this.lights.setAmbientColor(0xE4E4E4);
+                this.lights.setAmbientColor(0xc9c9c9);
             }
+
         
         
 
@@ -7481,7 +7482,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        
+        const portalLights = [];
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -7515,7 +7516,9 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             
-            this.lights.addLight(portal.x +8, portal.y + 8, 128,  portalLightColor).setIntensity(1);
+            this.portalLight = this.lights.addLight(portal.x +8, portal.y + 8, 128,
+                  portalLightColor).setIntensity(1.5);
+            portalLights.push(this.portalLight);
 
             var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
@@ -7545,6 +7548,46 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+
+        function adjustLightIntensityAndRadius(portalLights) {
+            const maxIntensity = 1.5; // Maximum intensity for lights
+            const baselineIntensity = 0.75; // Baseline intensity to ensure visibility
+            const maxRadius = 128; // Maximum radius for lights
+            const minRadius = 64; // Minimum radius to ensure visibility
+            const thresholdDistance = 128; // Distance threshold for adjustment
+        
+            portalLights.forEach(light1 => {
+                let additionalIntensity = 0;
+                let newRadius = maxRadius; // Start with the maximum radius
+        
+                portalLights.forEach(light2 => {
+                    if (light1 !== light2) {
+                        let distance = Phaser.Math.Distance.Between(light1.x, light1.y, light2.x, light2.y);
+                        if (distance < thresholdDistance) {
+                            // Adjust additional intensity based on distance
+                            additionalIntensity += Phaser.Math.Clamp((thresholdDistance - distance) / thresholdDistance, 0, maxIntensity - baselineIntensity);
+                            // Adjust radius based on distance
+                            newRadius = Math.max(newRadius * (distance / thresholdDistance), minRadius);
+                        }
+                    }
+                });
+        
+                // Calculate the final intensity and radius
+                const finalIntensity = Phaser.Math.Clamp(baselineIntensity + additionalIntensity, baselineIntensity, maxIntensity);
+                light1.setIntensity(finalIntensity);
+                console.log(finalIntensity)
+                light1.setRadius(newRadius); // Set the new radius
+            });
+        }
+
+        
+        // Adjust intensities and radii
+        adjustLightIntensityAndRadius(portalLights);
+        
+        
+        
+        
+        
 
         // #region Portals Play
         if (this.portals.length > 0) {

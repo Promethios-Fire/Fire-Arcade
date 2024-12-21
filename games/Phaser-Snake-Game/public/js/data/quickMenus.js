@@ -81,7 +81,7 @@ export const QUICK_MENUS = new Map([
             if (ourPersist.coins > 0) {
 
                 ourPersist.coins -= 1;
-                ourPersist.loseCoin();
+                ourSpaceBoy.loseCoin();
                 
                 // Clear for reseting game
                 //ourGameScene.events.off('addScore');
@@ -317,7 +317,7 @@ export const QUICK_MENUS = new Map([
             if (ourPersist.coins > 0) {
 
                 ourPersist.coins -= 1;
-                ourPersist.loseCoin();
+                ourSpaceBoy.loseCoin();
                 
                 // Clear for reseting game
                 //ourGameScene.events.off('addScore');
