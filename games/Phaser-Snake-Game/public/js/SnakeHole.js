@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 28; //28..................... Win Condition
+export const LENGTH_GOAL = 2; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -348,7 +348,6 @@ var generateNavMap = function () {
 }
 
 const NAV_MAP = generateNavMap();
-debugger
 
 
 
@@ -806,7 +805,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-3'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -6129,24 +6128,35 @@ class GameScene extends Phaser.Scene {
 
         // Loading all Next Stage name to slug to grab from the cache later.
 
-        // The first split and join santizes any spaces.
-        this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");
         
-        // TODO: This is kept in for loading the tutorial levels.
-        this.nextStages.forEach( stageName => {
-            /***
-             * ${stageName}data is to avoid overloading the json object storage that already
-             * has the Stage Name in it from loading the level. ${stageName}data
-             * exclusivley loads the Tiled properties into the global cache.
-             */
 
-            // Only do for stages not loaded from STAGES on the first pass.
-            if (STAGES.get(stageName) === undefined) {
-                this.load.json(`${stageName}.properties`, `assets/Tiled/${stageName}.json`, 'properties');
-            }
-            
+        var splitID = this.stage.split("_");
+        if (splitID[0] != "World") {
+            // The first split and join santizes any spaces.
+            this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");   
+        } else {
+            this.stageID = splitID[splitID.length - 1];
+            this.nextStages = NAV_MAP.get(this.stageID);
+        }
 
-        });
+        
+        
+        // This is kept in for loading the tutorial levels.
+        if (this.nextStages != undefined) {
+            this.nextStages.forEach( stageName => {
+                /***
+                 * ${stageName}data is to avoid overloading the json object storage that already
+                 * has the Stage Name in it from loading the level. ${stageName}data
+                 * exclusivley loads the Tiled properties into the global cache.
+                 */
+    
+                // Only do for stages not loaded from STAGES on the first pass.
+                if (STAGES.get(stageName) === undefined) {
+                    this.load.json(`${stageName}.properties`, `assets/Tiled/${stageName}.json`, 'properties');
+                }  
+            });  
+        }
+        
         
 
         
@@ -6872,9 +6882,8 @@ class GameScene extends Phaser.Scene {
                             
                             var blackholeTileIndex = 641; // Starting First column in the row.
                             this.extractLables = [];
-                            var nextStagesCopy = this.nextStages.slice();
-                            
-                            //console.log('PORTAL LAYER',this.nextStagePortalLayer);
+                            debugger
+                        
         
                             // Add one extract hole spawn here if it exists.
                             if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
@@ -6905,25 +6914,32 @@ class GameScene extends Phaser.Scene {
                                     delay: this.tweens.stagger(150)
                                 });
                                 
-                            }
-        
-                            for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
+                            } else {
+                                var nextStagesCopy = this.nextStages.slice();
+                                var blackHoleTiles = [];
+
+                                for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
+                                    if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
+                                        blackHoleTiles.push(this.nextStagePortalLayer.findByIndex(tileIndex));
+                                    }
                                 
-                                if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
-                                    var tile = this.nextStagePortalLayer.findByIndex(tileIndex);
-        
-                                
-                                    
-                                    var stageRaw = nextStagesCopy.shift();
-                                    var stageName = STAGES.get(stageRaw);
-                                    if (stageName === undefined) { // Catches levels that are not in STAGES
+                                }
+                                debugger
+
+                                nextStagesCopy.forEach( stageID => {
+
+                                    var tile = blackHoleTiles.shift(); // Will error if note enough Black Hole Tiles.
+                                    var stageName = STAGES.get(stageID);
+
+                                    if (stageName === undefined) { // Catches levels that are not in STAGES.
                                         stageName = stageRaw;
-                                    } 
+                                    }
+                                    
                                     var dataName = `${stageName}.properties`;
                                     var data = this.cache.json.get(dataName);
-                                
+
                                     data.forEach( propObj => {
-                                        
+                                            
                                         if (propObj.name === 'slug') {
         
                                             if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
@@ -6948,8 +6964,6 @@ class GameScene extends Phaser.Scene {
                                             } else {
                                                 spawnOn = true;
                                             }
-                                           
-                                            
         
                                             //debugger
                                             if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) {
@@ -7106,7 +7120,7 @@ class GameScene extends Phaser.Scene {
                                                 // Push false portal so index is correct on warp to next
                                                 this.nextStagePortals.push(undefined);
                                             }
-                                             
+                                            
                                             this.tweens.add({
                                                 targets: this.blackholeLabels,
                                                 alpha: {from: 0, to: 1},
@@ -7118,10 +7132,14 @@ class GameScene extends Phaser.Scene {
                                             
                                         }
                                     });
-        
-                                    blackholeTileIndex++;
+                                })
+                                debugger
+                                if (blackHoleTiles.length > 0 ) {
+                                    throw new Error(`Too many Black Hole Tiles on ${this.stage}. Need Exactly the right number. /n Next Stages on this stage. ${this.nextStages}`);
                                 }
                             }
+
+                            
                         }
                         break;
                 
