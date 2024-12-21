@@ -28,7 +28,7 @@ const ANALYTICS_ON = true;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 2; //28..................... Win Condition
+export const LENGTH_GOAL = 28; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -789,6 +789,14 @@ class SpaceBoyScene extends Phaser.Scene {
         //this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG')
         //.setDepth(10).setOrigin(0.0,0.0).setTint(0x555555);
 
+        this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
+            'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
+        this.UI_SpaceBoi.setPipeline('Light2D');
+
+        this.lights.enable().setAmbientColor(0x555555);
+        
+        this.light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
+
 
 
         // Create an invisible interactive zone for volume dial and the music player zone
@@ -826,7 +834,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 });
 
                 this.tweens.add({
-                    targets: light,
+                    targets: this.light,
                     x: SCREEN_WIDTH,
                     ease: 'Phaser.Math.Easing.Circular.InOut',
                     duration: 1800,
@@ -860,29 +868,29 @@ class SpaceBoyScene extends Phaser.Scene {
                                 this.spaceBoyReady = true;
                                 this.scene.get("MainMenuScene").pressToPlayTween.play();
                                 this.scene.get("PinballDisplayScene").pinballballPowerOn();
-                            // Tween to remove the dark tint and transition back to default
-                            this.tweens.add({
-                                targets: { value: 0 }, // Tween a dummy value
-                                value: 100, // End dummy value
-                                ease: 'Linear', // Easing function
-                                duration: 500, // Duration of the tween
-                                onUpdate: (tween) => {
-                                    const progress = tween.getValue() / 100;
+                                // Tween to remove the dark tint and transition back to default
+                                this.tweens.add({
+                                    targets: { value: 0 }, // Tween a dummy value
+                                    value: 100, // End dummy value
+                                    ease: 'Linear', // Easing function
+                                    duration: 500, // Duration of the tween
+                                    onUpdate: (tween) => {
+                                        const progress = tween.getValue() / 100;
 
-                                    const startTint = Phaser.Display.Color.ValueToColor(0x555555);
-                                    const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
+                                        const startTint = Phaser.Display.Color.ValueToColor(0x555555);
+                                        const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
 
-                                    const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
-                                    const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
-                                    const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
+                                        const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
+                                        const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
+                                        const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
 
-                                    const tintValue = Phaser.Display.Color.GetColor(r, g, b);
+                                        const tintValue = Phaser.Display.Color.GetColor(r, g, b);
 
-                                    this.UI_ScorePanel.setTint(tintValue);
-                                    this.UI_StagePanel.setTint(tintValue);
-                                    //this.comboBG.setTint(tintValue);
-                                },
-                                onUpdateScope: this // Ensure 'this' refers to the scene
+                                        this.UI_ScorePanel.setTint(tintValue);
+                                        this.UI_StagePanel.setTint(tintValue);
+                                        //this.comboBG.setTint(tintValue);
+                                    },
+                                    //onUpdateScope: this // Ensure 'this' refers to the scene
                             });
 
                             }
@@ -900,7 +908,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 
                         // Update the light color
                         let color = hsv[i].color;
-                        light.setColor(color);
+                        this.light.setColor(color);
                 
                         // Calculate the progress of the tween
                         const progress = tween.progress;
@@ -913,7 +921,7 @@ class SpaceBoyScene extends Phaser.Scene {
                         const b = Phaser.Math.Interpolation.Linear([startColor.blue, endColor.blue], progress);
                 
                         const ambientColor = Phaser.Display.Color.GetColor(r, g, b);
-                        this.lights.setAmbientColor(ambientColor);
+                        //this.lights.setAmbientColor(ambientColor);
                     }
                 });
             }
@@ -926,15 +934,7 @@ class SpaceBoyScene extends Phaser.Scene {
         
         
         
-        this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
-             'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
-        this.UI_SpaceBoi.setPipeline('Light2D');
 
-
-        var light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
-        var lightRadius = 10;
-
-        this.lights.enable().setAmbientColor(0x555555);
         
         // for black screen before game is presented
         this.blankScreen = this.add.graphics();
@@ -1083,6 +1083,7 @@ class SpaceBoyScene extends Phaser.Scene {
         this.lengthGoalUILabel.mask.invertAlpha = true;
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
+        console.log('SPACE BOY SCENE',this.lights.lights);
     }
 
     loseCoin(){
@@ -2014,17 +2015,51 @@ class PlinkoMachineScene extends Phaser.Scene {
         this.zedIndex = 1;
         this.zedsToAdd = 0;
         this.countDownTween = null;
+        this.plinkoLightNum = 0;
     }
     create() {
         var matterJSON = this.cache.json.get('collisionData');
 
+        this.lights.enable();
+        this.lights.setAmbientColor(0x555555);
 
         this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25,
-            'plinkoBoard').setOrigin(0,0).setDepth(52).setTint(0x555555);
+            'plinkoBoard').setOrigin(0,0).setDepth(52).setPipeline('Light2D');
         this.plinkoBoardMatterShape = this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
+
+        // Overhead Light (above the plinko board, and below the bezel)
+        this.plinkoLight = this.lights.addLight(GRID * 9.8, GRID * 22.25, 100)
+        .setColor(0xffffff).setIntensity(0);
+
+        this.plinkoLightR = this.lights.addLight(GRID * 11.5, GRID * 21, 40)
+        .setColor(0xff0000).setIntensity(0);
+
+        this.plinkoLightO = this.lights.addLight(GRID * 11.5, GRID * 22, 40)
+        .setColor(0xff8300).setIntensity(0);
+
+        this.plinkoLightY = this.lights.addLight(GRID * 11.5, GRID * 23, 40)
+        .setColor(0xfffb00).setIntensity(0);
+
+        this.plinkoLightG = this.lights.addLight(GRID * 11.5, GRID * 24, 40)
+        .setColor(0x32ff00).setIntensity(0);
+
+        this.plinkoLightT = this.lights.addLight(GRID * 11.5, GRID * 25, 40)
+        .setColor(0x00e7ff).setIntensity(0);
+
+        this.plinkoLightB = this.lights.addLight(GRID * 11.5, GRID * 25.75, 40)
+        .setColor(0x002cff).setIntensity(0);
+
+        this.plinkoLightV = this.lights.addLight(GRID * 11.5, GRID * 26.25, 40)
+        .setColor(0x9b00ff).setIntensity(0);
+
+        this.plinkoLightP = this.lights.addLight(GRID * 11.5, GRID * 27, 40)
+        .setColor(0xff00ef).setIntensity(0);
+
 
         this.plinkoBoardBG = this.add.sprite(GRID * 6 + 7, GRID * 21.5,
             'plinkoBoardBG').setOrigin(0,0).setDepth(40);
+        
+        
 
         var tubeData = [
             // Starting Top Tube
@@ -2080,32 +2115,98 @@ class PlinkoMachineScene extends Phaser.Scene {
         const spaceBoy = this.scene.get("SpaceBoyScene");
         //spaceBoy.zedTitle.setText('+0');
         //this.spawnPlinkos(1);
+        console.log('PLINK SCENE',this.lights.lights);
+
     }
-    spawnPlinkos (number) {
+    spawnPlinkos(number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
         const persist = this.scene.get("PersistScene");
-
+    
+        this.plinkoLightNum += 1;
+        console.log('PLINKOS',number,this.plinkoLightNum)
+        // Array of all plinko lights
+        const lights = [
+            this.plinkoLightP, 
+            this.plinkoLightV, 
+            this.plinkoLightB,
+            this.plinkoLightT,
+            this.plinkoLightG,
+            this.plinkoLightY,
+            this.plinkoLightO,
+            this.plinkoLightR
+        ];
         
-        if (number > 0){
+
+        // Determine which light to activate based on the number
+        let lightToActivate;
+        if (this.plinkoLightNum > 0 && this.plinkoLightNum <= 4) {
+            lightToActivate = this.plinkoLightP;
+        } else if (this.plinkoLightNum >= 4 && this.plinkoLightNum <= 8) {
+            lightToActivate = this.plinkoLightV;
+        } else if (this.plinkoLightNum >= 8 && this.plinkoLightNum <= 12) {
+            lightToActivate = this.plinkoLightB;
+        } else if (this.plinkoLightNum >= 12 && this.plinkoLightNum <= 16) {
+            lightToActivate = this.plinkoLightT;
+        } else if (this.plinkoLightNum >= 16 && this.plinkoLightNum <= 20) {
+            lightToActivate = this.plinkoLightG;
+        } else if (this.plinkoLightNum >= 20 && this.plinkoLightNum <= 24) {
+            lightToActivate = this.plinkoLightY;
+        } else if (this.plinkoLightNum >= 24 && this.plinkoLightNum <= 28) {
+            lightToActivate = this.plinkoLightO;
+        } else if (this.plinkoLightNum >= 28 && this.plinkoLightNum <= 32) {
+            lightToActivate = this.plinkoLightR;
+        }
+    
+        if (number > 0) {
+            this.tweens.add({
+                targets: this.plinkoLight,
+                intensity: 1,
+                ease: 'Sine.InOut',
+                duration: 750,
+                repeat: 0,
+                yoyo: false,
+            });
+    
             var delay = 275;
-            
+    
             // TOP SPAWN
-            //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
-            var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
+            var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 18, 'plinkoDisc', null, {
                 shape: {
                     type: 'polygon',
                     radius: 3.7,
                     sides: 4,
-                },
-                //slop:0.8,
-            }).setDepth(40);
-
-
+                }
+            }).setDepth(40).setTint(0xb1b1b1); 
+    
             plinkoDisc.setOnCollideWith(this.plinkoSensor, pair => {
-                // pair.bodyA
-                // pair.bodyB
-                number;
                 this.zedsToAdd += this.zedIndex;
+    
+            // Turn off all previous lights
+            lights.forEach(light => {
+                this.tweens.add({
+                    targets: light,
+                    intensity: 0,
+                    ease: 'Sine.InOut',
+                    duration: 200,
+                    repeat: 0,
+                    yoyo: false,
+                });
+            });
+                
+    
+                // Add the tween for the selected light
+                if (lightToActivate) {
+                    this.tweens.add({
+                        targets: lightToActivate,
+                        intensity: 1.5,
+                        ease: 'Sine.InOut',
+                        duration: 200,
+                        repeat: 0,
+                        yoyo: false,
+                    });
+                }
+
+
 
 
                 var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -2139,7 +2240,27 @@ class PlinkoMachineScene extends Phaser.Scene {
                 this.zedIndex += 1;
 
                 if (number === 0) {
+                    this.plinkoLightNum = 0;
                     // On final plinko's collision
+                    // Turn off all previous lights
+                    lights.forEach(light => {
+                        this.tweens.add({
+                            targets: light,
+                            intensity: 0,
+                            ease: 'Sine.InOut',
+                            duration: 200,
+                            repeat: 0,
+                            yoyo: false,
+                        });
+                    });
+                    this.tweens.add({
+                        targets: this.plinkoLight,
+                        intensity: 0,
+                        ease: 'Sine.InOut',
+                        duration: 750,
+                        repeat: 0,
+                        yoyo: false,
+                    });
                     var sineChain = this.tweens.chain({
                         targets: spaceBoy.zedTitle,
                         //paused: true,
@@ -2637,7 +2758,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg6', 'assets/sprites/zedbarSeg6.png', { frameWidth: 6, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg7', 'assets/sprites/zedbarSeg7.png', { frameWidth: 7, frameHeight: 3 });
-        this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png');
+        this.load.image('plinkoBoard',['assets/sprites/plinkoBoard.png','assets/sprites/plinkoBoard_n.png']);
         this.load.image('plinkoBoardBG','assets/sprites/plinkoBoardBG.png');
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png');
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png');
@@ -5525,7 +5646,7 @@ class PersistScene extends Phaser.Scene {
             this.scene.manager.scenes.forEach( scene => {
                 objMap.set(scene.scene.key, scene.children.list.length);
             })
-            console.log("Scene Game Objects", objMap);
+            //console.log("Scene Game Objects", objMap);
     
         }
 
@@ -13113,11 +13234,11 @@ var config = {
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
     scene: [ StartScene, 
-        MainMenuScene, QuickMenuScene, GalaxyMapScene, 
+        MainMenuScene, PlinkoMachineScene,QuickMenuScene, GalaxyMapScene, 
         PersistScene, TutorialScene,
         GameScene, InputScene, ScoreScene, 
         StageCodex, ExtractTracker,
-        SpaceBoyScene, PinballDisplayScene, PlinkoMachineScene, MusicPlayerScene]
+        SpaceBoyScene, PinballDisplayScene,  MusicPlayerScene]
 };
 
 // #region Screen Settings
