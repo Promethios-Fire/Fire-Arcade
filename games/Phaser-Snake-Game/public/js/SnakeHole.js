@@ -233,6 +233,123 @@ var calcRankScore = function() {
     return expertRank;
 }
 
+var genHardcorePaths = function() {
+
+    var parentToChild = new Map();
+    var childToParent = new Map();
+    
+    var stageSet = new Set();
+    var hardcorePaths = [];
+
+    EXTRACT_CODES.forEach( code => {
+
+        var stages = code.split("|");
+        stages.forEach( stageID => {
+            stageSet.add(stageID);
+            parentToChild.set(stageID, []); // Empty are end nodes.
+            childToParent.set(stageID, []); // Set them all as the parent node. Only one at the end should be left as empty.
+        });  
+    });
+
+    // Don't need to sort stageSet as long as they start sorted like they are.
+    var sorted = Phaser.Utils.Array.SortByDigits([...stageSet]);
+
+    var navSlots = [];
+    
+    var first = Phaser.Math.RND.weightedPick(sorted);
+
+    Phaser.Utils.Array.Remove(sorted, first);
+
+    Phaser.Utils.Array.Add(navSlots, [first,first,first,first]);
+    
+
+    do {
+
+        var _nextID = Phaser.Math.RND.weightedPick(sorted);
+        Phaser.Utils.Array.Remove(sorted, _nextID);
+        // find nav slot
+        var _parentNode = Phaser.Utils.Array.GetRandom(navSlots);
+        Phaser.Utils.Array.Remove(navSlots, _parentNode);
+
+        // add to map
+        parentToChild.get(_parentNode).push(_nextID);
+        childToParent.get(_nextID).push(_parentNode);
+
+        // add nav slots
+        Phaser.Utils.Array.Add(navSlots, [_nextID, _nextID]); // Two possible paths per node.
+        
+    } while (sorted.length > 0);
+
+    var addToPath = function(path, key) {
+        
+        var source = childToParent.get(key)[0];
+        var nextPath;
+
+        if (source) {
+            if (path === "") {
+                nextPath = source + "|" + key;
+            } else {
+                nextPath = source + "|" + path;
+            }
+            var nextPath = addToPath(nextPath, source);
+
+        } else {
+            nextPath = path;
+        }
+        return nextPath;
+    }
+
+    parentToChild.forEach( (value, key) => {
+        if (value.length === 0 ) {
+            var _path = "";
+            var path = addToPath(_path, key);
+            hardcorePaths.push(path);
+        }
+    });
+
+    var sortedPaths = Phaser.Utils.Array.SortByDigits(hardcorePaths);
+
+    return sortedPaths; 
+}
+
+
+
+var generateNavMap = function () {
+    var navMap = new Map();
+    var pairSet = new Set();
+    var stageSet = new Set();
+
+    EXTRACT_CODES.forEach( code => {
+    var codeArray = code.split("|");
+
+    do {
+        var _pair = codeArray.slice(0,2);
+        stageSet.add(_pair[0]);
+        stageSet.add(_pair[1]);
+        navMap.set(_pair[0], []);
+
+        var _pairCode = _pair.join("|");
+        pairSet.add(_pairCode);
+
+        codeArray.shift(); // Remove the first.
+
+        
+    } while (codeArray.length > 1); // Only look at pairs.
+
+    });
+
+    pairSet.forEach( pairCode => {
+        var _pair = pairCode.split("|");
+        navMap.get(_pair[0]).push(_pair[1]);
+    })
+
+    return navMap;
+    
+}
+
+const NAV_MAP = generateNavMap();
+debugger
+
 
 
 var updateSumOfBest = function(scene) {
@@ -400,9 +517,6 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
 }
 
 export var updatePlayerStats = function (stageData) {
-
-    
-
     var oldKeyList = ["atomsOverAte",
     "globalStore",
     "overEat"]
@@ -428,6 +542,7 @@ export var updatePlayerStats = function (stageData) {
     // JSON.stringify(this.stageData)
 
 }
+
 
 var xpFromZeds = function(zeds) {
     return zeds * (zeds + 1) / 2
@@ -2790,6 +2905,7 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
+        genHardcorePaths();
 
         const ourPersist = this.scene.get("PersistScene");
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
@@ -3437,7 +3553,6 @@ class ExtractTracker extends Phaser.Scene {
                     }
 
                     var pathVersion = String.fromCharCode(96 + worldCount[extractWorld]).toUpperCase();
-                    debugger
 
                     const pathTitle = this.add.bitmapText(topLeft - GRID * 1 - 1, rowY + 15, 'mainFontLarge',
                         `PATH  ${extractWorld}-${pathVersion}`,13
