@@ -1398,7 +1398,7 @@
         },
         "World_8-1_Adv_Portaling.json": {
             "scale": 4.670833333333333,
-            "selectedLayer": 0,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 173.95182872435325,
                 "y": 161.96253345227476

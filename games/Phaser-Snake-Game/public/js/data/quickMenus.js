@@ -52,14 +52,14 @@ export const QUICK_MENUS = new Map([
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
            
             ourPersist.mode = MODES.EXPERT;
-
-            ourSpaceBoy.mapProgressPanelText.setText('ADV. EXP')
+            ourSpaceBoy.mapProgressPanelText.setText('ADV. EXP');
 
             this.scene.get("InputScene").scene.restart();
 
             var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
             mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
             mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
+            mainMenuScene.scene.stop();
             
             this.scene.stop();
             // Do Stuff

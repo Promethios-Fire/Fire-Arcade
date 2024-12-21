@@ -136,14 +136,6 @@ const EXPERT_RANK_STEP = EXPERT_RANK_HIGHEST / RANK_AMOUNT;
 
 // #region Utils Functions
 
-// move to unlock Criteria?
-var checkExpertUnlocked = function () {
-    return (
-        checkRankGlobal(STAGES.get("9-4"), RANKS.WOOD)
-        && checkRankGlobal(STAGES.get("10-4"), RANKS.WOOD)
-    );
-}
-
 var calcPlayerRank = function (sumOfBest) {
     var testVal = 0;
     var counter = 0;
@@ -808,7 +800,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-3'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -3877,6 +3869,7 @@ class StageCodex extends Phaser.Scene {
         var categoryText;
 
         updateSumOfBest(ourPersist);
+        
 
         if (!checkExpertUnlocked.call(this)) {
             bestOfDisplay = BEST_OF_ALL;
@@ -4459,6 +4452,27 @@ class MainMenuScene extends Phaser.Scene {
                 
                 if (EXPERT_CHOICE && checkExpertUnlocked.call(this)) { // EXPERT_CHOICE
                     var qMenu = QUICK_MENUS.get(`adventure-mode`);
+
+                    if (checkHardcoreUnlocked()) {
+                        qMenu.set("Hardcore", function () {
+                            const ourPersist = this.scene.get("PersistScene");
+                            const mainMenuScene = this.scene.get("MainMenuScene");
+                            //const ourPersist = this.scene.get("PersistScene");
+                            const ourSpaceBoy = this.scene.get("SpaceBoyScene");
+                            
+                            ourPersist.mode = MODES.HARDCORE;
+                            ourSpaceBoy.mapProgressPanelText.setText('HARDCORE');
+                            this.scene.get("InputScene").scene.restart();
+
+                            var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+                            mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+
+                            mainMenuScene.scene.bringToTop('SpaceBoyScene'); // if not called, TutorialScene renders above
+                            mainMenuScene.scene.stop();
+                            this.scene.stop();
+
+                        });
+                    }
 
                     mainMenuScene.scene.launch("QuickMenuScene", {
                         menuOptions: qMenu, 
@@ -5832,11 +5846,9 @@ class GameScene extends Phaser.Scene {
             console.log('Tutorial Time!', this.stage);
         }
 
-        this.mode = MODES.HARDCORE;
         if (this.mode === MODES.HARDCORE && this.stage === START_STAGE) {
             var hardcoreStartID = ourPersist.hardcorePaths[0].split("|")[0];
             this.stage = STAGES.get(hardcoreStartID);
-
         } else {
             
         }
@@ -5862,20 +5874,6 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
-
-        // TEMP
-        this.mode = MODES.HARDCORE;
-
-        if (this.mode === MODES.HARDCORE) {
-
-            if (this.stage === START_STAGE) {
-                
-                debugger
-                // Hardcore Start Stage.
-                
-            }
-        }
-
 
 
         if (this.stage == 'Tutorial_3') { // TODO @holden Move to customLevels.js
@@ -13198,6 +13196,34 @@ function loadSpriteSheetsAndAnims(scene) {
         repeat: 0
       })
   }
+// #endregion
+
+
+
+
+// #region Utils
+// move Utils to here
+
+// Only use the following after BEST_OF_ALL is calibrated.
+var checkExpertUnlocked = function () {
+
+    return (
+        checkRankGlobal(STAGES.get("9-4"), RANKS.WOOD)
+        && checkRankGlobal(STAGES.get("10-4"), RANKS.WOOD)
+    );
+}
+
+var checkHardcoreUnlocked = function () {
+
+    var hasFalse = [...STAGES.values()].every( function(stage) {
+        var passed = checkRankGlobal(stage, RANKS.WOOD)
+        return passed == true;
+    });
+    return hasFalse;
+}
+
+
+
 // #endregion
 
 var tempHeightDiff = 16;
