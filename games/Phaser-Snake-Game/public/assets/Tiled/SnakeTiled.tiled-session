@@ -819,14 +819,14 @@
         },
         "World_0-1.json": {
             "scale": 2,
-            "selectedLayer": 0,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 160.75,
                 "y": 179.25
             }
         },
         "World_0-1.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 2
         },
         "World_1-1.json": {
             "scale": 2.1102011494252872,
@@ -1272,7 +1272,7 @@
         },
         "World_5-2_Racing.json": {
             "scale": 2.336781609195402,
-            "selectedLayer": 1,
+            "selectedLayer": 4,
             "viewCenter": {
                 "x": 173.52926709296608,
                 "y": 161.97491392031483

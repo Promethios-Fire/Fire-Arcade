@@ -40,7 +40,7 @@ export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
-const DEBUG_SCENE = "ScoreScene"
+const DEBUG_SCENE = "GameScene"
 //const DEBUG_ARGS = {
 //    stage:"World_0-1"
 //}
@@ -69,6 +69,9 @@ const DEBUG_ARGS = new Map ([
         uuid: "723426f7-cfc5-452a-94d9-80341db73c7f",
         zedLevel: 84,
         sRank: 31000
+    }],
+    ["GameScene", {
+        stage:"World_0-1",
     }],
 ]);
 
@@ -314,12 +317,12 @@ var genHardcorePaths = function() {
 
 
 
-var generateNavMap = function () {
+var generateNavMap = function (codes) {
     var navMap = new Map();
     var pairSet = new Set();
     var stageSet = new Set();
 
-    EXTRACT_CODES.forEach( code => {
+    codes.forEach( code => {
     var codeArray = code.split("|");
 
     do {
@@ -347,7 +350,7 @@ var generateNavMap = function () {
     
 }
 
-const NAV_MAP = generateNavMap();
+const NAV_MAP = generateNavMap(EXTRACT_CODES);
 
 
 
@@ -2904,7 +2907,6 @@ class StartScene extends Phaser.Scene {
     }
 
     create() {
-        genHardcorePaths();
 
         const ourPersist = this.scene.get("PersistScene");
         const ourSpaceBoy = this.scene.get("SpaceBoyScene");
@@ -5298,6 +5300,9 @@ class PersistScene extends Phaser.Scene {
     }
     
     create() {
+
+    this.hardcorePaths = genHardcorePaths();
+    this.hardcoreNavMap = generateNavMap(this.hardcorePaths);
     //herehere
     // #region Persist Scene
 
@@ -5819,13 +5824,23 @@ class GameScene extends Phaser.Scene {
     
     preload () {
         const ourTutorialScene = this.scene.get('TutorialScene');
+        const ourPersist = this.scene.get('PersistScene');
         var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
         if (tutorialData === null && this.stage === 'World_0-1') {
             this.stage = 'Tutorial_1'; // Remeber Override!
             console.log('Tutorial Time!', this.stage);
         }
-        this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
 
+        this.mode = MODES.HARDCORE;
+        if (this.mode === MODES.HARDCORE && this.stage === START_STAGE) {
+            var hardcoreStartID = ourPersist.hardcorePaths[0].split("|")[0];
+            this.stage = STAGES.get(hardcoreStartID);
+
+        } else {
+            
+        }
+        this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
+        
         //const ourGame = this.scene.get("GameScene");
         // would need to be custom for snake skins.
         //this.load.image('snakeDefaultNormal', 'assets/sprites/snakeSheetDefault_n.png');
@@ -5846,6 +5861,19 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
+
+        // TEMP
+        this.mode = MODES.HARDCORE;
+
+        if (this.mode === MODES.HARDCORE) {
+
+            if (this.stage === START_STAGE) {
+                
+                debugger
+                // Hardcore Start Stage.
+                
+            }
+        }
 
 
 
@@ -6135,8 +6163,14 @@ class GameScene extends Phaser.Scene {
             // The first split and join santizes any spaces.
             this.nextStages = this.tiledProperties.get("next").split(" ").join("").split(",");   
         } else {
-            this.stageID = splitID[splitID.length - 1];
-            this.nextStages = NAV_MAP.get(this.stageID);
+            this.stageID = splitID[1];
+
+            if (this.mode === MODES.HARDCORE) {
+                this.nextStages = ourPersist.hardcoreNavMap.get(this.stageID);
+            } else {
+                this.nextStages = NAV_MAP.get(this.stageID);
+            }
+            
         }
 
         
@@ -6876,17 +6910,47 @@ class GameScene extends Phaser.Scene {
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
                 switch (true) {
-                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                    case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.HARDCORE || this.mode === MODES.TUTORIAL:
                         if (this.map.getLayer('Next')) {
                             this.nextStagePortalLayer.visible = true;
                             
                             var blackholeTileIndex = 641; // Starting First column in the row.
                             this.extractLables = [];
-                            debugger
-                        
-        
+                            var blackHoleTiles = [];
+
+                            if (this.mode === MODES.HARDCORE) {
+
+                                var tileIndexes = [641, 642, 643, 644];
+
+                                this.nextStagePortalLayer.forEachTile( tile => {
+                                    switch (true) {
+                                        case tile.x === 6 && tile.y === 5:
+                                            tile.index = Phaser.Utils.Array.GetRandom(tileIndexes);
+                                            Phaser.Utils.Array.Remove(tileIndexes, tile.index);
+                                            break
+                                        case tile.x === 22 && tile.y === 5:
+                                            tile.index = Phaser.Utils.Array.GetRandom(tileIndexes);
+                                            Phaser.Utils.Array.Remove(tileIndexes, tile.index);
+                                            break
+                                        case tile.x === 6 && tile.y === 22:
+                                            tile.index = Phaser.Utils.Array.GetRandom(tileIndexes);
+                                            Phaser.Utils.Array.Remove(tileIndexes, tile.index);
+                                            break
+                                        case tile.x === 22 && tile.y === 22:
+                                            tile.index = Phaser.Utils.Array.GetRandom(tileIndexes);
+                                            Phaser.Utils.Array.Remove(tileIndexes, tile.index);
+                                            break
+                                        default:
+                                            tile.index = -1;
+                                            break;
+                                    }
+                                });  
+                            } else {
+
+                            }
+
                             // Add one extract hole spawn here if it exists.
-                            if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX)) {
+                            if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX) && this.mode != MODES.HARDCORE) {
                                 var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
                                 var extractImage = this.add.sprite(extractTile.pixelX + X_OFFSET, extractTile.pixelY + Y_OFFSET, 'extractHole.png' 
                                 ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
@@ -6915,16 +6979,17 @@ class GameScene extends Phaser.Scene {
                                 });
                                 
                             } else {
+        
+                                debugger
                                 var nextStagesCopy = this.nextStages.slice();
-                                var blackHoleTiles = [];
 
                                 for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
                                     if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
                                         blackHoleTiles.push(this.nextStagePortalLayer.findByIndex(tileIndex));
                                     }
-                                
                                 }
-                                debugger
+
+
 
                                 nextStagesCopy.forEach( stageID => {
 
@@ -6965,8 +7030,9 @@ class GameScene extends Phaser.Scene {
                                                 spawnOn = true;
                                             }
         
-                                            //debugger
-                                            if (STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) {
+    
+                                            if ((STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) || this.mode === MODES.HARDCORE) {
+                                                
                                                 // Now we know the Stage is unlocked, so make the black hole tile.
                                                 
                                                 //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
@@ -6992,13 +7058,7 @@ class GameScene extends Phaser.Scene {
                                                 var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
                                                 ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
         
-        
-                                                
-        
-                                                
-        
-        
-        
+          
                                                 //extractImage.playAfterRepeat('extractHoleClose');
                                                 
                                                 
@@ -7133,8 +7193,8 @@ class GameScene extends Phaser.Scene {
                                         }
                                     });
                                 })
-                                debugger
-                                if (blackHoleTiles.length > 0 ) {
+
+                                if (blackHoleTiles.length > 0  && this.mode != MODES.HARDCORE) {
                                     throw new Error(`Too many Black Hole Tiles on ${this.stage}. Need Exactly the right number. /n Next Stages on this stage. ${this.nextStages}`);
                                 }
                             }
@@ -9350,7 +9410,7 @@ class GameScene extends Phaser.Scene {
                     delay: 500,
                     onComplete: () =>{
                         switch (true) {
-                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
+                            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.HARDCORE || this.mode === MODES.TUTORIAL:
                                 var nextStageRaw = this.nextStages[nextStageIndex];
                                 if (STAGES.get(this.nextStages[nextStageIndex]) === undefined) {
             
