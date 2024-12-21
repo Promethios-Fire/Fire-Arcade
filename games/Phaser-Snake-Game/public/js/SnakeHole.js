@@ -714,8 +714,11 @@ export const MODES_TEXT = new Map([
 
 
 const MODE_LOCAL = new Map([
+    // Maps where a run should be saved in playing in different modes. Only Expert is tracked seperatly.
+    // Meaning any stage played in any other mode and you get new highscore will be saved and tracked in the overall rankings.
     [MODES.CLASSIC, "Classic"],
-    [MODES.GAUNTLET, "Classic"], // Use classic stage data
+    [MODES.GAUNTLET, "Classic"],
+    [MODES.HARDCORE, "Classic"],
     [MODES.EXPERT, "Expert"],
     [MODES.TUTORIAL, "Tutorial"]
 ]);
@@ -10476,6 +10479,7 @@ class ScoreScene extends Phaser.Scene {
             
             if (ourGame.stageUUID != "00000000-0000-0000-0000-000000000000" && ourGame.mode != MODES.PRACTICE) {
                 localStorage.setItem(`${ourGame.stageUUID}_best-${MODE_LOCAL.get(ourGame.mode)}`, JSON.stringify(this.stageData));
+                updateSumOfBest(ourPersist); // Updates BEST_OF_ALL.
             } else {
                 // Doesn't Save Score to local Storage
             }
@@ -10528,9 +10532,6 @@ class ScoreScene extends Phaser.Scene {
         var bestLocal = bestLog.atomTime();
         var bestAve = bestLocal/bestLog.foodLog.length;
 
-        // TODO: Don't do it a bonuse level? What do we do with the stage history on bonus levels?
-        // Exclude from the Stage history?
-
         var bestrun = Number(JSON.parse(localStorage.getItem(`BestFinalScore`)));
 
         // #region StageAnalytics
@@ -10545,8 +10546,6 @@ class ScoreScene extends Phaser.Scene {
         } else {
             dimensionSlug = `0${this.stageData.zedLevel}`;
         }
-        
-
         
 
         // Panels
