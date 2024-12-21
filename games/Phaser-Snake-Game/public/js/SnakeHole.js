@@ -2139,21 +2139,21 @@ class PlinkoMachineScene extends Phaser.Scene {
 
         // Determine which light to activate based on the number
         let lightToActivate;
-        if (this.plinkoLightNum > 0 && this.plinkoLightNum <= 4) {
+        if (this.plinkoLightNum >= 4 && this.plinkoLightNum <= 8) {
             lightToActivate = this.plinkoLightP;
-        } else if (this.plinkoLightNum >= 4 && this.plinkoLightNum <= 8) {
+        } else if (this.plinkoLightNum >= 8 && this.plinkoLightNum <= 11) {
             lightToActivate = this.plinkoLightV;
-        } else if (this.plinkoLightNum >= 8 && this.plinkoLightNum <= 12) {
+        } else if (this.plinkoLightNum >= 12 && this.plinkoLightNum <= 15) {
             lightToActivate = this.plinkoLightB;
-        } else if (this.plinkoLightNum >= 12 && this.plinkoLightNum <= 16) {
+        } else if (this.plinkoLightNum >= 16 && this.plinkoLightNum <= 19) {
             lightToActivate = this.plinkoLightT;
-        } else if (this.plinkoLightNum >= 16 && this.plinkoLightNum <= 20) {
+        } else if (this.plinkoLightNum >= 20 && this.plinkoLightNum <= 23) {
             lightToActivate = this.plinkoLightG;
-        } else if (this.plinkoLightNum >= 20 && this.plinkoLightNum <= 24) {
+        } else if (this.plinkoLightNum >= 24 && this.plinkoLightNum <= 27) {
             lightToActivate = this.plinkoLightY;
-        } else if (this.plinkoLightNum >= 24 && this.plinkoLightNum <= 28) {
+        } else if (this.plinkoLightNum >= 28 && this.plinkoLightNum <= 31) {
             lightToActivate = this.plinkoLightO;
-        } else if (this.plinkoLightNum >= 28 && this.plinkoLightNum <= 32) {
+        } else if (this.plinkoLightNum === 32) {
             lightToActivate = this.plinkoLightR;
         }
     
@@ -2249,6 +2249,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                             intensity: 0,
                             ease: 'Sine.InOut',
                             duration: 200,
+                            delay: 1000,
                             repeat: 0,
                             yoyo: false,
                         });
@@ -2258,6 +2259,7 @@ class PlinkoMachineScene extends Phaser.Scene {
                         intensity: 0,
                         ease: 'Sine.InOut',
                         duration: 750,
+                        delay:450,
                         repeat: 0,
                         yoyo: false,
                     });
