@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_0-1.json",
+    "activeFile": "World_3-3_Wrap.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -2732,7 +2732,10 @@
         "World_4-3.json",
         "r_11-30-4.json",
         "r-07-10-4.json",
-        "r-11-30.json"
+        "r-11-30.json",
+        "World_3-1_Wrap.json",
+        "World_3-2_Wrap.json",
+        "World_3-3_Wrap.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
@@ -2742,13 +2745,13 @@
         "Tutorial_3.json",
         "World_0-1.json",
         "World_1-2.json",
-        "World_1-3.json",
-        "World_2-1.json",
-        "World_2-2.json",
-        "World_5-4_Racing.json",
-        "r-11-30.json",
-        "r-07-10-4.json",
-        "r_11-30-4.json"
+        "World_1-1.json",
+        "r-11-12-4.json",
+        "r-11-12-3.json",
+        "r-11-12-2.json",
+        "r-11-12-1.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_4-3.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

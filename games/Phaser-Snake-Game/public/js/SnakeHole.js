@@ -921,7 +921,7 @@ class SpaceBoyScene extends Phaser.Scene {
                         const b = Phaser.Math.Interpolation.Linear([startColor.blue, endColor.blue], progress);
                 
                         const ambientColor = Phaser.Display.Color.GetColor(r, g, b);
-                        //this.lights.setAmbientColor(ambientColor);
+                        this.lights.setAmbientColor(ambientColor);
                     }
                 });
             }
