@@ -2579,6 +2579,7 @@ class TutorialScene extends Phaser.Scene {
 
         const onInput = function (scene) {
             const spaceBoy = scene.scene.get("SpaceBoyScene");
+            const ourPersist = scene.scene.get("PersistScene");
             if (scene.continueText.visible === true) {
                 // Clear for reseting game
                 scene.scene.get("PersistScene").stageHistory = [];
@@ -2591,12 +2592,24 @@ class TutorialScene extends Phaser.Scene {
                     scene.scene.get("MusicPlayerScene").nextSong();
                 }
 
+                var startStage;
+
+                if (ourPersist.mode === MODES.HARDCORE) {
+                    debugger
+                    
+                    var hardcoreStartID = ourPersist.hardcorePaths[0].split("|")[0];
+                    startStage = STAGES.get(hardcoreStartID);
+                    
+                } else {
+                    startStage = START_STAGE;
+                }
+
                 // @Holden add transition to nextScene here.
                 scene.scene.start("GameScene", {
-                    stage: START_STAGE,
+                    stage: startStage,
                     score: 0,
                     startupAnim: true,
-                    mode: scene.scene.get("PersistScene").mode
+                    mode: ourPersist.mode
 
                 });   
             }
@@ -5849,12 +5862,6 @@ class GameScene extends Phaser.Scene {
             console.log('Tutorial Time!', this.stage);
         }
 
-        if (this.mode === MODES.HARDCORE && this.stage === START_STAGE) {
-            var hardcoreStartID = ourPersist.hardcorePaths[0].split("|")[0];
-            this.stage = STAGES.get(hardcoreStartID);
-        } else {
-            
-        }
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
         
         //const ourGame = this.scene.get("GameScene");
@@ -8754,9 +8761,17 @@ class GameScene extends Phaser.Scene {
     // #region .gameOver(
     gameOver(){
         const ourStartScene = this.scene.get('StartScene');
+        const sPersist = this.scene.get("PersistScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
         this.scene.get('MusicPlayerScene').nextSong(`track_149`);
         var ourGame = this.scene.get("GameScene");
+
+        if (this.mode === MODES.HARDCORE) {
+
+            sPersist.hardcorePaths = genHardcorePaths();
+            sPersist.hardcoreNavMap = generateNavMap(sPersist.hardcorePaths);
+            console.log("New Hardcore Paths generated", sPersist.hardcorePaths);
+        }
         
         ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 6)
 
@@ -11249,7 +11264,7 @@ class ScoreScene extends Phaser.Scene {
                 ).setOrigin(1, 0).setScale(0.5);
 
 
-                if(ourGame.mode === MODES.EXPERT) {
+                if(ourGame.mode === MODES.EXPERT || ourGame.mode === MODES.HARDCORE) {
 
                     var currentRank = this.stageData.stageRank();
 
