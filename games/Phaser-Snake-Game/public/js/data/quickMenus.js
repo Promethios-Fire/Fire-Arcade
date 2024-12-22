@@ -81,7 +81,7 @@ export const QUICK_MENUS = new Map([
             if (ourPersist.coins > 0) {
 
                 ourPersist.coins -= 1;
-                ourPersist.loseCoin();
+                ourSpaceBoy.loseCoin();
                 
                 // Clear for reseting game
                 //ourGameScene.events.off('addScore');
@@ -127,7 +127,9 @@ export const QUICK_MENUS = new Map([
             ourGameScene.backgroundBlur(false);
             ourGameScene.gameSceneFullCleanup();
 
-            ourGameScene.scene.start("MainMenuScene");
+            ourGameScene.scene.start('MainMenuScene', {
+                startingAnimation : "menuReturn"
+            });
             
 
             qMenuCleanup.call(this); 
@@ -194,7 +196,11 @@ export const QUICK_MENUS = new Map([
             ourGameScene.backgroundBlur(false);
             ourGameScene.gameSceneFullCleanup();
 
-            ourGameScene.scene.start("MainMenuScene");
+            ourGameScene.scene.start('MainMenuScene', {
+                startingAnimation : "menuReturn"
+            });
+
+
             
 
             qMenuCleanup.call(this); 
@@ -262,7 +268,9 @@ export const QUICK_MENUS = new Map([
             //ourPersist.comboCover.setVisible(true);
             ourGameScene.backgroundBlur(false);
 
-            ourGameScene.scene.start("MainMenuScene");
+            ourGameScene.scene.start('MainMenuScene', {
+                startingAnimation : "menuReturn"
+            });
             
 
             qMenuCleanup.call(this); 
@@ -309,7 +317,7 @@ export const QUICK_MENUS = new Map([
             if (ourPersist.coins > 0) {
 
                 ourPersist.coins -= 1;
-                ourPersist.loseCoin();
+                ourSpaceBoy.loseCoin();
                 
                 // Clear for reseting game
                 //ourGameScene.events.off('addScore');
@@ -354,7 +362,9 @@ export const QUICK_MENUS = new Map([
             ourGameScene.backgroundBlur(false);
             debugger
 
-            ourGameScene.scene.start("MainMenuScene");
+            ourGameScene.scene.start('MainMenuScene', {
+                startingAnimation : "menuReturn"
+            });
             qMenuCleanup.call(this); 
             return true;
         }],

@@ -887,7 +887,7 @@ class SpaceBoyScene extends Phaser.Scene {
         const spaceboyFontColorHex = 0x1f211b;
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
-        //herehere
+
         
         // Create the sprites and apply initial dark tint
         // Initial Setup
@@ -895,8 +895,19 @@ class SpaceBoyScene extends Phaser.Scene {
             .setOrigin(0, 0).setDepth(0).setTint(0x555555);
         this.UI_StagePanel = this.add.sprite(GRID * 6.5 - 1, GRID * 6.5 + 2, 'UI_StagePanel')
             .setOrigin(0, 0).setDepth(0).setTint(0x555555);
+        this.UI_InventoryBG = this.add.sprite(X_OFFSET + GRID * 29 +1, GRID * 10, 'UI_InventoryBG')
+        .setOrigin(0, 0).setDepth(0);
+            
         //this.comboBG = this.add.sprite(GRID * 6.75, 0,'comboBG')
         //.setDepth(10).setOrigin(0.0,0.0).setTint(0x555555);
+
+        this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
+            'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
+        this.UI_SpaceBoi.setPipeline('Light2D');
+
+        this.lights.enable().setAmbientColor(0x555555);
+        
+        this.light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
 
 
 
@@ -935,7 +946,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 });
 
                 this.tweens.add({
-                    targets: light,
+                    targets: this.light,
                     x: SCREEN_WIDTH,
                     ease: 'Phaser.Math.Easing.Circular.InOut',
                     duration: 1800,
@@ -964,32 +975,34 @@ class SpaceBoyScene extends Phaser.Scene {
                             delay: 1400,
                             onComplete: () =>{
                                 this.blankScreen.destroy();
+                                this.blankScreenInventory.destroy();
+                                this.blankScreenBoost.destroy();
                                 this.spaceBoyReady = true;
                                 this.scene.get("MainMenuScene").pressToPlayTween.play();
                                 this.scene.get("PinballDisplayScene").pinballballPowerOn();
-                            // Tween to remove the dark tint and transition back to default
-                            this.tweens.add({
-                                targets: { value: 0 }, // Tween a dummy value
-                                value: 100, // End dummy value
-                                ease: 'Linear', // Easing function
-                                duration: 500, // Duration of the tween
-                                onUpdate: (tween) => {
-                                    const progress = tween.getValue() / 100;
+                                // Tween to remove the dark tint and transition back to default
+                                this.tweens.add({
+                                    targets: { value: 0 }, // Tween a dummy value
+                                    value: 100, // End dummy value
+                                    ease: 'Linear', // Easing function
+                                    duration: 500, // Duration of the tween
+                                    onUpdate: (tween) => {
+                                        const progress = tween.getValue() / 100;
 
-                                    const startTint = Phaser.Display.Color.ValueToColor(0x555555);
-                                    const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
+                                        const startTint = Phaser.Display.Color.ValueToColor(0x555555);
+                                        const endTint = Phaser.Display.Color.ValueToColor(0xffffff);
 
-                                    const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
-                                    const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
-                                    const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
+                                        const r = Phaser.Math.Interpolation.Linear([startTint.red, endTint.red], progress);
+                                        const g = Phaser.Math.Interpolation.Linear([startTint.green, endTint.green], progress);
+                                        const b = Phaser.Math.Interpolation.Linear([startTint.blue, endTint.blue], progress);
 
-                                    const tintValue = Phaser.Display.Color.GetColor(r, g, b);
+                                        const tintValue = Phaser.Display.Color.GetColor(r, g, b);
 
-                                    this.UI_ScorePanel.setTint(tintValue);
-                                    this.UI_StagePanel.setTint(tintValue);
-                                    //this.comboBG.setTint(tintValue);
-                                },
-                                onUpdateScope: this // Ensure 'this' refers to the scene
+                                        this.UI_ScorePanel.setTint(tintValue);
+                                        this.UI_StagePanel.setTint(tintValue);
+                                        //this.comboBG.setTint(tintValue);
+                                    },
+                                    //onUpdateScope: this // Ensure 'this' refers to the scene
                             });
 
                             }
@@ -1007,7 +1020,7 @@ class SpaceBoyScene extends Phaser.Scene {
                 
                         // Update the light color
                         let color = hsv[i].color;
-                        light.setColor(color);
+                        this.light.setColor(color);
                 
                         // Calculate the progress of the tween
                         const progress = tween.progress;
@@ -1033,20 +1046,22 @@ class SpaceBoyScene extends Phaser.Scene {
         
         
         
-        this.UI_SpaceBoi = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2,
-             'UI_SpaceBoi').setOrigin(0.5,0.5).setDepth(101);
-        this.UI_SpaceBoi.setPipeline('Light2D');
 
-
-        var light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
-        var lightRadius = 10;
-
-        this.lights.enable().setAmbientColor(0x555555);
         
         // for black screen before game is presented
         this.blankScreen = this.add.graphics();
-        this.blankScreen .fillStyle(0x161616, 1);
-        this.blankScreen .fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
+        this.blankScreen.fillStyle(0x161616, 1);
+        this.blankScreen.fillRect(X_OFFSET, Y_OFFSET, 346, 324).setDepth(51);
+
+        this.blankScreenInventory = this.add.graphics();
+        this.blankScreenInventory.fillStyle(0x161616, 1);
+        this.blankScreenInventory.fillRect(X_OFFSET + 346, Y_OFFSET + GRID * 6, GRID * 8,
+             GRID * 21).setDepth(51);
+
+        this.blankScreenBoost = this.add.graphics();
+        this.blankScreenBoost.fillStyle(0x161616, 1);
+        this.blankScreenBoost.fillRect(SCREEN_WIDTH/2 - 62,GRID * 1.5 - 8,
+            124,16).setDepth(51);
 
         this.spaceBoiMaskSprite = this.add.sprite(SCREEN_WIDTH/2 + GRID * 10.5,
             SCREEN_HEIGHT/2, 'UI_goalLabelMask').setDepth(101).setOrigin(1,0.5);
@@ -1180,7 +1195,27 @@ class SpaceBoyScene extends Phaser.Scene {
         this.lengthGoalUILabel.mask.invertAlpha = true;
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
+        console.log('SPACE BOY SCENE',this.lights.lights);
     }
+
+    loseCoin(){
+        // Create the new coin with Matter physics
+        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2, 'megaAtlas', 'coinPickup01Anim.png', {
+            //frictionAir: 0.1, //frictionAir bugs when repeatedly bonking
+        }).play('coin01idle').setDepth(101).setOrigin(0, 0);
+    
+        // Set the initial velocity for the new coin
+        this.coinsUICopy.setVelocity(
+            Phaser.Math.Between(-2, 1), // x velocity
+            Phaser.Math.Between(-2, -4)  // y velocity
+        );
+
+        //this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
+        //this.coinsUICopy.setGravity(0,400)
+        //TODO add coin flip here
+        //TODO trigger UI coin loader animation here
+    }
+
     updateZedSegments(maxZeds) {
 
         if (this.zedSegments.length > 0) {
@@ -1552,6 +1587,14 @@ class MusicPlayerScene extends Phaser.Scene {
         // not if the feature state is on or off
         this.playerPaused = false;
         this.playerLooped = false;
+    }
+    preload() {
+        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
+        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
+
     }
     create() {
         const ourGame = this.scene.get("GameScene");
@@ -1934,6 +1977,14 @@ class PinballDisplayScene extends Phaser.Scene {
     }
     init() {
     }
+    preload(){
+        this.load.image('comboBG','assets/sprites/UI_comboBG.png');
+        this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
+        this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
+        this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
+        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
+        this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
+    }
     create() {
         //this.scene.bringToTop('PinballDisplayScene');
 
@@ -2092,15 +2143,51 @@ class PlinkoMachineScene extends Phaser.Scene {
         this.zedIndex = 1;
         this.zedsToAdd = 0;
         this.countDownTween = null;
+        this.plinkoLightNum = 0;
     }
     create() {
         var matterJSON = this.cache.json.get('collisionData');
 
+        this.lights.enable();
+        this.lights.setAmbientColor(0x555555);
 
-        this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25, 'plinkoBoard').setOrigin(0,0).setDepth(52);
+        this.plinkoBoard = this.add.sprite(GRID * 9.8, GRID * 24.25,
+            'plinkoBoard').setOrigin(0,0).setDepth(52).setPipeline('Light2D');
         this.plinkoBoardMatterShape = this.matter.add.gameObject(this.plinkoBoard, { shape: matterJSON.plinkoBoard, isStatic: true });
 
-        this.plinkoBoardBG = this.add.sprite(GRID * 6 + 7, GRID * 21.5, 'plinkoBoardBG').setOrigin(0,0).setDepth(40);
+        // Overhead Light (above the plinko board, and below the bezel)
+        this.plinkoLight = this.lights.addLight(GRID * 9.8, GRID * 22.25, 100)
+        .setColor(0xffffff).setIntensity(0);
+
+        this.plinkoLightR = this.lights.addLight(GRID * 11.5, GRID * 21, 40)
+        .setColor(0xff0000).setIntensity(0);
+
+        this.plinkoLightO = this.lights.addLight(GRID * 11.5, GRID * 22, 40)
+        .setColor(0xff8300).setIntensity(0);
+
+        this.plinkoLightY = this.lights.addLight(GRID * 11.5, GRID * 23, 40)
+        .setColor(0xfffb00).setIntensity(0);
+
+        this.plinkoLightG = this.lights.addLight(GRID * 11.5, GRID * 24, 40)
+        .setColor(0x32ff00).setIntensity(0);
+
+        this.plinkoLightT = this.lights.addLight(GRID * 11.5, GRID * 25, 40)
+        .setColor(0x00e7ff).setIntensity(0);
+
+        this.plinkoLightB = this.lights.addLight(GRID * 11.5, GRID * 25.75, 40)
+        .setColor(0x002cff).setIntensity(0);
+
+        this.plinkoLightV = this.lights.addLight(GRID * 11.5, GRID * 26.25, 40)
+        .setColor(0x9b00ff).setIntensity(0);
+
+        this.plinkoLightP = this.lights.addLight(GRID * 11.5, GRID * 27, 40)
+        .setColor(0xff00ef).setIntensity(0);
+
+
+        this.plinkoBoardBG = this.add.sprite(GRID * 6 + 7, GRID * 21.5,
+            'plinkoBoardBG').setOrigin(0,0).setDepth(40);
+        
+        
 
         var tubeData = [
             // Starting Top Tube
@@ -2156,32 +2243,98 @@ class PlinkoMachineScene extends Phaser.Scene {
         const spaceBoy = this.scene.get("SpaceBoyScene");
         //spaceBoy.zedTitle.setText('+0');
         //this.spawnPlinkos(1);
+        //console.log('PLINK SCENE',this.lights.lights);
+
     }
-    spawnPlinkos (number) {
+    spawnPlinkos(number) {
         const spaceBoy = this.scene.get("SpaceBoyScene");
         const persist = this.scene.get("PersistScene");
-
+    
+        this.plinkoLightNum += 1;
+        console.log('PLINKOS',number,this.plinkoLightNum)
+        // Array of all plinko lights
+        const lights = [
+            this.plinkoLightP, 
+            this.plinkoLightV, 
+            this.plinkoLightB,
+            this.plinkoLightT,
+            this.plinkoLightG,
+            this.plinkoLightY,
+            this.plinkoLightO,
+            this.plinkoLightR
+        ];
         
-        if (number > 0){
+
+        // Determine which light to activate based on the number
+        let lightToActivate;
+        if (this.plinkoLightNum >= 4 && this.plinkoLightNum <= 8) {
+            lightToActivate = this.plinkoLightP;
+        } else if (this.plinkoLightNum >= 8 && this.plinkoLightNum <= 11) {
+            lightToActivate = this.plinkoLightV;
+        } else if (this.plinkoLightNum >= 12 && this.plinkoLightNum <= 15) {
+            lightToActivate = this.plinkoLightB;
+        } else if (this.plinkoLightNum >= 16 && this.plinkoLightNum <= 19) {
+            lightToActivate = this.plinkoLightT;
+        } else if (this.plinkoLightNum >= 20 && this.plinkoLightNum <= 23) {
+            lightToActivate = this.plinkoLightG;
+        } else if (this.plinkoLightNum >= 24 && this.plinkoLightNum <= 27) {
+            lightToActivate = this.plinkoLightY;
+        } else if (this.plinkoLightNum >= 28 && this.plinkoLightNum <= 31) {
+            lightToActivate = this.plinkoLightO;
+        } else if (this.plinkoLightNum === 32) {
+            lightToActivate = this.plinkoLightR;
+        }
+    
+        if (number > 0) {
+            this.tweens.add({
+                targets: this.plinkoLight,
+                intensity: 1,
+                ease: 'Sine.InOut',
+                duration: 750,
+                repeat: 0,
+                yoyo: false,
+            });
+    
             var delay = 275;
-            
+    
             // TOP SPAWN
-            //var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 6, 'plinkoDisc', null , { 
-            var plinkoDisc = this.matter.add.sprite(GRID *7.5 , GRID * 18, 'plinkoDisc', null , {
+            var plinkoDisc = this.matter.add.sprite(GRID * 7.5, GRID * 18, 'plinkoDisc', null, {
                 shape: {
                     type: 'polygon',
                     radius: 3.7,
                     sides: 4,
-                },
-                //slop:0.8,
-            }).setDepth(40);
-
-
+                }
+            }).setDepth(40).setTint(0xb1b1b1); 
+    
             plinkoDisc.setOnCollideWith(this.plinkoSensor, pair => {
-                // pair.bodyA
-                // pair.bodyB
-                number;
                 this.zedsToAdd += this.zedIndex;
+    
+            // Turn off all previous lights
+            lights.forEach(light => {
+                this.tweens.add({
+                    targets: light,
+                    intensity: 0,
+                    ease: 'Sine.InOut',
+                    duration: 200,
+                    repeat: 0,
+                    yoyo: false,
+                });
+            });
+                
+    
+                // Add the tween for the selected light
+                if (lightToActivate) {
+                    this.tweens.add({
+                        targets: lightToActivate,
+                        intensity: 1.5,
+                        ease: 'Sine.InOut',
+                        duration: 200,
+                        repeat: 0,
+                        yoyo: false,
+                    });
+                }
+
+
 
 
                 var zedText = this.add.dom(GRID * 15 , GRID * 27 + 6, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -2215,7 +2368,29 @@ class PlinkoMachineScene extends Phaser.Scene {
                 this.zedIndex += 1;
 
                 if (number === 0) {
+                    this.plinkoLightNum = 0;
                     // On final plinko's collision
+                    // Turn off all previous lights
+                    lights.forEach(light => {
+                        this.tweens.add({
+                            targets: light,
+                            intensity: 0,
+                            ease: 'Sine.InOut',
+                            duration: 200,
+                            delay: 1000,
+                            repeat: 0,
+                            yoyo: false,
+                        });
+                    });
+                    this.tweens.add({
+                        targets: this.plinkoLight,
+                        intensity: 0,
+                        ease: 'Sine.InOut',
+                        duration: 750,
+                        delay:450,
+                        repeat: 0,
+                        yoyo: false,
+                    });
                     var sineChain = this.tweens.chain({
                         targets: spaceBoy.zedTitle,
                         //paused: true,
@@ -2703,15 +2878,16 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
-        this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
-        this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
-        this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
-        this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
+        //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
+        //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
+        //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
+        //this.load.image('UI_comboReady', 'assets/sprites/UI_comboCoverReady.png');
         this.load.image('UI_comboGo', 'assets/sprites/UI_comboCoverGo.png');
         this.load.image('UI_goalLabel', 'assets/sprites/UI_goalLabel.png');
         this.load.image('UI_goalLabelMask', 'assets/sprites/UI_goalLabelMask.png');
         this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
         this.load.image('UI_PowerSwitch', 'assets/sprites/UI_PowerSwitch.png');
+        this.load.image('UI_InventoryBG', 'assets/sprites/UI_InventoryBG.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
@@ -2725,12 +2901,13 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('zedBarSeg5', 'assets/sprites/zedbarSeg5.png', { frameWidth: 5, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg6', 'assets/sprites/zedbarSeg6.png', { frameWidth: 6, frameHeight: 3 });
         this.load.spritesheet('zedBarSeg7', 'assets/sprites/zedbarSeg7.png', { frameWidth: 7, frameHeight: 3 });
-        this.load.image('plinkoBoard','assets/sprites/plinkoBoard.png');
+        this.load.image('plinkoBoard',['assets/sprites/plinkoBoard.png','assets/sprites/plinkoBoard_n.png']);
         this.load.image('plinkoBoardBG','assets/sprites/plinkoBoardBG.png');
         this.load.image('spaceBoyLight','assets/sprites/spaceBoyLight.png');
         this.load.image('UI_ScorePanel','assets/sprites/UI_ScorePanel.png');
         this.load.image('UI_StagePanel','assets/sprites/UI_StagePanel.png');
-        this.load.image('comboBG','assets/sprites/UI_comboBG.png');
+        //this.load.image('comboBG','assets/sprites/UI_comboBG.png');
+        this.load.spritesheet('wishlistButton1','assets/sprites/UI_WishlistButton1.png', { frameWidth: 101, frameHeight: 58 });
         
         // Tilemap
         this.load.image('tileSheetx12', ['assets/Tiled/tileSheetx12.png','assets/Tiled/tileSheetx12_n.png']);
@@ -2774,10 +2951,10 @@ class StartScene extends Phaser.Scene {
         this.load.atlas('uiPanelR', 'assets/sprites/UI_Panel_9SliceRIGHT.png', 'assets/9slice/nine-slice.json');
         this.load.atlas('uiMenu', 'assets/sprites/UI_MenuPanel_9Slice.png', 'assets/9slice/nine-sliceMenu.json');
         this.load.spritesheet('uiBackButton', 'assets/sprites/UI_backButton.png',{ frameWidth: 12, frameHeight: 12 });
-        this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
-        this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
-        this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
-        this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
+        //this.load.spritesheet('uiVolumeIcon', 'assets/sprites/ui_volumeIcon.png',{ frameWidth: 10, frameHeight: 8 });
+        //this.load.image('uiVolumeSlider', 'assets/sprites/ui_volumeSlider.png');
+        //this.load.image('uiVolumeSliderWidget', 'assets/sprites/ui_volumeSliderWidget.png');
+        //this.load.image('uiVolumeSliderWidgetRendered', 'assets/sprites/ui_VolumeSliderWidgetRendered.png');
         //this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6 });
         this.load.spritesheet('plinkoDisc', 'assets/sprites/plinkoDisc.png',{ frameWidth: 6, frameHeight: 6});
         //this.load.spritesheet('boostMeterAnim', 'assets/sprites/UI_boostMeterAnim.png', { frameWidth: 256, frameHeight: 48 });
@@ -2797,8 +2974,8 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle03Anim', 'assets/sprites/twinkle03Anim.png', { frameWidth: 16, frameHeight: 16 });
-        this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
-        this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
+        //this.load.spritesheet("comboLetters", "assets/sprites/comboLetters.png",{ frameWidth: 18, frameHeight: 24 });
+        //this.load.image('comboCover', 'assets/sprites/UI_comboCover.png');
         //this.load.image("snakeMask", "assets/sprites/snakeMask.png");
         //this.load.image("portalMask", "assets/sprites/portalMask.png");
         this.load.image('UI_maskMenu', 'assets/sprites/UI_maskMenu.png');
@@ -4367,19 +4544,28 @@ class MainMenuScene extends Phaser.Scene {
     preload(){
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
-
+    }
+    init(props){
+        var { startingAnimation = "default" } = props;
+        this.startingAnimation = startingAnimation;
     }
     create(props) {
+        
+        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+        const mainMenuScene = this.scene.get('MainMenuScene');
+        const ourPersist = this.scene.get('PersistScene');
+        const ourMap = this.scene.get('GalaxyMapScene');
 
-        var { startingAnimation = "default" } = props;
 
         var { portalTint = parseInt("0xFFFFFF", 16)} = props;
         var { portalFrame = 0 } = props;
         
-        
-        
+        //console.log(this.startingAnimation)
 
-        if (startingAnimation === "default") {
+        // starting from powering on
+        if (this.startingAnimation === "default") {
+            console.log('going straight to default')
+            this.pressedSpace = false;
             var titleContainer = this.add.container().setDepth(51);
 
             var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 0,'titleLogo').setDepth(60);
@@ -4398,21 +4584,29 @@ class MainMenuScene extends Phaser.Scene {
                 duration: 750,
                 ease: 'Sine.InOut',
             });
-            
-        } else if (startinAnimation === "menuReturn") {
-
+            var fadeInDuration = 500;
         }
+        // when returning to main menu and bypassing intro
+        if (this.startingAnimation === "menuReturn") {
+            console.log('passing main menu skip')
+            this.pressedSpace = true;
 
+            var titleLogo = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 - GRID * 6,
+                'titleLogo').setDepth(60).setAlpha(0);
+            var titlePortal = this.add.sprite(X_OFFSET + GRID * 7.1,
+                Y_OFFSET +  GRID * 6.0,).setAlpha(0);
+        
+            titlePortal.setTint(portalTint).setScale(1.25);
+            titlePortal.play('portalIdle', {startFrame: portalFrame} );
 
-        this.input.keyboard.addCapture('UP,DOWN,SPACE');
-        const mainMenuScene = this.scene.get('MainMenuScene');
-        const ourPersist = this.scene.get('PersistScene');
-        const ourMap = this.scene.get('GalaxyMapScene');
-
-        this.pressedSpace = false;
-
-
-
+            var titleTween = this.tweens.add({
+                targets: [titleLogo,titlePortal],
+                alpha: 1,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            var fadeInDuration = 0;
+        }
 
         //description panel
         this.descriptionDom = 'Travel to dozens of worlds and conquer their challenges. Unlock unique upgrades, items, cosmetics, and game modes.'
@@ -4433,15 +4627,13 @@ class MainMenuScene extends Phaser.Scene {
         ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
 
 
+        // for white line and circle that tracks menu option
         this.graphics = this.add.graphics({ lineStyle: { width: 1, color: 0xffffff }, fillStyle: { color: 0xffffff } });
         this.descriptionPointer = new Phaser.Geom.Circle(SCREEN_WIDTH/2 - GRID * 1, SCREEN_HEIGHT/2 + 3, 3);
         this.graphics.fillCircleShape(this.descriptionPointer);
         this.graphics.lineBetween(this.descriptionPointer.x, this.descriptionPointer.y, this.descriptionPanel.x,this.descriptionPointer.y);
         this.graphics.setAlpha(0);
-
         this.graphics.setDepth(50)
-
-
 
         var menuOptions = new Map([
             ['practice', function () {
@@ -4460,8 +4652,6 @@ class MainMenuScene extends Phaser.Scene {
             ['adventure', function () {
                 // Check if played before here. Maybe check for world 0-1 level stage data?
 
-                
-                
                 this.scene.get("StartScene").UUID_MAP.size;
 
                 mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("ADVENTURE");
@@ -4503,12 +4693,6 @@ class MainMenuScene extends Phaser.Scene {
                     QUICK_MENUS.get("adventure-mode").get("Classic").call(this);
                 }
                 
-
-
-
-                /*
-
-                */
                 return true;
             }],
             ['extraction', function () {
@@ -4613,7 +4797,7 @@ class MainMenuScene extends Phaser.Scene {
                     "fontSize": '24px',
                     "fontWeight": 400,
                     "color": "darkgrey",
-                    "text-decoration": 'line-through'
+                    //"text-decoration": 'line-through'
                 }),
                         `${menuList[index].toUpperCase()}`
                 ).setOrigin(0.0,0).setScale(0.5).setAlpha(0);
@@ -4646,29 +4830,45 @@ class MainMenuScene extends Phaser.Scene {
         let _hOffset = SCREEN_WIDTH/2 - GRID * 10.5;
         let _vOffset = SCREEN_HEIGHT/2 - GRID * 1.75;
 
-        this.practiceButton = this.add.nineslice(_hOffset,_vOffset, 'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
+        this.practiceButton = this.add.nineslice(_hOffset,_vOffset,
+             'uiMenu', 'brown', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.practiceIcon = this.add.sprite(this.practiceButton.x + 2,
+            this.practiceButton.y,"menuIcons", 0 ).setOrigin(0,0.5).setAlpha(0);
         
-        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2, 'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
+        this.adventureButton = this.add.nineslice(_hOffset,_vOffset + GRID * 2,
+             'uiMenu', 'purple', 104, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.adventureIcon = this.add.sprite(this.adventureButton.x + 2,
+            this.adventureButton.y,"menuIcons", 9 ).setOrigin(0,0.5).setAlpha(0);
         
-        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
+        this.extractionButton = this.add.nineslice(_hOffset,_vOffset + GRID * 4,
+             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.extractionIcon = this.add.sprite(this.extractionButton.x + 2,
+            this.extractionButton.y,"menuIcons", 2 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
+        this.championshipButton = this.add.nineslice(_hOffset,_vOffset + GRID * 6,
+             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.championshipIcon = this.add.sprite(this.championshipButton.x + 2,
+            this.championshipButton.y,"menuIcons", 3 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
+        this.gauntletButton = this.add.nineslice(_hOffset,_vOffset + GRID * 8,
+             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.gauntletIcon = this.add.sprite(this.gauntletButton.x + 2,
+            this.gauntletButton.y,"menuIcons", 4 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10, 'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
-        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
+        this.endlessButton = this.add.nineslice(_hOffset,_vOffset + GRID * 10,
+             'uiMenu', 'purple', 136, 18, 9,9,9,9).setOrigin(0,0.5).setTint('0x8a8a8a').setAlpha(0);
+        this.endlessIcon = this.add.sprite(this.endlessButton.x + 2,
+            this.endlessButton.y,"menuIcons", 5 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12, 'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
+        this.extrasButton = this.add.nineslice(_hOffset,_vOffset + GRID * 12,
+             'uiMenu', 'blue', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.extrasIcon = this.add.sprite(this.extrasButton.x + 2,
+            this.extrasButton.y,"menuIcons", 6 ).setOrigin(0,0.5).setAlpha(0);
 
-        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14, 'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
-        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
+        this.optionsButton = this.add.nineslice(_hOffset,_vOffset + GRID * 14,
+             'uiMenu', 'grey', 136, 18, 9,9,9,9).setOrigin(0,0.5).setAlpha(0);
+        this.optionsIcon = this.add.sprite(this.optionsButton.x + 2,
+            this.optionsButton.y,"menuIcons", 7 ).setOrigin(0,0.5).setAlpha(0);
 
         this.exitButton = this.add.sprite(X_OFFSET,Y_OFFSET, 'uiExitPanel',0)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0);
@@ -4692,11 +4892,19 @@ class MainMenuScene extends Phaser.Scene {
              SCREEN_HEIGHT/2 - GRID * 1 + 2,'UI_StageTrackerLabel').setAlpha(0).setOrigin(0,0.5);
             UI_StageTrackerLabel.angle = 90;
 
-        /*if (this.exitTween) {
-            this.exitTween.reverse();
-        }*/
-        
-        
+        var wishlistButton1 = this.add.sprite(SCREEN_WIDTH/2 + GRID * 9.5,
+            SCREEN_HEIGHT/2 + GRID * 12,'wishlistButton1',0)
+            .setAlpha(0).setOrigin(0.5,0.5).setInteractive();
+
+        wishlistButton1.on('pointerover', () => {
+            this.input.setDefaultCursor('pointer');
+            wishlistButton1.play('wListOn');
+        });
+        wishlistButton1.on('pointerout', () => {
+            this.input.setDefaultCursor('default');
+            wishlistButton1.play('wListOff');
+        });
+
 
         var selected = menuElements[cursorIndex];
         selected.node.style.color = "white";
@@ -4789,7 +4997,8 @@ class MainMenuScene extends Phaser.Scene {
 
                 
 
-                if (cursorIndex >= 2 && cursorIndex <= 5) {
+                if (cursorIndex === 2 || cursorIndex == 3 ||cursorIndex === 5
+                ) {
                     selected.node.style.color = "darkgrey";
                     selected.setAlpha(1)
                 }
@@ -4832,7 +5041,8 @@ class MainMenuScene extends Phaser.Scene {
                 selected.setAlpha(1);
                 
                 selected = menuElements[cursorIndex];
-                if (cursorIndex >= 2 && cursorIndex <= 5) {
+                if (cursorIndex === 2 || cursorIndex == 3 ||cursorIndex === 5
+                ) {
                     selected.node.style.color = "darkgrey";
                     selected.setAlpha(1)
 
@@ -4863,34 +5073,40 @@ class MainMenuScene extends Phaser.Scene {
                 this.exitButton,
                 this.graphics,
                 codexLabel,UI_StageTrackerLabel,
+                wishlistButton1
             ],
             alpha: 1,
-            duration: 100,
-            delay: 500,
+            duration: 300,
+            delay: fadeInDuration,
             ease: 'linear',
         });
-        titleTween.pause();
-        menuFadeTween.pause();
+        if (this.startingAnimation === "default") {
+            titleTween.pause();
+            menuFadeTween.pause();
+
+            this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
+                "fontSize": '24px',
+                "fontWeight": 400,
+                "color": "white",
+                "textAlign": 'center'
+    
+            }),
+                    `Press Space`
+            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
+    
+            this.pressToPlayTween = this.tweens.add({
+                targets: this.pressToPlay,
+                alpha: 1,
+                duration: 1000,
+                ease: 'Sine.InOut',
+                yoyo: true,
+                repeat: -1,
+                paused: true
+            });
+        }
+
         
-        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "white",
-            "textAlign": 'center'
 
-        }),
-                `Press Space`
-        ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
-
-        this.pressToPlayTween = this.tweens.add({
-            targets: this.pressToPlay,
-            alpha: 1,
-            duration: 1000,
-            ease: 'Sine.InOut',
-            yoyo: true,
-            repeat: -1,
-            paused: true
-        });
 
         this.input.keyboard.on('keydown-SPACE', function() {
             if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
@@ -4904,8 +5120,10 @@ class MainMenuScene extends Phaser.Scene {
                     mainMenuScene.pressToPlayTween.stop();
                     mainMenuScene.pressToPlay.setAlpha(0)
                     mainMenuScene.pressedSpace = true;
-                    titleTween.resume();
-                    menuFadeTween.resume();
+                    if (this.startingAnimation === "default") {
+                        titleTween.resume();
+                        menuFadeTween.resume();
+                    }
                     this.scene.get("MusicPlayerScene").showTrackID();   
                 }
                 else{
@@ -5580,19 +5798,7 @@ class PersistScene extends Phaser.Scene {
 
     this.graphics = this.add.graphics();
     }
-    loseCoin(){ // 
-        this.coinsUICopy = this.matter.add.sprite(X_OFFSET + GRID * 20 + 5, 2,'megaAtlas', 'coinPickup01Anim.png',
-            {
-                frictionAir:.1
-            }
-        ).play('coin01idle').setDepth(101).setOrigin(0,0).setScale(1);
-        var randomVec2 = new Phaser.Math.Vector2(Phaser.Math.Between(-2,1),Phaser.Math.Between(-2,5))
-        this.coinsUICopy.applyForce(randomVec2)
-        //this.coinsUICopy.setVelocity(Phaser.Math.Between(-20, 100), Phaser.Math.Between(-100, -200));
-        //this.coinsUICopy.setGravity(0,400)
-        //TODO add coin flip here
-        //TODO trigger UI coin loader animation here
-    }
+    
     closingTween(){
         this.tweens.addCounter({
             from: 600,
@@ -5623,7 +5829,7 @@ class PersistScene extends Phaser.Scene {
             this.scene.manager.scenes.forEach( scene => {
                 objMap.set(scene.scene.key, scene.children.list.length);
             })
-            console.log("Scene Game Objects", objMap);
+            //console.log("Scene Game Objects", objMap);
     
         }
 
@@ -6468,7 +6674,9 @@ class GameScene extends Phaser.Scene {
                 console.log("YES");
                 
                 ourGameScene.extractMenuOn = false;
-                ourGameScene.finalScore("MainMenuScene", {});
+                ourGameScene.finalScore("MainMenuScene", {
+                    startingAnimation : "menuReturn"
+                });
                 // play small victory fanfare here perhaps
                 return true;
             },
@@ -6683,8 +6891,9 @@ class GameScene extends Phaser.Scene {
          
             this.lights.enable();
             if (!this.tiledProperties.has("dark")) { // this checks for false so that an ambient color is NOT created when DARK_MODE is applied
-                this.lights.setAmbientColor(0xE4E4E4);
+                this.lights.setAmbientColor(0xc9c9c9);
             }
+
         
         
 
@@ -7543,7 +7752,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        
+        const portalLights = [];
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -7577,7 +7786,9 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             
-            this.lights.addLight(portal.x +8, portal.y + 8, 128,  portalLightColor).setIntensity(1);
+            this.portalLight = this.lights.addLight(portal.x +8, portal.y + 8, 128,
+                  portalLightColor).setIntensity(1.5);
+            portalLights.push(this.portalLight);
 
             var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
@@ -7607,6 +7818,46 @@ class GameScene extends Phaser.Scene {
             }
 
         });
+
+        function adjustLightIntensityAndRadius(portalLights) {
+            const maxIntensity = 1.5; // Maximum intensity for lights
+            const baselineIntensity = 0.75; // Baseline intensity to ensure visibility
+            const maxRadius = 128; // Maximum radius for lights
+            const minRadius = 64; // Minimum radius to ensure visibility
+            const thresholdDistance = 128; // Distance threshold for adjustment
+        
+            portalLights.forEach(light1 => {
+                let additionalIntensity = 0;
+                let newRadius = maxRadius; // Start with the maximum radius
+        
+                portalLights.forEach(light2 => {
+                    if (light1 !== light2) {
+                        let distance = Phaser.Math.Distance.Between(light1.x, light1.y, light2.x, light2.y);
+                        if (distance < thresholdDistance) {
+                            // Adjust additional intensity based on distance
+                            additionalIntensity += Phaser.Math.Clamp((thresholdDistance - distance) / thresholdDistance, 0, maxIntensity - baselineIntensity);
+                            // Adjust radius based on distance
+                            newRadius = Math.max(newRadius * (distance / thresholdDistance), minRadius);
+                        }
+                    }
+                });
+        
+                // Calculate the final intensity and radius
+                const finalIntensity = Phaser.Math.Clamp(baselineIntensity + additionalIntensity, baselineIntensity, maxIntensity);
+                light1.setIntensity(finalIntensity);
+                //console.log(finalIntensity)
+                light1.setRadius(newRadius); // Set the new radius
+            });
+        }
+
+        
+        // Adjust intensities and radii
+        adjustLightIntensityAndRadius(portalLights);
+        
+        
+        
+        
+        
 
         // #region Portals Play
         if (this.portals.length > 0) {
@@ -9216,7 +9467,10 @@ class GameScene extends Phaser.Scene {
             delay: 1000,
             onComplete: () =>{
                 //TODO: reset back to stage 1
-                this.scene.start('MainMenuScene');//start shuts down this scene and runs the given one
+                this.scene.start('MainMenuScene', {
+                    startingAnimation : "menuReturn"
+                });//start shuts down this scene and runs the given one
+                
             }
         });
         
@@ -9600,9 +9854,11 @@ class GameScene extends Phaser.Scene {
     }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
+        const ourSpaceboy = this.scene.get('SpaceBoyScene');
+
         const ourGame = this.scene.get("GameScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
-        ourPersist.loseCoin();
+        ourSpaceboy.loseCoin();
         this.coinsUIIcon.setVisible(false);
         ourPersist.coins += -1;
         this.coinUIText.setHTML(
@@ -12853,6 +13109,20 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 8,
         repeat: -1
     });
+
+    scene.anims.create({
+        key: 'wListOn',
+        frames: scene.anims.generateFrameNumbers('wishlistButton1',{ frames: [0,1,2]}),
+        frameRate: 32,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'wListOff',
+        frames: scene.anims.generateFrameNumbers('wishlistButton1',{ frames: [2,1,0]}),
+        frameRate: 12,
+        repeat: 0
+    });
+    
     
     scene.textures.addSpriteSheetFromAtlas('downArrowAnim', { atlas: 'megaAtlas', frameWidth: 16, frameHeight: 16,
         frame: 'UI_ArrowDownAnim.png'
@@ -13329,11 +13599,11 @@ var config = {
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
     scene: [ StartScene, 
-        MainMenuScene, QuickMenuScene, GalaxyMapScene, 
+        MainMenuScene, PlinkoMachineScene,QuickMenuScene, GalaxyMapScene, 
         PersistScene, TutorialScene,
         GameScene, InputScene, ScoreScene, 
         StageCodex, ExtractTracker,
-        SpaceBoyScene, PinballDisplayScene, PlinkoMachineScene, MusicPlayerScene]
+        SpaceBoyScene, PinballDisplayScene,  MusicPlayerScene]
 };
 
 // #region Screen Settings
