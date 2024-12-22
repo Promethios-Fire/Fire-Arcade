@@ -6184,6 +6184,13 @@ class GameScene extends Phaser.Scene {
 
         
         
+        
+
+        // Loads tiled properties if not on the main path of levels. May not need the next part that loads all of the next ones, but needs testing before removing.
+        if (STAGES.get(this.stage) === undefined) {
+            this.load.json(`${this.stage}.properties`, `assets/Tiled/${this.stage}.json`, 'properties');
+        }
+
         // This is kept in for loading the tutorial levels.
         if (this.nextStages != undefined) {
             this.nextStages.forEach( stageName => {
@@ -10745,7 +10752,7 @@ class ScoreScene extends Phaser.Scene {
         var atomTimeTotal = atomList.reduce((a,b) => a + b, 0);
         var stageCache = this.cache.json.get(`${this.stageData.stage}.properties`);
 
-        var sRankValue = undefined
+        var sRankValue = undefined;
         // Could use .some here.
         stageCache.forEach( probObj => {
             if (probObj.name === "sRank") {
@@ -10795,7 +10802,7 @@ class ScoreScene extends Phaser.Scene {
 
                     
                     switch (true) {
-                        case stageScore <  RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
+                        case stageScore < RANK_BENCHMARKS.get(RANKS.BRONZE): // In Wood
 
                             var filled = (stageScore/RANK_BENCHMARKS.get(RANKS.BRONZE));
                         
@@ -10803,7 +10810,7 @@ class ScoreScene extends Phaser.Scene {
                             rankProgressBar.fillRect(rankBarX, rankBarY - 4, size * filled, 3);
                             break;
 
-                        case stageScore <  RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
+                        case stageScore < RANK_BENCHMARKS.get(RANKS.SILVER): // In Bronze
 
                             //var remainder = stageScore % RANK_BENCHMARKS.get(RANKS.BRONZE);
                             var goal =  RANK_BENCHMARKS.get(RANKS.SILVER);
@@ -11238,6 +11245,7 @@ class ScoreScene extends Phaser.Scene {
                 }
             });
 
+            // TODO - Still needed?
             this.time.delayedCall(atomList.length * (frameTime * 2) * this.scoreTimeScale + 200, () => {
                 comboBo = this.stageData.comboBonus();
                 comboBonusUI.setHTML(
@@ -11285,6 +11293,7 @@ class ScoreScene extends Phaser.Scene {
 
 
             // This tween needs to end last.
+            
             this.tweens.addCounter({
                 from: 0,
                 to:  1,
@@ -11375,7 +11384,7 @@ class ScoreScene extends Phaser.Scene {
                         duration: 1000,
                         repeat: -1,
                         yoyo: true
-                      });
+                    });
 
 
                     modeScoreContainer.each( item => {
@@ -11385,6 +11394,7 @@ class ScoreScene extends Phaser.Scene {
                 },
             
             });
+            
 
 
 
@@ -11406,7 +11416,24 @@ class ScoreScene extends Phaser.Scene {
 
         var barSize = 138;
         var barY = Y_OFFSET + GRID * 18.5 + 8;
-        var bestScore = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
+
+        var bestScore;
+        if (BEST_OF_ALL.get(this.stageData.stage)) {
+            bestScore = BEST_OF_ALL.get(this.stageData.stage).calcTotal();
+        } else {
+            debugger
+            var tempJSONClassic = JSON.parse(localStorage.getItem(`${ourGame.uuid}_best-Classic`));
+            if (tempJSONClassic != null) {
+
+                var _stageDataClassic = new StageData(tempJSONClassic);
+                bestScore = _stageDataClassic.calcTotal();
+
+            } else {
+                bestScore = this.stageData.calcTotal(); 
+            }
+        }
+            
+        
         var overallAverage = globalStageStats[this.stageData.uuid].sum / globalStageStats[this.stageData.uuid].plays;
 
         prevBestBar.fillStyle(0x2d2d2d);
