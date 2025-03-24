@@ -24,7 +24,7 @@ var Snake = new Phaser.Class({
         this.previous = [];
 
         this.body.unshift(this.head);
-        this.bodyVisualTween = scene.tweens.addCounter({
+        this.criticalStateTween = scene.tweens.addCounter({
             from: 255,
             to: 0,
             yoyo: true,
@@ -42,7 +42,7 @@ var Snake = new Phaser.Class({
         });
 
         if (scene.scene.get("PersistScene").coins > 0) {
-            this.bodyVisualTween.pause();
+            this.criticalStateTween.pause();
         }
         
         //if (coins 0) {
@@ -477,7 +477,7 @@ var Snake = new Phaser.Class({
         if (ourPersistScene.coins === 1) {
             debugger
             musicPlayer.nextSong(`track_175`);
-            this.bodyVisualTween.resume();
+            this.criticalStateTween.resume();
         }
 
         if (!scene.stopOnBonk) {

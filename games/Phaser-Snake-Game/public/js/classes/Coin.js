@@ -43,7 +43,7 @@ var Coin = new Phaser.Class({
         if (ourPersistScene.coins === 0) {
             scene.scene.get("MusicPlayerScene").music.stop();
             scene.scene.get("MusicPlayerScene").nextSong();
-            scene.snake.bodyVisualTween.pause();
+            scene.snake.criticalStateTween.pause();
             scene.snake.body.forEach((part) => {
                 part.clearTint();
             });

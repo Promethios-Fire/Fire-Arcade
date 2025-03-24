@@ -9649,7 +9649,7 @@ class GameScene extends Phaser.Scene {
         else{
             //fanfare ending
             // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
-            this.snake.bodyVisualTween.pause();
+            this.snake.criticalStateTween.pause(); // stop flashing red if it exists
             console.log('should rainbow right now fr')
             this.slowMoTween = this.tweens.add({
                 targets: { value: 1 },
