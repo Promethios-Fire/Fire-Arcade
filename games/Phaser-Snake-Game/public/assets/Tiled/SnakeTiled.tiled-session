@@ -933,15 +933,15 @@
             "scaleInDock": 1
         },
         "World_10-3.json": {
-            "scale": 2.1102011494252872,
-            "selectedLayer": 2,
+            "scale": 1.5,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.68012528086064,
-                "y": 162.30680193368286
+                "x": 123.99999999999999,
+                "y": 262.99999999999994
             }
         },
         "World_10-3.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 2
         },
         "World_10-3_Final_Exams.json": {
             "scale": 2.1102011494252872,
