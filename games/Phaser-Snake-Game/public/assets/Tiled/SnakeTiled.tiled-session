@@ -868,7 +868,8 @@
         },
         "World_1-3.json#tileSheetx12": {
             "dynamicWrapping": false,
-            "scaleInDock": 1
+            "scaleInDock": 1,
+            "scaleInEditor": 1
         },
         "World_1-3.json#tileSheetx24": {
             "scaleInDock": 1
@@ -2712,7 +2713,7 @@
             "scaleInDock": 1
         }
     },
-    "last.exportedFilePath": "E:/FireArcade/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
+    "last.exportedFilePath": "E:/Fire Arcade/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
     "last.externalTilesetPath": "E:/Fire Arcade/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
     "last.imagePath": "E:/FireArcade/Fire-Arcade/games/Phaser-Snake-Game/public/assets/Tiled",
     "map.lastUsedExportFilter": "All Files (*)",

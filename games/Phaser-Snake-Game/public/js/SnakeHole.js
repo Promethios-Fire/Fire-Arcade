@@ -9981,7 +9981,7 @@ class GameScene extends Phaser.Scene {
         if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
             this.activeArrows.add(this.startingArrowsAnimE );
         }
-        if (!this.map.hasTileAtWorldXY(_x + 1 * GRID, _y)) {
+        if (!this.map.hasTileAtWorldXY(_x - 1 * GRID, _y)) {
             this.activeArrows.add(this.startingArrowsAnimW );
         }
 
