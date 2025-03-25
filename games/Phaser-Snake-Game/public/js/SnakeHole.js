@@ -6410,13 +6410,9 @@ class PersistScene extends Phaser.Scene {
     this.cameras.main.setBackgroundColor(0x111111);
     this.add.image(SCREEN_WIDTH/2 - 1, GRID * 1.5,'boostMeterBG').setDepth(10).setOrigin(0.5,0.5);
     
-
-   
-    
-    
     //waveshader     
     this.wavePipeline = game.renderer.pipelines.get('WaveShaderPipeline');
-    
+
     // #Backgrounds
     // for changing bg sprites
     this.bgTimer = 0;
@@ -6651,6 +6647,21 @@ class PersistScene extends Phaser.Scene {
 
     this.graphics = this.add.graphics();
     }
+
+    pixelateTransition(){
+        // check here if entering new world theme
+        const fxCamera = this.cameras.main.postFX.addPixelate(-1);
+        this.add.tween({
+            targets: fxCamera,
+            duration: 1000,
+            amount: 5,
+            yoyo: true,
+            delay: 600,
+            onComplete: () => {
+                this.cameras.main.postFX.remove(fxCamera);
+            }
+        });
+    }
     
     closingTween(){
         this.tweens.addCounter({
@@ -6717,7 +6728,6 @@ class PersistScene extends Phaser.Scene {
         // Background Layer FAR    
         // Update the X and Y of each background container's child object.
         this.currentBackgroundFar.list.forEach(child => {
-            
             child.x = -((this.bgBack.tilePositionX  + this.spriteScrollX)) * 8+ child.originalX;
             var remainderX = (child.x % this.gameScreenRight);
             if (child.x > 0) {
@@ -6737,7 +6747,6 @@ class PersistScene extends Phaser.Scene {
                 child.y = remainderY;
             }
         });
-
         // Background Layer CLOSE    
         // Update the X and Y of each background container's child object.
         this.currentBackgroundClose.list.forEach(child => {
@@ -7028,6 +7037,7 @@ class GameScene extends Phaser.Scene {
                 ourPersist.bgAsteroidsClose.setAlpha(1);
                 ourPersist.currentBackgroundFar = ourPersist.bgAsteroidsFar;
                 ourPersist.currentBackgroundClose = ourPersist.bgAsteroidsClose;
+
                 break;
             case "3": // Move to Wrap levels
                 ourPersist.bgBack.setTexture('background03');
@@ -9566,6 +9576,7 @@ class GameScene extends Phaser.Scene {
         }
     }
 
+
     // #region .Fanfare(
     victoryFanfare(){
         const ourInputScene = this.scene.get('InputScene');
@@ -10414,13 +10425,21 @@ class GameScene extends Phaser.Scene {
         //dim UI
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
+            const ourPersist = this.scene.get('PersistScene');
             this.tweens.add({
                 targets: [ourGameScene.countDown,ourGameScene.coinUIText,
                     ourSpaceboy.shiftLight1,ourSpaceboy.shiftLight2,ourSpaceboy.shiftLight3],
                 alpha: { from: 1, to: 0},
                 ease: 'Sine.InOut',
                 duration: 500,
-                });
+            });
+            // check if the next stage is a new world
+            var nextStageRaw = this.nextStages[nextStageIndex];
+            console.log(nextStageRaw)
+            if (nextStageRaw === '2-1' || nextStageRaw === '3-1_Wrap' || nextStageRaw === '4-1' ||
+                nextStageRaw === '5-1_Racing' || nextStageRaw === '8-1_Adv_Portaling' || nextStageRaw === '9-2_Final_Exams') {
+                ourPersist.pixelateTransition();
+            };
         });
 
         var wallSprites = [];
