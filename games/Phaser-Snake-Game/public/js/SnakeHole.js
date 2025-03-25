@@ -6559,7 +6559,8 @@ class PersistScene extends Phaser.Scene {
     this.bgAsteroidsClose.add([...medAsteroidsClose, ...smallAsteroidsClose,
         compSpriteAsteroid1,compSpriteAsteroid2,compSpriteAsteroid3,compSpriteAsteroid4
     ]);
-
+    this.bgAsteroidsFar.setAlpha(0);
+    this.bgAsteroidsClose.setAlpha(0);
 
     // used by above functions to create an image and preserve its originalX/Y value
     function createImage(scene, x, y, key, frame) {
