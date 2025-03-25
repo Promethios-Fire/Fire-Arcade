@@ -9985,7 +9985,7 @@ class GameScene extends Phaser.Scene {
             this.activeArrows.add(this.startingArrowsAnimW );
         }
 
-        this.tweens.add({
+        this.arrowStartupTween = this.tweens.add({
             targets: [...this.activeArrows],
             alpha: 1,
             duration: 500,
@@ -13784,6 +13784,7 @@ class InputScene extends Phaser.Scene {
             gameScene.scoreTimer.paused = false;
 
             gameScene.activeArrows.forEach ( arrow => {
+                gameScene.arrowStartupTween.stop();
                 arrow.setAlpha(0);
             });
         }
