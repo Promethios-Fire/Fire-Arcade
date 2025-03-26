@@ -10411,6 +10411,9 @@ class GameScene extends Phaser.Scene {
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
 
+        // drain boost bar so it's ready for next round
+        this.boostEnergy = Math.min(this.boostEnergy - 1000, 100);
+
         if (this.helpPanel) {
             this.tweens.add({
                 targets: [this.helpPanel,this.helpText],
@@ -10419,7 +10422,6 @@ class GameScene extends Phaser.Scene {
                 duration: 500,
                 });
         }
-
 
 
         //dim UI
@@ -10436,8 +10438,8 @@ class GameScene extends Phaser.Scene {
             // check if the next stage is a new world
             var nextStageRaw = this.nextStages[nextStageIndex];
             console.log(nextStageRaw)
-            if (nextStageRaw === '2-1' || nextStageRaw === '3-1_Wrap' || nextStageRaw === '4-1' ||
-                nextStageRaw === '5-1_Racing' || nextStageRaw === '8-1_Adv_Portaling' || nextStageRaw === '9-2_Final_Exams') {
+            if (nextStageRaw === '2-1' || nextStageRaw === '3-1' || nextStageRaw === '4-1' ||
+                nextStageRaw === '5-1' || nextStageRaw === '8-1' || nextStageRaw === '9-2') {
                 ourPersist.pixelateTransition();
             };
         });
