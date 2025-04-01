@@ -4570,6 +4570,32 @@ class MainMenuScene extends Phaser.Scene {
         const ourPersist = this.scene.get('PersistScene');
         const ourMap = this.scene.get('GalaxyMapScene');
 
+
+        /* FOR CHECKING IF PLAYER NEEDS TO BE ALERTED -- UNFINISHED
+        // needs somewhere to reference/store if an alert has happened before
+        // menu option unlock state
+        const menuUnlockState = {
+            LOCKED: 0, // is locked
+            UNLOCKED_FIRST_TIME: 1, // just unlocked for the first time (should only happen once)
+            UNLOCKED_PERM: 2, // option has been unlocked and doesn't display anything new
+            UNLOCKED_NEW: 3, // for menus that need to show that something new updated but HAS been unlocked
+        };
+        
+        const easyGauntlet = GAUNTLET_CODES.get("Easy Gauntlet");
+        if (easyGauntlet) {
+            const unlockStatus = easyGauntlet.checkUnlock();
+            //console.log("Unlock status (returned rank):", unlockStatus);
+            if (unlockStatus === true) {
+                console.log("Unlocked");
+            } else {
+                console.log("Locked");
+            }
+        }
+        else{
+            console.log('Error: no gauntlet')
+        }
+        */
+
         // set a random color to the portal
         this.portalColors = PORTAL_COLORS.slice();
         let randomColor = this.portalColors[
