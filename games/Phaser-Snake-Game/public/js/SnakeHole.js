@@ -1193,9 +1193,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
         // Length/Goal UI
 
-        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 6 + 1, 'mainFontLarge', ``, 13)
+        this.lengthGoalUI = this.add.bitmapText((X_OFFSET + GRID * 32.25) + 3, GRID * 3 + 1, 'mainFontLarge', ``, 13)
         .setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 6 + 2, 'UI_goalLabel'
+        this.lengthGoalUILabel = this.add.sprite((X_OFFSET + GRID * 29.0 + 6), GRID * 3 + 2, 'UI_goalLabel'
         ).setAlpha(0).setDepth(101).setOrigin(0,0).setScrollFactor(0);
         
         this.lengthGoalUIMaskSprite = this.add.sprite(X_OFFSET + GRID * 24,
@@ -1627,16 +1627,16 @@ class MusicPlayerScene extends Phaser.Scene {
 
         // speaker icon above slider
         this.volumeIcon = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 2.5 + 7, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
+            GRID * 7.5 + 8, 'uiVolumeIcon',0).setDepth(100).setAlpha(0);
         // volume slider icon
         this.volumeSlider = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75  + 6, 'uiVolumeSlider').setDepth(100).setAlpha(0);
+            GRID * 4.5  + 8, 'uiVolumeSlider').setDepth(100).setAlpha(0);
         // mask sprite
         this.volumeSliderWidgetMask = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75  + 6, 'uiVolumeSliderWidget').setDepth(101);
+            GRID * 4.5  + 8, 'uiVolumeSliderWidget').setDepth(101);
         // rendered sprite
         this.volumeSliderWidgetReal = this.add.sprite(X_OFFSET + GRID * 33.5 + 2,
-            GRID * 5.75  + 6, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
+            GRID * 4.5  + 8, 'uiVolumeSliderWidgetRendered').setDepth(101).setAlpha(0);
 
         const volumeMask = new Phaser.Display.Masks.BitmapMask(this,this.volumeSliderWidgetMask);
         this.volumeSlider.setMask(volumeMask)
@@ -1694,15 +1694,15 @@ class MusicPlayerScene extends Phaser.Scene {
                     this.updatedVolume = this.soundManager.volume + volumeChange
                     
                     // y values for adjusting the volumeSliderWidget and Mask
-                    const minY = 46;
-                    const maxY = 105;
+                    const minY = this.volumeSlider.y - this.volumeSlider.height/2;
+                    const maxY = this.volumeSlider.y + this.volumeSlider.height/2;
                     const newY = minY + (maxY - minY) * (1 - this.updatedVolume);
                     
                     // this console log is one event call behind hence this.updatedVolume
                     //console.log(`Volume: ${this.soundManager.volume}, Slider Y: ${newY}`);
 
                     // set volume icon based on volume level
-                    if (newY >= 46 && newY <= 105) {
+                    if (newY >= minY && newY <= maxY) {
                         this.volumeSliderWidgetMask.y = newY;
                         this.volumeSliderWidgetReal.y = newY;
 
@@ -1725,9 +1725,9 @@ class MusicPlayerScene extends Phaser.Scene {
         // Buttons
         var columnX = X_OFFSET + GRID * 36 + 1;
 
-        this.trackIDLabel = this.add.bitmapText(columnX - GRID * 4 -5, GRID * 2.75, 'mainFont', `TRACK`, 8
+        this.trackIDLabel = this.add.bitmapText(columnX - GRID * 4 -5, GRID * 7.75 + 1, 'mainFont', `TRACK`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
-        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 2.75, 'mainFont', `000`, 8
+        this.trackID = this.add.bitmapText(columnX - GRID * 3, GRID * 7.75 + 1, 'mainFont', `000`, 8
         ).setOrigin(1,0).setScale(1).setAlpha(0).setScrollFactor(0).setTintFill(0x1f211b);
         this.trackID.setDepth(80);
         this.trackID.setText(this.startTrack);
