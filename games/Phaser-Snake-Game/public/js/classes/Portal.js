@@ -77,62 +77,65 @@ var Portal = new Phaser.Class({
 
     },
     onOver: function(scene) {
-        scene.gState = GState.PORTAL;
-        scene.snake.lastPortal = this;
-        scene.scoreTimer.paused = true;
-
-
-        if (DEBUG) { console.log("PORTAL"); }
-
-        // Show portal snake body after head arrives.
-        if (scene.snake.body.length > 2) {
-            this.snakePortalingSprite.visible = true;   
-        }
-
-
-        var _x = this.target.x;
-        var _y = this.target.y;
-
-        
-
-        var portalSound = scene.portalSounds[0];
-        portalSound.play();
-
-        var _tween = scene.tweens.add({
-            targets: scene.snake.body[0], 
-            x: _x,
-            y: _y,
-            yoyo: false,
-            duration: SPEED_WALK * PORTAL_PAUSE,
-            ease: 'Linear',
-            repeat: 0,
-            //delay: 500
-            onStart: function () {       
-            }
-        });
-        
-        _tween.on('complete',()=>{
-            scene.gState = GState.PLAY;
-            scene.scoreTimer.paused = false;
-
+        if (scene.winned === false) {
+            scene.gState = GState.PORTAL;
+            scene.snake.lastPortal = this;
+            scene.scoreTimer.paused = true;
+    
+    
+            if (DEBUG) { console.log("PORTAL"); }
+    
             // Show portal snake body after head arrives.
             if (scene.snake.body.length > 2) {
-                this.targetObject.snakePortalingSprite.visible = true;   
+                this.snakePortalingSprite.visible = true;   
             }
+    
+    
+            var _x = this.target.x;
+            var _y = this.target.y;
+    
+            
+    
+            var portalSound = scene.portalSounds[0];
+            portalSound.play();
+    
+            var _tween = scene.tweens.add({
+                targets: scene.snake.body[0], 
+                x: _x,
+                y: _y,
+                yoyo: false,
+                duration: SPEED_WALK * PORTAL_PAUSE,
+                ease: 'Linear',
+                repeat: 0,
+                //delay: 500
+                onStart: function () {       
+                }
+            });
+            
+            _tween.on('complete',()=>{
+                scene.gState = GState.PLAY;
+                scene.scoreTimer.paused = false;
+    
+                // Show portal snake body after head arrives.
+                if (scene.snake.body.length > 2) {
+                    this.targetObject.snakePortalingSprite.visible = true;   
+                }
+    
+    
+                scene.scene.get("InputScene").moveHistory.push([
+                    [(this.x - X_OFFSET)/GRID, (this.y - Y_OFFSET)/GRID], 
+                    [(_x - X_OFFSET)/GRID, (_y - Y_OFFSET)/GRID], 
+                    scene.snake.direction
+                ]);
+    
+    
+                // Set last move to now. Fixes Corner Time.
+                scene.lastMoveTime = scene.time.now;
+    
+                PLAYER_STATS.portals += 1;
+            });
+        }
 
-
-            scene.scene.get("InputScene").moveHistory.push([
-                [(this.x - X_OFFSET)/GRID, (this.y - Y_OFFSET)/GRID], 
-                [(_x - X_OFFSET)/GRID, (_y - Y_OFFSET)/GRID], 
-                scene.snake.direction
-            ]);
-
-
-            // Set last move to now. Fixes Corner Time.
-            scene.lastMoveTime = scene.time.now;
-
-            PLAYER_STATS.portals += 1;
-        });
                         
     },
     

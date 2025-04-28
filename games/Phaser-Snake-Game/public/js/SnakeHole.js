@@ -8017,6 +8017,8 @@ class GameScene extends Phaser.Scene {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
+            this.collapsePortals();
+
             // #region is unlocked?
 
             if (this.winned) {
@@ -8644,7 +8646,7 @@ class GameScene extends Phaser.Scene {
         }
         
         // #endregion
-        const portalLights = [];
+        this.portalLights = [];
 
         this.portals.forEach(portal => { // each portal adds a light, portal light color, particle emitter, and mask
             var portalLightColor = 0xFFFFFF;
@@ -8680,7 +8682,7 @@ class GameScene extends Phaser.Scene {
             
             this.portalLight = this.lights.addLight(portal.x +8, portal.y + 8, 128,
                   portalLightColor).setIntensity(1.5);
-            portalLights.push(this.portalLight);
+            this.portalLights.push(this.portalLight);
 
             var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
@@ -8744,7 +8746,7 @@ class GameScene extends Phaser.Scene {
 
         
         // Adjust intensities and radii
-        adjustLightIntensityAndRadius(portalLights);
+        adjustLightIntensityAndRadius(this.portalLights);
         
         
         
@@ -10957,6 +10959,22 @@ class GameScene extends Phaser.Scene {
         
         this.lengthGoalUI
         this.lengthGoalUILabel
+    }
+
+    collapsePortals(){
+        this.portals.forEach(portal => {
+            portal.play('portalClose');
+            portal.portalHighlight.alpha = 0;
+            portal.alpha = 0;
+        })
+
+        this.portalLights.forEach(portalLight => {
+            this.lights.removeLight(portalLight);
+        });
+
+        this.portalParticles.forEach(portalParticles => { 
+            portalParticles.stop();
+        });
     }
 
     // #region Game Update
@@ -13946,6 +13964,12 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'portalForm',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
+        frameRate: 8,
+        repeat: 0
+    });
+    scene.anims.create({
+        key: 'portalClose',
+        frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 9,8,7,6]}),
         frameRate: 8,
         repeat: 0
     });
