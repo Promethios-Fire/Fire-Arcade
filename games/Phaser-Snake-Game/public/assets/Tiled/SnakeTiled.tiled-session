@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_1-3.json",
+    "activeFile": "World_0-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -832,8 +832,8 @@
             "scale": 2,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 166.75,
-                "y": 121.25
+                "x": 162.75,
+                "y": 194.25
             }
         },
         "World_0-1.json#tileSheetx12": {
@@ -2672,7 +2672,7 @@
         },
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 1,
+            "scaleInDock": 1.5,
             "scaleInEditor": 1
         },
         "tileSheetx24.tsx": {
@@ -2744,7 +2744,6 @@
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
-        "World_0-1.json",
         "World_1-2.json",
         "World_1-1.json",
         "r-11-12-4.json",
@@ -2763,23 +2762,24 @@
         "World_9-3_Final_Exams.json",
         "World_9-4_Final_Exams.json",
         "World_10-4.json",
-        "World_1-3.json"
+        "World_1-3.json",
+        "World_0-1.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "bool",
     "recentFiles": [
-        "World_0-1..tmx",
-        "World_1-3.tmx",
         "Tutorial_1.json",
         "Tutorial_2.json",
         "Tutorial_3.json",
-        "World_0-1.json",
         "World_1-2.json",
         "World_1-1.json",
         "r-11-12-4.json",
         "r-11-12-3.json",
         "r-11-12-2.json",
-        "r-11-12-1.json"
+        "r-11-12-1.json",
+        "World_8-3_Adv_Portaling.json",
+        "World_4-3.json",
+        "r_11-30-4.json"
     ],
     "resizeMap.removeObjects": false,
     "tileset.embedInMap": true,

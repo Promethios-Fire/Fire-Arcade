@@ -10524,7 +10524,7 @@ class GameScene extends Phaser.Scene {
         
         var allTheThings = [
             ...this.coinsArray,
-            ...this.portals,
+            //...this.portals,
             ...this.atoms,
             ...wallSprites,
         ];

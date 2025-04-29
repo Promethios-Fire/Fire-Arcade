@@ -402,7 +402,7 @@ var Snake = new Phaser.Class({
 
             if (this.closestPortal === undefined) {
                 this.closestPortal = testPortal;
-                this.closestPortal.flipX = true;
+                //this.closestPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: this.closestPortal.targetObject.portalHighlight,
@@ -432,7 +432,7 @@ var Snake = new Phaser.Class({
                 var oldPortal = this.closestPortal;
                 oldPortal.flipX = false;
 
-                testPortal.flipX = true;
+                //testPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: testPortal.targetObject.portalHighlight,
