@@ -11068,8 +11068,15 @@ class GameScene extends Phaser.Scene {
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
 
-            this.scene.launch('ScoreScene', stageDataJSON);
             this.backgroundBlur(true);
+            this.tweens.add({
+                targets: this.cameras.main,
+                alpha: 0,
+                duration: 1000,
+                ease: 'Linear'
+            });
+
+            this.scene.launch('ScoreScene', stageDataJSON);
             this.setWallsPermeable();
         }
 
@@ -11253,6 +11260,7 @@ class GameScene extends Phaser.Scene {
             this.scene.pause();
 
             this.scene.start('ScoreScene');
+
         }
         // #endregion
 
@@ -11793,7 +11801,7 @@ class ScoreScene extends Phaser.Scene {
         this.scoreTimeScale = .25;
 
         //STAGE CLEAR X_OFFSET + GRID * 2
-        this.add.dom(SCREEN_WIDTH / 2, GRID * 5.8, 'div', Object.assign({}, STYLE_DEFAULT, {
+        /*this.add.dom(SCREEN_WIDTH / 2, GRID * 5.8, 'div', Object.assign({}, STYLE_DEFAULT, {
             
             "text-shadow": "4px 4px 0px #000000",
             "font-size": '32px',
@@ -11806,8 +11814,12 @@ class ScoreScene extends Phaser.Scene {
             "white-space": 'pre-line'
         })).setHTML(
             (this.stageData.stage.replaceAll("_", " ") + " CLEAR")
-        ).setOrigin(0.5, 0.5).setScale(.5);
+        ).setOrigin(0.5, 0.5).setScale(.5);*/
 
+        let formattedText = (this.stageData.stage.replaceAll("_", "_") + "_CLEAR").toUpperCase(); // still need space font space to replace '_'
+
+        this.add.bitmapText(SCREEN_WIDTH / 2, GRID * 5.8, 'mainFontLarge', formattedText, 13)
+        .setOrigin(0.5,0.5);
 
 
 
@@ -13282,8 +13294,11 @@ class ScoreScene extends Phaser.Scene {
         ourPersist.prevPlayerRankTut = calcPlayerRank(ourPersist.sumOfBestTut);
 
         var continue_text = '[SPACE TO CONTINUE]';
-            
-        var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27 + 0,'div', Object.assign({}, STYLE_DEFAULT, {
+        
+        var continueText = this.add.bitmapText(SCREEN_WIDTH/2, GRID*26, 'mainFontLarge', `SPACE_TO_CONTINUE`, 13)
+        .setOrigin(0.5,0.5);
+
+        /*var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27 + 0,'div', Object.assign({}, STYLE_DEFAULT, {
             "fontSize":'32px',
             "font-family": '"Press Start 2P", system-ui',
             "text-shadow": "4px 4px 0px #000000",
@@ -13291,12 +13306,20 @@ class ScoreScene extends Phaser.Scene {
             //"text-shadow": '4px 4px 0px #000000, -2px 0 0 limegreen, 2px 0 0 fuchsia, 2px 0 0 #4405fc'
             }
         )).setText(continue_text).setOrigin(0.5,0).setScale(.5).setDepth(25).setInteractive();
-
+*/
         
         continueText.setVisible(false); 
         
 
         const onContinue = function (scene) {
+            
+            scene.tweens.add({
+                targets: ourGame.cameras.main,
+                alpha: 1,
+                duration: 1000,
+                ease: 'Linear',
+            });
+
             console.log('pressing space inside score scene');
 
             var gameOver = false;

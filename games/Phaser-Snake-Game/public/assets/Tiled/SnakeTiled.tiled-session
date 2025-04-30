@@ -829,11 +829,11 @@
             "scaleInDock": 1
         },
         "World_0-1.json": {
-            "scale": 2,
+            "scale": 1,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 162.75,
-                "y": 194.25
+                "x": 132,
+                "y": 228.5
             }
         },
         "World_0-1.json#tileSheetx12": {
@@ -873,8 +873,8 @@
             "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 168.33333333333331,
-                "y": 126.99999999999997
+                "x": 174.33333333333331,
+                "y": 161.66666666666663
             }
         },
         "World_1-3.json#tileSheetx12": {
@@ -1768,7 +1768,7 @@
             "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.10892281022774,
-                "y": 162.0436269080753
+                "y": 162.04362690807528
             }
         },
         "r-11-30.json#tileSheetx12": {
@@ -2658,6 +2658,17 @@
         "testingWallPortal.json#tileSheetx12": {
             "dynamicWrapping": false,
             "scaleInDock": 1
+        },
+        "testing_SnP_example.json": {
+            "scale": 1.5,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 162,
+                "y": 196.99999999999997
+            }
+        },
+        "testing_SnP_example.json#tileSheetx12": {
+            "scaleInDock": 3
         },
         "testingx01.json": {
             "scale": 0.8618951612903225,
