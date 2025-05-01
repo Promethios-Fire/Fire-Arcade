@@ -9224,6 +9224,7 @@ class GameScene extends Phaser.Scene {
 
 
             this.tweens.add({
+                //herehere
                 targets: ourSpaceBoyScene.deltaScoreUI,
                 alpha:{ from: 1, to: 0 },
                 ease: 'Expo.easeInOut',
@@ -10371,7 +10372,9 @@ class GameScene extends Phaser.Scene {
         // scene blur removal
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
         const ourGameScene = this.scene.get('GameScene');
+        const ourSpaceBoyScene = this.scene.get('SpaceBoyScene');
 
+        ourSpaceBoyScene.deltaScoreUI.alpha = 0;
         // Clear for reseting game
         ourGameScene.events.off('addScore');
         ourGameScene.events.off('spawnBlackholes');
