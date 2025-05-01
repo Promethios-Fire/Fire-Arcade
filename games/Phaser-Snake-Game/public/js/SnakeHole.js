@@ -913,7 +913,8 @@ class SpaceBoyScene extends Phaser.Scene {
         
         this.light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
 
-
+        // logic
+        this._scoreTweenShown = false;
 
         // Create an invisible interactive zone for volume dial and the music player zone
 
@@ -1477,6 +1478,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
     
     scoreTweenShow(){
+        this._scoreTweenShown = true;
         this.tweens.add({
             targets: this.UIScoreContainer,
             y: (0),
@@ -1513,6 +1515,7 @@ class SpaceBoyScene extends Phaser.Scene {
         });
     }
     scoreTweenHide(){
+        this._scoreTweenShown = false;
         if (this.UIScoreContainer.y === 0) {
             this.tweens.add({
                 targets: this.UIScoreContainer,
@@ -9222,14 +9225,19 @@ class GameScene extends Phaser.Scene {
                 `+${deltaScore}`
             )
 
-
-            this.tweens.add({
-                //herehere
-                targets: ourSpaceBoyScene.deltaScoreUI,
-                alpha:{ from: 1, to: 0 },
-                ease: 'Expo.easeInOut',
-                duration: 2000,
-            })
+            if (!ourSpaceBoyScene._scoreTweenShown) {
+                console.log('shown')
+                this.tweens.add({
+                    targets: ourSpaceBoyScene.deltaScoreUI,
+                    alpha:{ from: 1, to: 0 },
+                    ease: 'Expo.easeInOut',
+                    duration: 2000,
+                })
+            } 
+            else{
+                console.log('hidden')
+            }
+  
             
 
 
