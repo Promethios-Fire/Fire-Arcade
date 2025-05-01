@@ -6973,6 +6973,7 @@ class GameScene extends Phaser.Scene {
             STAGE_OVERRIDES.get(this.stage).preFix(this);
         }
 
+
         const ourInputScene = this.scene.get('InputScene');
         const ourGameScene = this.scene.get('GameScene');
         const ourStartScene = this.scene.get('StartScene');
@@ -6981,7 +6982,6 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
-
 
         if (this.stage == 'Tutorial_3') { // TODO @holden Move to customLevels.js
             this.time.delayedCall(5000, () => {
@@ -7009,8 +7009,6 @@ class GameScene extends Phaser.Scene {
             duration: 1000,
             ease: 'Sine.Out',
         });
-
-        
         
 
         ourSpaceBoyScene.setLog(this.stage);
@@ -9582,25 +9580,22 @@ class GameScene extends Phaser.Scene {
 
     backgroundBlur(isBlurring){
         const ourPersist = this.scene.get('PersistScene');
+        
         if (isBlurring) {
-            // not needed anymore, but handy for referencing if pixelation is true: if (this.renderer.pipelines.FX_PIPELINE.pixelate = false) {
-            //this.fxbgFront = ourPersist.bgFront.postFX.addPixelate(1);
-            this.fxbgMid = ourPersist.bgMid.postFX.addPixelate(1);
-            this.fxbgBack = ourPersist.bgBack.postFX.addPixelate(1);
-            this.fxbgFurthest = ourPersist.bgFurthest.postFX.addPixelate(1);
-            //console.log(ourQuickMenu.renderer.pipelines.FX_PIPELINE.pixelate)
+            this.fxCamera = ourPersist.cameras.main.postFX.addPixelate(-1);
+            this.fxCameraGame = this.cameras.main.postFX.addPixelate(-1);
+
+            this.fxCamera.amount = 1;    
+            this.fxCameraGame.amount = 0.5; 
         }
-        else{
-            // we remove the postFX pixelate pipeline to disable it as setting to 0 or -1 does nothing
-            // setting the object to null ensures garbage collection -- works now, but errors from desync if holding tab down
-            //ourPersist.bgFront.postFX.remove(this.fxbgFront)
-            //this.fxbgFront = null;
-            ourPersist.bgMid.postFX.remove(this.fxbgMid)
-            this.fxbgMid = null;
-            ourPersist.bgBack.postFX.remove(this.fxbgBack)
-            this.fxbgBack = null;
-            ourPersist.bgFurthest.postFX.remove(this.fxbgFurthest)
-            this.fxbgFurthest = null;
+        else{  
+            if (this.fxCamera) {
+                this.fxCamera.amount = 0;
+                this.fxCameraGame.amount = 0;
+
+                ourPersist.cameras.main.postFX.remove(this.fxCamera);
+                this.cameras.main.postFX.remove(this.fxCameraGame);
+            }
         }
     }
 
@@ -11068,15 +11063,23 @@ class GameScene extends Phaser.Scene {
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
 
-            this.backgroundBlur(true);
-            this.tweens.add({
-                targets: this.cameras.main,
-                alpha: 0,
-                duration: 1000,
-                ease: 'Linear'
-            });
+            //this.backgroundBlur(true);
+
 
             this.scene.launch('ScoreScene', stageDataJSON);
+
+            const ourQuickMenu = this.scene.get('QuickMenuScene');
+            console.log(ourQuickMenu);
+
+
+            // for handling if quick menu is active or not
+            if (this.scene.isActive(ourQuickMenu)) {
+                console.log('its open!!!!')
+                ourQuickMenu.scene.stop();
+            }
+            else{
+                this.backgroundBlur(true);
+            }
             this.setWallsPermeable();
         }
 
@@ -11607,8 +11610,6 @@ class ScoreScene extends Phaser.Scene {
         const plinkoMachine = this.scene.get("PlinkoMachineScene");
         //bypass scorescene temporarily for slowmo
         //ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
-
-
      
 
         /*var style = {
@@ -13313,12 +13314,7 @@ class ScoreScene extends Phaser.Scene {
 
         const onContinue = function (scene) {
             
-            scene.tweens.add({
-                targets: ourGame.cameras.main,
-                alpha: 1,
-                duration: 1000,
-                ease: 'Linear',
-            });
+            ourGame.backgroundBlur(false);
 
             console.log('pressing space inside score scene');
 
@@ -13393,7 +13389,7 @@ class ScoreScene extends Phaser.Scene {
             ourGame.events.off('addScore');
 
 
-            ourGame.backgroundBlur(false);
+            
             ourScoreScene.scene.stop();
 
                 
