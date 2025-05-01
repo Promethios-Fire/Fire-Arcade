@@ -9225,23 +9225,17 @@ class GameScene extends Phaser.Scene {
                 `+${deltaScore}`
             )
 
+            // checks if displaying deltaScore is in the way of other UI elements
+            // before displaying.
             if (!ourSpaceBoyScene._scoreTweenShown) {
-                console.log('shown')
                 this.tweens.add({
                     targets: ourSpaceBoyScene.deltaScoreUI,
                     alpha:{ from: 1, to: 0 },
                     ease: 'Expo.easeInOut',
                     duration: 2000,
                 })
-            } 
-            else{
-                console.log('hidden')
             }
-  
-            
 
-
-            
              // Restart Score Timer
             if (this.length < this.lengthGoal || this.lengthGoal === 0) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
@@ -9281,7 +9275,6 @@ class GameScene extends Phaser.Scene {
 
         
         if (this.startupAnim) {
-            
             this.time.delayedCall(400, event => {
                 this.panelAppearTween = this.tweens.add({
                     targets: [this.UIScoreContainer],
