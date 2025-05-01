@@ -9083,6 +9083,7 @@ class GameScene extends Phaser.Scene {
             });
         }
 
+        this.electronGroup = this.add.group();
         
         //  #region @E: addScore
         this.events.on('addScore', function (fruit) {
@@ -9122,14 +9123,16 @@ class GameScene extends Phaser.Scene {
             
             if (timeLeft > BOOST_ADD_FLOOR) {
                 this.boostEnergy = Math.min(this.boostEnergy + 250, 1000);
-     
 
                 var electronToCapacitor = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
                 .setOrigin(0.5,0.5).setDepth(80).setScale(1);
+                this.electronGroup.add(electronToCapacitor);
                 var electronToCapacitor2 = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
                 .setOrigin(0.5,0.5).setDepth(80).setScale(1);
+                this.electronGroup.add(electronToCapacitor2);
                 var electronToCapacitor3 = ourSpaceBoy.add.sprite(this.snake.head.x + Phaser.Math.RND.integerInRange(-24, 24), this.snake.head.y + Phaser.Math.RND.integerInRange(-12, 12),'electronParticle')
                 .setOrigin(0.5,0.5).setDepth(80).setScale(1);
+                this.electronGroup.add(electronToCapacitor3);
                 //electronToCapacitor.play("electronIdle");
                 //electronToCapacitor.anims.msPerFrame = 66;
 
@@ -10368,26 +10371,42 @@ class GameScene extends Phaser.Scene {
         
         
     }
-    gameSceneCleanup(){
-        // TODO: finish event listener cleanup here
-        // scene blur removal
+    // for scenes outside of gameScene
+    gameSceneExternalCleanup(){
+        console.log('cleaning up spaceboy scene')
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
-        const ourGameScene = this.scene.get('GameScene');
-        const ourSpaceBoyScene = this.scene.get('SpaceBoyScene');
-
-        ourSpaceBoyScene.deltaScoreUI.alpha = 0;
-        // Clear for reseting game
-        ourGameScene.events.off('addScore');
-        ourGameScene.events.off('spawnBlackholes');
-        ourGameScene.scene.get("InputScene").scene.restart();
-
         if (ourSpaceBoy.electronFanfare) {
-            
             ourSpaceBoy.electronFanfare.destroy();
         }
         if (ourSpaceBoy.CapSparkFinale) {
             ourSpaceBoy.CapSparkFinale.destroy();
         }
+        if (this.electronGroup && this.electronGroup.getLength() > 0) {
+            this.electronGroup.children.each(electron => {
+                if (electron.electronToCapacitor) electron.electronFanfare.destroy();
+                if (electron.electronToCapacitor2) electron.electronFanfare.destroy();
+                if (electron.electronToCapacitor3) electron.electronFanfare.destroy();
+            });
+        }
+        else {
+            console.log("Electron group is empty or undefined.");
+        }   
+    }
+
+    gameSceneCleanup(){
+        // TODO: finish event listener cleanup here
+        // scene blur removal
+        const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+        const ourGameScene = this.scene.get('GameScene');
+
+
+        ourSpaceBoy.deltaScoreUI.alpha = 0;
+        // Clear for reseting game
+        ourGameScene.events.off('addScore');
+        ourGameScene.events.off('spawnBlackholes');
+        ourGameScene.scene.get("InputScene").scene.restart();
+
+        this.gameSceneExternalCleanup();
 
         while (ourSpaceBoy.navLog.length > 0) {
             var log = ourSpaceBoy.navLog.pop();
