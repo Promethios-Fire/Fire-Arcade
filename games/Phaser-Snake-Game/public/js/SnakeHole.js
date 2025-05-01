@@ -8195,7 +8195,7 @@ class GameScene extends Phaser.Scene {
                                                     ).setDepth(49).setAlpha(0);
             
                                                     r1.postFX.addShine(1, .5, 5)
-                                                    r1.setStrokeStyle(2, 0x4d9be6, 0.75);
+                                                    r1.setStrokeStyle(2, 0x4d9be6, 1);
             
                                                     
                                                     
