@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -8817,7 +8817,8 @@ class GameScene extends Phaser.Scene {
             this.bestBase = 0;
         }
 
-        ourSpaceBoyScene.bestScoreValue.setText(`${commaInt(this.bestBase.toString())}`);
+        this.replenishScoreBest();
+        //ourSpaceBoyScene.bestScoreValue.setText(`${commaInt(this.bestBase.toString())}`);
         // #placeholder - james
 
         
@@ -10371,6 +10372,39 @@ class GameScene extends Phaser.Scene {
         
         
     }
+    drainScore() {
+        const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+    
+        let scoreObj = { score: parseInt(this.bestBase, 10) }; // Ensure it's a number
+    
+        ourSpaceBoy.tweens.add({
+            targets: scoreObj,
+            score: 0,
+            duration: 1000,
+            ease: 'Linear',
+            onUpdate: () => {
+                const wholeNumber = Math.floor(scoreObj.score); // Rounds down to nearest whole number
+                ourSpaceBoy.bestScoreValue.setText(`${commaInt(wholeNumber.toString())}`);
+            }
+        });
+    }
+    replenishScoreBest() {
+        const ourSpaceBoy = this.scene.get('SpaceBoyScene');
+    
+        let scoreObj = { score: 0 };
+
+        ourSpaceBoy.tweens.add({
+            targets: scoreObj,
+            score: parseInt(this.bestBase, 10),
+            duration: 1000,
+            ease: 'Linear',
+            onUpdate: () => {
+                const wholeNumber = Math.floor(scoreObj.score); // Rounds down to nearest whole number
+                ourSpaceBoy.bestScoreValue.setText(`${commaInt(wholeNumber.toString())}`);
+            }
+        });
+    }
+
     // for scenes outside of gameScene
     gameSceneExternalCleanup(){
         console.log('cleaning up spaceboy scene')
@@ -10414,6 +10448,8 @@ class GameScene extends Phaser.Scene {
             log = null;
         }
 
+
+
         this.scene.get("PinballDisplayScene").resetPinball()
 
         ourSpaceBoy.shiftLightsDim();
@@ -10454,6 +10490,7 @@ class GameScene extends Phaser.Scene {
         this.gState = GState.TRANSITION;
 
         ourSpaceboy.scoreTweenShow();
+        this.drainScore();
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
 

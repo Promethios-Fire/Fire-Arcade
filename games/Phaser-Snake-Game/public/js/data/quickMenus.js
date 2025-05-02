@@ -77,7 +77,8 @@ export const QUICK_MENUS = new Map([
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             const ourPersist = this.scene.get("PersistScene");
 
-
+            //set score to 0
+            ourSpaceBoy.scoreValue.setText(`0`);
             if (ourPersist.coins > 0) {
 
                 ourPersist.coins -= 1;
