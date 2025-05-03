@@ -10376,15 +10376,35 @@ class GameScene extends Phaser.Scene {
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
     
         let scoreObj = { score: parseInt(this.bestBase, 10) }; // Ensure it's a number
-    
+        
+        let lengthValue = LENGTH_GOAL
+        let lengthGoalObj = { value: lengthValue };
+
+        // Tween to reduce bestScoreValue to 0
         ourSpaceBoy.tweens.add({
             targets: scoreObj,
             score: 0,
             duration: 1000,
             ease: 'Linear',
             onUpdate: () => {
-                const wholeNumber = Math.floor(scoreObj.score); // Rounds down to nearest whole number
-                ourSpaceBoy.bestScoreValue.setText(`${commaInt(wholeNumber.toString())}`);
+                const wholeNumberBest = Math.floor(scoreObj.score); // Rounds down to nearest whole number
+                ourSpaceBoy.bestScoreValue.setText(`${commaInt(wholeNumberBest.toString())}`);
+            }
+        });
+
+        // Tween to reduce lengthGoalUI to 0
+        ourSpaceBoy.tweens.add({
+            targets: lengthGoalObj,
+            value: 0,
+            duration: 1000,
+            ease: 'Linear',
+            onUpdate: function(tween) {        
+                const wholeNumberGoal = Math.round(lengthGoalObj.value);
+                //console.log(`Tweening whole number: ${wholeNumberValue}`);
+                ourSpaceBoy.lengthGoalUI.setText(
+                    `${String(wholeNumberGoal).padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
+                ).setOrigin(0, 0);
+                
             }
         });
     }
