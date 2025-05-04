@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = true;
+const DEBUG_SKIP_INTRO = false;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -890,8 +890,6 @@ class SpaceBoyScene extends Phaser.Scene {
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
 
-
-
         
         // Create the sprites and apply initial dark tint
         // Initial Setup
@@ -913,8 +911,12 @@ class SpaceBoyScene extends Phaser.Scene {
         
         this.light =  this.lights.addLight(0, 0, 200).setScrollFactor(0).setIntensity(1.5);
 
-        // logic
+        // LOGIC
         this._scoreTweenShown = false;
+
+        // AUDIO
+
+        this.buttonHover01 = this.sound.add('buttonHover01', { allowMultiple: true });
 
         // Create an invisible interactive zone for volume dial and the music player zone
 
@@ -923,6 +925,7 @@ class SpaceBoyScene extends Phaser.Scene {
         // debugging bounding box for powerButtonZone
         //this.add.graphics().lineStyle(2, 0xff0000)
         //.strokeRectShape(this.powerButtonZone).setDepth(102);
+
         
         this.UI_PowerSwitch = this.add.sprite(GRID * 3.5 + 1, GRID * 6.5,
             'UI_PowerSwitch').setOrigin(0.0,0.0).setDepth(105);
@@ -3039,6 +3042,8 @@ class StartScene extends Phaser.Scene {
         // #region Load Audio
         this.load.setPath('assets/audio');
 
+        this.load.audio('buttonHover01',[ 'buttonHover01.ogg', 'buttonHover01.mp3'])
+
         this.load.audio('snakeCrash', [ 'snakeCrash.ogg', 'snakeCrash.mp3']);
         this.load.audio('pop02', [ 'pop02.ogg', 'pop02.mp3']);
         this.load.audio('pop03', [ 'pop03.ogg', 'pop03.mp3']);
@@ -3475,6 +3480,7 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
         this.input.keyboard.on('keydown-DOWN', function() {
+            this.scene.get("SpaceBoyScene").sound.play('buttonHover01');
             // Reset all menu elements to dark grey
             //this.menuElements.forEach((element, index) => {
             //    element.node.style.color = "darkgrey";
@@ -3503,6 +3509,7 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
         this.input.keyboard.on('keydown-UP', function() {
+            this.scene.get("SpaceBoyScene").sound.play('buttonHover01');
             this.menuElements[this.cursorIndex].node.style.color = "darkgrey";
             this.cursorIndex = Phaser.Math.Wrap(this.cursorIndex - 1, 0, this.menuElements.length)
             this.menuElements[this.cursorIndex].node.style.color = "white";
@@ -5262,6 +5269,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-DOWN', (event) => {
             // check if player has entered main menu yet.
             if (mainMenuScene.pressedSpace && this.menuState === 0) {
+                this.scene.get("SpaceBoyScene").sound.play('buttonHover01');
                 cursorIndex = Phaser.Math.Wrap(cursorIndex + 1, 0, this.menuElements.length);
                 this.selected = this.menuElements[cursorIndex];
                 mainMenuScene.changeMenuSprite(cursorIndex);
@@ -5304,6 +5312,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.on('keydown-UP', (event) => {
             // check if player has entered main menu yet.
             if (mainMenuScene.pressedSpace && this.menuState == 0) {
+                this.scene.get("SpaceBoyScene").sound.play('buttonHover01');
                 cursorIndex = Phaser.Math.Wrap(cursorIndex - 1, 0, this.menuElements.length);
                 this.selected = this.menuElements[cursorIndex];
                 mainMenuScene.changeMenuSprite(cursorIndex);
@@ -7131,6 +7140,7 @@ class GameScene extends Phaser.Scene {
         this.pop03 = this.sound.add('pop03')
         this.chime01 = this.sound.add('chime01')
         this.snakeCrash = this.sound.add('snakeCrash');
+        
         //this.pointCollect = this.sound.add('pointCollect01');
         //this.pointCollect.play();
 

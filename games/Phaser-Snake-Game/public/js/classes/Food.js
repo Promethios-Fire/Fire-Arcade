@@ -36,6 +36,7 @@ var Food = new Phaser.Class({
     },
 
     onOver: function(scene) {
+        console.log('OVER AN ATOM')
         if (scene.length < scene.lengthGoal -1) {
             scene.snakeEating();
         }
