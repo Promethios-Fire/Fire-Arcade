@@ -9431,7 +9431,7 @@ class GameScene extends Phaser.Scene {
             tile.alpha = 0.5;
         });
         this.wallLayerShadow.forEachTile(tile => {
-            tile.alpha = 0.0;
+            tile.alpha = 0.5;
         });
     }
 
@@ -10536,7 +10536,6 @@ class GameScene extends Phaser.Scene {
                 });
         }
 
-
         //dim UI
         this.time.delayedCall(1000, event => {
             const ourGameScene = this.scene.get('GameScene');
@@ -10568,20 +10567,6 @@ class GameScene extends Phaser.Scene {
 
         var camDirection = new Phaser.Math.Vector2((blackholeLocation.y - centerLocation.y),(blackholeLocation.x - centerLocation.x));
 
-        this.wallLayer.culledTiles.forEach( tile => {
-
-            var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
-            ).setOrigin(0,0).setDepth(20);
-            _sprite.setPipeline('Light2D')
-
-            
-            if (FADE_OUT_TILES.includes(tile.index)) {
-                fadeOutSprites.push(_sprite);
-            } else {
-                wallSprites.push(_sprite);
-            }               
-            
-        });
         if (this.groundLayer != undefined) {
             this.groundLayer.culledTiles.forEach( tile => {
 
@@ -10599,19 +10584,45 @@ class GameScene extends Phaser.Scene {
             });
             this.groundLayer.visible = false;
         }
+
+        //const debugGraphics = this.add.graphics();
+        //debugGraphics.lineStyle(2, 0xff0000, 1);
         
+        this.wallLayer.culledTiles.forEach( tile => {
+
+            var _sprite = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'tileSprites', tile.index - 1,
+            ).setOrigin(0,0).setDepth(20);
+            _sprite.setPipeline('Light2D');
+
+            const dx = tile.pixelX + X_OFFSET - this.snake.head.x;
+            const dy = tile.pixelY + Y_OFFSET - this.snake.head.y;
+            const distance = Math.sqrt(dx * dx + dy * dy);
+        
+            //debugGraphics.strokeLineShape(new Phaser.Geom.Line(
+            //    this.snake.head.x, this.snake.head.y,
+            //   tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET
+            //));
+            
+            if (FADE_OUT_TILES.includes(tile.index)) {
+                fadeOutSprites.push(_sprite);
+            } else {
+                wallSprites.push({ sprite: _sprite, distance });
+            }               
+            
+        });
+        wallSprites.sort((a, b) => a.distance - b.distance);
+        const sortedWallSprites = wallSprites.map(obj => obj.sprite);
 
         this.wallLayer.visible = false;
         this.wallLayerShadow.visible = false;
         
-
-        Phaser.Utils.Array.Shuffle(wallSprites);
+        //Phaser.Utils.Array.Shuffle(wallSprites);
         
         var allTheThings = [
             ...this.coinsArray,
             //...this.portals,
             ...this.atoms,
-            ...wallSprites,
+            ...sortedWallSprites,
         ];
 
         //turn off portal particles and any portal sprites
