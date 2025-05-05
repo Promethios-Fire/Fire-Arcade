@@ -16,7 +16,6 @@ var Snake = new Phaser.Class({
         this.body = [];
 
         this.head = scene.add.image(x, y, 'snakeDefault', 0).setPipeline('Light2D');
-        
         //set snake invisible so it can appear from blackhole
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);

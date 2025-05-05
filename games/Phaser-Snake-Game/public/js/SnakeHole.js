@@ -8728,7 +8728,7 @@ class GameScene extends Phaser.Scene {
             const maxIntensity = 1.5; // Maximum intensity for lights
             const baselineIntensity = 0.75; // Baseline intensity to ensure visibility
             const maxRadius = 128; // Maximum radius for lights
-            const minRadius = 64; // Minimum radius to ensure visibility
+            const minRadius = 32; // Minimum radius to ensure visibility
             const thresholdDistance = 128; // Distance threshold for adjustment
         
             portalLights.forEach(light1 => {
