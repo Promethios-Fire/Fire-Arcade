@@ -267,6 +267,42 @@
                         }]
                 }, 
                 {
+                 "id":12,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":13,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":14,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":15,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
                  "id":20,
                  "properties":[
                         {
@@ -418,7 +454,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":38,
                  "properties":[
@@ -454,8 +491,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":54,
                  "properties":[
@@ -680,7 +716,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":92,
                  "properties":[
@@ -716,8 +753,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":97,
                  "properties":[
@@ -942,7 +978,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":135,
                  "properties":[
@@ -978,8 +1015,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":139,
                  "properties":[
@@ -1204,7 +1240,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":173,
                  "properties":[
@@ -1240,8 +1277,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":181,
                  "properties":[
@@ -1466,7 +1502,8 @@
                          "type":"bool",
                          "value":true
                         }]
-                }, 
+                },
+            
                 {
                  "id":215,
                  "properties":[
@@ -1502,8 +1539,7 @@
                          "type":"bool",
                          "value":true
                         }]
-                },
-            
+                }, 
                 {
                  "id":224,
                  "properties":[
@@ -1704,6 +1740,24 @@
                 }, 
                 {
                  "id":250,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":280,
+                 "properties":[
+                        {
+                         "name":"hasCollision",
+                         "type":"bool",
+                         "value":true
+                        }]
+                }, 
+                {
+                 "id":281,
                  "properties":[
                         {
                          "name":"hasCollision",

@@ -22,7 +22,7 @@ const IS_DEV = false;
 const ANALYTICS_VERS = "0.3.241018";
 const DEV_BRANCH = "dev";
 
-const ANALYTICS_ON = true;
+const ANALYTICS_ON = false;
 const TUTORIAL_ON = false;
 
 
@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;

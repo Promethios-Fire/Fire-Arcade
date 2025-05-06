@@ -861,4 +861,14 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="280">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="281">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
 </tileset>
