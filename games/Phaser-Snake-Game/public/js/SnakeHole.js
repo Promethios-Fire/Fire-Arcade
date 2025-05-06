@@ -13769,7 +13769,7 @@ class InputScene extends Phaser.Scene {
     moveUp(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
 
             //console.log("I'm Moving Up");
             
@@ -13805,7 +13805,7 @@ class InputScene extends Phaser.Scene {
     moveDown(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
            
 
             this.setPLAY(gameScene);
@@ -13837,7 +13837,7 @@ class InputScene extends Phaser.Scene {
     moveLeft(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) {
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) {
             
             this.setPLAY(gameScene);
 
@@ -13869,7 +13869,7 @@ class InputScene extends Phaser.Scene {
     moveRight(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 2 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
             
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);
