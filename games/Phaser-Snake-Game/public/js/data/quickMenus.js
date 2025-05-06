@@ -77,6 +77,7 @@ export const QUICK_MENUS = new Map([
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             const ourPersist = this.scene.get("PersistScene");
 
+            ourGameScene.backgroundBlur(false);
             //set score to 0
             ourSpaceBoy.scoreValue.setText(`0`);
             if (ourPersist.coins > 0) {
@@ -101,7 +102,6 @@ export const QUICK_MENUS = new Map([
                 } else {
                 }
                 */
-                ourGameScene.backgroundBlur(false);
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
