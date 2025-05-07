@@ -516,6 +516,26 @@
    <property name="hasCollision" type="bool" value="true"/>
   </properties>
  </tile>
+ <tile id="155">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="156">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="157">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="158">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
  <tile id="160">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
@@ -627,6 +647,26 @@
   </properties>
  </tile>
  <tile id="186">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="187">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="188">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="189">
+  <properties>
+   <property name="hasCollision" type="bool" value="true"/>
+  </properties>
+ </tile>
+ <tile id="190">
   <properties>
    <property name="hasCollision" type="bool" value="true"/>
   </properties>

@@ -99,6 +99,12 @@ export const STAGES = new Map([
     ["10-2", "World_10-2"],
     ["10-3", "World_10-3"],
     ["10-4", "World_10-4"],
+
+    ["G1-1", "Gauntlet_1-1"],
+    ["G1-2", "Gauntlet_1-2"],
+    ["G1-3", "Gauntlet_1-3"],
+    ["G1-4", "Gauntlet_1-4"],
+    ["G1-5", "Gauntlet_1-5"]
 ])
 
 export const EXTRACT_CODES = [
@@ -119,14 +125,21 @@ export const EXTRACT_CODES = [
 ];
 
 export const GAUNTLET_CODES = new Map([
-    ["Easy Gauntlet", {
+    ["TRIAL I", {
         checkUnlock: function () {
             return checkRankGlobal(STAGES.get("2-4"), RANKS.WOOD);
         },
-        stages: "1-1|2-1|1-2|2-2|1-3|2-3|2-4", //"1-1|2-1|1-2|2-2|1-3|2-3|2-4"
-        startingCoins: 24,
+        stages: "G1-1|G1-2|G1-3|G1-4|G1-5", //"1-1|2-1|1-2|2-2|1-3|2-3|2-4"
+        startingCoins: 8,
     }],
-    ["Oops! All Ones", {
+    /*["Easy Gauntlet", {
+        checkUnlock: function () {
+            return checkRankGlobal(STAGES.get("2-4"), RANKS.WOOD);
+        },
+        stages: "G1-1|2-1|1-2|2-2|1-3|2-3|2-4", //"1-1|2-1|1-2|2-2|1-3|2-3|2-4"
+        startingCoins: 24,
+    }],*/
+    /*["Oops! All Ones", {
         checkUnlock: function () {
             var checkLevels = [
                 STAGES.get("1-1"), STAGES.get("2-1"), STAGES.get("3-1"),
@@ -163,7 +176,7 @@ export const GAUNTLET_CODES = new Map([
         },
         stages: "4-5|9-4|10-4",
         startingCoins: 0,
-    }],
+    }],*/
 ]);
 
 /* Template

@@ -4817,8 +4817,7 @@ class MainMenuScene extends Phaser.Scene {
                             }
                             generateMenu.push([menuKey, menuVal]);
                             
-                        } 
-
+                        }
                     })
 
 
