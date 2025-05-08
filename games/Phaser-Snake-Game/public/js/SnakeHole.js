@@ -10664,8 +10664,8 @@ class GameScene extends Phaser.Scene {
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
-            x: this.snake.head.x - GRID * 1,
-            y: this.snake.head.y + GRID * 1,
+            x: this.snake.head.x - 6,
+            y: this.snake.head.y + 18,
             //x: {from: this.snake.head.x + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.x},
             //y: {from: this.snake.head.y + Phaser.Math.RND.integerInRange(-40,40),to: this.snake.head.y},
             yoyo: false,

@@ -335,7 +335,6 @@ export const QUICK_MENUS = new Map([
                     }
                 } else {
                 }
-                ourGameScene.backgroundBlur(false);
                 ourGameScene.scene.restart( {
                     stage: ourGameScene.stage, 
                     score: ourGameScene.stageStartScore, 
@@ -345,7 +344,7 @@ export const QUICK_MENUS = new Map([
 
                 ourGameScene.gameSceneCleanup();
             }
-            
+            ourGameScene.backgroundBlur(false);
 
             qMenuCleanup.call(this);   
 
