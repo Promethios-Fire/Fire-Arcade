@@ -1133,12 +1133,17 @@ class SpaceBoyScene extends Phaser.Scene {
             this.setVisible(false)
         });
 
-        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 30 + 1, Y_OFFSET + GRID * 6,
-             'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
-        this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 31.5 -2, Y_OFFSET + GRID * 6,
-             'shiftLight',1).setOrigin(0,0).setDepth(53).setAlpha(0);
-        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 32 + 7, Y_OFFSET + GRID * 6,
+        this.shiftLight1 = this.add.sprite(X_OFFSET + GRID * 9 + 6, GRID * 2 + 7,
              'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight2 = this.add.sprite(X_OFFSET + GRID * 9 + 6 + 24, GRID * 2 + 7,
+             'shiftLight',1).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight3 = this.add.sprite(X_OFFSET + GRID * 9 + 6 + 48, GRID * 2 + 7,
+             'shiftLight',2).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight4 = this.add.sprite(X_OFFSET + GRID * 9 + 6 + 72, GRID * 2 + 7,
+        'shiftLight',1).setOrigin(0,0).setDepth(53).setAlpha(0);
+        this.shiftLight5 = this.add.sprite(X_OFFSET + GRID * 9 + 6 + 96, GRID * 2 + 7,
+            'shiftLight',0).setOrigin(0,0).setDepth(53).setAlpha(0);
+                  
         
         this.spaceBoyLight = this.add.sprite(X_OFFSET - GRID * 3.5 , GRID * 4 - 2, 'spaceBoyLight').
         setOrigin(0,0).setDepth(102).setAlpha(0);
@@ -1472,7 +1477,7 @@ class SpaceBoyScene extends Phaser.Scene {
     }
     shiftLightsDim(){
         this.tweens.add({
-            targets: [this.shiftLight1,this.shiftLight2,this.shiftLight3],
+            targets: [this.shiftLight1,this.shiftLight2,this.shiftLight3,this.shiftLight4,this.shiftLight5],
             alpha: 0,
             ease: 'Sine.InOut',
             duration: 500,
@@ -3012,7 +3017,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight: 20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
         this.load.spritesheet('startingArrowsAnim', 'assets/sprites/startingArrowsAnim.png', { frameWidth: 24, frameHeight: 24 });
-        this.load.spritesheet('shiftLight', 'assets/sprites/spaceBoyShiftLight.png', { frameWidth: 12, frameHeight: 12 });
+        this.load.spritesheet('shiftLight', 'assets/sprites/spaceBoyShiftLight.png', { frameWidth: 23, frameHeight: 3 });
         //this.load.spritesheet('fruitAppearSmokeAnim', 'assets/sprites/fruitAppearSmokeAnim.png', { frameWidth: 52, frameHeight: 52 }); //not used anymore, might come back for it -Holden    
         //this.load.spritesheet('dreamWallAnim', 'assets/sprites/wrapBlockAnimOLD.png', { frameWidth: GRID, frameHeight: GRID });
         //this.load.spritesheet('boostTrailX', 'assets/sprites/boostTrailX01Anim.png', { frameWidth: 24, frameHeight: 72 });
@@ -9260,12 +9265,24 @@ class GameScene extends Phaser.Scene {
             switch (this.length) {
                 case this.lengthGoal - 3:
                     ourSpaceBoy.shiftLight1.setAlpha(1);
+                    ourSpaceBoy.shiftLight1.setFrame(0);
+                    ourSpaceBoy.shiftLight5.setAlpha(1);
+                    ourSpaceBoy.shiftLight5.setFrame(0);
                     break;
                 case this.lengthGoal - 2:
                     ourSpaceBoy.shiftLight2.setAlpha(1);
+                    ourSpaceBoy.shiftLight1.setFrame(1);
+                    ourSpaceBoy.shiftLight2.setFrame(1);
+                    ourSpaceBoy.shiftLight4.setAlpha(1);
+                    ourSpaceBoy.shiftLight4.setFrame(1);
+                    ourSpaceBoy.shiftLight5.setFrame(1);
                     break;
                 case this.lengthGoal - 1:
-                    ourSpaceBoy.shiftLight3.setAlpha(1);
+                    ourSpaceBoy.shiftLight3.setAlpha(2);
+                    ourSpaceBoy.shiftLight1.setFrame(2);
+                    ourSpaceBoy.shiftLight2.setFrame(2);
+                    ourSpaceBoy.shiftLight4.setFrame(2);
+                    ourSpaceBoy.shiftLight5.setFrame(2);
                     break;
                 default:
                     break;
@@ -10538,7 +10555,8 @@ class GameScene extends Phaser.Scene {
             const ourPersist = this.scene.get('PersistScene');
             this.tweens.add({
                 targets: [ourGameScene.countDown,ourGameScene.coinUIText,
-                    ourSpaceboy.shiftLight1,ourSpaceboy.shiftLight2,ourSpaceboy.shiftLight3],
+                    ourSpaceboy.shiftLight1,ourSpaceboy.shiftLight2,ourSpaceboy.shiftLight3,
+                    ourSpaceboy.shiftLight4,ourSpaceboy.shiftLight5],
                 alpha: { from: 1, to: 0},
                 ease: 'Sine.InOut',
                 duration: 500,
