@@ -9436,14 +9436,11 @@ class GameScene extends Phaser.Scene {
 
     // #region .screenShake(
     screenShake(){
-        const ourSpaceBoy = this.scene.get("SpaceBoyScene");
         if (this.moveInterval === this.speedSprint) {
             this.cameras.main.shake(400, .01);
-            ourSpaceBoy.cameras.main.shake(400, .01); //shakes differently than main when referencing different cameras
         }
         else if (this.moveInterval === this.speedWalk){
-            this.cameras.main.shake(300, .00625);
-            ourSpaceBoy.cameras.main.shake(300, .00625); //above note
+            this.cameras.main.shake(300, .00625)
         }    
     }
 
