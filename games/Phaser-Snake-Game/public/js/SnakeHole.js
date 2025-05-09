@@ -1117,9 +1117,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
         var zobj = calcZedObj(persist.zeds);
 
-        this.zedLevel = this.add.bitmapText(GRID * 11 - 1, GRID * 27 + 8, 'mainFont',
+        this.zedLevel = this.add.bitmapText(GRID * 11 + 6, GRID * 27 + 8, 'mainFont',
             zobj.level,
-        8).setOrigin(0,0).setDepth(91).setTintFill(0x869D54);
+        8).setOrigin(1,0).setDepth(91).setTintFill(0x869D54);
 
         this.prevZedLevel = zobj.level;
         this.zedBarGraphics = this.add.graphics().setDepth(90);
