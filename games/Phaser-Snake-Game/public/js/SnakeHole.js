@@ -7141,8 +7141,8 @@ class GameScene extends Phaser.Scene {
         this.coinSound = this.sound.add('coinCollect');
 
         var _chargeUp = this.sound.add('chargeUp');
-        this.pop03 = this.sound.add('pop03')
-        this.chime01 = this.sound.add('chime01')
+        this.pop03 = this.sound.add('pop03',{ allowMultiple: true });
+        this.chime01 = this.sound.add('chime01');
         this.snakeCrash = this.sound.add('snakeCrash');
         
         //this.pointCollect = this.sound.add('pointCollect01');

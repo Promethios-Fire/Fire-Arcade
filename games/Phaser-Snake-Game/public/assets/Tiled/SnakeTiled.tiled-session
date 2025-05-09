@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_5-3_Racing.json",
+    "activeFile": "World_3-1_Wrap.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1161,11 +1161,11 @@
             "scaleInDock": 1
         },
         "World_3-1_Wrap.json": {
-            "scale": 1.5,
-            "selectedLayer": 1,
+            "scale": 3,
+            "selectedLayer": 2,
             "viewCenter": {
-                "x": 173.66666666666669,
-                "y": 161.66666666666663
+                "x": 176.16666666666666,
+                "y": 198.83333333333331
             }
         },
         "World_3-1_Wrap.json#tileSheetx12": {
