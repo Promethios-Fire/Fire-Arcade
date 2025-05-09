@@ -1177,10 +1177,10 @@ class SpaceBoyScene extends Phaser.Scene {
         }
 
         // #region Top Right UI
-        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1,
+        this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + -1, GRID * .7 - 1,
              'mainFontLarge',`BEST:`,13)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 1 ,
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 + 2, GRID * .7 - 1 ,
              'mainFontLarge',`0`,13)
             .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
