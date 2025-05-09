@@ -6904,6 +6904,7 @@ class GameScene extends Phaser.Scene {
 
         this.stageOver = false; // deprecated to be removed
 
+        this.canPortal = true;
         this.winned = false; // marked as true any time this.winCondition is met.
         this.canContinue = true; // used to check for a true game over
 
@@ -8032,7 +8033,6 @@ class GameScene extends Phaser.Scene {
             console.log('SPAWNING BLACKHOLES')
             const ourSpaceBoy = this.scene.get("SpaceBoyScene");
             
-            this.collapsePortals();
 
             // #region is unlocked?
 
@@ -11077,8 +11077,12 @@ class GameScene extends Phaser.Scene {
     collapsePortals(){
         this.portals.forEach(portal => {
             portal.play('portalClose');
+            portal.on('animationcomplete', (animation) => {
+                if (animation.key === 'portalClose') {
+                    portal.alpha = 0;
+                }
+            });
             portal.portalHighlight.alpha = 0;
-            portal.alpha = 0;
         })
 
         this.portalLights.forEach(portalLight => {
@@ -11138,6 +11142,7 @@ class GameScene extends Phaser.Scene {
 
             console.log("YOU WIN" , this.stage);
             this.winned = true;
+            this.canPortal = false;
             this.atoms.forEach(atom => {
                 // So you can't see them during free play.
                 atom.electrons.visible = false;
@@ -11182,9 +11187,9 @@ class GameScene extends Phaser.Scene {
             }
 
             //this.backgroundBlur(true);
-
-
+            this.collapsePortals();
             this.scene.launch('ScoreScene', stageDataJSON);
+            
 
             const ourQuickMenu = this.scene.get('QuickMenuScene');
             console.log(ourQuickMenu);

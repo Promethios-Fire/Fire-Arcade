@@ -394,7 +394,7 @@ var Snake = new Phaser.Class({
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
 
-        if (checkPortals.length > 1) { //&& !scene.winned) {
+        if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
                 testPortal.x, testPortal.y);

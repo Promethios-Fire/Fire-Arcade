@@ -77,7 +77,7 @@ var Portal = new Phaser.Class({
 
     },
     onOver: function(scene) {
-        //if (scene.winned === false) {
+        if (scene.canPortal === true) {
             scene.gState = GState.PORTAL;
             scene.snake.lastPortal = this;
             scene.scoreTimer.paused = true;
@@ -134,7 +134,7 @@ var Portal = new Phaser.Class({
     
                 PLAYER_STATS.portals += 1;
             });
-        //}
+        }
 
                         
     },
