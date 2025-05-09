@@ -1180,15 +1180,15 @@ class SpaceBoyScene extends Phaser.Scene {
         this.bestScoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * .7 - 1,
              'mainFontLarge',`BEST:`,13)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 2 ,
+        this.bestScoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 1, GRID * .7 - 1 ,
              'mainFontLarge',`0`,13)
             .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
         // Score Text SET INVISIBLE
-        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24 + 2, GRID * 2.7 - 1,
+        this.scoreLabel = this.add.bitmapText(X_OFFSET + GRID * 24, GRID * 2.7 - 1,
             'mainFontLarge',`SCORE:`,13)
         .setOrigin(0,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
-        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 - 2, GRID * 2.7 - 2,
+        this.scoreValue = this.add.bitmapText(X_OFFSET + GRID * 34 + 2, GRID * 2.7 - 1,
             'mainFontLarge',`0`, 13)
             .setOrigin(1,0).setAlpha(0).setScrollFactor(0).setTint(0x1f211b);
 
@@ -9235,7 +9235,10 @@ class GameScene extends Phaser.Scene {
 
             // Update UI
             //var tempScore = `${this.scoreHistory.reduce((a,b) => a + b, 0)}`
-            ourSpaceBoyScene.scoreValue.setText(`${commaInt(currentScore.toString())}`);
+            //set score to have a comma only when under 6 digits
+            ourSpaceBoyScene.scoreValue.setText(
+                `${currentScore.toString().length < 6 ? commaInt(currentScore.toString()) : currentScore}`
+              );
 
             //this.deltaScoreUI.x = this.scoreValue.x - this.scoreValue.displayWidth - 1;
             
@@ -11932,7 +11935,7 @@ class ScoreScene extends Phaser.Scene {
             (this.stageData.stage.replaceAll("_", " ") + " CLEAR")
         ).setOrigin(0.5, 0.5).setScale(.5);*/
 
-        let formattedText = (this.stageData.stage.replaceAll("_", "_") + "_CLEAR").toUpperCase(); // still need space font space to replace '_'
+        let formattedText = (this.stageData.stage.replaceAll("_", " ") + " CLEAR").toUpperCase(); // still need space font space to replace '_'
 
         this.add.bitmapText(SCREEN_WIDTH / 2, GRID * 5.8, 'mainFontLarge', formattedText, 13)
         .setOrigin(0.5,0.5);
@@ -13411,7 +13414,7 @@ class ScoreScene extends Phaser.Scene {
 
         var continue_text = '[SPACE TO CONTINUE]';
         
-        var continueText = this.add.bitmapText(SCREEN_WIDTH/2, GRID*26, 'mainFontLarge', `SPACE_TO_CONTINUE`, 13)
+        var continueText = this.add.bitmapText(SCREEN_WIDTH/2, GRID*26, 'mainFontLarge', `SPACE TO CONTINUE`, 13)
         .setOrigin(0.5,0.5);
 
         /*var continueText = this.add.dom(SCREEN_WIDTH/2, GRID*27 + 0,'div', Object.assign({}, STYLE_DEFAULT, {
