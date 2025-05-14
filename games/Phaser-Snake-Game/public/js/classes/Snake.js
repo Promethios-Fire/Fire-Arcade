@@ -390,9 +390,10 @@ var Snake = new Phaser.Class({
 
         }
 
-        // Update closet portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
+        // Update closest portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
+
 
         if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);

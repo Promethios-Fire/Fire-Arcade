@@ -38,7 +38,7 @@ const GHOST_WALLS = true;
 
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -3175,7 +3175,7 @@ class StartScene extends Phaser.Scene {
         this.scene.launch('PlinkoMachineScene');
         this.scene.launch('PinballDisplayScene');
         this.scene.launch('MusicPlayerScene');
-        this.scene.launch('GalaxyMapScene');
+        //this.scene.launch('GalaxyMapScene');
         this.scene.bringToTop('SpaceBoyScene');
         this.scene.bringToTop('MusicPlayerScene');
         
@@ -4582,7 +4582,7 @@ class MainMenuScene extends Phaser.Scene {
         this.input.keyboard.addCapture('UP,DOWN,SPACE');
         const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
-        const ourMap = this.scene.get('GalaxyMapScene');
+        //const ourMap = this.scene.get('GalaxyMapScene');
 
 
         /* FOR CHECKING IF PLAYER NEEDS TO BE ALERTED -- UNFINISHED
@@ -13627,16 +13627,20 @@ class InputScene extends Phaser.Scene {
     }
 
     preload() {
-        this.load.image('upWASD', 'assets/sprites/upWASD.png')
-        this.load.image('downWASD', 'assets/sprites/downWASD.png');
-        this.load.image('leftWASD', 'assets/sprites/leftWASD.png');
-        this.load.image('rightWASD', 'assets/sprites/rightWASD.png');
-        this.load.image('spaceWASD', 'assets/sprites/spaceWASD.png');
+        //this.load.image('upWASD', 'assets/sprites/upWASD.png')
+        //this.load.image('downWASD', 'assets/sprites/downWASD.png');
+        //this.load.image('leftWASD', 'assets/sprites/leftWASD.png');
+        //this.load.image('rightWASD', 'assets/sprites/rightWASD.png');
+        //this.load.image('spaceWASD', 'assets/sprites/spaceWASD.png');
 
     }
     create() {
     const ourGame = this.scene.get("GameScene");
     const ourInput = this.scene.get("InputScene");
+
+    // disable camera for scenes with no rendered objects
+    this.cameras.remove(this.cameras.main);
+
 
     var tempButtonScale = 10;
     var tempInOffSet = 8;
@@ -13646,9 +13650,9 @@ class InputScene extends Phaser.Scene {
 
     this.spaceBar = this.input.keyboard.addKey(Phaser.Input.Keyboard.KeyCodes.SPACE);
 
-    this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'upWASD', 0
-    ).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
-    this.upWASD.on('pointerdown', function (pointer)
+    //this.upWASD = this.add.sprite(tempInOffSet * GRID, tempInputHeight * GRID - GRID*2.5, 'upWASD', 0
+    //).setDepth(50).setOrigin(0,0).setScale(tempButtonScale).setInteractive();
+    /*this.upWASD.on('pointerdown', function (pointer)
     {
 
         this.setTint(0xff0000);
@@ -13749,7 +13753,7 @@ class InputScene extends Phaser.Scene {
     {
         this.clearTint();
 
-    });
+    });*/
     
     }
     update() {
@@ -14669,7 +14673,7 @@ var config = {
     maxLights: 16, // prevents lights from flickering in and out -- don't know performance impact
     
     scene: [ StartScene, 
-        MainMenuScene, PlinkoMachineScene,QuickMenuScene, GalaxyMapScene, 
+        MainMenuScene, PlinkoMachineScene,QuickMenuScene, //GalaxyMapScene, 
         PersistScene, TutorialScene,
         GameScene, InputScene, ScoreScene, 
         StageCodex, ExtractTracker,
