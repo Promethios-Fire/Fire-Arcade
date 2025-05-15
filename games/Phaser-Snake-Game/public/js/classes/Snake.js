@@ -393,8 +393,22 @@ var Snake = new Phaser.Class({
         // Update closest portal. I think it techinally is lagging behind because it follows the lights which are one step behind.
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
-
-
+        
+        if (scene.canPortal) {
+             scene.portals.forEach(portal => {
+                let dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
+                
+                var minFrameRate = 8; 
+                var maxFrameRate = 64;
+                
+                portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                    dist, minFrameRate, maxFrameRate);
+                portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
+                
+                portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(dist / maxFrameRate, 0, 1);
+            });
+        }
+       
         if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
@@ -404,12 +418,13 @@ var Snake = new Phaser.Class({
                 this.closestPortal = testPortal;
                 //this.closestPortal.flipX = true;
 
-                scene.tweens.add({
+                /*scene.tweens.add({
                     targets: this.closestPortal.targetObject.portalHighlight,
-                    alpha: {from: 1, to: 0},
+                    alpha: {from: this.closestPortal.targetObject.portalHighlight.alpha,
+                         to: 0},
                     duration: 98,
                     ease: 'Sine.Out',
-                    });
+                    });*/
             }
 
             checkPortals.forEach( portal => {
@@ -427,23 +442,27 @@ var Snake = new Phaser.Class({
 
             });
 
+
+
             if (this.closestPortal != testPortal) {
                 //console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 var oldPortal = this.closestPortal;
-                oldPortal.flipX = false;
+                //oldPortal.flipX = false;
 
                 //testPortal.flipX = true;
 
                 scene.tweens.add({
                     targets: testPortal.targetObject.portalHighlight,
-                    alpha: {from: 0, to: 1},
+                    //alpha: {from: testPortal.targetObject.portalHighlight.alpha,
+                    //  to: 1},
                     duration: 98,
                     ease: 'Sine.Out',
                     onStart: () =>{
                         scene.tweens.add({
                             targets: oldPortal.targetObject.portalHighlight,
-                            alpha: {from: 1, to: 0},
-                            duration: 300,
+                            alpha: {from: oldPortal.targetObject.portalHighlight.alpha,
+                                 to: 0},
+                            duration: 200,
                             ease: 'Sine.Out',
                             });
                     }
@@ -451,6 +470,8 @@ var Snake = new Phaser.Class({
                 this.closestPortal = testPortal;
 
             }
+
+
             
         }
 
