@@ -927,7 +927,7 @@ class SpaceBoyScene extends Phaser.Scene {
         //.strokeRectShape(this.powerButtonZone).setDepth(102);
 
         
-        this.UI_PowerSwitch = this.add.sprite(GRID * 3.5 + 1, GRID * 6.5,
+        this.UI_PowerSwitch = this.add.sprite(GRID * 3.5, GRID * 6.5,
             'UI_PowerSwitch').setOrigin(0.0,0.0).setDepth(105);
 
         this.powerButtonZone.on('pointerover', () => {
@@ -9322,7 +9322,8 @@ class GameScene extends Phaser.Scene {
 
         // dot matrix
         
-        if (this.startupAnim){
+        // removing until it can be optimized
+        /*if (this.startupAnim){
 
             const hsv = Phaser.Display.Color.HSVColorWheel();
 
@@ -9357,7 +9358,7 @@ class GameScene extends Phaser.Scene {
                 [ 33.333, { grid: [ gw, gh ], from: 'center' } ],
             ];
             this.getStaggerTween(0, group);
-        }
+        }*/
 
         this.tweens.add( {
             targets: this.coinsArray,
