@@ -805,7 +805,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'testingArcade'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
@@ -1467,11 +1467,11 @@ class SpaceBoyScene extends Phaser.Scene {
         8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
 
         
-        var stageOutLine = this.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125) + offset * index, stageID.length * 5 + 3, 10,  
-            ).setOrigin(1,0).setDepth(100).setAlpha(1);
-        stageOutLine.setFillStyle(0x000000, 0);
-        stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
-        this.navLog.push(stageText, stageOutLine);
+        //var stageOutLine = this.add.rectangle(GRID * 11 + 1.5, Y_OFFSET + GRID * (5.125) + offset * index, stageID.length * 5 + 3, 10,  
+        //    ).setOrigin(1,0).setDepth(100).setAlpha(1);
+        //stageOutLine.setFillStyle(0x000000, 0);
+        //stageOutLine.setStrokeStyle(1, 0x1f211b, 1);
+        //this.navLog.push(stageText, stageOutLine);
 
     }
     shiftLightsDim(){
@@ -9478,9 +9478,9 @@ class GameScene extends Phaser.Scene {
         // non initallized values as undefined and so any comparison or look up throws an error.
         
         // 2. Make a viritual GRID space to minimise the size of the array.
-        for (var _x = 0; _x < 29; _x++) {
+        for (var _x = 0; _x < 87; _x++) {
             testGrid[_x] = [];
-            for (var _y = 0; _y < 27; _y++) {
+            for (var _y = 0; _y < 81; _y++) {
                 testGrid[_x][_y] = 1; // Note: In the console the grid looks rotated.
             }
         }
@@ -11133,6 +11133,8 @@ class GameScene extends Phaser.Scene {
             
         });*/
         
+        this.cameras.main.startFollow(this.snake.head)
+        //this.cameras.main.y = this.snake.head.y * GRID;
 
         if (this.gState === GState.PORTAL || this.gState === GState.BONK) { 
             // ?: does this need to happen every frame? Probably because you can move mid frame and the light needs to follow you.

@@ -2260,11 +2260,11 @@
             "scaleInDock": 1
         },
         "testing.json": {
-            "scale": 1.402016129032258,
+            "scale": 1,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 372.320966350302,
-                "y": 473.24705205637053
+                "x": 369,
+                "y": 479.5
             }
         },
         "testing.json#tileSheetx24": {
@@ -2654,6 +2654,17 @@
             }
         },
         "testing16.json#tileSheetx24": {
+            "scaleInDock": 1
+        },
+        "testingArcade.json": {
+            "scale": 1,
+            "selectedLayer": 3,
+            "viewCenter": {
+                "x": 126,
+                "y": 161.5
+            }
+        },
+        "testingArcade.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "testingAztec.json": {

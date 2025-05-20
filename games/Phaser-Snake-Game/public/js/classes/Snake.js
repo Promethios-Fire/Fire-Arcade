@@ -178,7 +178,7 @@ var Snake = new Phaser.Class({
         switch (this.direction) {
             case DIRS.LEFT:
                 yN = this.head.y;
-                xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                xN = Phaser.Math.Wrap(this.head.x  - GRID, X_OFFSET, X_OFFSET + 87 * GRID);
                 ourPersistScene.bgCoords.x -= .25 * ourPersistScene.bgRatio;
                 if (xN > this.head.x) {
                     //console.log("I AM WRAPPING LEFT");
@@ -188,7 +188,7 @@ var Snake = new Phaser.Class({
 
             case DIRS.RIGHT:
                 yN = this.head.y;
-                xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+                xN = Phaser.Math.Wrap(this.head.x + GRID, X_OFFSET, X_OFFSET + 87 * GRID);
                 ourPersistScene.bgCoords.x += .25 * ourPersistScene.bgRatio;
                 if (xN < this.head.x) {
                     //console.log("I AM WRAPPING RIGHT");
@@ -198,7 +198,7 @@ var Snake = new Phaser.Class({
 
             case DIRS.UP:
                 xN = this.head.x;
-                yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                yN = Phaser.Math.Wrap(this.head.y - GRID, Y_OFFSET, Y_OFFSET + 81 * GRID);
                 ourPersistScene.bgCoords.y -= .25 * ourPersistScene.bgRatio;
                 if (yN > this.head.y) {
                     //console.log("I AM WRAPPING UP");
@@ -208,7 +208,7 @@ var Snake = new Phaser.Class({
 
             case DIRS.DOWN:
                 xN = this.head.x;
-                yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                yN = Phaser.Math.Wrap(this.head.y + GRID, Y_OFFSET, Y_OFFSET + 81 * GRID);
                 ourPersistScene.bgCoords.y += .25 * ourPersistScene.bgRatio;
                 if (yN < this.head.y) {
                     //console.log("I AM WRAPPING DOWN");
