@@ -2274,7 +2274,7 @@ class PlinkoMachineScene extends Phaser.Scene {
         const persist = this.scene.get("PersistScene");
     
         this.plinkoLightNum += 1;
-        console.log('PLINKOS',number,this.plinkoLightNum)
+        //console.log('PLINKOS',number,this.plinkoLightNum)
         // Array of all plinko lights
         const lights = [
             this.plinkoLightP, 
@@ -8430,6 +8430,7 @@ class GameScene extends Phaser.Scene {
 
         // #region Coin Layer Logic
         this.coinsArray = [];
+        this.coinDiff = 0;
 
         var coinVarient = ''
         if (this.varientIndex) {
@@ -9360,14 +9361,14 @@ class GameScene extends Phaser.Scene {
             this.getStaggerTween(0, group);
         }*/
 
-        this.tweens.add( {
+        /*this.tweens.add( {
             targets: this.coinsArray,
             originY: [0.1875 - .0466,0.1875 + .0466],
             ease: 'sine.inout',
             duration: 500, //
             yoyo: true,
             repeat: -1,
-           })
+           })*/
 
         this.helpPanel = this.add.nineslice(0,0,
             'uiPanelL', 'Glass', 100, 56, 18,18,18,18).setDepth(100)
@@ -10540,6 +10541,9 @@ class GameScene extends Phaser.Scene {
         this.snake.head.setTexture('snakeDefault', 0);
         this.goFadeOut = false;
 
+        console.log('COIN COUNT',this.coinsArray)
+        this.addCoins(0);
+
         // drain boost bar so it's ready for next round
         this.boostEnergy = Math.min(this.boostEnergy - 1000, 100);
 
@@ -10677,8 +10681,9 @@ class GameScene extends Phaser.Scene {
 
         var popCounter = 1;
         var numberOfThings = allTheThings.length;
-        
+
         //ourPersist.bgRatio = 1;
+
 
         var blackholeTween = this.tweens.add({
             targets: allTheThings, 
@@ -10718,6 +10723,7 @@ class GameScene extends Phaser.Scene {
                 popCounter += 1;
             },
             onComplete: () =>{
+
                 this.nextStagePortals.forEach( blackholeImage=> {
                     if (blackholeImage != undefined) {
                         blackholeImage.play('blackholeClose')
@@ -10818,6 +10824,25 @@ class GameScene extends Phaser.Scene {
             
         });
                     
+    }
+
+    addCoins(index){
+        const ourPersist = this.scene.get('PersistScene');
+        
+        if (index >= this.coinsArray.length - this.coinDiff) return;
+        
+        const element = this.coinsArray[index];
+
+        this.time.delayedCall(120, () => {
+            ourPersist.coins += 1;
+            console.log('adding coin +1')
+            this.coinSound.play();
+            this.coinUIText.setHTML(`${commaInt(ourPersist.coins).padStart(2, '0')}`);
+
+            // Call the function recursively with the next index
+            this.addCoins(index + 1);
+        }, [], this);
+
     }
 
     currentScoreTimer() {
@@ -11410,7 +11435,9 @@ class GameScene extends Phaser.Scene {
             this.lastTimeTick = timeTick;
 
             if(!this.scoreTimer.paused) {
-                this.coinSpawnCounter -= 1;
+                if (!this.winned) {
+                    this.coinSpawnCounter -= 1;
+                }
 
                 if (this.coinSpawnCounter < 1) {
                     if (this.spawnCoins) {
@@ -11425,7 +11452,7 @@ class GameScene extends Phaser.Scene {
                                 
                                 _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
         
-                                this.coinsArray.push(_coin);
+                                //this.coinsArray.push(_coin);
                                 
                                 break;
                             case MODES.EXPERT:
@@ -13482,7 +13509,7 @@ class ScoreScene extends Phaser.Scene {
                     plinkoMachine.zedIndex = 1;
                     plinkoMachine.countDownTween.pause();
                 }
-                plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
+                //plinkoMachine.spawnPlinkos(rollResults.get("bestZeros"));
                 //ourSpaceBoy.spawnPlinkos(rollResults.get("bestZeros"));
 
                 const zedObject = calcZedObj(ourPersist.zeds);

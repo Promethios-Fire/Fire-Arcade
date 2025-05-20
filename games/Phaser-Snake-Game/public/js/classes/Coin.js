@@ -27,10 +27,8 @@ var Coin = new Phaser.Class({
            })
 
         coinArray.push(this);
-
-        scene.children.add(this);
         
-
+        scene.children.add(this);
         
     },
     onOver: function(scene) {
@@ -60,6 +58,11 @@ var Coin = new Phaser.Class({
         )
 
         scene.interactLayer[(this.x - X_OFFSET)/GRID][(this.y - Y_OFFSET)/GRID] = "empty";
+
+        // was using coinsArray.pop() but ordering issues occured, so this
+        // new value is subtracted from the array in gameScene
+        scene.coinDiff += 1;
+
         this.destroy();
         
         //scene.coins.splice(index,1);
