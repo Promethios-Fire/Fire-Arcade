@@ -11133,8 +11133,10 @@ class GameScene extends Phaser.Scene {
             
         });*/
         
+        //this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.snake.head.x - this.cameras.main.width / 2, 0.1);
+        //this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.snake.head.y - this.cameras.main.height / 2, 0.1);
         this.cameras.main.startFollow(this.snake.head)
-        //this.cameras.main.y = this.snake.head.y * GRID;
+
 
         if (this.gState === GState.PORTAL || this.gState === GState.BONK) { 
             // ?: does this need to happen every frame? Probably because you can move mid frame and the light needs to follow you.
