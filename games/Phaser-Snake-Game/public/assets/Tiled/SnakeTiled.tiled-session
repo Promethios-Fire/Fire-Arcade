@@ -774,10 +774,10 @@
         },
         "Tutorial_3.json": {
             "scale": 1.5,
-            "selectedLayer": 2,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 131.99999999999994,
+                "y": 174.66666666666663
             }
         },
         "Tutorial_3.json#tileSheetx12": {
@@ -928,8 +928,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.75
+                "x": 194,
+                "y": 209.25
             }
         },
         "World_1-3.json#tileSheetx12": {
