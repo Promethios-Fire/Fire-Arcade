@@ -126,6 +126,11 @@
          "value":"72cb50a1-6f72-4569-9bd5-ab3b23a87ea2"
         }, 
         {
+         "name":"atoms",
+         "type":"int",
+         "value":3
+        }, 
+        {
          "name":"diffBonus",
          "type":"int",
          "value":100
@@ -133,12 +138,12 @@
         {
          "name":"next",
          "type":"string",
-         "value":"Tutorial_3"
+         "value":""
         }, 
         {
          "name":"slug",
          "type":"string",
-         "value":"learn-to-wrap"
+         "value":"tut2"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

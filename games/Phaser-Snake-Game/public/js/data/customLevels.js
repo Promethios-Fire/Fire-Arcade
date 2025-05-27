@@ -45,7 +45,7 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
             scene.checkWinCon = function(){
-                if (scene.length >= 14) { 
+                if (scene.length >= 7) { //14
                     debugger
                     var howToCard = "move";
                     
@@ -70,7 +70,7 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
             scene.checkWinCon = function(){
-                if (scene.length >= 21) { 
+                if (scene.length >= 7) { //21
 
                     var howToCard = "move";
                     
@@ -95,7 +95,7 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
             scene.checkWinCon = function(){
-                if (scene.length >= 21) { 
+                if (scene.length >= 7) { //28
 
                     //var howToCard = "move";
                     

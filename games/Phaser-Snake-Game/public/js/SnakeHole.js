@@ -13413,12 +13413,6 @@ class ScoreScene extends Phaser.Scene {
                 });
             }
 
-            
-
-            if (ourGame.stage == 'Tutorial_1') {
-                ourGame.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - ourGame.helpPanel.width/2 - GRID,
-                     Y_OFFSET + ourGame.helpPanel.height/2 + GRID,1,)
-            }
             //score screen starting arrows
             ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
 

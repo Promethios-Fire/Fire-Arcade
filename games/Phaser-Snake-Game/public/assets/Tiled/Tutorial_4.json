@@ -133,12 +133,12 @@
         {
          "name":"next",
          "type":"string",
-         "value":"end"
+         "value":""
         }, 
         {
          "name":"slug",
          "type":"string",
-         "value":"these-are-coins"
+         "value":"tut4"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",
