@@ -1,4 +1,4 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt } from "../SnakeHole.js";
 
 export var STAGE_OVERRIDES = new Map([
     ["Tutorial_1", {
@@ -14,13 +14,22 @@ export var STAGE_OVERRIDES = new Map([
             // Override checkWinCon()
             scene.checkWinCon = function(){
                 if (scene.length >= 7) {
-                    debugger
-                    var howToCard = "move";
                     
-                    scene.scene.start('TutorialScene', {
-                        cards: [howToCard],
+                    scene.winned = true;
+                    scene.gState = GState.TRANSITION;
+                    scene.snake.direction = DIRS.STOP;
+
+                    var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
+
+                    vTween.on("complete", () => {
+                    
+                        scene.scene.start('TutorialScene', {
+                        cards: ["move","atoms"],
                         toStage: "Tutorial_2",
+                        });
                     });
+                    
+                    // Scene Clean Up needed?
     
                 } else {
                     return false;
