@@ -2503,7 +2503,10 @@ class TutorialScene extends Phaser.Scene {
     constructor () {
         super({key: 'TutorialScene', active: false});
     }
-    create(tutorialPanels, toStage) {
+    create(args) {
+
+        var tutorialPanels = args.cards;
+        var toStage = args.toStage;
 
         this.scene.bringToTop('MusicPlayerScene');
 
@@ -3162,17 +3165,6 @@ class StartScene extends Phaser.Scene {
         this.scene.bringToTop('SpaceBoyScene');
         this.scene.bringToTop('MusicPlayerScene');
         
-        
-        
-        //temporaily removing HOW TO PLAY section from scene to move it elsewhere
-        if (localStorage["version"] === undefined) {
-            this.hasPlayedBefore = false;
-            console.log("Testing LOCAL STORAGE => Has not played.", );
-
-        } else {
-            this.hasPlayedBefore = true;
-            console.log("Testing LOCAL STORAGE => Has played.", );
-        }
 
 
         // Get the Map of UUIDs
@@ -3288,7 +3280,7 @@ class StartScene extends Phaser.Scene {
         } else {
             // @JAMES_ACTIVE
 
-            // Start tutorial levels here if never played.
+            
 
             this.scene.start('MainMenuScene', {
                 portalTint: intColor,
@@ -5295,6 +5287,30 @@ class MainMenuScene extends Phaser.Scene {
 
         
         this.input.keyboard.on('keydown-SPACE', function() {
+
+
+            // Check for starting tutorial
+            if (localStorage["version"] === undefined) {
+                this.hasPlayedBefore = false;
+                console.log("Testing LOCAL STORAGE => Has not played.", );
+
+                
+
+            } else {
+                this.hasPlayedBefore = true;
+                console.log("Testing LOCAL STORAGE => Has played.", );
+
+                var howToCard = "move";
+                //debugger
+                this.scene.start('TutorialScene', {
+                    cards: [howToCard],
+                    toStage: "Tutorial_1",
+                });
+                
+            }
+
+            
+            
             if (this.scene.get("SpaceBoyScene").spaceBoyReady) {
                 this.scene.get("SpaceBoyScene").mapProgressPanelText.setAlpha(1);
                 if (!mainMenuScene.pressedSpace) {
@@ -9322,17 +9338,6 @@ class GameScene extends Phaser.Scene {
         this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
         //console.log(this.interactLayer);
-
-        // debug override. checkWinCon()
-        this.checkWinCon = function(){
-            debugger
-            if (this.lengthGoal > 0) { // Placeholder check for bonus level.
-                return this.length >= 7;
-
-            } else {
-                return false;
-            }
-        }
 
         if (STAGE_OVERRIDES.has(this.stage)) {
             console.log("Running postFix Override on", this.stage);

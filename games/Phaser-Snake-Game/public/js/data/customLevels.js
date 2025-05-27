@@ -10,8 +10,24 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
-
+            
+            // Override checkWinCon()
+            scene.checkWinCon = function(){
+                if (scene.length >= 7) {
+                    debugger
+                    var howToCard = "move";
+                    
+                    scene.scene.start('TutorialScene', {
+                        cards: [howToCard],
+                        toStage: "Tutorial_2",
+                    });
+    
+                } else {
+                    return false;
+                }
+            }
         }
+
     }],
     ["Tutorial_2", {
         preFix: function (scene) {
@@ -28,7 +44,20 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
-            
+            scene.checkWinCon = function(){
+                if (scene.length >= 14) { 
+                    debugger
+                    var howToCard = "move";
+                    
+                    scene.scene.start('TutorialScene', {
+                        cards: [howToCard],
+                        toStage: "Tutorial_3",
+                    });
+    
+                } else {
+                    return false;
+                }
+            }
 
         }
     }],
@@ -40,6 +69,45 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
+            scene.checkWinCon = function(){
+                if (scene.length >= 21) { 
+
+                    var howToCard = "move";
+                    
+                    scene.scene.start('TutorialScene', {
+                        cards: [howToCard],
+                        toStage: "Tutorial_4",
+                    });
+    
+                } else {
+                    return false;
+                }
+            }
+
+        }
+    }],
+    ["Tutorial_4", {
+        preFix: function (scene) {
+
+            scene.mode = MODES.TUTORIAL;
+            scene.scene.get('PersistScene').coins = 20
+
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = function(){
+                if (scene.length >= 21) { 
+
+                    //var howToCard = "move";
+                    
+                    //scene.scene.start('TutorialScene', {
+                    //    cards: [howToCard],
+                    //    toStage: "Tutorial_3",
+                    //});
+    
+                } else {
+                    return false;
+                }
+            }
 
         }
     }],
