@@ -65,7 +65,8 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
-            scene.scene.get('PersistScene').coins = 20
+            scene.spawnCoins = false;
+            scene.scene.get('PersistScene').coins = 99;
 
         },
         postFix: function (scene) {
