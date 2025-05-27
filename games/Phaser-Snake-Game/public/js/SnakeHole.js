@@ -364,7 +364,6 @@ var updateSumOfBest = function(scene) {
 
     BEST_OF_ALL = new Map();
     BEST_OF_EXPERT = new Map ();
-    BEST_OF_TUTORIAL = new Map ();
 
 
     scene.scene.get("StartScene").UUID_MAP.keys().forEach( uuid => {
@@ -417,19 +416,6 @@ var updateSumOfBest = function(scene) {
         }
 
     })
-
-    TUTORIAL_UUIDS.forEach( uuid => {
-        var tempJSON = JSON.parse(localStorage.getItem(`${uuid}_best-Tutorial`));
-        if (tempJSON != null) {
-            var _stageDataTut = new StageData(tempJSON);
-            _stageDataTut.zedLevel = calcZedObj(scene.zeds).level;
-            scene.stagesCompleteTut += 1;
-
-            BEST_OF_TUTORIAL.set(_stageDataTut.stage, _stageDataTut);
-
-            scene.sumOfBestTut += _stageDataTut.calcTotal();  
-        }
-    });
 }
 
 var tempSumOfBest = function(scene, stageData) {
@@ -592,7 +578,6 @@ var rollZeds = function(score) {
 
 export var BEST_OF_ALL = new Map (); // STAGE DATA TYPE
 export var BEST_OF_EXPERT = new Map ();
-var BEST_OF_TUTORIAL = new Map ();
 
 export var commaInt = function(int) {
     return `${int}`.replace(/\B(?=(\d{3})+(?!\d))/g, ",");
@@ -807,7 +792,8 @@ export const GState = Object.freeze({
 // #region START STAGE
 export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
-const TUTORIAL_UUID =     "e80aad2f-f24a-4619-b525-7dc3af65ed33";
+const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
+
 var END_STAGE = 'Stage-06'; // Is var because it is set during debugging UI
 
 const TUTORIAL_UUIDS = [
@@ -2517,7 +2503,7 @@ class TutorialScene extends Phaser.Scene {
     constructor () {
         super({key: 'TutorialScene', active: false});
     }
-    create(tutorialPanels) {
+    create(tutorialPanels, toStage) {
 
         this.scene.bringToTop('MusicPlayerScene');
 
@@ -2799,7 +2785,7 @@ class TutorialScene extends Phaser.Scene {
                     startStage = STAGES.get(hardcoreStartID);
                     
                 } else {
-                    startStage = START_STAGE;
+                    startStage = toStage;
                 }
 
                 // @Holden add transition to nextScene here.
@@ -2871,9 +2857,6 @@ class StartScene extends Phaser.Scene {
     init() {
         // #region StartScene()
         this.UUID_MAP = new Map();
-        
-        
-        
     }
 
     preload() {
@@ -3303,6 +3286,10 @@ class StartScene extends Phaser.Scene {
                 this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE));
             }
         } else {
+            // @JAMES_ACTIVE
+
+            // Start tutorial levels here if never played.
+
             this.scene.start('MainMenuScene', {
                 portalTint: intColor,
                 portalFrame: Phaser.Math.Wrap(
@@ -3320,48 +3307,6 @@ class StartScene extends Phaser.Scene {
         const onInput = function (scene) { // @james - something is not right here
             if (scene.continueText.visible === true) {
                 const ourPersist = scene.scene.get('PersistScene');
-                //continueText.on('pointerdown', e =>
-                //{
-                //    this.onInput();
-                //    //ourInput.moveUp(ourGame, "upUI")
-            
-                //});
-            
-            /** 
-            else {
-                                                
-
-            }
-            ourPersist.closingTween(); //@holden do we need to keep this?
-            scene.tweens.addCounter({
-                from: 600,
-                to: 0,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                onUpdate: tween =>
-                    {   
-                        graphics.clear();
-                        var value = (tween.getValue());
-                        scene.tweenValue = value
-                        scene.shape1 = scene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                        var geomask1 = scene.shape1.createGeometryMask();
-                        
-                        scene.cameras.main.setMask(geomask1,true)
-                    },
-                onComplete: () => {
-                    scene.scene.setVisible(false);
-                    //this.scene.get("UIScene").setVisible(false);
-
-                    ourPersist.starterTween.stop();
-                    ourPersist.openingTween(scene.tweenValue);
-                    scene.openingTweenStart.stop();
-                    scene.scene.stop();
-                    
-                    //var ourGameScene = this.scene.get("GameScene");
-                    //console.log(e)
-                }
-            });
-            */
             }
         }
         
@@ -4096,12 +4041,6 @@ class StageCodex extends Phaser.Scene {
             
         } else {
             switch (displayCategory) {
-                case "Tutorial":
-                    bestOfDisplay = BEST_OF_TUTORIAL;
-                    sumOfBestDisplay = ourPersist.sumOfBestTut;
-                    stagesCompleteDisplay = ourPersist.stagesCompleteTut;
-                    categoryText = "Tutorial";
-                    break;
                 case "Expert":
                     bestOfDisplay = BEST_OF_EXPERT;
                     sumOfBestDisplay = ourPersist.sumOfBestExpert;
@@ -4738,7 +4677,7 @@ class MainMenuScene extends Phaser.Scene {
                             this.scene.get("InputScene").scene.restart();
 
                             var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-                            mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+                            mainMenuScene.scene.launch('TutorialScene', [randomHowTo], START_STAGE);
 
                             mainMenuScene.scene.bringToTop('SpaceBoyScene'); // if not called, TutorialScene renders above
                             mainMenuScene.scene.stop();
@@ -6860,7 +6799,6 @@ class GameScene extends Phaser.Scene {
         // #region Init Vals
 
         // Game State Bools
-        this.tutorialState = false;
 
         if (!DEBUG_FORCE_EXPERT) {
             this.mode = props.mode; // Default Case
@@ -6967,13 +6905,6 @@ class GameScene extends Phaser.Scene {
         const ourTutorialScene = this.scene.get('TutorialScene');
         const ourPersist = this.scene.get('PersistScene');
 
-        if (TUTORIAL_ON) {
-            var tutorialData = localStorage.getItem(`${TUTORIAL_UUID}_best-Tutorial`);
-            if (tutorialData === null && this.stage === 'World_0-1') {
-                this.stage = 'Tutorial_1'; // Remeber Override!
-                console.log('Tutorial Time!', this.stage);
-            }
-        }
         
         this.load.tilemapTiledJSON(this.stage, `assets/Tiled/${this.stage}.json`);
         
@@ -8928,8 +8859,8 @@ class GameScene extends Phaser.Scene {
         this.boostMask.scaleX = 0;
 
         
-       
-       
+        
+        
         this.boostBar.play('increasing');
 
 
@@ -8974,17 +8905,6 @@ class GameScene extends Phaser.Scene {
        this.letterX = this.add.sprite(X_OFFSET + GRID * 7 - GRID * 4,GRID * 1.25,"comboLetters", 5).setDepth(51).setAlpha(0);
        */
 
-       
-        
-        
-        
-
-        
-
-        
-
-
-        
        // #endregion
 
 
@@ -9402,6 +9322,17 @@ class GameScene extends Phaser.Scene {
         this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
         //console.log(this.interactLayer);
+
+        // debug override. checkWinCon()
+        this.checkWinCon = function(){
+            debugger
+            if (this.lengthGoal > 0) { // Placeholder check for bonus level.
+                return this.length >= 7;
+
+            } else {
+                return false;
+            }
+        }
 
         if (STAGE_OVERRIDES.has(this.stage)) {
             console.log("Running postFix Override on", this.stage);
@@ -10494,8 +10425,6 @@ class GameScene extends Phaser.Scene {
             log.destroy();
             log = null;
         }
-
-
 
         this.scene.get("PinballDisplayScene").resetPinball()
 

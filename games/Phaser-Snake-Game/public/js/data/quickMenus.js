@@ -36,9 +36,9 @@ export const QUICK_MENUS = new Map([
 
             if (localStorage.hasOwnProperty(`${START_UUID}_best-Classic`)) {
                 var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-                mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+                mainMenuScene.scene.launch('TutorialScene', [randomHowTo], START_STAGE);
             } else {
-                mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"]);
+                mainMenuScene.scene.launch('TutorialScene', ["move", "atoms", "portals" , "boost"], START_STAGE);
             }
 
             mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
@@ -57,7 +57,7 @@ export const QUICK_MENUS = new Map([
             this.scene.get("InputScene").scene.restart();
 
             var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-            mainMenuScene.scene.launch('TutorialScene', [randomHowTo]);
+            mainMenuScene.scene.launch('TutorialScene', [randomHowTo], START_STAGE);
             mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above
             mainMenuScene.scene.stop();
             
