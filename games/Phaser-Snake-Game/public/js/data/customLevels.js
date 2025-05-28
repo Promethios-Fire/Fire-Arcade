@@ -24,6 +24,9 @@ export var STAGE_OVERRIDES = new Map([
                     var timeDelay = vTween.totalDuration;
 
                     scene.time.delayedCall(timeDelay + 75, () => {
+
+                        scene.gameSceneFullCleanup();
+
                         scene.scene.start('TutorialScene', {
                             cards: ["move","atoms"],
                             toStage: "Tutorial_2",
@@ -69,6 +72,8 @@ export var STAGE_OVERRIDES = new Map([
 
             scene.checkWinCon = function(){
                 if (scene.length >= 14) {
+                    scene.gameSceneFullCleanup();
+
                     var howToCard = "move";
                     
                     scene.scene.start('TutorialScene', {
@@ -101,6 +106,8 @@ export var STAGE_OVERRIDES = new Map([
 
             scene.checkWinCon = function(){
                 if (scene.length >= 21) {
+
+                    scene.gameSceneFullCleanup();
 
                     var howToCard = "move";
                     
@@ -138,18 +145,46 @@ export var STAGE_OVERRIDES = new Map([
                     scene.gState = GState.TRANSITION;
                     scene.snake.direction = DIRS.STOP;
 
-                    //var howToCard = "move";
+                    scene.gameSceneFullCleanup();
+
+                    var howToCard = "move";
                     
-                    //scene.scene.start('TutorialScene', {
-                    //    cards: [howToCard],
-                    //    toStage: "Tutorial_3",
-                    //});
+                    scene.scene.start('TutorialScene', {
+                        cards: [howToCard],
+                        toStage: "Tutorial_5",
+                    });
     
                 } else {
                     return false;
                 }
             }
 
+        }
+    }],
+    ["Tutorial_5", {
+        preFix: function (scene) {
+
+            scene.mode = MODES.TUTORIAL;
+            //scene.scene.get('PersistScene').coins = 20
+            scene.skipScoreScreen = true;
+
+        },
+        postFix: function (scene) {
+
+            let counter = 28;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
+            //this.events.emit('spawnBlackholes', ourGame.snake.direction);
+
+            scene.checkWinCon = function() { // Returns Bool
+                if (scene.lengthGoal > 0) { // Placeholder check for bonus level.
+                    return scene.length >= scene.lengthGoal
+                }
+                
+            }
         }
     }],
     ["Bonus-Stage-x1", {

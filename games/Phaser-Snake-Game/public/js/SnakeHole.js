@@ -6879,6 +6879,7 @@ class GameScene extends Phaser.Scene {
         this.stepMode = false; // Stops auto moving, only pressing moves.
         this.extractMenuOn = false; // set to true to enable extract menu functionality.
         this.spawnCoins = true;
+        this.skipScoreScreen = false; //
         
         this.lightMasks = [];
         this.hasGhostTiles = false;
@@ -8097,8 +8098,10 @@ class GameScene extends Phaser.Scene {
                                         var tile = blackHoleTiles.shift(); // Will error if note enough Black Hole Tiles.
                                         var stageName = STAGES.get(stageID);
 
+                                        debugger
+
                                         if (stageName === undefined) { // Catches levels that are not in STAGES.
-                                            stageName = stageRaw;
+                                            //stageName = stageRaw;
                                         }
                                         
                                         var dataName = `${stageName}.properties`;
@@ -9316,7 +9319,7 @@ class GameScene extends Phaser.Scene {
         }
         
     }
-    
+
     // #region .setWallsPermeable(
     setWallsPermeable() {
         //this.wallsPermeable = true;
@@ -10434,6 +10437,7 @@ class GameScene extends Phaser.Scene {
                 duration: 500,
             });
             // check if the next stage is a new world
+            debugger
             var nextStageRaw = this.nextStages[nextStageIndex];
             console.log(nextStageRaw)
             if (nextStageRaw === '2-1' || nextStageRaw === '3-1' || nextStageRaw === '4-1' ||
@@ -11078,7 +11082,10 @@ class GameScene extends Phaser.Scene {
 
             //this.backgroundBlur(true);
             this.collapsePortals();
+
             this.scene.launch('ScoreScene', stageDataJSON);
+            
+            
             
 
             const ourQuickMenu = this.scene.get('QuickMenuScene');
@@ -11954,6 +11961,7 @@ class ScoreScene extends Phaser.Scene {
         var stageScore;
         var cursorIndex = -1; // Plays sound at 0;
         
+        debugger
         var atomTimeTotal = atomList.reduce((a,b) => a + b, 0);
         var stageCache = this.cache.json.get(`${this.stageData.stage}.properties`);
 
@@ -13425,6 +13433,10 @@ class ScoreScene extends Phaser.Scene {
             } 
         }
 
+        if (ourGame.skipScoreScreen) {
+            onContinue(ourGame);
+        }
+
         // #region Space to Continue
         this.time.delayedCall(250, function() {
             // Bit of time to not hold space and skip on accident.
@@ -13450,6 +13462,8 @@ class ScoreScene extends Phaser.Scene {
             });
 
         }, [], this);
+
+        
 
         
 
