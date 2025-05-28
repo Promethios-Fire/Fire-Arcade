@@ -6947,13 +6947,6 @@ class GameScene extends Phaser.Scene {
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
 
-        if (this.stage == 'Tutorial_3') { // TODO @holden Move to customLevels.js
-            this.time.delayedCall(5000, () => {
-                this.tutorialPrompt(SCREEN_WIDTH - X_OFFSET - this.helpPanel.width/2 - GRID,
-                    Y_OFFSET + this.helpPanel.height/2 + GRID,3,)
-            })
-        }
-
         
         if (this.scene.get("PinballDisplayScene").comboCoverFG) {
             this.scene.get("PinballDisplayScene").pinballballFGOn();
@@ -9307,36 +9300,9 @@ class GameScene extends Phaser.Scene {
             repeat: -1,
            })*/
 
-        this.helpPanel = this.add.nineslice(0,0,
-            'uiPanelL', 'Glass', 100, 56, 18,18,18,18).setDepth(100)
-            .setOrigin(0.5,0.5).setScrollFactor(0).setAlpha(0);
 
         this.targetAlpha = 0; // Initialize target alpha
         this.currentAlpha = 0; // Initialize current alpha
-
-        this.updatePanelAlpha = () => {
-            const distance = Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, this.helpPanel.x, this.helpPanel.y);
-            const maxDistance = 360;
-            const normalizedDistance = Phaser.Math.Clamp(distance / maxDistance, 0, 1);
-            this.targetAlpha = Math.sin(normalizedDistance * Math.PI / 2);
-            
-            const lerpFactor = 0.1; // Adjust this value for smoother or faster transitions
-            this.currentAlpha = Phaser.Math.Interpolation.Linear(
-                [this.currentAlpha, this.targetAlpha], lerpFactor);
-            this.helpPanel.setAlpha(this.currentAlpha);
-            this.helpText.setAlpha(this.currentAlpha);
-        }
-        this.helpText = this.add.dom(0, 0, 'div', {
-            color: 'white',
-            'font-size': '8px',
-            'font-family': 'Oxanium',
-            'font-weight': '200',
-            'text-align': 'left',
-            'letter-spacing': "1px",
-            'width': '86px',
-            'word-wrap': 'break-word'
-        });
-        this.helpText.setText(``).setOrigin(0.5,0.5).setScrollFactor(0);
 
         //console.log(this.interactLayer);
 
@@ -9350,35 +9316,7 @@ class GameScene extends Phaser.Scene {
         }
         
     }
-
-    tutorialPrompt(x,y,key){
-        // remove this? @james
-
-
-        this.helpPanel.setAlpha(1);
-        this.helpPanel.x = x;
-        this.helpPanel.y = y;
-        //print message based on key
-        var _message = '';
-        switch (key) {
-            case 1:
-                _message = 'Proceed through the blackhole to travel to a new stage.'
-                break;
-            case 2:
-                _message = 'Cross the side of the screen to wrap around to the other side!'
-                break;
-            case 3:
-                _message = 'Bonking will consume a coin. Collect coins to increase your lives!'
-                this.helpPanel.height = 68
-                break;
-            default:
-                _message = ''
-        }
-        this.helpText.x = x;
-        this.helpText.y = y;
-        this.helpText.setText(`${_message}`).setOrigin(0.5,0.5).setScrollFactor(0);
-    }
-
+    
     // #region .setWallsPermeable(
     setWallsPermeable() {
         //this.wallsPermeable = true;
@@ -10482,15 +10420,6 @@ class GameScene extends Phaser.Scene {
 
         // drain boost bar so it's ready for next round
         this.boostEnergy = Math.min(this.boostEnergy - 1000, 100);
-
-        if (this.helpPanel) {
-            this.tweens.add({
-                targets: [this.helpPanel,this.helpText],
-                alpha: { from: 1, to: 0},
-                ease: 'Sine.InOut',
-                duration: 500,
-                });
-        }
 
         //dim UI
         this.time.delayedCall(1000, event => {

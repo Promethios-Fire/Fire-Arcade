@@ -57,10 +57,6 @@ export var STAGE_OVERRIDES = new Map([
             scene.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
 
-            scene.time.delayedCall(5000, () => {
-                scene.tutorialPrompt(X_OFFSET + scene.helpPanel.width/2 + GRID,
-                     Y_OFFSET + scene.helpPanel.height/2 + GRID,2,)
-            })
 
         },
         postFix: function (scene) {
