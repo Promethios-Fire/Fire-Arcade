@@ -13,7 +13,7 @@ export var STAGE_OVERRIDES = new Map([
             
             // Override checkWinCon()
             scene.checkWinCon = function(){
-                if (scene.length >= 7) {
+                if (scene.length >= 7 && !scene.winned) {
                     
                     scene.winned = true;
                     scene.gState = GState.TRANSITION;
@@ -21,13 +21,24 @@ export var STAGE_OVERRIDES = new Map([
 
                     var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
 
-                    vTween.on("complete", () => {
-                    
+                    var timeDelay = vTween.totalDuration;
+
+                    scene.time.delayedCall(timeDelay + 75, () => {
+                        debugger
                         scene.scene.start('TutorialScene', {
-                        cards: ["move","atoms"],
-                        toStage: "Tutorial_2",
+                            cards: ["move","atoms"],
+                            toStage: "Tutorial_2",
                         });
                     });
+
+                    /* This also works
+                    vTween.on("complete", () => {
+                        scene.scene.start('TutorialScene', {
+                            cards: ["move","atoms"],
+                            toStage: "Tutorial_2",
+                        });
+                    });
+                    */
                     
                     // Scene Clean Up needed?
     
