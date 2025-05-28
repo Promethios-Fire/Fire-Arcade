@@ -24,7 +24,6 @@ export var STAGE_OVERRIDES = new Map([
                     var timeDelay = vTween.totalDuration;
 
                     scene.time.delayedCall(timeDelay + 75, () => {
-                        debugger
                         scene.scene.start('TutorialScene', {
                             cards: ["move","atoms"],
                             toStage: "Tutorial_2",
@@ -52,7 +51,6 @@ export var STAGE_OVERRIDES = new Map([
     ["Tutorial_2", {
         preFix: function (scene) {
 
-            debugger
             scene.mode = MODES.TUTORIAL;
             scene.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
@@ -60,9 +58,17 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
+
+
+            let counter = 7;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
+
             scene.checkWinCon = function(){
-                if (scene.length >= 7) { //14
-                    debugger
+                if (scene.length >= 14) {
                     var howToCard = "move";
                     
                     scene.scene.start('TutorialScene', {
@@ -86,8 +92,15 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
+
+            let counter = 14;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
             scene.checkWinCon = function(){
-                if (scene.length >= 7) { //21
+                if (scene.length >= 21) {
 
                     var howToCard = "move";
                     
@@ -111,8 +124,19 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
+
+            let counter = 21;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
             scene.checkWinCon = function(){
-                if (scene.length >= 7) { //28
+                if (scene.length >= 28) { //28
+
+                    scene.winned = true;
+                    scene.gState = GState.TRANSITION;
+                    scene.snake.direction = DIRS.STOP;
 
                     //var howToCard = "move";
                     

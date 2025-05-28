@@ -754,8 +754,8 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.83333333333331,
-                "y": 161.66666666666663
+                "x": 113.16666666666663,
+                "y": 226.66666666666663
             }
         },
         "Tutorial_1.json#tileSheetx12": {
@@ -765,7 +765,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 216.16666666666666,
+                "x": 181.49999999999997,
                 "y": 160
             }
         },
@@ -776,7 +776,7 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 179.16666666666666,
+                "x": 144.49999999999997,
                 "y": 199.33333333333334
             }
         },
@@ -786,14 +786,14 @@
         },
         "Tutorial_4.json": {
             "scale": 3,
-            "selectedLayer": 2,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 179.16666666666666,
+                "x": 179.16666666666663,
                 "y": 199.33333333333334
             }
         },
         "Tutorial_4.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 3
         },
         "UTurn_Stage-03a.json": {
             "scale": 1.3509408602150537,
@@ -1003,7 +1003,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 173.75,
+                "x": 121.75,
                 "y": 162
             }
         },
