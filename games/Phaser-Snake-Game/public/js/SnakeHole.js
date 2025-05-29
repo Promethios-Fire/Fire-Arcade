@@ -4670,7 +4670,10 @@ class MainMenuScene extends Phaser.Scene {
                             this.scene.get("InputScene").scene.restart();
 
                             var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
-                            mainMenuScene.scene.launch('TutorialScene', [randomHowTo], START_STAGE);
+                            mainMenuScene.scene.launch('TutorialScene', {
+                                cards: [randomHowTo],
+                                toStage: START_STAGE, 
+                            });
 
                             mainMenuScene.scene.bringToTop('SpaceBoyScene'); // if not called, TutorialScene renders above
                             mainMenuScene.scene.stop();
@@ -5295,19 +5298,15 @@ class MainMenuScene extends Phaser.Scene {
                 this.hasPlayedBefore = false;
                 console.log("Testing LOCAL STORAGE => Has not played.", );
 
-                
-
-            } else {
-                this.hasPlayedBefore = true;
-                console.log("Testing LOCAL STORAGE => Has played.", );
-
                 var howToCard = "move";
                 //debugger
                 this.scene.start('TutorialScene', {
                     cards: [howToCard],
-                    toStage: "Tutorial_5", // Tutorial_1
+                    toStage: "Tutorial_1", // Tutorial_1
                 });
-                
+            } else {
+                this.hasPlayedBefore = true;
+                console.log("Testing LOCAL STORAGE => Has played.", ); 
             }
 
             

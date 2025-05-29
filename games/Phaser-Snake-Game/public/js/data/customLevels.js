@@ -1,4 +1,5 @@
 import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt } from "../SnakeHole.js";
+import { PORTAL_COLORS } from '../const.js';
 
 export var STAGE_OVERRIDES = new Map([
     ["Tutorial_1", {
@@ -166,18 +167,19 @@ export var STAGE_OVERRIDES = new Map([
 
             scene.mode = MODES.TUTORIAL;
             //scene.scene.get('PersistScene').coins = 20
-            scene.skipScoreScreen = true;
+            //scene.skipScoreScreen = true;
 
         },
         postFix: function (scene) {
 
-            let counter = 0; //28
+            let counter = 28; //28
             while (counter > 0) {
                 scene.snake.grow(scene);
                 counter--;
             }
 
             scene.winned = true;
+
 
             scene.events.emit('spawnBlackholes', scene.snake.direction);
 
@@ -191,6 +193,23 @@ export var STAGE_OVERRIDES = new Map([
             }
         }
     }],
+
+    ["Tutorial_6", {
+        preFix: function (scene) {
+
+            scene.mode = MODES.TUTORIAL;
+            //scene.scene.get('PersistScene').coins = 20
+            //scene.skipScoreScreen = true;
+
+            //window.location.reload();
+
+        },
+        postFix: function (scene) {
+            scene.gameSceneFullCleanup();
+            scene.scene.start('MainMenuScene');
+        }
+    }],
+
     ["Bonus-Stage-x1", {
         preFix: function (scene) {
             scene.lengthGoal = 0;
