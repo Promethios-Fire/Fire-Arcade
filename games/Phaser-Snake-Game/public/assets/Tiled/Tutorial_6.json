@@ -138,12 +138,12 @@
         {
          "name":"next",
          "type":"string",
-         "value":"Tutorial_6"
+         "value":"end"
         }, 
         {
          "name":"slug",
          "type":"string",
-         "value":"tut5"
+         "value":"tut6"
         }],
  "renderorder":"right-down",
  "tiledversion":"1.11.0",

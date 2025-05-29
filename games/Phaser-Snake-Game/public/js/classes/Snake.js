@@ -357,13 +357,17 @@ var Snake = new Phaser.Class({
         
         // Check for Blackholes
         if (scene.winned) {
+            
             /**
              * Okay to not be part of the interact layer because there is only ever 8?
              */
+            
             for (let index = 0; index < scene.nextStagePortals.length; index++) {
 
                 
                 if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
+                    
+                    debugger
                     console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
                     scene.portals.forEach(portal => {
                         portal.portalHighlight.visible = false;

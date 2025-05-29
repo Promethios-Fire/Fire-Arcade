@@ -1436,13 +1436,13 @@ class SpaceBoyScene extends Phaser.Scene {
 
         if (persist.stageHistory.length > 0) {
             persist.stageHistory.forEach(stageData => {
-                
-                var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
-                'mainFont', 
-                   `${stageData.stage.split("_")[1]} ${RANK_LETTERS.get(stageData.stageRank())}`, 
-               8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
-
-               this.navLog.push(_stageText);
+                if (stageData != undefined) {
+                    var _stageText = this.add.bitmapText(GRID * 11, Y_OFFSET + GRID * 5.125 + offset * index,
+                        'mainFont', 
+                           `${stageData.stage.split("_")[1]} ${RANK_LETTERS.get(stageData.stageRank())}`, 
+                    8).setOrigin(1,0.0).setDepth(100).setTintFill(0x1f211b);
+                    this.navLog.push(_stageText); 
+                } 
                index++;
             }); 
         }
@@ -5305,7 +5305,7 @@ class MainMenuScene extends Phaser.Scene {
                 //debugger
                 this.scene.start('TutorialScene', {
                     cards: [howToCard],
-                    toStage: "Tutorial_1",
+                    toStage: "Tutorial_5", // Tutorial_1
                 });
                 
             }
@@ -7985,6 +7985,7 @@ class GameScene extends Phaser.Scene {
                 const EXTRACT_BLACK_HOLE_INDEX = 616;
 
                 switch (true) {
+
                     case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.HARDCORE || this.mode === MODES.TUTORIAL:
                         if (this.map.getLayer('Next')) {
                             this.nextStagePortalLayer.visible = true;
@@ -8053,10 +8054,7 @@ class GameScene extends Phaser.Scene {
                                     delay: this.tweens.stagger(150)
                                 });
                                 
-                            } else {
-        
-                                debugger
-                                
+                            } else {           
 
                                 for (let tileIndex = BLACK_HOLE_START_TILE_INDEX; tileIndex <= BLACK_HOLE_START_TILE_INDEX + 8; tileIndex++) {
                                     if (this.nextStagePortalLayer.findByIndex(tileIndex)) {
@@ -8095,207 +8093,220 @@ class GameScene extends Phaser.Scene {
                                     var nextStagesCopy = this.nextStages.slice();
                                     nextStagesCopy.forEach( stageID => {
 
-                                        var tile = blackHoleTiles.shift(); // Will error if note enough Black Hole Tiles.
+                                        var tile = blackHoleTiles.shift(); // Will error if not enough Black Hole Tiles.
                                         var stageName = STAGES.get(stageID);
 
-                                        debugger
-
-                                        if (stageName === undefined) { // Catches levels that are not in STAGES.
+                                        if (stageName != undefined) { // Catches levels that are not in STAGES.
                                             //stageName = stageRaw;
-                                        }
-                                        
-                                        var dataName = `${stageName}.properties`;
-                                        var data = this.cache.json.get(dataName);
+                                            var dataName = `${stageName}.properties`;
+                                            var data = this.cache.json.get(dataName);
 
-                                        data.forEach( propObj => {
-                                                
-                                            if (propObj.name === 'slug') {
-            
-                                                if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
-                                                    tile.index = -1;
-                                                    // Only removes levels that have unlock slugs.
-                                                    // Easier to debug which levels don't have slugs formatted correctly.
-                                                }
-            
-                                                
-                                                // Easier to see when debugging with debugger in console.
-                                                stageName;
-                                                var temp = STAGE_UNLOCKS.get(propObj.value);
-                                                //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
-            
-                                                var stageID = stageName.split("_")[1];
-                                                var hasPath = checkCanExtract(stageID);
-                                                
-                                                
-                                                var spawnOn;
-                                                if (!hasPath && this.mode === MODES.EXPERT) {
-                                                    spawnOn = false;
-                                                } else {
-                                                    spawnOn = true;
-                                                }
-            
-        
-                                                if ((STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) || this.mode === MODES.HARDCORE) {
+                                            data.forEach( propObj => {
                                                     
-                                                    // Now we know the Stage is unlocked, so make the black hole tile.
+                                                if (propObj.name === 'slug') {
+                
+                                                    if (STAGE_UNLOCKS.get(propObj.value) != undefined) {
+                                                        tile.index = -1;
+                                                        // Only removes levels that have unlock slugs.
+                                                        // Easier to debug which levels don't have slugs formatted correctly.
+                                                    }
+                
                                                     
-                                                    //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
-            
-            
-                                                    //this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
-                                                    //    "EXTRACT", 
-                                                    //    16).setDepth(50).setAlpha(0);
-            
-                                                    var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
-                                                        stageName.replaceAll("_", " ").toUpperCase(),
-                                                        8).setOrigin(0.5,0.5).setDepth(50).setAlpha(0);
-                                                
-                                                    
-                                                    var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
-                                                    ).setDepth(49).setAlpha(0);
-            
-                                                    r1.postFX.addShine(1, .5, 5)
-                                                    r1.setStrokeStyle(2, 0x4d9be6, 1);
-            
+                                                    // Easier to see when debugging with debugger in console.
+                                                    stageName;
+                                                    var temp = STAGE_UNLOCKS.get(propObj.value);
+                                                    //var tempEval = STAGE_UNLOCKS.get(propObj.value).call(ourPersist);
+                
+                                                    var stageID = stageName.split("_")[1];
+                                                    var hasPath = checkCanExtract(stageID);
                                                     
                                                     
-                                                    var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
-                                                    ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
-            
-            
-                                                    //extractImage.playAfterRepeat('extractHoleClose');
-                                                    
-                                                    
-                                                    //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
-                                                    //this.cameras.main.postFX.addBarrel(this,-0.5);
-                                                    //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
-                                                    /*this.blackholes.forEach(blackholeImage =>{
-                                                        this.cameras.main.postFX.addBarrel([.125]) 
-                                                    })*/
-                                                    
-                                                    this.blackholes.push(blackholeImage);
-                                                    
-                                                    
-                                                    this.blackholesContainer.add(this.blackholes);
-                                                
-            
-                                                    this.blackholeLabels.push(stageText,r1);
-                                                    if (blackholeImage.anims.getName() === 'blackholeForm')
-                                                        {
-                                                            blackholeImage.playAfterRepeat('blackholeIdle');
-                                                        }
-            
-                                                    //line code doesn't work yet
-                                                    //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
-                                                    //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
-                                                    
-                                                    if (BEST_OF_ALL.get(stageName) != undefined) {
-                                                        switch (BEST_OF_ALL.get(stageName).stageRank()) {
-                                                            case RANKS.WOOD:
-                                                                blackholeImage.setTint(0xB87333);
-                                                                break;
-                                                            case RANKS.BRONZE:
-                                                                blackholeImage.setTint(0xCD7F32);
-                                                                break;
-                                                            case RANKS.SILVER:
-                                                                blackholeImage.setTint(0xC0C0C0);
-                                                                break;
-                                                            case RANKS.GOLD:
-                                                                blackholeImage.setTint(0xDAA520);
-                                                                break;
-                                                            case RANKS.PLATINUM:
-                                                                blackholeImage.setTint(0xE5E4E2);
-                                                                break;
-                                                            case RANKS.GRAND_MASTER:
-                                                                blackholeImage.setTint(0xE5E4E2);
-                                                                break;
-                                                            default:
-                                                                // here is if you have never played a level before
-                                                                blackholeImage.setTint(0xFFFFFF);    
-                                                                break;
-                                                        }
+                                                    var spawnOn;
+                                                    if (!hasPath && this.mode === MODES.EXPERT) {
+                                                        spawnOn = false;
                                                     } else {
-                                                        blackholeImage.setTint(0xFFFFFF);
+                                                        spawnOn = true;
                                                     }
+                
             
-                                                    if (this.stage === "World_0-1" && this.mode === MODES.CLASSIC) {
-                                                        switch (true) {
-                                                            case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
-                                                                if (stageName === STAGES.get("1-1")) {
-                                                                    blackholeImage.postFX.addShine(1, .5, 5);
-                                                                    blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                                    
-                                                                }
-                                                                break;
-                                                            case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
-                                                                if (stageName === STAGES.get("2-1")) {
-                                                                    blackholeImage.postFX.addShine(1, .5, 5);
-                                                                    blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                                }
-                                                                break;
-                                                            case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
-                                                                if (stageName === STAGES.get("4-1")) {
-                                                                    blackholeImage.postFX.addShine(1, .5, 5);
-                                                                    blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                                }
-                                                                break;
-                                                            case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
-                                                                if (stageName === STAGES.get("8-1")) {
-                                                                    blackholeImage.postFX.addShine(1, .5, 5);
-                                                                    blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                                }
-                                                                break;
-                                                            case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
-                                                                if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
-                                                                    blackholeImage.postFX.addShine(1, .5, 5);
-                                                                    blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                                }
-                                                                if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
-                                                                    blackholeImage.postFX.addShine(1, .5, 5);
-                                                                    blackholeImage.setTint(COLOR_FOCUS_HEX);
-                                                                }     
-                                                            
-                                                                break;
+                                                    if ((STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) || this.mode === MODES.HARDCORE) {
                                                         
-                                                            default:
-                                                                break;
+                                                        // Now we know the Stage is unlocked, so make the black hole tile.
+                                                        
+                                                        //console.log("MAKING Black Hole TILE AT", tile.index, tile.pixelX + X_OFFSET, tile.pixelY + X_OFFSET , "For Stage", stageName);
+                
+                
+                                                        //this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
+                                                        //    "EXTRACT", 
+                                                        //    16).setDepth(50).setAlpha(0);
+                
+                                                        var stageText = this.add.bitmapText(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont',
+                                                            stageName.replaceAll("_", " ").toUpperCase(),
+                                                            8).setOrigin(0.5,0.5).setDepth(50).setAlpha(0);
+                                                    
+                                                        
+                                                        var r1 = this.add.rectangle(tile.pixelX + X_OFFSET + GRID * 0.5, tile.pixelY - 11 + GRID * 3 + Y_OFFSET, stageText.width + 8, 14, 0x1a1a1a  
+                                                        ).setDepth(49).setAlpha(0);
+                
+                                                        r1.postFX.addShine(1, .5, 5)
+                                                        r1.setStrokeStyle(2, 0x4d9be6, 1);
+                
+                                                        
+                                                        
+                                                        var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                                        ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+                
+                
+                                                        //extractImage.playAfterRepeat('extractHoleClose');
+                                                        
+                                                        
+                                                        //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+                                                        //this.cameras.main.postFX.addBarrel(this,-0.5);
+                                                        //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
+                                                        /*this.blackholes.forEach(blackholeImage =>{
+                                                            this.cameras.main.postFX.addBarrel([.125]) 
+                                                        })*/
+                                                        
+                                                        this.blackholes.push(blackholeImage);
+                                                        
+                                                        
+                                                        this.blackholesContainer.add(this.blackholes);
+                                                    
+                
+                                                        this.blackholeLabels.push(stageText,r1);
+                                                        if (blackholeImage.anims.getName() === 'blackholeForm')
+                                                            {
+                                                                blackholeImage.playAfterRepeat('blackholeIdle');
+                                                            }
+                
+                                                        //line code doesn't work yet
+                                                        //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
+                                                        //this.line = new Phaser.Geom.Line(this,tile.x * GRID, tile.y * GRID, blackholeImage.x,blackholeImage.y, r1.x,r1.y[0x000000],1)
+                                                        
+                                                        if (BEST_OF_ALL.get(stageName) != undefined) {
+                                                            switch (BEST_OF_ALL.get(stageName).stageRank()) {
+                                                                case RANKS.WOOD:
+                                                                    blackholeImage.setTint(0xB87333);
+                                                                    break;
+                                                                case RANKS.BRONZE:
+                                                                    blackholeImage.setTint(0xCD7F32);
+                                                                    break;
+                                                                case RANKS.SILVER:
+                                                                    blackholeImage.setTint(0xC0C0C0);
+                                                                    break;
+                                                                case RANKS.GOLD:
+                                                                    blackholeImage.setTint(0xDAA520);
+                                                                    break;
+                                                                case RANKS.PLATINUM:
+                                                                    blackholeImage.setTint(0xE5E4E2);
+                                                                    break;
+                                                                case RANKS.GRAND_MASTER:
+                                                                    blackholeImage.setTint(0xE5E4E2);
+                                                                    break;
+                                                                default:
+                                                                    // here is if you have never played a level before
+                                                                    blackholeImage.setTint(0xFFFFFF);    
+                                                                    break;
+                                                            }
+                                                        } else {
+                                                            blackholeImage.setTint(0xFFFFFF);
+                                                        }
+                
+                                                        if (this.stage === "World_0-1" && this.mode === MODES.CLASSIC) {
+                                                            switch (true) {
+                                                                case !checkRank.call(this, STAGES.get("1-3"), RANKS.WOOD):
+                                                                    if (stageName === STAGES.get("1-1")) {
+                                                                        blackholeImage.postFX.addShine(1, .5, 5);
+                                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                        
+                                                                    }
+                                                                    break;
+                                                                case !checkRank.call(this, STAGES.get("2-3"), RANKS.WOOD):
+                                                                    if (stageName === STAGES.get("2-1")) {
+                                                                        blackholeImage.postFX.addShine(1, .5, 5);
+                                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                    }
+                                                                    break;
+                                                                case !checkRank.call(this, STAGES.get("4-3"), RANKS.WOOD):
+                                                                    if (stageName === STAGES.get("4-1")) {
+                                                                        blackholeImage.postFX.addShine(1, .5, 5);
+                                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                    }
+                                                                    break;
+                                                                case !checkRank.call(this, STAGES.get("8-4"), RANKS.WOOD):
+                                                                    if (stageName === STAGES.get("8-1")) {
+                                                                        blackholeImage.postFX.addShine(1, .5, 5);
+                                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                    }
+                                                                    break;
+                                                                case !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD) || !checkRank.call(this,STAGES.get("10-4"), RANKS.WOOD):
+                                                                    if (stageName === STAGES.get("1-1") && !checkRank.call(this, STAGES.get("9-4"), RANKS.WOOD)) {
+                                                                        blackholeImage.postFX.addShine(1, .5, 5);
+                                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                    }
+                                                                    if (stageName === STAGES.get("2-1") && !checkRank.call(this, STAGES.get("10-4"), RANKS.WOOD)) {
+                                                                        blackholeImage.postFX.addShine(1, .5, 5);
+                                                                        blackholeImage.setTint(COLOR_FOCUS_HEX);
+                                                                    }     
+                                                                
+                                                                    break;
+                                                            
+                                                                default:
+                                                                    break;
+                                                            }
+                                                            
                                                         }
                                                         
+                                                        this.nextStagePortals.push(blackholeImage);
+                                                        
+                                                        this.add.particles(blackholeImage.x, blackholeImage.y, 'megaAtlas', {
+                                                            frame: ['portalParticle01.png'],
+                                                            color: [ 0xFFFFFF,0x000000],
+                                                            colorEase: 'quad.out',
+                                                            x:{min: -9 - 12, max: 24 + 12},
+                                                            y:{min: -9 - 12, max: 24 + 12},
+                                                            scale: {start: 1, end: .25},
+                                                            speed: 1,
+                                                            moveToX: 7,
+                                                            moveToY: 7,
+                                                            alpha:{start: 1, end: 0 },
+                                                            ease: 'Sine.easeOutIn',
+                                                        }).setFrequency(667,[1]).setDepth(0);
+                
+                                                    }
+                                                    else {
+                                                        // Push false portal so index is correct on warp to next
+                                                        this.nextStagePortals.push(undefined);
                                                     }
                                                     
-                                                    this.nextStagePortals.push(blackholeImage);
-                                                    
-                                                    this.add.particles(blackholeImage.x, blackholeImage.y, 'megaAtlas', {
-                                                        frame: ['portalParticle01.png'],
-                                                        color: [ 0xFFFFFF,0x000000],
-                                                        colorEase: 'quad.out',
-                                                        x:{min: -9 - 12, max: 24 + 12},
-                                                        y:{min: -9 - 12, max: 24 + 12},
-                                                        scale: {start: 1, end: .25},
-                                                        speed: 1,
-                                                        moveToX: 7,
-                                                        moveToY: 7,
-                                                        alpha:{start: 1, end: 0 },
+                                                    this.tweens.add({
+                                                        targets: this.blackholeLabels,
+                                                        alpha: {from: 0, to: 1},
                                                         ease: 'Sine.easeOutIn',
-                                                    }).setFrequency(667,[1]).setDepth(0);
-            
+                                                        duration: 50,
+                                                        delay: this.tweens.stagger(150)
+                                                    });
+                
+                                                    
                                                 }
-                                                else {
-                                                    // Push false portal so index is correct on warp to next
-                                                    this.nextStagePortals.push(undefined);
-                                                }
-                                                
-                                                this.tweens.add({
-                                                    targets: this.blackholeLabels,
-                                                    alpha: {from: 0, to: 1},
-                                                    ease: 'Sine.easeOutIn',
-                                                    duration: 50,
-                                                    delay: this.tweens.stagger(150)
-                                                });
-            
-                                                
-                                            }
-                                        });
+                                            });
+                                        } else {
+                                            var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                            ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+    
+    
+                                            //extractImage.playAfterRepeat('extractHoleClose');
+                                            //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
+                                            //this.cameras.main.postFX.addBarrel(this,-0.5);
+                                            //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
+                                            /*this.blackholes.forEach(blackholeImage =>{
+                                                this.cameras.main.postFX.addBarrel([.125]) 
+                                            })*/
+
+                                            this.nextStagePortals.push(blackholeImage);
+                                            
+                                            this.blackholes.push(blackholeImage);
+                                        }
                                     })  
                                 }
 

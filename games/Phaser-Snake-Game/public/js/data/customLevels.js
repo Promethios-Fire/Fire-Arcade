@@ -171,17 +171,21 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
 
-            let counter = 28;
+            let counter = 0; //28
             while (counter > 0) {
                 scene.snake.grow(scene);
                 counter--;
             }
 
+            scene.winned = true;
+
+            scene.events.emit('spawnBlackholes', scene.snake.direction);
+
             //this.events.emit('spawnBlackholes', ourGame.snake.direction);
 
             scene.checkWinCon = function() { // Returns Bool
                 if (scene.lengthGoal > 0) { // Placeholder check for bonus level.
-                    return scene.length >= scene.lengthGoal
+                    return scene.length >= scene.lengthGoal + 1; // Should never reach here.
                 }
                 
             }

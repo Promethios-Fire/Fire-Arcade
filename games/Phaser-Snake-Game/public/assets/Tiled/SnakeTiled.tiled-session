@@ -795,6 +795,28 @@
         "Tutorial_4.json#tileSheetx12": {
             "scaleInDock": 3
         },
+        "Tutorial_5.json": {
+            "scale": 3,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 179.16666666666663,
+                "y": 199.33333333333334
+            }
+        },
+        "Tutorial_5.json#tileSheetx12": {
+            "scaleInDock": 3
+        },
+        "Tutorial_6.json": {
+            "scale": 3,
+            "selectedLayer": 2,
+            "viewCenter": {
+                "x": 179.16666666666663,
+                "y": 199.33333333333334
+            }
+        },
+        "Tutorial_6.json#tileSheetx12": {
+            "scaleInDock": 3
+        },
         "UTurn_Stage-03a.json": {
             "scale": 1.3509408602150537,
             "selectedLayer": 4,
@@ -910,10 +932,10 @@
         },
         "World_1-2.json": {
             "scale": 1.5,
-            "selectedLayer": 0,
+            "selectedLayer": 3,
             "viewCenter": {
                 "x": 173.66666666666663,
-                "y": 162
+                "y": 161.33333333333331
             }
         },
         "World_1-2.json#tileSheetx12": {
@@ -928,7 +950,7 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 193.75,
+                "x": 141.75,
                 "y": 209
             }
         },
