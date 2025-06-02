@@ -396,18 +396,27 @@ var Snake = new Phaser.Class({
         
         if (scene.canPortal) {
              scene.portals.forEach(portal => {
-                let dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
-                //dist = dist/2;
-                console.log(dist)
+                let _dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
+                if (portal.targetObject.portalTimerRunning === false) {
+                    
+                    //dist = dist/2;
+                    //console.log(_dist)
 
-                var minFrameRate = 8; 
-                var maxFrameRate = 128;
-                
-                portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
-                    dist, minFrameRate, maxFrameRate);
-                portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
-                
-                portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(dist / maxFrameRate, 0, 1.1);
+                    var minFrameRate = 32; 
+                    var maxFrameRate = 64;
+                    
+                    portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                        _dist, minFrameRate, maxFrameRate);
+                    portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
+
+                    portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
+                }  
+                else{
+                    //portal.anims.msPerFrame = 128;
+                    //portal.portalHighlight.anims.msPerFrame =  128;
+
+                    //portal.portalHighlight.alpha = 0;
+                }
             });
         }
        
@@ -470,11 +479,7 @@ var Snake = new Phaser.Class({
                     }
                     });
                 this.closestPortal = testPortal;
-
-            }
-
-
-            
+            } 
         }
 
         // #region Coin Collision

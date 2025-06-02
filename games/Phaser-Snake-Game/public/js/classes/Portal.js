@@ -55,25 +55,15 @@ var Portal = new Phaser.Class({
         this.snakePortalingSprite.setTint(color.color);
         this.snakePortalingSprite.visible = false;
 
+        this.portalTimerRunning = false;
+
         scene.children.add(this);
 
         // Add Glow
-        this.preFX.setPadding(32);
+        //this.preFX.setPadding(32);
 
-        this.fx = this.preFX.addGlow([color.color],[.5],[.25],[true]);
-
-        //  For PreFX Glow the quality and distance are set in the Game Configuration
-
-        /*
-        scene.tweens.add({
-            targets: this.fx,
-            outerStrength: 10,
-            yoyo: true,
-            loop: -1,
-            ease: 'sine.inout'
-        });*/
-
-        this.fx.setActive(false);
+        //this.fx = this.preFX.addGlow([color.color],[.5],[.25],[true]);
+        //this.fx.setActive(false);
 
     },
     onOver: function(scene) {
@@ -82,7 +72,31 @@ var Portal = new Phaser.Class({
             scene.snake.lastPortal = this;
             scene.scoreTimer.paused = true;
     
-    
+
+            this.portalTimerRunning = true;
+            //this.target.portalTimerRunning = true;
+            
+            //this.anims.msPerFrame = 128;
+            //this.portalHighlight.anims.msPerFrame =  128;
+            //this.portalHighlight.alpha = 0;
+
+            scene.time.delayedCall(750, () => { 
+                this.portalTimerRunning = false;
+                //this.target.portalTimerRunning = false;    
+            });
+
+            /*scene.tweens.add({
+                    targets: this,
+                    alpha: {from: this.targetObject.portalHighlight.anims.msPerFrame,
+                         to: 8},
+                    duration: 98,
+                    ease: 'Sine.Out',
+                    onUpdate:() => {
+                        this.portalHighlight.anims.msPerFrame = 8;
+                        this.anims.msPerFrame = 8;
+                    },
+            });*/
+
             if (DEBUG) { console.log("PORTAL"); }
     
             // Show portal snake body after head arrives.
