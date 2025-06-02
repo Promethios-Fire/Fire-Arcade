@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_1-3.json",
+    "activeFile": "World_10-4.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -754,7 +754,7 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 197.33333333333331,
                 "y": 161.66666666666663
             }
         },
@@ -776,8 +776,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 131.99999999999994,
-                "y": 174.66666666666663
+                "x": 174,
+                "y": 161.66666666666663
             }
         },
         "Tutorial_3.json#tileSheetx12": {
@@ -928,7 +928,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 194,
+                "x": 136,
                 "y": 209.25
             }
         },
@@ -1003,7 +1003,7 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
+                "x": 180.5,
                 "y": 161.75
             }
         },
@@ -1033,15 +1033,15 @@
             "scaleInDock": 1
         },
         "World_10-4.json": {
-            "scale": 1.5,
-            "selectedLayer": 1,
+            "scale": 3,
+            "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 199.66666666666666,
+                "y": 162.99999999999997
             }
         },
         "World_10-4.json#tileSheetx12": {
-            "scaleInDock": 1
+            "scaleInDock": 3
         },
         "World_10-4_Final_Exams.json": {
             "scale": 2.1102011494252872,
@@ -1316,7 +1316,7 @@
             "scale": 1.9733024691358025,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 173.82028622820053,
+                "x": 173.8202862282005,
                 "y": 161.91131618049582
             }
         },
