@@ -397,15 +397,17 @@ var Snake = new Phaser.Class({
         if (scene.canPortal) {
              scene.portals.forEach(portal => {
                 let dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
-                
+                //dist = dist/2;
+                console.log(dist)
+
                 var minFrameRate = 8; 
-                var maxFrameRate = 64;
+                var maxFrameRate = 128;
                 
                 portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
                     dist, minFrameRate, maxFrameRate);
                 portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
                 
-                portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(dist / maxFrameRate, 0, 1);
+                portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(dist / maxFrameRate, 0, 1.1);
             });
         }
        
