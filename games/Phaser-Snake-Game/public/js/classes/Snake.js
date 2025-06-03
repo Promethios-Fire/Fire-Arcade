@@ -457,41 +457,54 @@ var Snake = new Phaser.Class({
                         //console.log(portal.targetObject.portalHighlight.alpha);
                 }  
                 else{
-                    //portal.anims.msPerFrame = 128;
-                    //portal.portalHighlight.anims.msPerFrame =  128;
+                        //portal.anims.msPerFrame = 128;
+                        //portal.portalHighlight.anims.msPerFrame =  128;
 
-                    //portal.portalHighlight.alpha = 0;
-                }
-            });
-        }
+                        //portal.portalHighlight.alpha = 0;
+                    }
+                });
+            }
 
-
+        /*scene.tweens.add({
+            targets: testPortal.targetObject.portalHighlight,
+            //alpha: {from: testPortal.targetObject.portalHighlight.alpha,
+            //  to: 1},
+            duration: 98,
+            ease: 'Sine.Out',
+            onStart: () =>{
+                scene.tweens.add({
+                    targets: oldPortal.targetObject.portalHighlight,
+                    alpha: {from: oldPortal.targetObject.portalHighlight.alpha,
+                            to: 0},
+                    duration: 200,
+                    ease: 'Sine.Out',
+                    });
+            }
+        })*/
             if (this.closestPortal != testPortal) {
                 //console.log("New Closest Portal:", testPortal.x, testPortal.y);
                 var oldPortal = this.closestPortal;
                 //oldPortal.flipX = false;
 
                 //testPortal.flipX = true;
-
-                scene.tweens.add({
-                    targets: testPortal.targetObject.portalHighlight,
-                    //alpha: {from: testPortal.targetObject.portalHighlight.alpha,
-                    //  to: 1},
-                    duration: 98,
-                    ease: 'Sine.Out',
-                    onStart: () =>{
-                        scene.tweens.add({
-                            targets: oldPortal.targetObject.portalHighlight,
-                            alpha: {from: oldPortal.targetObject.portalHighlight.alpha,
-                                 to: 0},
-                            duration: 200,
-                            ease: 'Sine.Out',
-                            });
-                    }
+                if (dist < 60) {
+                    scene.tweens.add({
+                        targets: testPortal.targetObject.portalHighlight,
+                        alpha: {from: testPortal.targetObject.portalHighlight.alpha,
+                        to: 1},
+                        duration: 98,
+                        ease: 'Sine.Out',
+                        onComplete: () =>{
+                            testPortal.targetObject.portalTimerRunning = true;
+                            testPortal.targetObject.portalHighlight.alpha = 1;
+                            scene.time.delayedCall(200, () => { 
+                                testPortal.targetObject.portalTimerRunning = false; }, scene);
+                        }  
                     });
                 this.closestPortal = testPortal;
-            } 
-        }
+                    }
+                }
+            }
 
         // #region Coin Collision
         //for (let index = 0; index < scene.coins.length; index++) {
