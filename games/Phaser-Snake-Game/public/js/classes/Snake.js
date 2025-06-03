@@ -20,6 +20,8 @@ var Snake = new Phaser.Class({
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
 
+        this.newHead = {};
+
         this.previous = [];
 
         this.body.unshift(this.head);
@@ -394,31 +396,7 @@ var Snake = new Phaser.Class({
         // Not sure if it should stay that way or not.
         var checkPortals = [...scene.portals, ...scene.wallPortals]
         
-        if (scene.canPortal) {
-             scene.portals.forEach(portal => {
-                let _dist = Phaser.Math.Distance.Between(this.head.x, this.head.y, portal.x, portal.y);
-                if (portal.targetObject.portalTimerRunning === false) {
-                    
-                    //dist = dist/2;
-                    //console.log(_dist)
-
-                    var minFrameRate = 32; 
-                    var maxFrameRate = 64;
-                    
-                    portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
-                        _dist, minFrameRate, maxFrameRate);
-                    portal.targetObject.portalHighlight.anims.msPerFrame =  portal.targetObject.anims.msPerFrame;
-
-                    portal.targetObject.portalHighlight.alpha = 1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
-                }  
-                else{
-                    //portal.anims.msPerFrame = 128;
-                    //portal.portalHighlight.anims.msPerFrame =  128;
-
-                    //portal.portalHighlight.alpha = 0;
-                }
-            });
-        }
+        
        
         if (checkPortals.length > 1 && scene.canPortal) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
@@ -443,16 +421,49 @@ var Snake = new Phaser.Class({
                 this.snakeLights.forEach( light => {
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
-
+                    
                     if (dist > distN) {
                         dist = distN;
                         testPortal = portal;
+                        this.newHead = light;
                     }
-
                 });
 
             });
 
+            if (scene.canPortal) {
+                scene.portals.forEach(portal => {
+                let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
+                     portal.x, portal.y);
+                if (!portal.targetObject){
+                    portal.targetObject = {};
+                }
+                if (portal.targetObject.portalTimerRunning === false) {
+                    
+                    //_dist = _dist/2;
+                    //console.log(_dist)
+
+                    var minFrameRate = 32; 
+                    var maxFrameRate = 64;
+                    
+                    portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                        _dist, minFrameRate, maxFrameRate);
+                    portal.targetObject.portalHighlight.anims.msPerFrame = 
+                        portal.targetObject.anims.msPerFrame;
+
+                    portal.targetObject.portalHighlight.alpha = 
+                        1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
+                    
+                        //console.log(portal.targetObject.portalHighlight.alpha);
+                }  
+                else{
+                    //portal.anims.msPerFrame = 128;
+                    //portal.portalHighlight.anims.msPerFrame =  128;
+
+                    //portal.portalHighlight.alpha = 0;
+                }
+            });
+        }
 
 
             if (this.closestPortal != testPortal) {
