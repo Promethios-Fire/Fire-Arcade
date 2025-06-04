@@ -487,22 +487,22 @@ var Snake = new Phaser.Class({
                 //oldPortal.flipX = false;
 
                 //testPortal.flipX = true;
-                if (dist < 60) {
+                this.closestPortal = testPortal;
+                /*if (dist < 72) {
                     scene.tweens.add({
                         targets: testPortal.targetObject.portalHighlight,
                         alpha: {from: testPortal.targetObject.portalHighlight.alpha,
                         to: 1},
                         duration: 98,
                         ease: 'Sine.Out',
-                        onComplete: () =>{
+                        onStart: () =>{
                             testPortal.targetObject.portalTimerRunning = true;
                             testPortal.targetObject.portalHighlight.alpha = 1;
-                            scene.time.delayedCall(200, () => { 
+                            scene.time.delayedCall(240, () => { 
                                 testPortal.targetObject.portalTimerRunning = false; }, scene);
                         }  
                     });
-                this.closestPortal = testPortal;
-                    }
+                }*/
                 }
             }
 
