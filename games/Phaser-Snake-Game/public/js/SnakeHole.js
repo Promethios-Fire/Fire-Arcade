@@ -1220,7 +1220,13 @@ class SpaceBoyScene extends Phaser.Scene {
         this.lengthGoalUILabel.mask.invertAlpha = true;
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
-        console.log('SPACE BOY SCENE',this.lights.lights);
+        console.log('SPACE BOY SCENE',this.lights.lights)
+
+        if (INVENTORY.piggybank) {
+            var piggy = this.add.sprite(501, 140, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+            piggy.play('coin01idle');
+        }
     }
 
     loseCoin(){
