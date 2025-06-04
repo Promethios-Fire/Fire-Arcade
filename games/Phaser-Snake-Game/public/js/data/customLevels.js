@@ -1,7 +1,60 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, INVENTORY } from "../SnakeHole.js";
 import { PORTAL_COLORS } from '../const.js';
 
+
+
+
 export var STAGE_OVERRIDES = new Map([
+    ["World_2-4", {
+        preFix: function (scene) {
+            scene.get
+
+        },
+        postFix: function (scene) {
+
+            var piggyTile = scene.wallLayer.findByIndex(11);
+            piggyTile.index = -1;
+
+            var piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+
+            piggy.play('coin01idle');
+
+            scene.tweens.add( {
+                targets: piggy,
+                originY: [0.1875 - .0466,0.1875 + .0466],
+                ease: 'sine.inout',
+                duration: 500,
+                yoyo: true,
+                repeat: -1,
+            });
+
+
+            if (scene.interactLayer[(piggy.x - X_OFFSET)/GRID][(piggy.y - Y_OFFSET)/GRID] === "empty") {
+
+                scene.interactLayer[(piggy.x - X_OFFSET)/GRID][(piggy.y - Y_OFFSET)/GRID] = piggy;
+                debugger
+
+            } else {
+                // Sanity debugger.
+                debugger
+            }
+            
+
+
+
+            piggy.onOver = function() {
+                INVENTORY.piggybank = true;
+                localStorage.setItem("inventory", JSON.stringify(INVENTORY))
+
+                scene.interactLayer[(piggy.x - X_OFFSET)/GRID][(piggy.y - Y_OFFSET)/GRID] = "empty";
+                
+                piggy.destroy();        
+            }
+            
+        }
+
+    }],
     ["Tutorial_T-1", {
         preFix: function (scene) {
             

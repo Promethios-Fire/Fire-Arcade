@@ -1004,6 +1004,17 @@
         "Tutorial_T-5.json#tileSheetx12": {
             "scaleInDock": 1
         },
+        "Tutorial_T-6.json": {
+            "scale": 4.500771604938271,
+            "selectedLayer": 0,
+            "viewCenter": {
+                "x": 174.0812617863878,
+                "y": 161.9722269843991
+            }
+        },
+        "Tutorial_T-6.json#tileSheetx12": {
+            "scaleInDock": 1
+        },
         "UTurn_Stage-03a.json": {
             "scale": 1.3509408602150537,
             "selectedLayer": 4,

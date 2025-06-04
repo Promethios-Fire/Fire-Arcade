@@ -470,6 +470,23 @@ var tempSumOfBest = function(scene, stageData) {
     return sumOfBest;
 }
 
+export var INVENTORY = JSON.parse(localStorage.getItem("inventory")); {
+    if (!JSON.parse(localStorage.getItem("inventory"))) {
+        INVENTORY = {}
+    }
+
+    var inventoryDefaults = new Map([
+        ["piggybank", INVENTORY.piggybank ?? false],
+    ])
+
+    // Add Saved Values
+    inventoryDefaults.keys().forEach( key => {
+        INVENTORY[key] = inventoryDefaults.get(key);
+    });
+
+    localStorage.setItem("inventory", JSON.stringify(INVENTORY));
+}
+
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     if (!JSON.parse(localStorage.getItem("playerStats"))) {
@@ -7321,9 +7338,6 @@ class GameScene extends Phaser.Scene {
             });  
         }
         
-        
-
-        
 
         
         this.load.start(); // Loader doesn't start on its own outside of the preload function.
@@ -8909,8 +8923,6 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
         }
-
-
         
         // #endregion
 
