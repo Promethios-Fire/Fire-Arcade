@@ -1,7 +1,8 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt } from "../SnakeHole.js";
+import { PORTAL_COLORS } from '../const.js';
 
 export var STAGE_OVERRIDES = new Map([
-    ["Tutorial_1", {
+    ["T_Tutorial-1", {
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
@@ -10,29 +11,116 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         postFix: function (scene) {
+            
+            // Override checkWinCon()
+            scene.checkWinCon = function(){
+                if (scene.length >= 7 && !scene.winned) {
+                    
+                    scene.winned = true;
+                    scene.gState = GState.TRANSITION;
+                    scene.snake.direction = DIRS.STOP;
 
+                    var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
+
+                    var timeDelay = vTween.totalDuration;
+
+                    scene.time.delayedCall(timeDelay + 75, () => {
+
+                        scene.gameSceneFullCleanup();
+
+                        scene.scene.start('TutorialScene', {
+                            cards: ["walls","screenwrap"],
+                            toStage: "T_Tutorial-2",
+                        });
+                    });
+
+                    /* This also works
+                    vTween.on("complete", () => {
+                        scene.scene.start('TutorialScene', {
+                            cards: ["move","atoms"],
+                            toStage: "Tutorial_2",
+                        });
+                    });
+                    */
+                    
+                    // Scene Clean Up needed?
+    
+                } else {
+                    return false;
+                }
+            }
         }
+
     }],
-    ["Tutorial_2", {
+    ["T_Tutorial-2", {
         preFix: function (scene) {
 
-            debugger
             scene.mode = MODES.TUTORIAL;
             scene.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
 
-            scene.time.delayedCall(5000, () => {
-                scene.tutorialPrompt(X_OFFSET + scene.helpPanel.width/2 + GRID,
-                     Y_OFFSET + scene.helpPanel.height/2 + GRID,2,)
-            })
 
         },
         postFix: function (scene) {
-            
+
+
+            let counter = 7;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
+
+            scene.checkWinCon = function(){
+                if (scene.length >= 14) {
+                    scene.gameSceneFullCleanup();
+                    
+                    scene.scene.start('TutorialScene', {
+                        cards: ["portals"],
+                        toStage: "T_Tutorial-3",
+                    });
+    
+                } else {
+                    return false;
+                }
+            }
 
         }
     }],
-    ["Tutorial_3", {
+    ["T_Tutorial-3", {
+        preFix: function (scene) {
+
+            scene.mode = MODES.TUTORIAL;
+            scene.spawnCoins = false;
+            scene.scene.get('PersistScene').coins = 99;
+
+        },
+        postFix: function (scene) {
+
+            let counter = 14;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
+            scene.checkWinCon = function(){
+                if (scene.length >= 21) {
+
+                    scene.gameSceneFullCleanup();
+                    
+                    scene.scene.start('TutorialScene', {
+                        cards: ["coins"],
+                        toStage: "T_Tutorial-4",
+                    });
+    
+                } else {
+                    return false;
+                }
+            }
+
+        }
+    }],
+    ["T_Tutorial-4", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -41,8 +129,84 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
 
+            let counter = 21;
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
+            scene.checkWinCon = function(){
+                if (scene.length >= 28) { //28
+
+                    scene.winned = true;
+                    scene.gState = GState.TRANSITION;
+                    scene.snake.direction = DIRS.STOP;
+
+                    scene.gameSceneFullCleanup();
+                    
+                    scene.scene.start('TutorialScene', {
+                        cards: ["blackholes"],
+                        toStage: "T_Tutorial-5",
+                    });
+    
+                } else {
+                    return false;
+                }
+            }
+
         }
     }],
+    ["T_Tutorial-5", {
+        preFix: function (scene) {
+
+            scene.mode = MODES.TUTORIAL;
+            //scene.scene.get('PersistScene').coins = 20
+            //scene.skipScoreScreen = true;
+
+        },
+        postFix: function (scene) {
+
+            let counter = 28; //28
+            while (counter > 0) {
+                scene.snake.grow(scene);
+                counter--;
+            }
+
+            scene.winned = true;
+
+
+            scene.events.emit('spawnBlackholes', scene.snake.direction);
+
+            //this.events.emit('spawnBlackholes', ourGame.snake.direction);
+
+            scene.checkWinCon = function() { // Returns Bool
+                if (scene.lengthGoal > 0) { // Placeholder check for bonus level.
+                    return scene.length >= scene.lengthGoal + 1; // Should never reach here.
+                }
+                
+            }
+        }
+    }],
+
+    ["T_Tutorial-6", {
+        preFix: function (scene) {
+
+            scene.mode = MODES.TUTORIAL;
+            //scene.scene.get('PersistScene').coins = 20
+            //scene.skipScoreScreen = true;
+
+            //window.location.reload();
+
+            //temporary solution for resetting the game -- doesn't preserve object permanence
+            window.location.reload();
+
+        },
+        postFix: function (scene) {
+            scene.gameSceneFullCleanup();
+            scene.scene.start('MainMenuScene');
+        }
+    }],
+
     ["Bonus-Stage-x1", {
         preFix: function (scene) {
             scene.lengthGoal = 0;

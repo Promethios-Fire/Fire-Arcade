@@ -13,6 +13,8 @@ var tutStyle = {
     "fontSize":'24px',
 }
 
+const nineGrid = 36;
+
 var midpointY = 360/2 - 12  * 1;
 var hOffSet = 570;
 
@@ -101,7 +103,11 @@ export var TUTORIAL_PANELS = new Map([
         */
 
         
-        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 10.5, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 10.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            {
+                "fontSize":'24px',
+                //width: '50px'
+            }), 
             'Collect atoms to grow longer.',
         ).setOrigin(0.5,0).setScale(.5);
         
@@ -128,6 +134,110 @@ export var TUTORIAL_PANELS = new Map([
         _map.get("text").push(tutText2);
         _map.get("images").push(tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);
         _map.get("panels").push(panel2);
+        _map.set("growPanelTo", {w:200, h:120});
+
+        return _map
+
+    }],
+    ["walls", function (panelNumber) {
+        var _map = structuredClone(defaultMap);
+
+
+        const _panel = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, nineGrid, nineGrid, nineGrid, nineGrid);
+        _panel.setDepth(80);
+        _panel.setScale(0);
+
+        
+        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 13.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            {
+                "fontSize":'24px',
+                width: '200px'
+            }),  
+            'Collide with walls (or body) and lose lives.',
+        ).setOrigin(0.5,0).setScale(.5);
+        
+
+        _map.get("text").push(tutText2);
+        _map.get("images").push();
+        _map.get("panels").push(_panel);
+        _map.set("growPanelTo", {w:200, h:120});
+
+        return _map
+
+    }],
+    ["screenwrap", function (panelNumber) {
+        var _map = structuredClone(defaultMap);
+
+
+        const _panel = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, nineGrid, nineGrid, nineGrid, nineGrid);
+        _panel.setDepth(80);
+        _panel.setScale(0);
+
+        
+        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            {
+                "fontSize":'24px',
+                width: '200px'
+            }),  
+            'Screen wrap in all 4 directions to access areas blocked by walls.',
+        ).setOrigin(0.5,0).setScale(.5);
+        
+
+        _map.get("text").push(tutText2);
+        _map.get("images").push();
+        _map.get("panels").push(_panel);
+        _map.set("growPanelTo", {w:200, h:120});
+
+        return _map
+
+    }],
+    ["coins", function (panelNumber) {
+        var _map = structuredClone(defaultMap);
+
+
+        const _panel = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, nineGrid, nineGrid, nineGrid, nineGrid);
+        _panel.setDepth(80);
+        _panel.setScale(0);
+
+        
+        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            {
+                "fontSize":'24px',
+                width: '200px'
+            }),  
+            'Collect coins to gain lives',
+        ).setOrigin(0.5,0).setScale(.5);
+        
+
+        _map.get("text").push(tutText2);
+        _map.get("images").push();
+        _map.get("panels").push(_panel);
+        _map.set("growPanelTo", {w:200, h:120});
+
+        return _map
+
+    }],
+    ["blackholes", function (panelNumber) {
+        var _map = structuredClone(defaultMap);
+
+
+        const _panel = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, nineGrid, nineGrid, nineGrid, nineGrid);
+        _panel.setDepth(80);
+        _panel.setScale(0);
+
+        
+        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+            {
+                "fontSize":'24px',
+                width: '200px'
+            }),  
+            'Enter the center of a black hole to progress to the next stage.',
+        ).setOrigin(0.5,0).setScale(.5);
+        
+
+        _map.get("text").push(tutText2);
+        _map.get("images").push();
+        _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
 
         return _map
