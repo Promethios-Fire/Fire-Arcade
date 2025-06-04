@@ -15,47 +15,49 @@ export var STAGE_OVERRIDES = new Map([
             var piggyTile = scene.wallLayer.findByIndex(11);
             piggyTile.index = -1;
 
-            scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
-            .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+            if (!INVENTORY.piggybank) {
+                scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+                .setOrigin(0, 0).setDepth(100).setTint(0x800080);
 
-            scene.piggy.play('coin01idle');
+                scene.piggy.play('coin01idle');
 
-            scene.tweens.add( {
-                targets: scene.piggy,
-                originY: [0.1875 - .0466,0.1875 + .0466],
-                ease: 'sine.inout',
-                duration: 500,
-                yoyo: true,
-                repeat: -1,
-            });
-
-
-            if (scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] === "empty") {
-
-                scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = scene.piggy;
-
-            } else {
-                // Sanity debugger.
-                debugger
-            }
-            
+                scene.tweens.add( {
+                    targets: scene.piggy,
+                    originY: [0.1875 - .0466,0.1875 + .0466],
+                    ease: 'sine.inout',
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                });
 
 
+                if (scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] === "empty") {
 
-            scene.piggy.onOver = function() {
-                INVENTORY.piggybank = true;
-                localStorage.setItem("inventory", JSON.stringify(INVENTORY))
+                    scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = scene.piggy;
 
-                scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
+                } else {
+                    // Sanity debugger.
+                    debugger
+                }
                 
-                scene.piggy.destroy();
 
-                var spaceboy = scene.scene.get("SpaceBoyScene");
-                
-                if (INVENTORY.piggybank) {
-                    var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
-                    .setOrigin(0, 0).setDepth(100).setTint(0x800080);
-                    piggy.play('coin01idle');
+
+
+                scene.piggy.onOver = function() {
+                    INVENTORY.piggybank = true;
+                    localStorage.setItem("inventory", JSON.stringify(INVENTORY))
+
+                    scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
+                    
+                    scene.piggy.destroy();
+
+                    var spaceboy = scene.scene.get("SpaceBoyScene");
+                    
+                    if (INVENTORY.piggybank) {
+                        var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
+                        .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+                        piggy.play('coin01idle');
+                    }
                 }
             }
             
