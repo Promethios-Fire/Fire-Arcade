@@ -470,6 +470,16 @@ var tempSumOfBest = function(scene, stageData) {
     return sumOfBest;
 }
 
+export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory") ?? "{}"))); {
+    
+    var inventoryDefaults = new Map([
+        ["piggybank", INVENTORY.get("piggybank") ?? false],
+    ])
+    INVENTORY = inventoryDefaults;
+
+    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+}
+
 // SHOULD BE READ ONLY
 export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
     if (!JSON.parse(localStorage.getItem("playerStats"))) {
@@ -1203,7 +1213,13 @@ class SpaceBoyScene extends Phaser.Scene {
         this.lengthGoalUILabel.mask.invertAlpha = true;
         this.updateZedDisplay(calcZedObj(persist.zeds));
 
-        console.log('SPACE BOY SCENE',this.lights.lights);
+        console.log('SPACE BOY SCENE',this.lights.lights)
+
+        if (INVENTORY.get("piggybank")) {
+            var piggy = this.add.sprite(501, 140, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+            piggy.play('coin01idle');
+        }
     }
 
     loseCoin(){
@@ -3469,7 +3485,7 @@ class QuickMenuScene extends Phaser.Scene {
         }, this);
 
 
-        this.input.keyboard.on('keydown-TAB', function() {
+        this.input.keyboard.on('keydown-Q', function() {
             //this.scene.sleep("QuickMenuScene");
             var option = this.menuList[0]; //tab calls option 1 every time
             this.menuOptions.get(option).call(this, qMenuArgs.fromScene);
@@ -4392,7 +4408,7 @@ class StageCodex extends Phaser.Scene {
         }
 
         if (practiceMode) {
-                this.input.keyboard.on('keydown-TAB', e => {
+                this.input.keyboard.on('keydown-Q', e => {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
                     this.scene.stop('StageCodex');
@@ -5092,7 +5108,7 @@ class MainMenuScene extends Phaser.Scene {
         var mapEngaged = false;
 
         // used to back out of sub menus
-        this.input.keyboard.on('keydown-TAB', e => {
+        this.input.keyboard.on('keydown-Q', e => {
             // if we are in sub menu EXTRAS
             if (this.menuState === 1 && !this.inMotion) {
                 subCursorIndex = 0;
@@ -5301,7 +5317,7 @@ class MainMenuScene extends Phaser.Scene {
                 //debugger
                 this.scene.start('TutorialScene', {
                     cards: ["move", "atoms"],
-                    toStage: "T_Tutorial-1", // Tutorial_1
+                    toStage: "Tutorial_T-1", // Tutorial_1
                 });
             } else {
                 this.hasPlayedBefore = true;
@@ -6315,7 +6331,7 @@ class GalaxyMapScene extends Phaser.Scene {
         super({key: 'GalaxyMapScene', active: true});
     }
     create() {
-        this.input.keyboard.on('keydown-TAB', function (event) {
+        this.input.keyboard.on('keydown-Q', function (event) {
             event.preventDefault();
         });
         this.cameras.main.scrollX += SCREEN_WIDTH
@@ -6344,7 +6360,7 @@ class GalaxyMapScene extends Phaser.Scene {
             this.arrowR.setAlpha(0);
             
         })
-        this.input.keyboard.on('keydown-TAB', e => {
+        this.input.keyboard.on('keydown-Q', e => {
             this.galaxyMapState = 0;
             this.arrowR.setAlpha(1);
         })
@@ -7321,9 +7337,6 @@ class GameScene extends Phaser.Scene {
             });  
         }
         
-        
-
-        
 
         
         this.load.start(); // Loader doesn't start on its own outside of the preload function.
@@ -7990,7 +8003,7 @@ class GameScene extends Phaser.Scene {
         });
 
         this.tabDown = false;
-        this.input.keyboard.on('keydown-TAB', function() {
+        this.input.keyboard.on('keydown-Q', function() {
             if (!this.tabDown) {
                 this.tabDown = true;
                 const ourQuickMenu = this.scene.get('QuickMenuScene');
@@ -8020,7 +8033,7 @@ class GameScene extends Phaser.Scene {
             }
         }, this);
         
-        this.input.keyboard.on('keyup-TAB', e => {
+        this.input.keyboard.on('keyup-Q', e => {
             this.tabDown = false; 
         }, this);
 
@@ -8912,8 +8925,6 @@ class GameScene extends Phaser.Scene {
             this.ghostWallLayer.mask = new Phaser.Display.Masks.BitmapMask(this, this.lightMasksContainer);
 
         }
-
-
         
         // #endregion
 

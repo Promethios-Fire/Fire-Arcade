@@ -1,8 +1,67 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, INVENTORY } from "../SnakeHole.js";
 import { PORTAL_COLORS } from '../const.js';
 
+
+
+
 export var STAGE_OVERRIDES = new Map([
-    ["T_Tutorial-1", {
+    ["World_2-4", {
+        preFix: function (scene) {
+            scene.get
+
+        },
+        postFix: function (scene) {
+
+            var piggyTile = scene.wallLayer.findByIndex(11);
+            piggyTile.index = -1;
+
+            if (!INVENTORY.get("piggybank")) {
+                scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+                .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+
+                scene.piggy.play('coin01idle');
+
+                scene.tweens.add( {
+                    targets: scene.piggy,
+                    originY: [0.1875 - .0466,0.1875 + .0466],
+                    ease: 'sine.inout',
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                });
+
+
+                if (scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] === "empty") {
+
+                    scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = scene.piggy;
+
+                } else {
+                    // Sanity debugger.
+                    debugger
+                }
+                
+
+
+
+                scene.piggy.onOver = function() {
+                    INVENTORY.set("piggybank", true);
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)))
+
+                    scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
+                    
+                    scene.piggy.destroy();
+
+                    var spaceboy = scene.scene.get("SpaceBoyScene");
+                    
+                    var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
+                    .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+                    piggy.play('coin01idle'); 
+                }
+            }
+        }
+
+    }],
+    ["Tutorial_T-1", {
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
@@ -30,7 +89,7 @@ export var STAGE_OVERRIDES = new Map([
 
                         scene.scene.start('TutorialScene', {
                             cards: ["walls","screenwrap"],
-                            toStage: "T_Tutorial-2",
+                            toStage: "Tutorial_T-2",
                         });
                     });
 
@@ -52,7 +111,7 @@ export var STAGE_OVERRIDES = new Map([
         }
 
     }],
-    ["T_Tutorial-2", {
+    ["Tutorial_T-2", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -77,7 +136,7 @@ export var STAGE_OVERRIDES = new Map([
                     
                     scene.scene.start('TutorialScene', {
                         cards: ["portals"],
-                        toStage: "T_Tutorial-3",
+                        toStage: "Tutorial_T-3",
                     });
     
                 } else {
@@ -87,7 +146,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["T_Tutorial-3", {
+    ["Tutorial_T-3", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -110,7 +169,7 @@ export var STAGE_OVERRIDES = new Map([
                     
                     scene.scene.start('TutorialScene', {
                         cards: ["coins"],
-                        toStage: "T_Tutorial-4",
+                        toStage: "Tutorial_T-4",
                     });
     
                 } else {
@@ -120,7 +179,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["T_Tutorial-4", {
+    ["Tutorial_T-4", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -146,7 +205,7 @@ export var STAGE_OVERRIDES = new Map([
                     
                     scene.scene.start('TutorialScene', {
                         cards: ["blackholes"],
-                        toStage: "T_Tutorial-5",
+                        toStage: "Tutorial_T-5",
                     });
     
                 } else {
@@ -156,7 +215,7 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["T_Tutorial-5", {
+    ["Tutorial_T-5", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -188,7 +247,7 @@ export var STAGE_OVERRIDES = new Map([
         }
     }],
 
-    ["T_Tutorial-6", {
+    ["Tutorial_T-6", {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -276,6 +335,20 @@ export var STAGE_OVERRIDES = new Map([
             scene.speedWalk = SPEED_SPRINT;
             scene.speedSprint = SPEED_WALK;
             scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+    
+        },
+        
+    }],
+    ["World_0-1", {
+        preFix: function (scene) {
+            //scene.lengthGoal = 0;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            scene.speedSprint = 147;
+            //scene.boostCost = 3;
         },
         postFix: function (scene) {
     
