@@ -1,7 +1,66 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS, INVENTORY } from "../SnakeHole.js";
 import { PORTAL_COLORS } from '../const.js';
 
+
+
+
 export var STAGE_OVERRIDES = new Map([
+    ["World_2-4", {
+        preFix: function (scene) {
+            scene.get
+
+        },
+        postFix: function (scene) {
+
+            var piggyTile = scene.wallLayer.findByIndex(11);
+            piggyTile.index = -1;
+
+            if (!INVENTORY.get("piggybank")) {
+                scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+                .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+
+                scene.piggy.play('coin01idle');
+
+                scene.tweens.add( {
+                    targets: scene.piggy,
+                    originY: [0.1875 - .0466,0.1875 + .0466],
+                    ease: 'sine.inout',
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                });
+
+
+                if (scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] === "empty") {
+
+                    scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = scene.piggy;
+
+                } else {
+                    // Sanity debugger.
+                    debugger
+                }
+                
+
+
+
+                scene.piggy.onOver = function() {
+                    INVENTORY.set("piggybank", true);
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)))
+
+                    scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
+                    
+                    scene.piggy.destroy();
+
+                    var spaceboy = scene.scene.get("SpaceBoyScene");
+                    
+                    var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
+                    .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+                    piggy.play('coin01idle'); 
+                }
+            }
+        }
+
+    }],
     ["Tutorial_T-1", {
         preFix: function (scene) {
             
