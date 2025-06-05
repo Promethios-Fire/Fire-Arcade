@@ -470,14 +470,7 @@ var tempSumOfBest = function(scene, stageData) {
     return sumOfBest;
 }
 
-if (!JSON.parse(localStorage.getItem("inventory"))) {
-    localStorage.setItem("inventory", "{}");
-}
-
-console.log(Object.entries(JSON.parse(localStorage.getItem("inventory"))));
-
-
-export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory")))); {
+export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory") ?? "{}"))); {
     
     var inventoryDefaults = new Map([
         ["piggybank", INVENTORY.get("piggybank") ?? false],
