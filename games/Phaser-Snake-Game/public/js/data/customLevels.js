@@ -361,6 +361,8 @@ export var STAGE_OVERRIDES = new Map([
             scene.startWWraps = PLAYER_STATS.wWraps;
             scene.delta = 0;
             scene.deltaCache = 0;
+
+            scene.secretPortal = undefined;
             //scene.lengthGoal = 0;
             //scene.stopOnBonk = true;
             //scene.maxScore = 60;
@@ -381,13 +383,22 @@ export var STAGE_OVERRIDES = new Map([
             } 
 
             if (scene.wallVarient === "Wall_2" && scene.delta != scene.deltaCache) {
-                if (scene.delta > 4) {
-                    var blackHole = scene.add.sprite(scene.snake.head.x + GRID * 0.5, scene.snake.head.y + GRID * 0.5);
-                    blackHole.play('blackholeForm');
-                    console.log("SPAWNING BLACKHOLE", scene.delta);
+
+                var tile = scene.wallLayer.getTileAt(16, 12);
+
+
+                if (scene.delta > 4 && scene.secretPortal === undefined) {
+                    scene.secretPortal = scene.add.sprite(tile.pixelX + X_OFFSET + GRID * 3.5, tile.pixelY + Y_OFFSET + GRID * 0.5);
+                    scene.secretPortal.play('blackholeForm');
+                    console.log("SPAWNING SECRET BLACKHOLE", scene.delta);
+
+                    scene.secretPortal.onOver = function() {
+                        console.log("Something Secret!");
+                    } 
+                    scene.interactLayer[tile.x + 3][tile.y] = scene.secretPortal;
                 }
                 // add in code here to tint based on the delta size.
-                var tile = scene.wallLayer.getTileAt(16, 12).tint = 0xFF0000;
+                tile.tint = 0xFF0000;
                 scene.deltaCache = scene.delta;
             }
 
