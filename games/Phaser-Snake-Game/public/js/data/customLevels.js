@@ -45,7 +45,7 @@ export var STAGE_OVERRIDES = new Map([
 
                 scene.piggy.onOver = function() {
                     INVENTORY.set("piggybank", true);
-                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)))
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
 
                     scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
                     
@@ -381,16 +381,17 @@ export var STAGE_OVERRIDES = new Map([
             } 
 
             if (scene.wallVarient === "Wall_2" && scene.delta != scene.deltaCache) {
+                if (scene.delta > 4) {
+                    var blackHole = scene.add.sprite(scene.snake.head.x + GRID * 0.5, scene.snake.head.y + GRID * 0.5);
+                    blackHole.play('blackholeForm');
+                    console.log("SPAWNING BLACKHOLE", scene.delta);
+                }
                 // add in code here to tint based on the delta size.
                 var tile = scene.wallLayer.getTileAt(16, 12).tint = 0xFF0000;
                 scene.deltaCache = scene.delta;
             }
 
-            if (delta > 10) {
-                var blackHole = this.add.sprite(this.snake.tail.x + GRID * 0.5,this.snake.tail.y + GRID * 0.5);
-                blackHole.play('blackholeForm');
-                console.log(scene.delta);
-            }
+            
         }
         
     }],
