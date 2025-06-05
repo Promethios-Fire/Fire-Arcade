@@ -15,7 +15,7 @@ export var STAGE_OVERRIDES = new Map([
             var piggyTile = scene.wallLayer.findByIndex(11);
             piggyTile.index = -1;
 
-            if (!INVENTORY.piggybank) {
+            if (!INVENTORY.get("piggybank")) {
                 scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
                 .setOrigin(0, 0).setDepth(100).setTint(0x800080);
 
@@ -44,8 +44,8 @@ export var STAGE_OVERRIDES = new Map([
 
 
                 scene.piggy.onOver = function() {
-                    INVENTORY.piggybank = true;
-                    localStorage.setItem("inventory", JSON.stringify(INVENTORY))
+                    INVENTORY.set("piggybank", true);
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)))
 
                     scene.interactLayer[(scene.piggy.x - X_OFFSET)/GRID][(scene.piggy.y - Y_OFFSET)/GRID] = "empty";
                     
@@ -53,14 +53,11 @@ export var STAGE_OVERRIDES = new Map([
 
                     var spaceboy = scene.scene.get("SpaceBoyScene");
                     
-                    if (INVENTORY.piggybank) {
-                        var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
-                        .setOrigin(0, 0).setDepth(100).setTint(0x800080);
-                        piggy.play('coin01idle');
-                    }
+                    var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
+                    .setOrigin(0, 0).setDepth(100).setTint(0x800080);
+                    piggy.play('coin01idle'); 
                 }
             }
-            
         }
 
     }],

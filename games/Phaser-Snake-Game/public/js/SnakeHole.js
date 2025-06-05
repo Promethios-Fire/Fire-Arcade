@@ -470,21 +470,21 @@ var tempSumOfBest = function(scene, stageData) {
     return sumOfBest;
 }
 
-export var INVENTORY = JSON.parse(localStorage.getItem("inventory")); {
-    if (!JSON.parse(localStorage.getItem("inventory"))) {
-        INVENTORY = {}
-    }
+if (!JSON.parse(localStorage.getItem("inventory"))) {
+    localStorage.setItem("inventory", "{}");
+}
 
+console.log(Object.entries(JSON.parse(localStorage.getItem("inventory"))));
+
+
+export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory")))); {
+    
     var inventoryDefaults = new Map([
-        ["piggybank", INVENTORY.piggybank ?? false],
+        ["piggybank", INVENTORY.get("piggybank") ?? false],
     ])
+    INVENTORY = inventoryDefaults;
 
-    // Add Saved Values
-    inventoryDefaults.keys().forEach( key => {
-        INVENTORY[key] = inventoryDefaults.get(key);
-    });
-
-    localStorage.setItem("inventory", JSON.stringify(INVENTORY));
+    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
 }
 
 // SHOULD BE READ ONLY
@@ -1222,7 +1222,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
         console.log('SPACE BOY SCENE',this.lights.lights)
 
-        if (INVENTORY.piggybank) {
+        if (INVENTORY.get("piggybank")) {
             var piggy = this.add.sprite(501, 140, 'coinPickup01Anim.png')
             .setOrigin(0, 0).setDepth(100).setTint(0x800080);
             piggy.play('coin01idle');
