@@ -481,6 +481,10 @@ export var PLAYER_STATS = JSON.parse(localStorage.getItem("playerStats")); {
         ["atomsEaten", PLAYER_STATS.atomsEaten ?? 0],
         ["turns", PLAYER_STATS.turns ?? 0],
         ["wraps", PLAYER_STATS.wraps ?? 0],
+        ["nWraps", PLAYER_STATS.nWraps ?? 0],
+        ["sWraps", PLAYER_STATS.sWraps ?? 0],
+        ["eWraps", PLAYER_STATS.eWraps ?? 0],
+        ["wWraps", PLAYER_STATS.wWraps ?? 0],
         ["portals", PLAYER_STATS.portals ?? 0],
         ["globalScore", PLAYER_STATS.globalScore ?? 0],
         ["comboHistory", PLAYER_STATS.comboHistory ?? Array(28).fill(0)],
@@ -514,7 +518,8 @@ export var updatePlayerStats = function (stageData) {
         PLAYER_STATS.bonks += stageData.bonks;
         PLAYER_STATS.atomsEaten += stageData.foodLog.length;
         PLAYER_STATS.turns += stageData.turns;
-        PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);  
+        PLAYER_STATS.stagesFinished = Math.floor(PLAYER_STATS.atomsEaten / 28);
+        PLAYER_STATS.wraps = PLAYER_STATS.nWraps + PLAYER_STATS.sWraps + PLAYER_STATS.eWraps + PLAYER_STATS.wWraps;
     }
     
     // This also saves changes not listed here that

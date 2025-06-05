@@ -1,4 +1,4 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS } from "../SnakeHole.js";
 import { PORTAL_COLORS } from '../const.js';
 
 export var STAGE_OVERRIDES = new Map([
@@ -294,6 +294,45 @@ export var STAGE_OVERRIDES = new Map([
         postFix: function (scene) {
     
         },
+        
+    }],
+    ["World_4-1", {
+        preFix: function (scene) {
+            scene.startEWraps = PLAYER_STATS.eWraps;
+            scene.startWWraps = PLAYER_STATS.wWraps;
+            scene.delta = 0;
+            scene.deltaCache = 0;
+            //scene.lengthGoal = 0;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = 147;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+
+        },
+        onMove: function (scene) {
+            var currentEWraps = PLAYER_STATS.eWraps - scene.startEWraps;
+            var currentWWraps = PLAYER_STATS.wWraps - scene.startWWraps;
+
+            scene.delta = currentWWraps - currentEWraps;
+            if (scene.delta < 1) {
+                scene.delta = 0;
+            } 
+
+            if (scene.wallVarient === "Wall_2" && scene.delta != scene.deltaCache) {
+                // add in code here to tint based on the delta size.
+                var tile = scene.wallLayer.getTileAt(16, 12).tint = 0xFF0000;
+                scene.deltaCache = scene.delta;
+            }
+
+            if (delta > 10) {
+                var blackHole = this.add.sprite(this.snake.tail.x + GRID * 0.5,this.snake.tail.y + GRID * 0.5);
+                blackHole.play('blackholeForm');
+                console.log(scene.delta);
+            }
+        }
         
     }],
 ]);
