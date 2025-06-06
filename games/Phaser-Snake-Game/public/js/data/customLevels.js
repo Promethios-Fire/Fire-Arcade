@@ -1,5 +1,5 @@
 import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS, INVENTORY } from "../SnakeHole.js";
-import { PORTAL_COLORS } from '../const.js';
+import { PORTAL_COLORS, ITEMS } from '../const.js';
 
 
 
@@ -14,14 +14,14 @@ export var STAGE_OVERRIDES = new Map([
             var transTile = scene.wallLayer.findByIndex(11);
             transTile.index = -1;
 
-            if (!INVENTORY.get("transmission")) {
-                scene.transmission = scene.add.sprite(transTile.pixelX + X_OFFSET, transTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+            if (!INVENTORY.get("gearbox")) {
+                scene.gearbox = scene.add.sprite(transTile.pixelX + X_OFFSET, transTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
                 .setOrigin(0, 0).setDepth(100).setTint(0xFfc0cb);
 
-                scene.transmission.play('coin01idle');
+                scene.gearbox.play('coin01idle');
 
                 scene.tweens.add( {
-                    targets: scene.transmission,
+                    targets: scene.gearbox,
                     originY: [0.1875 - .0466,0.1875 + .0466],
                     ease: 'sine.inout',
                     duration: 500,
@@ -30,9 +30,9 @@ export var STAGE_OVERRIDES = new Map([
                 });
 
 
-                if (scene.interactLayer[(scene.transmission.x - X_OFFSET)/GRID][(scene.transmission.y - Y_OFFSET)/GRID] === "empty") {
+                if (scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] === "empty") {
 
-                    scene.interactLayer[(scene.transmission.x - X_OFFSET)/GRID][(scene.transmission.y - Y_OFFSET)/GRID] = scene.transmission;
+                    scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] = scene.gearbox;
 
                 } else {
                     // Sanity debugger.
@@ -42,19 +42,16 @@ export var STAGE_OVERRIDES = new Map([
 
 
 
-                scene.transmission.onOver = function() {
-                    INVENTORY.set("transmission", true);
+                scene.gearbox.onOver = function() {
+                    INVENTORY.set("gearbox", true);
                     localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
 
-                    scene.interactLayer[(scene.transmission.x - X_OFFSET)/GRID][(scene.transmission.y - Y_OFFSET)/GRID] = "empty";
+                    scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] = "empty";
                     
-                    scene.transmission.destroy();
+                    scene.gearbox.destroy();
 
                     var spaceboy = scene.scene.get("SpaceBoyScene");
-                    
-                    var transmission = spaceboy.add.sprite(501 + GRID * 1.5, 140, 'coinPickup01Anim.png')
-                    .setOrigin(0, 0).setDepth(100).setTint(0xFfc0cb);
-                    transmission.play('coin01idle'); 
+                    ITEMS.get("gearbox").addToInventory(spaceboy);
                 }
             }
         }
@@ -93,8 +90,7 @@ export var STAGE_OVERRIDES = new Map([
                     // Sanity debugger.
                     debugger
                 }
-                
-
+            
 
 
                 scene.piggy.onOver = function() {
@@ -106,10 +102,7 @@ export var STAGE_OVERRIDES = new Map([
                     scene.piggy.destroy();
 
                     var spaceboy = scene.scene.get("SpaceBoyScene");
-                    
-                    var piggy = spaceboy.add.sprite(501, 140, 'coinPickup01Anim.png')
-                    .setOrigin(0, 0).setDepth(100).setTint(0x800080);
-                    piggy.play('coin01idle'); 
+                    ITEMS.get("piggybank").addToInventory(spaceboy);
                 }
             }
         }

@@ -1,6 +1,8 @@
 
 
 
+import {GRID, INVENTORY} from "./SnakeHole.js";
+
 export const PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
     //'#AABBCC',
@@ -75,3 +77,75 @@ export const PORTAL_TILE_RULES = { // TODO Move out of here
     423:3,
     424:3
 };
+
+
+
+export const ITEMS = new Map([
+    ["piggybank", {
+        addToInventory: function (scene) {
+            debugger
+            var piggy = scene.add.sprite(501, 140, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(80).setTint(0x800080);
+            piggy.play('coin01idle');
+
+            piggy.name = "piggybank";
+
+            scene.invItems.set("piggybank", piggy);
+
+            var target = piggy.getBottomRight();
+            
+            scene.savedCoinsUI = scene.add.bitmapText(target.x, target.y, 'mainFont',
+                INVENTORY.get("savedCoins") ?? 0,
+            8).setOrigin(1,1).setDepth(81)
+
+            return piggy;
+
+        },
+        interact: function (scene) {
+            return
+        }
+    }],
+    ["gearbox", {
+        addToInventory: function (scene) {
+            var gearbox = scene.add.sprite(501 + GRID * 1.5, 140, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(80).setTint(0xFfc0cb);
+            gearbox.play('coin01idle');
+
+            gearbox.name = "gearbox";
+
+            scene.invItems.set("gearbox", gearbox);
+            scene.invSettings.set("gearbox", "fast");
+
+            var target = gearbox.getBottomRight();
+            
+            gearbox.text = scene.add.bitmapText(target.x, target.y, 'mainFont',
+                "FAST",
+            8).setOrigin(0,1).setDepth(81)
+
+            return gearbox;
+        },
+        interact: function (scene) {
+
+            var sprite = scene.invItems.get("gearbox");
+
+            if (scene.invSettings.get("gearbox") === "fast") {
+
+                sprite.setTint(0x606000);
+                scene.invSettings.set("gearbox", "slow");
+                sprite.text.setText("SLOW");
+                scene.scene.get("PersistScene").speedSprint = 138
+                
+            } else if (scene.invSettings.get("gearbox") === "slow") {
+                sprite.setTint(0xFfc0cb);
+                scene.invSettings.set("gearbox", "fast");
+                sprite.text.setText("FAST");
+                scene.scene.get("PersistScene").speedSprint = 33
+                
+            }
+
+            console.log("Sprint_Speed now = ", scene.scene.get("PersistScene").speedSprint);
+
+            return
+        }
+    }]
+]);

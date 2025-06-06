@@ -5,7 +5,7 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
+import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS, ITEMS } from './const.js';
 import { STAGE_UNLOCKS, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
@@ -474,7 +474,7 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
     
     var inventoryDefaults = new Map([
         ["piggybank", INVENTORY.get("piggybank") ?? false],
-        ["transmission", INVENTORY.get("transmission") ?? false],
+        ["gearbox", INVENTORY.get("gearbox") ?? false],
         ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
     ])
     INVENTORY = inventoryDefaults;
@@ -882,6 +882,9 @@ class SpaceBoyScene extends Phaser.Scene {
         this.spaceBoyPowered = false;
         this.spaceBoyReady = false;
         this.navLog = [];
+        this.invItems = new Map();
+        this.invSettings = new Map();
+        this.inInventory = false;
         this.maxBin = 0;
         this.prevZedLevel = 0;
         this.zedSegments = [];
@@ -1064,11 +1067,6 @@ class SpaceBoyScene extends Phaser.Scene {
             }
         });
         
-
-        
-        
-
-        
         // for black screen before game is presented
         this.blankScreen = this.add.graphics();
         this.blankScreen.fillStyle(0x161616, 1);
@@ -1222,22 +1220,91 @@ class SpaceBoyScene extends Phaser.Scene {
 
         console.log('SPACE BOY SCENE',this.lights.lights)
 
+        this.events.on('navInventory', function (selectedIndex) {
+            this.inInventory = true;
+
+            this.invArray = Array.from(this.invItems.values());
+            this.invIndex = selectedIndex;
+
+            var firstItem = this.invArray[selectedIndex];
+
+            firstItem.outLine = this.add.rectangle(firstItem.getBottomLeft().x, firstItem.getBottomLeft().y + 3 , 10, 1
+            ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
+
+            firstItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);
+        }, this);
+
+        this.input.keyboard.on('keydown-RIGHT', e => {
+
+            if (this.inInventory) {
+                var prevItem = this.invArray[this.invIndex];
+
+                prevItem.outLine.destroy();
+
+                this.invIndex = Phaser.Math.Wrap(this.invIndex + 1, 0, this.invItems.size);
+
+                var nextItem = this.invArray[this.invIndex];
+
+                nextItem.outLine = this.add.rectangle(nextItem.getBottomLeft().x, nextItem.getBottomLeft().y + 3 , 10, 1
+                ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
+    
+                nextItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);
+                
+            }
+
+        }, this);
+
+        this.input.keyboard.on('keydown-LEFT', e => {
+
+            if (this.inInventory) {
+                var prevItem = this.invArray[this.invIndex];
+
+                prevItem.outLine.destroy();
+
+                this.invIndex = Phaser.Math.Wrap(this.invIndex - 1, 0, this.invItems.size);
+
+                var nextItem = this.invArray[this.invIndex];
+
+                nextItem.outLine = this.add.rectangle(nextItem.getBottomLeft().x, nextItem.getBottomLeft().y + 3 , 10, 1
+                ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
+    
+                nextItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);  
+            }
+        }, this);
+
+        this.input.keyboard.on('keydown-SPACE', e => {
+            if (this.inInventory) {
+                var selected = this.invArray[this.invIndex];
+
+                ITEMS.get(selected.name).interact(this);
+            }
+
+        }, this);
+
+        this.input.keyboard.on('keydown-Q', e => {
+            if (this.inInventory) {
+
+                var selected = this.invArray[this.invIndex];
+                selected.outLine.destroy();
+
+                this.inInventory = false;
+                this.scene.resume("MainMenuScene");
+            }
+
+        }, this);
+
+
+
         if (INVENTORY.get("piggybank")) {
-            var piggy = this.add.sprite(501, 140, 'coinPickup01Anim.png')
-            .setOrigin(0, 0).setDepth(80).setTint(0x800080);
-            piggy.play('coin01idle');
 
-            var target = piggy.getBottomRight();
-
-            this.savedCoinsUI = this.add.bitmapText(target.x, target.y, 'mainFont',
-                INVENTORY.get("savedCoins"),
-            8).setOrigin(1,1).setDepth(81)
+            var piggy = ITEMS.get("piggybank").addToInventory(this);
         }
 
-        if (INVENTORY.get("transmission")) {
-            var transmission = this.add.sprite(501 + GRID, 140, 'coinPickup01Anim.png')
-            .setOrigin(0, 0).setDepth(80).setTint(0xFfc0cb);
-            transmission.play('coin01idle');
+        if (INVENTORY.get("gearbox")) {
+
+            ITEMS.get("gearbox").addToInventory(this);
+            
+            this.invSettings.set("gearbox", "fast");
         }
     }
 
@@ -4546,7 +4613,7 @@ class MainMenuScene extends Phaser.Scene {
         this.inMotion = false;
     }
     create(props) {
-        this.input.keyboard.addCapture('UP,DOWN,SPACE');
+        this.input.keyboard.addCapture('UP,DOWN,SPACE,Q,TAB');
         const mainMenuScene = this.scene.get('MainMenuScene');
         const ourPersist = this.scene.get('PersistScene');
         //const ourMap = this.scene.get('GalaxyMapScene');
@@ -5128,6 +5195,10 @@ class MainMenuScene extends Phaser.Scene {
 
         // used to back out of sub menus
         this.input.keyboard.on('keydown-Q', e => {
+            if (this.menuState === 0) {
+                this.scene.pause();
+                this.scene.get("SpaceBoyScene").events.emit("navInventory", 0);
+            }
             // if we are in sub menu EXTRAS
             if (this.menuState === 1 && !this.inMotion) {
                 subCursorIndex = 0;
@@ -6471,6 +6542,7 @@ class PersistScene extends Phaser.Scene {
         this.prevCodexStageMemory = START_STAGE;
         this.prevStage = START_STAGE;
         this.prevRank = 0;
+        this.speedSprint = SPEED_SPRINT;
 
         // List of Background Containers
         this.bgPlanets = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
@@ -6962,7 +7034,7 @@ class GameScene extends Phaser.Scene {
         this.moveInterval = SPEED_WALK;
         this.boostCost = 6;
         this.speedWalk = SPEED_WALK;
-        this.speedSprint = SPEED_SPRINT;
+        //this.speedSprint = this.scene.get("PersistScene").speedSprint;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -9435,7 +9507,7 @@ class GameScene extends Phaser.Scene {
 
     // #region .screenShake(
     screenShake(){
-        if (this.moveInterval === this.speedSprint) {
+        if (this.moveInterval === this.scene.get("PersistScene").speedSprint) {
             this.cameras.main.shake(400, .01);
         }
         else if (this.moveInterval === this.speedWalk){
@@ -9621,8 +9693,8 @@ class GameScene extends Phaser.Scene {
 
         
         // Store speed values
-        let _walkSpeed = this.speedWalk
-        let _sprintSpeed = this.speedSprint
+        let _walkSpeed = this.speedWalk;
+        let _sprintSpeed = this.scene.get("PersistScene").speedSprint;
 
         // Store initial camera position
         let initialCameraX = this.cameras.main.scrollX;
@@ -9672,7 +9744,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = slowMoValue;
                         this.anims.globalTimeScale = slowMoValue;
                         this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.speedSprint = _sprintSpeed / slowMoValue;
+                        this.scene.get("PersistScene").speedSprint = _sprintSpeed / slowMoValue;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = slowMoValue;
                         }
@@ -9682,7 +9754,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = 1;
                         this.anims.globalTimeScale = 1;
                         this.speedWalk = _walkSpeed;
-                        this.speedSprint = _sprintSpeed;
+                        this.scene.get("PersistScene").speedSprint = _sprintSpeed;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = 1;
                         }
@@ -9717,7 +9789,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = slowMoValue;
                         this.anims.globalTimeScale = slowMoValue;
                         this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.speedSprint = _sprintSpeed / slowMoValue;
+                        this.scene.get("PersistScene").speedSprint = _sprintSpeed / slowMoValue;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = slowMoValue;
                         }
@@ -9770,7 +9842,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = 1;
                         this.anims.globalTimeScale = 1;
                         this.speedWalk = _walkSpeed;
-                        this.speedSprint = _sprintSpeed;
+                        this.scene.get("PersistScene").speedSprint = _sprintSpeed;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = 1;
                         }
@@ -9861,7 +9933,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Linear',
             repeat: 0,
             timeScale: slowMoValCopy,
-            delay: this.tweens.stagger(this.speedSprint),
+            delay: this.tweens.stagger(this.scene.get("PersistScene").speedSprint),
             onUpdate: (tween) => {
                 this.timeScale = slowMoValCopy /2;
             }
@@ -10864,7 +10936,7 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(this.speedSprint),
+            delay: this.tweens.stagger(this.scene.get("PersistScene").speedSprint),
         });
 
         return this.snakeEating
@@ -11531,7 +11603,7 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = this.speedSprint;
+                    this.moveInterval = this.scene.get("PersistScene").speedSprint;
                     
                     if (!this.winned) {
                         // Boost Stats

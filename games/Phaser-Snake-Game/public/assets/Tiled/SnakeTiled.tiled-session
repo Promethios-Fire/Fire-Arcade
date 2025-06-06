@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "T_Tutorial-5.json",
+    "activeFile": "World_4-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -1534,7 +1534,7 @@
         },
         "World_4-4.json": {
             "scale": 1.9733024691358025,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.07366856964106,
                 "y": 162.16469852193634
@@ -2970,7 +2970,7 @@
         },
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 3,
+            "scaleInDock": 2,
             "scaleInEditor": 2
         },
         "tileSheetx24.tsx": {
@@ -3087,11 +3087,12 @@
         "World_5-3_Racing.json",
         "World_4-5.json",
         "World_4-4.json",
-        "T_Tutorial-5.json",
-        "T_Tutorial-1.json",
-        "T_Tutorial-2.json",
-        "T_Tutorial-6.json",
-        "T_Tutorial-4.json"
+        "Tutorial_T-1.json",
+        "Tutorial_T-2.json",
+        "Tutorial_T-3.json",
+        "Tutorial_T-4.json",
+        "Tutorial_T-5.json",
+        "Tutorial_T-6.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "int",
