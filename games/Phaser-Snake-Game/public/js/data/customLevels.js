@@ -5,9 +5,63 @@ import { PORTAL_COLORS } from '../const.js';
 
 
 export var STAGE_OVERRIDES = new Map([
+    ["World_4-4", {
+        preFix: function (scene) {
+
+        },
+        postFix: function (scene) {
+
+            var transTile = scene.wallLayer.findByIndex(11);
+            transTile.index = -1;
+
+            if (!INVENTORY.get("transmission")) {
+                scene.transmission = scene.add.sprite(transTile.pixelX + X_OFFSET, transTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
+                .setOrigin(0, 0).setDepth(100).setTint(0xFfc0cb);
+
+                scene.transmission.play('coin01idle');
+
+                scene.tweens.add( {
+                    targets: scene.transmission,
+                    originY: [0.1875 - .0466,0.1875 + .0466],
+                    ease: 'sine.inout',
+                    duration: 500,
+                    yoyo: true,
+                    repeat: -1,
+                });
+
+
+                if (scene.interactLayer[(scene.transmission.x - X_OFFSET)/GRID][(scene.transmission.y - Y_OFFSET)/GRID] === "empty") {
+
+                    scene.interactLayer[(scene.transmission.x - X_OFFSET)/GRID][(scene.transmission.y - Y_OFFSET)/GRID] = scene.transmission;
+
+                } else {
+                    // Sanity debugger.
+                    debugger
+                }
+                
+
+
+
+                scene.transmission.onOver = function() {
+                    INVENTORY.set("transmission", true);
+                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+
+                    scene.interactLayer[(scene.transmission.x - X_OFFSET)/GRID][(scene.transmission.y - Y_OFFSET)/GRID] = "empty";
+                    
+                    scene.transmission.destroy();
+
+                    var spaceboy = scene.scene.get("SpaceBoyScene");
+                    
+                    var transmission = spaceboy.add.sprite(501 + GRID * 1.5, 140, 'coinPickup01Anim.png')
+                    .setOrigin(0, 0).setDepth(100).setTint(0xFfc0cb);
+                    transmission.play('coin01idle'); 
+                }
+            }
+        }
+
+    }],
     ["World_2-4", {
         preFix: function (scene) {
-            scene.get
 
         },
         postFix: function (scene) {

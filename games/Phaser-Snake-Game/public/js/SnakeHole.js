@@ -474,6 +474,7 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
     
     var inventoryDefaults = new Map([
         ["piggybank", INVENTORY.get("piggybank") ?? false],
+        ["transmission", INVENTORY.get("transmission") ?? false],
         ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
     ])
     INVENTORY = inventoryDefaults;
@@ -1231,6 +1232,12 @@ class SpaceBoyScene extends Phaser.Scene {
             this.savedCoinsUI = this.add.bitmapText(target.x, target.y, 'mainFont',
                 INVENTORY.get("savedCoins"),
             8).setOrigin(1,1).setDepth(81)
+        }
+
+        if (INVENTORY.get("transmission")) {
+            var transmission = this.add.sprite(501 + GRID, 140, 'coinPickup01Anim.png')
+            .setOrigin(0, 0).setDepth(80).setTint(0xFfc0cb);
+            transmission.play('coin01idle');
         }
     }
 
