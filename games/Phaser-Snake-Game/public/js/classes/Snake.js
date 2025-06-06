@@ -420,7 +420,7 @@ var Snake = new Phaser.Class({
             }
 
             checkPortals.forEach( portal => {
-
+                //console.log(portal.targetObject.anims)
                 this.snakeLights.forEach( light => {
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
@@ -436,34 +436,35 @@ var Snake = new Phaser.Class({
 
             if (scene.canPortal) {
                 scene.portals.forEach(portal => {
-                let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
-                     portal.x, portal.y);
-                if (!portal.targetObject){
-                    portal.targetObject = {};
-                }
-                if (portal.targetObject.portalTimerRunning === false) {
-                    
-                    //_dist = _dist/2;
-                    //console.log(_dist)
+                    console.log(portal.targetObject)
+                    let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
+                        portal.x, portal.y);
+                    /*if (!portal.targetObject){
+                        portal.targetObject = {};
+                    }*/
+                    if (portal.targetObject.portalTimerRunning === false) {
+                        
+                        //_dist = _dist/2;
+                        //console.log(_dist)
 
-                    var minFrameRate = 32; 
-                    var maxFrameRate = 64;
-                    
-                    portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
-                        _dist, minFrameRate, maxFrameRate);
-                    portal.targetObject.portalHighlight.anims.msPerFrame = 
-                        portal.targetObject.anims.msPerFrame;
+                        var minFrameRate = 32; 
+                        var maxFrameRate = 64;
+                        
+                        portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                            _dist, minFrameRate, maxFrameRate);
+                        portal.targetObject.portalHighlight.anims.msPerFrame = 
+                            portal.targetObject.anims.msPerFrame;
 
-                    portal.targetObject.portalHighlight.alpha = 
-                        1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
-                    
-                        //console.log(portal.targetObject.portalHighlight.alpha);
-                }  
-                else{
-                        //portal.anims.msPerFrame = 128;
-                        //portal.portalHighlight.anims.msPerFrame =  128;
+                        portal.targetObject.portalHighlight.alpha = 
+                            1 - Phaser.Math.Clamp(_dist / maxFrameRate, -0.5, 1.25);
+                        
+                            //console.log(portal.targetObject.portalHighlight.alpha);
+                    }  
+                    else {
+                            //portal.anims.msPerFrame = 128;
+                            //portal.portalHighlight.anims.msPerFrame =  128;
 
-                        //portal.portalHighlight.alpha = 0;
+                            //portal.portalHighlight.alpha = 0;
                     }
                 });
             }
