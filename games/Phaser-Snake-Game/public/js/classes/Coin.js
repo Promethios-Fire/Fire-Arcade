@@ -34,7 +34,7 @@ var Coin = new Phaser.Class({
     onOver: function(scene) {
         const ourPersistScene = scene.scene.get('PersistScene');
         //var _coin = scene.coins[index];
-        console.log("Hit Coin");
+        //console.log("Hit Coin");
         scene.coinSound.play();
         //this.snakeCritical = false;
 

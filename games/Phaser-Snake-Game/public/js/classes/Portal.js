@@ -23,6 +23,8 @@ var Portal = new Phaser.Class({
         
         this.setDepth(47);
 
+        //this.canHighlight = false;
+
         if (anim === "portalForm") {
             this.setOrigin(.3125,.3125);
             scene.portals.push(this);
@@ -37,7 +39,16 @@ var Portal = new Phaser.Class({
             scene.wallPortals.push(this);
             this.play(this.anim);
         }
-        //this.play("portalIdle");
+
+        // code related to fixing portal speedup... 
+        // would replace 'this.chain(['portalIdle']);' from earlier
+        /*this.once('animationcomplete-portalForm', () => {
+            this.play('portalIdle');
+            scene.time.delayedCall(300, event => {
+                this.canHighlight = true;
+            });
+            
+        });*/
 
         this.freeDir = freeDir;
 

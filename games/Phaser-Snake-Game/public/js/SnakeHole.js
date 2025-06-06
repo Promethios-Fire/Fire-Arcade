@@ -14197,7 +14197,7 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'portalFormHighlight',
         frames: scene.anims.generateFrameNumbers('portalHighlights',{ frames: [ 6,7,8,9]}),
-        frameRate: 8,
+        frameRate: 16,
         repeat: 0
     });
     scene.anims.create({
@@ -14216,7 +14216,7 @@ function loadSpriteSheetsAndAnims(scene) {
     scene.anims.create({
         key: 'portalForm',
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 6,7,8,9]}),
-        frameRate: 8,
+        frameRate: 16,
         repeat: 0
     });
     scene.anims.create({
