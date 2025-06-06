@@ -3,7 +3,7 @@
         "height": 4300,
         "width": 2
     },
-    "activeFile": "World_10-4.json",
+    "activeFile": "World_4-1.json",
     "expandedProjectPaths": [
         "."
     ],
@@ -886,8 +886,8 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 197.33333333333331,
-                "y": 161.66666666666663
+                "x": 113.16666666666663,
+                "y": 226.66666666666663
             }
         },
         "Tutorial_1.json#tileSheetx12": {
@@ -897,19 +897,19 @@
             "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 181.49999999999997,
+                "y": 160
             }
         },
         "Tutorial_2.json#tileSheetx12": {
             "scaleInDock": 1
         },
         "Tutorial_3.json": {
-            "scale": 1.5,
+            "scale": 3,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 144.49999999999997,
+                "y": 199.33333333333334
             }
         },
         "Tutorial_3.json#tileSheetx12": {
@@ -1105,7 +1105,7 @@
         },
         "World_0-1.json": {
             "scale": 1,
-            "selectedLayer": 3,
+            "selectedLayer": 2,
             "viewCenter": {
                 "x": 173.5,
                 "y": 162
@@ -1118,8 +1118,8 @@
             "scale": 1.5,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_1-1.json#tileSheetx12": {
@@ -1132,8 +1132,8 @@
             "scale": 1.5,
             "selectedLayer": 3,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_1-2.json#tileSheetx12": {
@@ -1148,8 +1148,8 @@
             "scale": 2,
             "selectedLayer": 1,
             "viewCenter": {
-                "x": 136,
-                "y": 209.25
+                "x": 173.75,
+                "y": 162
             }
         },
         "World_1-3.json#tileSheetx12": {
@@ -1223,8 +1223,8 @@
             "scale": 2,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 180.5,
-                "y": 161.75
+                "x": 173.75,
+                "y": 162
             }
         },
         "World_10-2.json#tileSheetx12": {
@@ -1253,15 +1253,15 @@
             "scaleInDock": 1
         },
         "World_10-4.json": {
-            "scale": 3,
-            "selectedLayer": 0,
+            "scale": 1.5,
+            "selectedLayer": 1,
             "viewCenter": {
-                "x": 199.66666666666666,
-                "y": 162.99999999999997
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_10-4.json#tileSheetx12": {
-            "scaleInDock": 3
+            "scaleInDock": 1
         },
         "World_10-4_Final_Exams.json": {
             "scale": 2.1102011494252872,
@@ -1289,8 +1289,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_2-1.json#tileSheetx12": {
@@ -1300,8 +1300,8 @@
             "scale": 1.5,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_2-2.json#tileSheetx12": {
@@ -1365,11 +1365,11 @@
             "scaleInDock": 1
         },
         "World_2-4.json": {
-            "scale": 1.5,
+            "scale": 4,
             "selectedLayer": 0,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 167.625,
+                "y": 148.5
             }
         },
         "World_2-4.json#tileSheetx12": {
@@ -1437,7 +1437,7 @@
         },
         "World_4-1.json": {
             "scale": 2,
-            "selectedLayer": 3,
+            "selectedLayer": 1,
             "viewCenter": {
                 "x": 173.75,
                 "y": 162
@@ -1494,8 +1494,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_4-3.json#tileSheetx12": {
@@ -1534,7 +1534,7 @@
         },
         "World_4-4.json": {
             "scale": 1.9733024691358025,
-            "selectedLayer": 1,
+            "selectedLayer": 0,
             "viewCenter": {
                 "x": 174.07366856964106,
                 "y": 162.16469852193634
@@ -1583,8 +1583,8 @@
             "scale": 1.5,
             "selectedLayer": 2,
             "viewCenter": {
-                "x": 174,
-                "y": 161.66666666666663
+                "x": 173.66666666666663,
+                "y": 162
             }
         },
         "World_5-2_Racing.json#tileSheetx12": {
@@ -2970,7 +2970,7 @@
         },
         "tileSheetx12.tsx": {
             "dynamicWrapping": false,
-            "scaleInDock": 3,
+            "scaleInDock": 2,
             "scaleInEditor": 2
         },
         "tileSheetx24.tsx": {
@@ -3087,11 +3087,12 @@
         "World_5-3_Racing.json",
         "World_4-5.json",
         "World_4-4.json",
-        "T_Tutorial-5.json",
-        "T_Tutorial-1.json",
-        "T_Tutorial-2.json",
-        "T_Tutorial-6.json",
-        "T_Tutorial-4.json"
+        "Tutorial_T-1.json",
+        "Tutorial_T-2.json",
+        "Tutorial_T-3.json",
+        "Tutorial_T-4.json",
+        "Tutorial_T-5.json",
+        "Tutorial_T-6.json"
     ],
     "project": "SnakeTiled.tiled-project",
     "property.type": "int",

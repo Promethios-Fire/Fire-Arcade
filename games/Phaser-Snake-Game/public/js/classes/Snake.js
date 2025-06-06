@@ -2,8 +2,9 @@ import { GRID,  SCREEN_WIDTH, SCREEN_HEIGHT, GState, updatePlayerStats,
     DIRS, DEBUG, commaInt,
     LENGTH_GOAL, PLAYER_STATS, SPEED_SPRINT, COMBO_ADD_FLOOR,
     X_OFFSET,
-    Y_OFFSET
+    Y_OFFSET,
 } from "../SnakeHole.js";
+import { STAGE_OVERRIDES } from '../data/customLevels.js';
 import { Food } from "./Food.js";
 import { Portal } from './Portal.js';
 
@@ -184,7 +185,7 @@ var Snake = new Phaser.Class({
                 ourPersistScene.bgCoords.x -= .25 * ourPersistScene.bgRatio;
                 if (xN > this.head.x) {
                     //console.log("I AM WRAPPING LEFT");
-                    PLAYER_STATS.wraps += 1;
+                    PLAYER_STATS.eWraps += 1;
                 }
                 break;
 
@@ -194,7 +195,7 @@ var Snake = new Phaser.Class({
                 ourPersistScene.bgCoords.x += .25 * ourPersistScene.bgRatio;
                 if (xN < this.head.x) {
                     //console.log("I AM WRAPPING RIGHT");
-                    PLAYER_STATS.wraps += 1;
+                    PLAYER_STATS.wWraps += 1;
                 }
                 break;
 
@@ -204,7 +205,7 @@ var Snake = new Phaser.Class({
                 ourPersistScene.bgCoords.y -= .25 * ourPersistScene.bgRatio;
                 if (yN > this.head.y) {
                     //console.log("I AM WRAPPING UP");
-                    PLAYER_STATS.wraps += 1;
+                    PLAYER_STATS.nWraps += 1;
                 }
                 break;
 
@@ -214,7 +215,7 @@ var Snake = new Phaser.Class({
                 ourPersistScene.bgCoords.y += .25 * ourPersistScene.bgRatio;
                 if (yN < this.head.y) {
                     //console.log("I AM WRAPPING DOWN");
-                    PLAYER_STATS.wraps += 1;
+                    PLAYER_STATS.sWraps += 1;
                 }
                 break;
                 
@@ -520,6 +521,10 @@ var Snake = new Phaser.Class({
         //    if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
         //        
         //});
+
+        if (STAGE_OVERRIDES.has(scene.stage) && "onMove" in STAGE_OVERRIDES.get(scene.stage)) {
+            STAGE_OVERRIDES.get(scene.stage).onMove(scene);
+        }
     },
 
     // #region Bonk()
@@ -573,7 +578,7 @@ var Snake = new Phaser.Class({
                     }
                     
                     // Turn back on arrows
-                    ourGame.startArrows(ourGame.snake.head);
+                    ourGame.events.emit("spawnArrows", ourGame.snake.head);
     
                     ourGame.gState = GState.WAIT_FOR_INPUT;
                     ourGame.scoreTimer.paused = true;
