@@ -419,6 +419,7 @@ var Snake = new Phaser.Class({
 
             checkPortals.forEach( portal => {
                 //console.log(portal.targetObject.anims)
+
                 this.snakeLights.forEach( light => {
 
                     var distN = Phaser.Math.Distance.Between(light.x, light.y, portal.x, portal.y);
@@ -434,6 +435,7 @@ var Snake = new Phaser.Class({
 
             if (scene.canPortal) {
                 scene.portals.forEach(portal => {
+
                     let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
                         portal.x, portal.y);
                         // normalized code to be used at a later point
@@ -441,6 +443,24 @@ var Snake = new Phaser.Class({
                         (_dist - 0) / (600 - 0), 
                         0, 1
                         );*/
+                    if (scene.gState != GState.PORTAL) {
+                        switch (true) {
+                            case _dist > GRID * 5:
+                                
+                                portal.anims.msPerFrame = 125; // 125
+                                break;
+                            case _dist > GRID * 3:
+                                portal.anims.msPerFrame = 32;
+                                break;
+                            case _dist > GRID * 0:
+                                portal.anims.msPerFrame = 16;
+                                break;
+                        
+                            default:
+                                break;
+                        }   
+                    }
+                    
 
                     if (portal.targetObject.portalTimerRunning === false) { // && portal.canHighlight === true) {
 

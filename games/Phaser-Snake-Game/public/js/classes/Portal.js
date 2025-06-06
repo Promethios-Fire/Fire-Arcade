@@ -82,6 +82,10 @@ var Portal = new Phaser.Class({
             scene.gState = GState.PORTAL;
             scene.snake.lastPortal = this;
             scene.scoreTimer.paused = true;
+
+            // Start other portal spinning
+            debugger
+            this.targetObject.anims.msPerFrame = 16;
     
 
             this.portalTimerRunning = true;
