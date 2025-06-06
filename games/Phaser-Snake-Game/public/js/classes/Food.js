@@ -36,10 +36,10 @@ var Food = new Phaser.Class({
     },
 
     onOver: function(scene) {
-        //console.log('OVER AN ATOM')
-        if (scene.length < scene.lengthGoal -1) {
-            scene.snakeEating();
-        }
+        console.log('OVER AN ATOM')
+        
+        scene.snakeEating();
+        
         var timeSinceFruit = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
         
         if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup

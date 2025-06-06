@@ -39,7 +39,7 @@ const GHOST_WALLS = true;
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 
-const DEBUG_SKIP_INTRO = false;
+const DEBUG_SKIP_INTRO = true;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -7008,8 +7008,6 @@ class GameScene extends Phaser.Scene {
 
         // Boost Array
         this.boostOutlinesBody = [];
-        //this.boostOutlines.length = 0; //this needs to be set to 1 on init or else a lingering outline persists on space-down
-        this.boostOutlinesSmall;
         this.boostGhosts = [];
 
         // Sounds
@@ -7521,9 +7519,22 @@ class GameScene extends Phaser.Scene {
 
 
         if (this.map.getLayer('Ghost-1')) {
-            this.hasGhostTiles = true;
-            this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
-            this.ghostWallLayer.setDepth(26);
+            var ghostTiles = [
+                545, 546, 547, 548,
+                577, 578, 579, 580,
+                609, 610, 611, 612
+            ];
+
+            var passed = ghostTiles.some( tileIndex => {
+                return this.map.findByIndex(tileIndex, false, false, 'Ghost-1');
+            });
+
+            if (passed) {
+                this.hasGhostTiles = true;
+                this.ghostWallLayer = this.map.createLayer('Ghost-1', [this.tileset], X_OFFSET, Y_OFFSET).setTint(0xff00ff).setPipeline('Light2D');
+                this.ghostWallLayer.setDepth(26);
+            }
+  
         }
        
 
@@ -7934,6 +7945,7 @@ class GameScene extends Phaser.Scene {
                     });
                     
                     if (this.boostOutlinesBody.length > 0 && e.code != "Space") {
+                        // Move snake by arrow key press.
                         
                         var lastElement = this.boostOutlinesBody.shift();
                         lastElement.destroy();
@@ -7999,7 +8011,7 @@ class GameScene extends Phaser.Scene {
                         ease: 'linear'
                         }, this);
 
-                    if (index < this.snake.body.length -1) {
+                    if (index < this.snake.body.length -1 || this.snake.body.length === 1) {
                         // For all the body segments
                         boostOutline.play("snakeOutlineAnim");
                         this.boostOutlinesBody.unshift(boostOutline);
@@ -8021,8 +8033,10 @@ class GameScene extends Phaser.Scene {
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
 
-                // add the tail in.
-                this.boostOutlinesBody.push(this.boostOutlineTail);
+                if (this.snake.body.length > 1) {
+                    // add the tail in.
+                    this.boostOutlinesBody.push(this.boostOutlineTail);
+                }
 
                 this.boostOutlinesBody.forEach(boostOutline =>{ //TODO - Do this in a wave with delay?
                     var fadeoutTween = this.tweens.add({
@@ -9559,52 +9573,42 @@ class GameScene extends Phaser.Scene {
 
     // #region .validSpawnLocation(
     validSpawnLocations() {
-        var testGrid = [];
 
-        // Start with all safe points as true. This is important because Javascript treats 
-        // non initallized values as undefined and so any comparison or look up throws an error.
+        var validPoints = new Set();
         
         // 2. Make a viritual GRID space to minimise the size of the array.
         for (var _x = 0; _x < 29; _x++) {
-            testGrid[_x] = [];
             for (var _y = 0; _y < 27; _y++) {
-                testGrid[_x][_y] = 1; // Note: In the console the grid looks rotated.
+                validPoints.add( `${_x},${_y}`);
             }
         }
 
         // No Spawning on the edges under the bezel.
         for (let row = 0; row < 27; row++) {
-            testGrid[0][row] = 0;
-            testGrid[28][row] = 0; 
+            validPoints.delete(`0,${row}`);
+
+            validPoints.delete(`28,${row}`); 
         }
 
         for (let column = 0; column < 29; column++) {
-            testGrid[column][0] = 0;
-            testGrid[column][26] = 0;
+            validPoints.delete(`${column},0`);
+
+            validPoints.delete(`${column},26`);
         }
-        
-        
     
         // Set all the unsafe places unsafe
-
         this.map.getLayer(this.wallVarient); //if not set, Ghost Walls overwrite and break Black Hole code
         this.wallLayer.forEachTile(wall => {
-        
-    
             if (wall.index > 0) {                
-                testGrid[wall.x][wall.y] = 0; // In TileSpace
+                validPoints.delete(`${wall.x},${wall.y}`);
             }
         });
         
         
-        
-        
         if (this.map.getLayer('Ghost-1')) {
             this.ghostWallLayer.forEachTile(wall => {
-    
                 if (wall.index > 0) {
-                    
-                    testGrid[wall.x][wall.y] = 0;
+                    validPoints.delete(`${wall.x},${wall.y}`);
                 }
             });
         }
@@ -9613,86 +9617,34 @@ class GameScene extends Phaser.Scene {
         for (let x = 0; x < this.interactLayer.length; x++) {
             for (let y = 0; y < this.interactLayer[x].length; y++) {
                 if (this.interactLayer[x][y] != "empty") {
-                    testGrid[x][y] = 0;
+                    validPoints.delete(`${x},${y}`);
                 }        
             }
         }
 
         
-
-
-        // Don't spawn on Dream Walls
-
-
-        // THIS IS BROKE NOW. Also no dream walls now.
-        //this.dreamWalls.forEach( dreamwall => {
-        //    testGrid[dreamwall.x/GRID][dreamwall.y/GRID] = false;
-        //});
-        
-
-
-
-        // This version for if we decide to build the wall index once and check against only wall values.
-        //this.walls.forEach(wall => {
-        //    if (wall.x < SCREEN_WIDTH) {
-        //        // Hack to sanitize index undefined value
-        //        // Current Tiled input script adds additional X values.
-        //        testGrid[wall.x][wall.y] = false;
-        //    }
-        //});
-
-        //this.atoms.forEach(_fruit => {
-
-        //    var _x = Math.floor((_fruit.x - X_OFFSET ) / GRID);
-        //    var _y = Math.floor((_fruit.y - Y_OFFSET) / GRID);
-        //     testGrid[_x][_y] = "a";
-            
-        //});
-        
-
-        // TEMP
-        //this.portals.forEach(_portal => {
-        //    testGrid[Math.floor(_portal.x/GRID)][Math.floor(_portal.y/GRID)] = false;
-        //});
-
-
-        // THIS EXISTS TWICE????
-        //this.dreamWalls.forEach( _dreamWall => {
-        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-        //});
-
-
-        // Don't let fruit spawn on dreamwall blocks
-        //scene.dreamWalls.forEach(_dreamWall => {
-        //    testGrid[_dreamWall.x/GRID][_dreamWall.y/GRID] = false;
-        //});
-        
         this.snake.body.forEach(_part => {
             //testGrid[_part.x/GRID][_part.y/GRID] = false;
-            //debugger
-            if (!isNaN(_part.x) && !isNaN(_part.x) ) { 
-                // This goes nan sometimes. Ignore if that happens.
-                // Round maths for the case when adding a fruit while the head interpolates across the screen
-                //testGrid[Math.round(_part.x/GRID)][Math.round(_part.y/GRID)] = false;
+            if (!isNaN(_part.x) && !isNaN(_part.x) ) {
+                // Can I get rid of the Nan check here now I have the Number check? -- Optimization
+                
+                var _x = (_part.x - X_OFFSET) / GRID;
+                var _y = (_part.y - Y_OFFSET) / GRID;
+
+                if (Number.isInteger(_x) && Number.isInteger(_y)) {
+                    // If the part is not on the grid ignore it.
+                    validPoints.delete(`${_x},${_y}`);
+                }
             }
             
-        });
-
-
-        
-
+        })
         
         var validLocations = [];
 
-        for (var _x = 0; _x < 29; _x++) {
-            for (var _y = 0; _y < 27; _y++) {
-                if (testGrid[_x][_y] === 1) {
-                    // Push only valid positions to an array.
-                    validLocations.push({x: _x * GRID + X_OFFSET, y: _y * GRID + Y_OFFSET});     
-                }
-            }
-        }
-
+        validPoints.forEach( item => {
+            var point = item.split(",");
+            validLocations.push({x: point[0] * GRID + X_OFFSET, y: point[1] * GRID + Y_OFFSET});
+        });
 
         return validLocations;
 
@@ -11423,8 +11375,12 @@ class GameScene extends Phaser.Scene {
 
 
                 if (this.boostEnergy < 1) {
-                    // add the tail in.
-                    this.boostOutlinesBody.push(this.boostOutlineTail);
+
+                    if (this.snake.body.length > 1) {
+                        // add the tail in.
+                        this.boostOutlinesBody.push(this.boostOutlineTail);
+                    }
+                    
     
                     this.boostOutlinesBody.forEach(boostOutline =>{
                         var fadeoutTween = this.tweens.add({
@@ -11448,24 +11404,26 @@ class GameScene extends Phaser.Scene {
             //this.spaceKey.isDown
 
 
-            if(this.boostOutlinesBody.length > 0){ //needs to only happen when boost bar has energy, will abstract later
+            if (this.boostOutlinesBody.length > 0) { //needs to only happen when boost bar has energy, will abstract later
                 // Get ride of the old one
-                if (this.boostOutlinesBody.length > 0) {
-                    var toDelete = this.boostOutlinesBody.shift();
-                    toDelete.destroy();
-    
-                    // Make the new one
-                    var boostOutline = this.add.sprite(
-                        this.snake.head.x, 
-                        this.snake.head.y
-                    ).setOrigin(.083333,.083333).setDepth(8);
-                    
-                    boostOutline.play("snakeOutlineAnim");
-                    this.boostOutlinesBody.push(boostOutline);
-                    
-                }
+                
+                var toDelete = this.boostOutlinesBody.shift();
+                toDelete.destroy();
+
+                // Make the new one
+                var boostOutline = this.add.sprite(
+                    this.snake.head.x, 
+                    this.snake.head.y
+                ).setOrigin(.083333,.083333).setDepth(8);
+                
+                boostOutline.play("snakeOutlineAnim");
+                this.boostOutlinesBody.push(boostOutline);
+
+                if (this.boostOutlinesBody.length > 1) {
+                    // Has tail
                     this.boostOutlineTail.x = this.snake.body[this.snake.body.length -1].x;
-                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;
+                    this.boostOutlineTail.y = this.snake.body[this.snake.body.length -1].y;        
+                }       
 
             }
             
@@ -12163,7 +12121,6 @@ class ScoreScene extends Phaser.Scene {
         var stageScore;
         var cursorIndex = -1; // Plays sound at 0;
         
-        debugger
         var atomTimeTotal = atomList.reduce((a,b) => a + b, 0);
         var stageCache = this.cache.json.get(`${this.stageData.stage}.properties`);
 
