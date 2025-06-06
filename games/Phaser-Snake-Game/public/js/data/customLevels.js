@@ -5,7 +5,8 @@ import { PORTAL_COLORS, ITEMS } from '../const.js';
 
 
 export var STAGE_OVERRIDES = new Map([
-    ["World_4-4", {
+    ["World_4-4", { 
+        // #region 4-4
         preFix: function (scene) {
 
         },
@@ -56,8 +57,10 @@ export var STAGE_OVERRIDES = new Map([
             }
         }
 
+    
     }],
     ["World_2-4", {
+        // #region 2-4
         preFix: function (scene) {
 
         },
@@ -108,7 +111,109 @@ export var STAGE_OVERRIDES = new Map([
         }
 
     }],
+    
+    ["Bonus_X-1", {
+        // #region Bonus
+        preFix: function (scene) {
+            debugger
+            scene.lengthGoal = Infinity;
+            scene.stopOnBonk = true;
+        },
+        postFix: function (scene) {
+
+            // Override
+            scene.onBonk = this.onBonk;
+            scene.checkWinCon = this.checkWinCon;
+
+
+        },
+        onBonk: function () { // .this = GameScene
+            var ourPersist = this.scene.get("PersistScene");
+            this.coinsUIIcon.setVisible(false);
+            ourPersist.coins = Math.max(ourPersist.coins -1, 1);
+
+            if (ourPersist.coins != 1) {
+                ourPersist.loseCoin();
+            }
+            this.coinUIText.setHTML(
+            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+            );
+
+            this.maxScore = Math.max(this.maxScore - 10, 1);
+
+            debugger;
+
+            this.snake.head;
+
+            // Add check for stuck on self.  
+        },
+        checkWinCon: function () {
+
+            let head = this.snake.head;
+
+            var above = {x:head.x , y: head.y - GRID};
+            var down = {x:head.x , y: head.y + GRID};
+            var left = {x:head.x - GRID , y: head.y};
+            var right = {x:head.x + GRID , y: head.y};
+
+            return [above, down, left, right].every( pos => {
+                return this.snake.body.some( part => {
+                    return pos.x === part.x && pos.y === part.y
+                })
+            });
+            debugger
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 2; 
+
+        }
+    }],
+    ["Bonus-Stage-x2", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+            scene.stopOnBonk = true;
+            scene.maxScore = 60;
+            scene.boostCost = 0;
+        },
+        postFix: function (scene) {
+    
+        },
+        
+    }],
+    ["Bonus-Stage-x3", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+            scene.maxScore = 60;
+            scene.boostCost = 0;
+        },
+        postFix: function (scene) {
+
+            scene.onEat = this.onEat;
+    
+        },
+        onEat: function (food) {
+            this.atoms.delete(food);
+            food.delayTimer.destroy();
+            food.electrons.destroy();
+            food.destroy();
+        }
+        
+    }],
+    ["Bonus-Stage-x4", {
+        preFix: function (scene) {
+            scene.lengthGoal = 0;
+            scene.stopOnBonk = true;
+            scene.maxScore = 60;
+            scene.speedWalk = SPEED_SPRINT;
+            scene.speedSprint = SPEED_WALK;
+            scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+    
+        },
+        
+    }],
+    // #endregion Bonus
     ["Tutorial_T-1", {
+        // #region T-1
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
@@ -313,81 +418,6 @@ export var STAGE_OVERRIDES = new Map([
         }
     }],
 
-    ["Bonus-Stage-x1", {
-        preFix: function (scene) {
-            scene.lengthGoal = 0;
-            scene.stopOnBonk = true;
-
-            
-
-        },
-        postFix: function (scene) {
-
-            // Override
-            scene.onBonk = this.onBonk
-
-        },
-        onBonk: function () { // .this = GameScene
-            var ourPersist = this.scene.get("PersistScene");
-            this.coinsUIIcon.setVisible(false);
-            ourPersist.coins = Math.max(ourPersist.coins -1, 1);
-
-            if (ourPersist.coins != 1) {
-                ourPersist.loseCoin();
-            }
-            this.coinUIText.setHTML(
-            `${commaInt(ourPersist.coins).padStart(2, '0')}`
-            );
-
-            this.maxScore = Math.max(this.maxScore - 10, 1);
-            
-        }
-    }],
-    ["Bonus-Stage-x2", {
-        preFix: function (scene) {
-            scene.lengthGoal = 0;
-            scene.stopOnBonk = true;
-            scene.maxScore = 60;
-            scene.boostCost = 0;
-        },
-        postFix: function (scene) {
-    
-        },
-        
-    }],
-    ["Bonus-Stage-x3", {
-        preFix: function (scene) {
-            scene.lengthGoal = 0;
-            scene.maxScore = 60;
-            scene.boostCost = 0;
-        },
-        postFix: function (scene) {
-
-            scene.onEat = this.onEat;
-    
-        },
-        onEat: function (food) {
-            this.atoms.delete(food);
-            food.delayTimer.destroy();
-            food.electrons.destroy();
-            food.destroy();
-        }
-        
-    }],
-    ["Bonus-Stage-x4", {
-        preFix: function (scene) {
-            scene.lengthGoal = 0;
-            scene.stopOnBonk = true;
-            scene.maxScore = 60;
-            scene.speedWalk = SPEED_SPRINT;
-            scene.speedSprint = SPEED_WALK;
-            scene.boostCost = 3;
-        },
-        postFix: function (scene) {
-    
-        },
-        
-    }],
     ["World_0-1", {
         preFix: function (scene) {
             //scene.lengthGoal = 0;

@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -9098,7 +9098,6 @@ class GameScene extends Phaser.Scene {
         localStorage.setItem('version', GAME_VERSION); // Can compare against this later to reset things.
 
         var length = 0;
-        this.lengthGoal = LENGTH_GOAL;
         var length = `${ourGame.length}`;
 
         if (this.lengthGoal != 0) {
@@ -9362,7 +9361,7 @@ class GameScene extends Phaser.Scene {
             }
 
              // Restart Score Timer
-            if (this.length < this.lengthGoal || this.lengthGoal === 0) {
+            if (this.length < this.lengthGoal) {
                 this.scoreTimer = this.time.addEvent({  // This should probably be somewhere else, but works here for now.
                     delay: this.maxScore * 100,
                     paused: false
@@ -10945,9 +10944,7 @@ class GameScene extends Phaser.Scene {
 
     }
     checkWinCon() { // Returns Bool
-        if (this.lengthGoal > 0) { // Placeholder check for bonus level.
-            return this.length >= this.lengthGoal
-        }
+        return this.length >= this.lengthGoal
         
     }
 
@@ -11430,21 +11427,10 @@ class GameScene extends Phaser.Scene {
             // #region boost update
  
         }
-        
 
         var timeTick = this.currentScoreTimer()
       
-        
-        // #region Bonus Level Code @james TODO Move to custom Check Win Condition level. // @james do I even need this anymore?
-        if (timeTick < SCORE_FLOOR && this.lengthGoal === 0){
-            // Temp Code for bonus level
-            console.log("YOU LOOSE, but here if your score", timeTick, SCORE_FLOOR);
-
-            this.scene.pause();
-
-            this.scene.start('ScoreScene');
-
-        }
+    
         // #endregion
 
         if (!this.checkWinCon() && !this.scoreTimer.paused) {
