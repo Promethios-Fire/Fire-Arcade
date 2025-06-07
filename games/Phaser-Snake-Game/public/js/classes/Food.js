@@ -120,7 +120,8 @@ var Food = new Phaser.Class({
         }
 
         if (STAGE_OVERRIDES.has(scene.stage) && "afterEat" in STAGE_OVERRIDES.get(scene.stage)) {
-                    STAGE_OVERRIDES.get(scene.stage).afterEat(scene);
+            debugger
+                    STAGE_OVERRIDES.get(scene.stage).afterEat(scene, this);
         }
         
         return 'valid';

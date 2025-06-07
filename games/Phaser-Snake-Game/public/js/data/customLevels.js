@@ -225,9 +225,11 @@ export var STAGE_OVERRIDES = new Map([
             })
     
         },
-        afterEat: function (scene) {
+        afterEat: function (scene, food) {
+            debugger
             // dounble grow
             scene.snake.grow(scene);
+            scene.events.emit('addScore', food); 
         },
         checkWinCon: function () {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR;
@@ -281,7 +283,7 @@ export var STAGE_OVERRIDES = new Map([
             scene.bombAtom.setTint(0x000000);
     
         },
-        afterEat: function (scene) {
+        afterEat: function (scene, food) {
             scene.snake.grow(scene);
             scene.snake.grow(scene);
             scene.snake.grow(scene);
