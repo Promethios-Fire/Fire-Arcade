@@ -9605,7 +9605,8 @@ class GameScene extends Phaser.Scene {
         });
         
         
-        if (this.map.getLayer('Ghost-1')) {
+        if (this.ghostWallLayer) {
+            debugger
             this.ghostWallLayer.forEachTile(wall => {
                 if (wall.index > 0) {
                     validPoints.delete(`${wall.x},${wall.y}`);
