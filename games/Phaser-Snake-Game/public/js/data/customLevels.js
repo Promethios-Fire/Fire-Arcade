@@ -43,22 +43,21 @@ export var STAGE_OVERRIDES = new Map([
                     // Sanity debugger.
                     debugger
                 }
-                
 
-
-
-                scene.gearbox.onOver = function() {
-                    INVENTORY.set("gearbox", true);
-                    localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
-
-                    scene.interactLayer[(scene.gearbox.x - X_OFFSET)/GRID][(scene.gearbox.y - Y_OFFSET)/GRID] = "empty";
-                    
-                    scene.gearbox.destroy();
-
-                    var spaceboy = scene.scene.get("SpaceBoyScene");
-                    ITEMS.get("gearbox").addToInventory(spaceboy);
-                }
+                scene.gearbox.onOver = this.onOver;
             }
+        },
+        onOver: function () {
+            INVENTORY.set("gearbox", true);
+            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+
+            this.interactLayer[(this.gearbox.x - X_OFFSET)/GRID][(this.gearbox.y - Y_OFFSET)/GRID] = "empty";
+            
+            this.gearbox.destroy();
+
+            var spaceboy = this.scene.get("SpaceBoyScene");
+            ITEMS.get("gearbox").addToInventory(spaceboy);
+
         }
 
     
@@ -397,9 +396,9 @@ export var STAGE_OVERRIDES = new Map([
 
             scene.attackerText = scene.add.bitmapText(0, 0, 'mainFont', 
                 scene.attackTimer, 
-                8).setOrigin(1,1).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
 
             scene.snake.body[scene.snake.body.length -1].setTint(0xCC0000);
+            
 
             scene.checkWinCon = this.checkWinCon;
         },
@@ -462,6 +461,7 @@ export var STAGE_OVERRIDES = new Map([
             scene.length = scene.length - 50;
 
             scene.snake.body[scene.snake.body.length -1].setTint(0x000000);
+            scene.snake.body[scene.snake.body.length -1].setDepth(45);
 
             scene.attackerText = scene.add.bitmapText(
                 scene.startCoords.x + GRID - 1, 
@@ -469,7 +469,7 @@ export var STAGE_OVERRIDES = new Map([
                 'mainFont', 
                 scene.deathTimer, 
                 8
-            ).setOrigin(1,1).setDepth(110).setAlpha(1).setTintFill(0xFFFFFF);
+            ).setOrigin(1,1).setDepth(50).setAlpha(1).setTintFill(0xFFFFFF);
 
             scene.checkWinCon = this.checkWinCon;
             scene.snake.grow = this.grow;
@@ -491,8 +491,6 @@ export var STAGE_OVERRIDES = new Map([
 
                     oldPart[0].destroy();  
                 }
-
-                
                 scene.tickCounter = 0;
             }
             scene.attackerText.setText(scene.deathTimer - scene.tickCounter);    
@@ -502,6 +500,10 @@ export var STAGE_OVERRIDES = new Map([
                 scene.snake.body[scene.snake.body.length -1].setTexture('snakeDefault',[1]);
                 scene.snake.body[scene.snake.body.length -1].setTint(0x000000);
                 scene.snake.body[scene.snake.body.length -2].clearTint();
+
+                scene.snake.body[scene.snake.body.length -1].setDepth(45);
+                scene.snake.body[scene.snake.body.length -2].setDepth(40);
+                
             }
         },
         afterMove: function (scene) {
@@ -515,6 +517,8 @@ export var STAGE_OVERRIDES = new Map([
                 scene.attackerText.x = tail.x;
                 scene.attackerText.y = tail.y;    
             }
+
+            
 
             
 
