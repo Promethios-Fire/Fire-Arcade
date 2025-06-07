@@ -103,7 +103,7 @@ var Snake = new Phaser.Class({
         //scene.scale.gameSize.height += 24;
         //scene.scale.refresh()
         //debugger
-        if (scene.boostOutlinesBody.length > 0) {
+        if (scene.boostOutlinesBody.length > 1) {
             //newPart.setTint(0xFF00FF);
             // Make the new one
             var boostOutline = scene.add.sprite(

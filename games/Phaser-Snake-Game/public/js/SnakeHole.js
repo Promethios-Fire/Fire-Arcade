@@ -8032,8 +8032,9 @@ class GameScene extends Phaser.Scene {
         this.input.keyboard.on('keyup-SPACE', e => {  //JMS1
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
+                debugger
 
-                if (this.snake.body.length > 1) {
+                if (this.boostOutlineTail) {
                     // add the tail in.
                     this.boostOutlinesBody.push(this.boostOutlineTail);
                 }
@@ -11374,7 +11375,7 @@ class GameScene extends Phaser.Scene {
 
                 if (this.boostEnergy < 1) {
 
-                    if (this.snake.body.length > 1) {
+                    if (this.boostOutlineTail) {
                         // add the tail in.
                         this.boostOutlinesBody.push(this.boostOutlineTail);
                     }
