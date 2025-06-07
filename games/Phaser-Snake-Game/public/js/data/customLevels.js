@@ -219,7 +219,15 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
+
+            scene.atoms.forEach( atom => {
+                atom.setTint(0xFFD700);
+            })
     
+        },
+        afterEat: function (scene) {
+            // dounble grow
+            scene.snake.grow(scene);
         },
         checkWinCon: function () {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR;
