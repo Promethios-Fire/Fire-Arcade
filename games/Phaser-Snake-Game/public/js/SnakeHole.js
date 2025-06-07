@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-2'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-3'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7032,6 +7032,7 @@ class GameScene extends Phaser.Scene {
 
         this.moveInterval = SPEED_WALK;
         this.boostCost = 6;
+        this.boostAdd = 1;
         this.speedWalk = SPEED_WALK;
         this.speedSprint = SPEED_SPRINT;
 
@@ -11570,7 +11571,8 @@ a
                 //console.log("spacebar not down");
                 this.moveInterval = this.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
-                this.boostEnergy = Math.min(this.boostEnergy + 1, 1000); // Recharge Boost Slowly
+                
+                this.boostEnergy = Math.min(this.boostEnergy + this.boostAdd, 1000); // Recharge Boost Slowly
             }
             this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
             this.boostBarTween.updateTo("duration", 30000, true);

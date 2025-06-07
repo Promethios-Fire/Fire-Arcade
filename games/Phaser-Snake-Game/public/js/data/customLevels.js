@@ -170,8 +170,10 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
-            scene.maxScore = 60;
+            //scene.maxScore = 60;
             //scene.boostCost = 0;
+            scene.boostCost = 4;
+            scene.boostAdd = 2;
             
             scene.speedSprint = 99;
             scene.speedWalk = 33;
@@ -181,14 +183,17 @@ export var STAGE_OVERRIDES = new Map([
         },
         
     }],
-    ["Bonus-Stage-x3", {
+    ["Bonus_X-3", {
         preFix: function (scene) {
-            scene.lengthGoal = 0;
-            scene.maxScore = 60;
-            scene.boostCost = 0;
+            scene.lengthGoal = 221;
+            //scene.maxScore = 60;
+            //scene.boostCost = 0;
         },
         postFix: function (scene) {
-
+            scene.atoms.forEach( atom => {
+                atom.electrons.alpha = 0;
+            });
+            
             scene.onEat = this.onEat;
     
         },
