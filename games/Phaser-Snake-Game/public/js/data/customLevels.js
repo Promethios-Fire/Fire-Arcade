@@ -396,6 +396,7 @@ export var STAGE_OVERRIDES = new Map([
 
             scene.attackerText = scene.add.bitmapText(0, 0, 'mainFont', 
                 scene.attackTimer, 
+                8).setOrigin(1,1).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
 
             scene.snake.body[scene.snake.body.length -1].setTint(0xCC0000);
             
@@ -518,27 +519,22 @@ export var STAGE_OVERRIDES = new Map([
                 scene.attackerText.y = tail.y;    
             }
 
-            
-
-            
 
         },
         grow: function (scene)
-    {
-        const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
-        scene.length += 1;
-        scene.globalFruitCount += 1; // Run Wide Counter
+        {
+            const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
+            scene.length += 1;
+            scene.globalFruitCount += 1; // Run Wide Counter
 
-        var length = `${scene.length}`;
+            var length = `${scene.length}`;
 
-        ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+            
+            this.tail = this.body.slice(-1);
         
-        this.tail = this.body.slice(-1);
-    
-        scene.applyMask();
-
-
-    },
+            scene.applyMask()
+        },
         
 
         
