@@ -266,7 +266,7 @@ export var STAGE_OVERRIDES = new Map([
             var pos = scene.bombAtom.getBottomRight();
 
             scene.bombAtom.timerText = scene.mapProgressPanelText = scene.add.bitmapText(pos.x, pos.y, 'mainFont', 
-                0, 
+                Math.trunc(scene.bombTime / 10), 
                 8).setOrigin(1,1).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
             
             
