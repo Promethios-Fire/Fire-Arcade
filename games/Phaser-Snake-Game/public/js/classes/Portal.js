@@ -84,7 +84,6 @@ var Portal = new Phaser.Class({
             scene.scoreTimer.paused = true;
 
             // Start other portal spinning
-            debugger
             this.targetObject.anims.msPerFrame = 16;
     
 

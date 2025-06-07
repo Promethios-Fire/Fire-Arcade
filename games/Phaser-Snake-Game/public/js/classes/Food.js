@@ -1,5 +1,6 @@
 import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT, X_OFFSET, Y_OFFSET, 
     COMBO_ADD_FLOOR, SPEED_WALK, SPEED_SPRINT, GState, PLAYER_STATS} from "../SnakeHole.js";
+import { STAGE_OVERRIDES } from '../data/customLevels.js';
 
 var Food = new Phaser.Class({
 
@@ -99,7 +100,6 @@ var Food = new Phaser.Class({
 
         }, [], this);
 
-        scene.onEat(this);
 
         if (scene.snake.body.length > 29) {
             PLAYER_STATS.atomsOverEaten += 1;
@@ -117,6 +117,10 @@ var Food = new Phaser.Class({
             // Play sniper sound here.
             // There are some moveInterval shenanigans happening here. 
             // Need to debug when exactly the move call happens compared to setting the movesInterval.
+        }
+
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterEat" in STAGE_OVERRIDES.get(scene.stage)) {
+                    STAGE_OVERRIDES.get(scene.stage).afterEat(scene);
         }
         
         return 'valid';

@@ -2,6 +2,7 @@ import { X_OFFSET, Y_OFFSET,
     GRID, SPEED_WALK, SPEED_SPRINT, MODES, 
     GState, DIRS, commaInt, PLAYER_STATS, 
     INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR } from "../SnakeHole.js";
+import { Food } from "../classes/Food.js";
 import { PORTAL_COLORS, ITEMS } from '../const.js';
 
 
@@ -244,6 +245,61 @@ export var STAGE_OVERRIDES = new Map([
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },
+        
+        
+    }],
+    ["Bonus_X-6", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            scene.bombTime = 40;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
+
+            scene.bombAtom = new Food(scene, Phaser.Math.RND.pick(scene.validSpawnLocations()));
+
+            var pos = scene.bombAtom.getBottomRight();
+
+            scene.bombAtom.timerText = scene.mapProgressPanelText = scene.add.bitmapText(pos.x, pos.y, 'mainFont', 
+                0, 
+                8).setOrigin(1,1).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
+            
+            
+            scene.bombAtom.setTint(0x000000);
+    
+        },
+        afterEat: function (scene) {
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+
+            var pos = scene.bombAtom.getBottomRight()
+
+            scene.bombAtom.timerText.x = pos.x;
+            scene.bombAtom.timerText.y = pos.y;
+
+        },
+        onTick: function (scene) {
+            var diff = scene.maxScore - scene.bombTime;
+            var time = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10 ;
+
+            scene.bombAtom.timerText.setText(
+                Math.max(Math.trunc((time - diff - 1) / 10) + 1
+                , 0)
+            );
+
+        },
+        checkWinCon: function () {
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < this.maxScore - this.bombTime;
+        
+        },
+        
         
         
     }],
