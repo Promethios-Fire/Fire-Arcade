@@ -262,11 +262,6 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.bombTime = 40;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
@@ -308,9 +303,240 @@ export var STAGE_OVERRIDES = new Map([
         checkWinCon: function () {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < this.maxScore - this.bombTime;
         
+        }, 
+    }],
+    ["Bonus_X-7", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+
+            var times = 28;
+            while (times > 0) {
+                scene.snake.grow(scene);
+                times--;
+            }
+            
+            scene.checkWinCon = this.checkWinCon;
+            scene.snake.grow = this.grow;
+    
+        },
+        checkWinCon: function () {
+            return this.length < 1;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
+        
+        },
+        grow: function (scene)
+        {
+            const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
+            scene.length -= 1;
+            scene.globalFruitCount += 1; // Run Wide Counter
+    
+            var length = `${scene.length}`;
+            
+            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
+            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+    
+    
+            /*
+            if (scene.boostOutlinesBody.length > 1) {
+                //newPart.setTint(0xFF00FF);
+                // Make the new one
+                var boostOutline = scene.add.sprite(
+                    this.body[this.body.length - 2].x, 
+                    this.body[this.body.length - 2].y
+                ).setOrigin(.083333,.083333).setDepth(15);
+                 
+                boostOutline.play("snakeOutlineAnim");
+                scene.boostOutlinesBody.unshift(boostOutline);
+            }
+            */
+            
+            if (this.body.length > 1) {
+                this.tail = this.body.slice(-1);
+                Math.random()
+
+                var oldPart = this.body.splice(1,1);
+
+                oldPart[0].destroy();
+                
+            } else {
+                scene.winned = true;
+            }
+    
+    
+            if (this.body.length > 1){
+                this.body[this.body.length -1].setTexture('snakeDefault',[4])
+                
+            }
+            //this.body.push(newPart);
+            scene.applyMask();
+    
+    
         },
         
+    }],
+    ["Bonus_X-8", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            scene.attackTimer = 10;
+            scene.tickCounter = 0;
+        },
+        postFix: function (scene) {
+
+            var times = 5;
+            while (times > 0) {
+                scene.snake.grow(scene);
+                times--;
+            }
+
+            scene.attackerText = scene.add.bitmapText(0, 0, 'mainFont', 
+                scene.attackTimer, 
+                8).setOrigin(1,1).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
+
+            scene.snake.body[scene.snake.body.length -1].setTint(0xCC0000);
+
+            scene.checkWinCon = this.checkWinCon;
+        },
+        checkWinCon: function () {
+            return this.snake.body.length < 2;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
         
+        },
+        onTick: function (scene) {
+            
+            scene.tickCounter++;
+            if (scene.tickCounter > scene.attackTimer - scene.length / 12 + 1 ){
+
+                if (scene.snake.body.length > 1) {
+                    scene.snake.tail = scene.snake.body.slice(-1);
+                    Math.random()
+
+                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+
+                    oldPart[0].destroy();  
+                }
+
+                scene.attackerText.setText(Math.floor(scene.attackTimer - scene.length / 12 + 1));
+
+                scene.tickCounter = 0;
+            }    
+        },
+        afterEat: function (scene) {
+            if (scene.snake.body.length > 1){
+                scene.snake.body[scene.snake.body.length -1].setTexture('snakeDefault',[4]);
+                scene.snake.body[scene.snake.body.length -1].setTint(0xCC0000);
+                scene.snake.body[scene.snake.body.length -2].clearTint();
+            }
+        },
+        afterMove: function (scene) {
+            var tail = scene.snake.body[scene.snake.body.length -1].getBottomRight();
+
+            scene.attackerText.x = tail.x;
+            scene.attackerText.y = tail.y;
+
+        },
+        
+
+        
+    }],
+    ["Bonus_X-9", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            scene.deathTimer = 10;
+            scene.tickCounter = 0;
+        },
+        postFix: function (scene) {
+
+            var times = 50;
+            while (times > 0) {
+                scene.snake.grow(scene);
+                times--;
+            }
+            
+            scene.length = scene.length - 50;
+
+            scene.snake.body[scene.snake.body.length -1].setTint(0x000000);
+
+            scene.attackerText = scene.add.bitmapText(
+                scene.startCoords.x + GRID - 1, 
+                scene.startCoords.y + GRID - 1, 
+                'mainFont', 
+                scene.deathTimer, 
+                8
+            ).setOrigin(1,1).setDepth(110).setAlpha(1).setTintFill(0xFFFFFF);
+
+            scene.checkWinCon = this.checkWinCon;
+            scene.snake.grow = this.grow;
+        },
+        checkWinCon: function () {
+            return this.snake.body.length < 2;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
+        
+        },
+        onTick: function (scene) {
+            
+            scene.tickCounter++;
+            if (scene.tickCounter >= scene.deathTimer){
+
+                if (scene.snake.body.length > 1) {
+                    scene.snake.tail = scene.snake.body.slice(-1);
+
+                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+
+                    oldPart[0].destroy();  
+                }
+
+                
+                scene.tickCounter = 0;
+            }
+            scene.attackerText.setText(scene.deathTimer - scene.tickCounter);    
+        },
+        afterEat: function (scene) {
+            if (scene.snake.body.length > 1){
+                scene.snake.body[scene.snake.body.length -1].setTexture('snakeDefault',[1]);
+                scene.snake.body[scene.snake.body.length -1].setTint(0x000000);
+                scene.snake.body[scene.snake.body.length -2].clearTint();
+            }
+        },
+        afterMove: function (scene) {
+            
+            var tail = scene.snake.body[scene.snake.body.length -1].getBottomRight();
+
+            if (isNaN(tail.x) || isNaN(tail.y)) {
+                scene.attackerText.x = scene.startCoords.x + GRID;
+                scene.attackerText.y = scene.startCoords.y + GRID;  
+            } else {
+                scene.attackerText.x = tail.x;
+                scene.attackerText.y = tail.y;    
+            }
+
+            
+
+        },
+        grow: function (scene)
+    {
+        const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
+        scene.length += 1;
+        scene.globalFruitCount += 1; // Run Wide Counter
+
+        var length = `${scene.length}`;
+
+        ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+        
+        this.tail = this.body.slice(-1);
+    
+        scene.applyMask();
+
+
+    },
+        
+
         
     }],
     // #endregion Bonus
@@ -556,7 +782,7 @@ export var STAGE_OVERRIDES = new Map([
         postFix: function (scene) {
 
         },
-        onMove: function (scene) {
+        afterMove: function (scene) {
             var currentEWraps = PLAYER_STATS.eWraps - scene.startEWraps;
             var currentWWraps = PLAYER_STATS.wWraps - scene.startWWraps;
 

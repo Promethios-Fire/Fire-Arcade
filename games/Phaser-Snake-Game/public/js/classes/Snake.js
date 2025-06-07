@@ -87,22 +87,9 @@ var Snake = new Phaser.Class({
 
         var length = `${scene.length}`;
         
-        // Exception for Bonus Levels when the Length Goal = 0
-        if (scene.lengthGoal != 0) {
-            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
-            ourSpaceBoy.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${scene.lengthGoal.toString().padStart(2, "0")}`
-            )
-            
-        }
-        else {
-            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
-            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
-        }
 
-        //scene.scale.gameSize.height += 24;
-        //scene.scale.refresh()
-        //debugger
+        ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+
         if (scene.boostOutlinesBody.length > 1) {
             //newPart.setTint(0xFF00FF);
             // Make the new one
@@ -541,8 +528,8 @@ var Snake = new Phaser.Class({
         //        
         //});
 
-        if (STAGE_OVERRIDES.has(scene.stage) && "onMove" in STAGE_OVERRIDES.get(scene.stage)) {
-            STAGE_OVERRIDES.get(scene.stage).onMove(scene);
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage)) {
+            STAGE_OVERRIDES.get(scene.stage).afterMove(scene);
         }
     },
 
