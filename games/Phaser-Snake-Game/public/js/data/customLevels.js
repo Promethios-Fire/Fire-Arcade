@@ -1,4 +1,7 @@
-import { X_OFFSET, Y_OFFSET, GRID, SPEED_WALK, SPEED_SPRINT, MODES, GState, DIRS, commaInt, PLAYER_STATS, INVENTORY } from "../SnakeHole.js";
+import { X_OFFSET, Y_OFFSET, 
+    GRID, SPEED_WALK, SPEED_SPRINT, MODES, 
+    GState, DIRS, commaInt, PLAYER_STATS, 
+    INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR } from "../SnakeHole.js";
 import { PORTAL_COLORS, ITEMS } from '../const.js';
 
 
@@ -161,8 +164,7 @@ export var STAGE_OVERRIDES = new Map([
                     return pos.x === part.x && pos.y === part.y
                 })
             });
-            debugger
-            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 2; 
+             
 
         }
     }],
@@ -172,8 +174,8 @@ export var STAGE_OVERRIDES = new Map([
             scene.stopOnBonk = true;
             //scene.maxScore = 60;
             //scene.boostCost = 0;
-            scene.boostCost = 4;
-            scene.boostAdd = 2;
+            scene.boostCost = 8;
+            scene.boostAdd = 0;
             
             scene.speedSprint = 99;
             scene.speedWalk = 33;
@@ -193,7 +195,7 @@ export var STAGE_OVERRIDES = new Map([
             scene.atoms.forEach( atom => {
                 atom.electrons.alpha = 0;
             });
-            
+
             scene.onEat = this.onEat;
     
         },
@@ -205,18 +207,44 @@ export var STAGE_OVERRIDES = new Map([
         }
         
     }],
-    ["Bonus-Stage-x4", {
+    ["Bonus_X-4", {
         preFix: function (scene) {
-            scene.lengthGoal = 0;
-            scene.stopOnBonk = true;
-            scene.maxScore = 60;
-            scene.speedWalk = SPEED_SPRINT;
-            scene.speedSprint = SPEED_WALK;
-            scene.boostCost = 3;
+            scene.lengthGoal = Infinity;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
         },
         postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
     
         },
+        checkWinCon: function () {
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR;
+        
+        },
+        
+        
+    }],
+    ["Bonus_X-5", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
+    
+        },
+        checkWinCon: function () {
+            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
+        
+        },
+        
         
     }],
     // #endregion Bonus

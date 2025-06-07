@@ -100,7 +100,7 @@ const PORTAL_SPAWN_DELAY = 66;
 
 // Make into a ENUM
 const SCORE_FLOOR = 1; // Floor of Fruit score as it counts down.
-const BOOST_ADD_FLOOR = 100;
+export const BOOST_ADD_FLOOR = 100;
 export const COMBO_ADD_FLOOR = 108;
 const MAX_SCORE = 120;
 export const X_OFFSET = 292 / 2;
@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-3'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-2'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -10955,12 +10955,13 @@ class GameScene extends Phaser.Scene {
     }
 
     checkLoseCon() {
+        /*
         if (this.lengthGoal > 0) { // Placeholder check for bonus level.
             const ourPersist = this.scene.get("PersistScene");
             return ourPersist.coins < 0;
         } else {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 === 1; 
-        }
+        */
         
     }
 
