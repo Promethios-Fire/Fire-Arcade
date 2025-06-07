@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-2'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -6542,7 +6542,7 @@ class PersistScene extends Phaser.Scene {
         this.prevCodexStageMemory = START_STAGE;
         this.prevStage = START_STAGE;
         this.prevRank = 0;
-        this.speedSprint = SPEED_SPRINT;
+        //this.speedSprint = SPEED_SPRINT;
 
         // List of Background Containers
         this.bgPlanets = this.add.container(X_OFFSET - 64, Y_OFFSET -64);
@@ -7033,7 +7033,7 @@ class GameScene extends Phaser.Scene {
         this.moveInterval = SPEED_WALK;
         this.boostCost = 6;
         this.speedWalk = SPEED_WALK;
-        //this.speedSprint = this.scene.get("PersistScene").speedSprint;
+        this.speedSprint = SPEED_SPRINT;
 
         // Flag used to keep player from accidentally reseting the stage by holding space into a bonk
         this.pressedSpaceDuringWait = false; 
@@ -8029,7 +8029,7 @@ class GameScene extends Phaser.Scene {
             }
         });
 
-        this.input.keyboard.on('keyup-SPACE', e => { 
+        this.input.keyboard.on('keyup-SPACE', e => {  //JMS1
             if (this.boostOutlinesBody.length > 0 || this.boostOutlineTail){
                 ////debugger
 
@@ -9557,7 +9557,7 @@ class GameScene extends Phaser.Scene {
 
     // #region .screenShake(
     screenShake(){
-        if (this.moveInterval === this.scene.get("PersistScene").speedSprint) {
+        if (this.moveInterval === this.speedSprint) {
             this.cameras.main.shake(400, .01);
         }
         else if (this.moveInterval === this.speedWalk){
@@ -9683,7 +9683,7 @@ class GameScene extends Phaser.Scene {
         
         // Store speed values
         let _walkSpeed = this.speedWalk;
-        let _sprintSpeed = this.scene.get("PersistScene").speedSprint;
+        let _sprintSpeed = this.speedSprint;
 
         // Store initial camera position
         let initialCameraX = this.cameras.main.scrollX;
@@ -9733,7 +9733,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = slowMoValue;
                         this.anims.globalTimeScale = slowMoValue;
                         this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed / slowMoValue;
+                        this.speedSprint = _sprintSpeed / slowMoValue;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = slowMoValue;
                         }
@@ -9743,7 +9743,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = 1;
                         this.anims.globalTimeScale = 1;
                         this.speedWalk = _walkSpeed;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed;
+                        this.speedSprint = _sprintSpeed;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = 1;
                         }
@@ -9778,7 +9778,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = slowMoValue;
                         this.anims.globalTimeScale = slowMoValue;
                         this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed / slowMoValue;
+                        this.speedSprint = _sprintSpeed / slowMoValue;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = slowMoValue;
                         }
@@ -9831,7 +9831,7 @@ class GameScene extends Phaser.Scene {
                         this.tweens.timeScale = 1;
                         this.anims.globalTimeScale = 1;
                         this.speedWalk = _walkSpeed;
-                        this.scene.get("PersistScene").speedSprint = _sprintSpeed;
+                        this.speedSprint = _sprintSpeed;
                         if (this.starEmitterFinal) {
                             this.starEmitterFinal.timeScale = 1;
                         }
@@ -9922,7 +9922,7 @@ class GameScene extends Phaser.Scene {
             ease: 'Linear',
             repeat: 0,
             timeScale: slowMoValCopy,
-            delay: this.tweens.stagger(this.scene.get("PersistScene").speedSprint),
+            delay: this.tweens.stagger(this.speedSprint),
             onUpdate: (tween) => {
                 this.timeScale = slowMoValCopy /2;
             }
@@ -10892,7 +10892,7 @@ class GameScene extends Phaser.Scene {
             duration: 64,
             ease: 'Linear',
             repeat: 0,
-            delay: this.tweens.stagger(this.scene.get("PersistScene").speedSprint),
+            delay: this.tweens.stagger(this.speedSprint),
         });
 
         return this.snakeEating
@@ -11549,7 +11549,7 @@ class GameScene extends Phaser.Scene {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    this.moveInterval = this.scene.get("PersistScene").speedSprint;
+                    this.moveInterval = this.speedSprint;
 a                    
                     if (!this.winned) {
                         // Boost Stats

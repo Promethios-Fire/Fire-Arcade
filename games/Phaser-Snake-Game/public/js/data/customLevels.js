@@ -166,12 +166,15 @@ export var STAGE_OVERRIDES = new Map([
 
         }
     }],
-    ["Bonus-Stage-x2", {
+    ["Bonus_X-2", {
         preFix: function (scene) {
-            scene.lengthGoal = 0;
+            scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
             scene.maxScore = 60;
-            scene.boostCost = 0;
+            //scene.boostCost = 0;
+            
+            scene.speedSprint = 99;
+            scene.speedWalk = 33;
         },
         postFix: function (scene) {
     
