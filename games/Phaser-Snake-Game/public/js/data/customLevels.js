@@ -195,12 +195,9 @@ export var STAGE_OVERRIDES = new Map([
             scene.atoms.forEach( atom => {
                 atom.electrons.alpha = 0;
             });
-
-            scene.onEat = this.onEat;
-    
         },
-        onEat: function (food) {
-            this.atoms.delete(food);
+        afterEat: function (stage, food) {
+            stage.atoms.delete(food);
             food.delayTimer.destroy();
             food.electrons.destroy();
             food.destroy();
