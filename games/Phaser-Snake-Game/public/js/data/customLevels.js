@@ -383,16 +383,19 @@ export var STAGE_OVERRIDES = new Map([
     ["Bonus_X-8", {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            scene.attackTimer = 10;
+            scene.attackTimer = 12;
             scene.tickCounter = 0;
+            scene.length = - 12;
         },
         postFix: function (scene) {
 
-            var times = 5;
+            var times = 12;
             while (times > 0) {
                 scene.snake.grow(scene);
                 times--;
             }
+
+            //scene.length = scene.length - 12;
 
             scene.attackerText = scene.add.bitmapText(0, 0, 'mainFont', 
                 scene.attackTimer, 
@@ -411,7 +414,7 @@ export var STAGE_OVERRIDES = new Map([
         onTick: function (scene) {
             
             scene.tickCounter++;
-            if (scene.tickCounter > scene.attackTimer - scene.length / 12 + 1 ){
+            if (scene.tickCounter > scene.attackTimer - (scene.length / 12)){
 
                 if (scene.snake.body.length > 1) {
                     scene.snake.tail = scene.snake.body.slice(-1);
@@ -422,7 +425,7 @@ export var STAGE_OVERRIDES = new Map([
                     oldPart[0].destroy();  
                 }
 
-                scene.attackerText.setText(Math.floor(scene.attackTimer - scene.length / 12 + 1));
+                scene.attackerText.setText(Math.floor(scene.attackTimer - (scene.length / 12 + 1 )));
 
                 scene.tickCounter = 0;
             }    
@@ -450,6 +453,7 @@ export var STAGE_OVERRIDES = new Map([
             scene.lengthGoal = Infinity;
             scene.deathTimer = 10;
             scene.tickCounter = 0;
+            scene.length = -50;
         },
         postFix: function (scene) {
 
@@ -458,8 +462,6 @@ export var STAGE_OVERRIDES = new Map([
                 scene.snake.grow(scene);
                 times--;
             }
-            
-            scene.length = scene.length - 50;
 
             scene.snake.body[scene.snake.body.length -1].setTint(0x000000);
             scene.snake.body[scene.snake.body.length -1].setDepth(45);
