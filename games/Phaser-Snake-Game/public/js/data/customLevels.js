@@ -151,7 +151,7 @@ export var STAGE_OVERRIDES = new Map([
 
             // Add check for stuck on self.  
         },
-        afterEat: function (scene) {
+        afterEat: function (scene, food) {
 
             //if (scene.tickCounter >= 15) {
 
@@ -206,16 +206,73 @@ export var STAGE_OVERRIDES = new Map([
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
             //scene.maxScore = 60;
-            //scene.boostCost = 0;
-            scene.boostCost = 8;
+            scene.boostCost = 0;
+            //scene.boostCost = 8;
             scene.boostAdd = 0;
             
             scene.speedSprint = 99;
             scene.speedWalk = 33;
         },
         postFix: function (scene) {
+
+            scene.atoms.forEach( atom => {
+                atom.scale = 2;
+                atom.electrons.scale = 2;
+
+                atom.move(scene);
+
+            });
     
         },
+        afterEat: function(scene, food) {
+            // Grow 3 more times.
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            
+        },
+        afterMoveFood: function (scene, food) {
+
+            debugger
+
+            var foodX = (food.prevX - X_OFFSET) / GRID;
+            var foodY = (food.prevY - Y_OFFSET) / GRID;
+
+            scene.interactLayer[foodX + 1][foodY] = "empty";
+            scene.interactLayer[foodX][foodY + 1] = "empty";
+            scene.interactLayer[foodX + 1][foodY + 1] = "empty";
+
+            var foodX = (food.x - X_OFFSET) / GRID;
+            var foodY = (food.y - Y_OFFSET) / GRID;
+
+            scene.interactLayer[foodX + 1][foodY] = food;
+            scene.interactLayer[foodX][foodY + 1] = food;
+            scene.interactLayer[foodX + 1][foodY + 1] = food;
+
+        }
+        /*afterMove: function (scene) {
+
+            var onGridX = (scene.snake.head.x - X_OFFSET) / GRID;
+            var onGridY = (scene.snake.head.y - Y_OFFSET) / GRID;
+            //remove decimals to prevent erroring
+            onGridX = Math.round(onGridX);
+            onGridY = Math.round(onGridY);
+
+            if (scene.gState === GState.PLAY) {
+
+                if (typeof scene.interactLayer[Math.min(onGridX + 1, 29)][onGridY].onOver === 'function') {
+                    scene.interactLayer[Math.min(onGridX + 1, 29)][onGridY].onOver(scene);
+                }
+                if (typeof scene.interactLayer[Math.min(onGridX + 1, 29)][Math.min(onGridY + 1, 27)].onOver === 'function') {
+                    scene.interactLayer[Math.min(onGridX + 1, 29)][Math.min(onGridY + 1, 27)].onOver(scene);
+                }
+                if (typeof scene.interactLayer[onGridX][Math.min(onGridY + 1, 27)].onOver === 'function') {
+                    scene.interactLayer[onGridX][Math.min(onGridY + 1, 27)].onOver(scene);
+                }
+            }
+
+
+        */
         
     }],
     ["Bonus_X-3", {

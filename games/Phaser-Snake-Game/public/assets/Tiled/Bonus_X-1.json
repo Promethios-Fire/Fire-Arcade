@@ -88,6 +88,11 @@
          "value":"00000000-0000-0000-0000-000000000000"
         }, 
         {
+         "name":"atoms",
+         "type":"int",
+         "value":6
+        }, 
+        {
          "name":"next",
          "type":"string",
          "value":"Bonus_X-2"

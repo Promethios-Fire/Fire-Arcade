@@ -130,6 +130,8 @@ var Food = new Phaser.Class({
     move: function (scene) {
         const ourInputScene = scene.scene.get("InputScene");
 
+        this.prevX = this.x;
+        this.prevY = this.y;
 
         scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = "empty";
         
@@ -148,6 +150,10 @@ var Food = new Phaser.Class({
         if (DEBUG) { // Reset Fruit Timer Text
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
         }
+
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterMoveFood" in STAGE_OVERRIDES.get(scene.stage)) {
+            STAGE_OVERRIDES.get(scene.stage).afterMoveFood(scene, this);
+}
     },
 
     startDecay: function(scene) {
