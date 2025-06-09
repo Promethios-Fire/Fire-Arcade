@@ -81,6 +81,10 @@ var Snake = new Phaser.Class({
     // #region Grow
     grow: function (scene)
     {
+        if (scene === undefined) {
+            throw new Error("Error: No scene passed into Snake.grow()");
+        }
+        
         const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
         scene.length += 1;
         scene.globalFruitCount += 1; // Run Wide Counter

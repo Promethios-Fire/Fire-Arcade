@@ -732,6 +732,74 @@ export var STAGE_OVERRIDES = new Map([
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },   
+        },
+    }],
+    ["Bonus_X-12", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            //scene.collideSelf = false;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
+            scene.laserWall = -1;
+            scene.tickCount = 0;
+            scene.deathWalls = [];
+        },
+        postFix: function (scene) {
+            scene.snake.grow(scene);
+        
+            scene.moveWall = this.moveWall;
+        },
+        afterTick: function (scene) {
+            scene.tickCount++;
+
+            if (scene.tickCount > 10) {
+                scene.moveWall();
+
+                scene.tickCount = 0;
+            }
+        },
+        afterMove: function(scene) {
+            scene.deathWalls.forEach( wall => {
+                if (wall.pixelX + X_OFFSET === scene.snake.head.x && wall.pixelY + Y_OFFSET === scene.snake.head.y) {
+                    //var middle = Math.ceil(scene.snake.body.length / 2);
+                    debugger
+                    
+                }
+            });
+            
+        },
+        checkWinCon: function () {
+            return scene.snake.body.length < 2;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
+        
+        },
+        moveWall: function () {
+
+            this.laserWall = Phaser.Math.Wrap(this.laserWall + 1, 0, 28);
+            var y = 0;
+            this.deathWalls = [];
+
+            while (y < 27) {
+
+                var prevTile = this.wallLayer.getTileAt(Phaser.Math.Wrap(this.laserWall - 1, 0, 28), y, true, this.wallVarient);
+                
+                prevTile.index = -1;
+                prevTile.properties.hasCollision = false;
+                
+                var tile = this.wallLayer.getTileAt(this.laserWall, y, true, this.wallVarient);
+                
+                tile.index = 577;
+                tile.properties.hasCollision = false;
+
+                this.deathWalls.push(tile);
+            
+                y++ ;
+            }
+
+        }      
     }],
     // #endregion Bonus
     ["Tutorial_T-1", {
