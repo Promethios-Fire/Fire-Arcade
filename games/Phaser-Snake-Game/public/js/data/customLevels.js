@@ -121,6 +121,7 @@ export var STAGE_OVERRIDES = new Map([
             debugger
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
+            scene.tickCounter = 0;
         },
         postFix: function (scene) {
 
@@ -149,6 +150,38 @@ export var STAGE_OVERRIDES = new Map([
             this.snake.head;
 
             // Add check for stuck on self.  
+        },
+        afterEat: function (scene) {
+
+            //if (scene.tickCounter >= 15) {
+
+                var valid = scene.validSpawnLocations();
+                var times = 2
+
+                while (times > 0) {
+
+                    var chords = Phaser.Math.RND.pick(valid);
+                    var _x = (chords.x - X_OFFSET) / GRID;
+                    var _y = (chords.y - Y_OFFSET) / GRID;
+                    
+
+                    var wall = scene.wallLayer.getTileAt(0, 0, true, scene.wallVarient);
+                    var tile = scene.wallLayer.getTileAt(_x, _y, true, scene.wallVarient);
+                    
+                    tile.index = 5;
+                    tile.properties.hasCollision = true;
+
+                    times--;
+                    
+                }
+                
+                
+
+
+                //scene.tickCounter = 0
+                
+            //}
+            //scene.tickCounter++;
         },
         checkWinCon: function () {
 
@@ -286,7 +319,7 @@ export var STAGE_OVERRIDES = new Map([
             scene.bombAtom.timerText.y = pos.y;
 
         },
-        onTick: function (scene) {
+        afterTick: function (scene) {
             var diff = scene.maxScore - scene.bombTime;
             var time = scene.scoreTimer.getRemainingSeconds().toFixed(1) * 10 ;
 
@@ -408,7 +441,7 @@ export var STAGE_OVERRIDES = new Map([
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
         
         },
-        onTick: function (scene) {
+        afterTick: function (scene) {
             
             scene.tickCounter++;
             if (scene.tickCounter > scene.attackTimer - (scene.length / 12)){
@@ -479,7 +512,7 @@ export var STAGE_OVERRIDES = new Map([
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
         
         },
-        onTick: function (scene) {
+        afterTick: function (scene) {
             
             scene.tickCounter++;
             if (scene.tickCounter >= scene.deathTimer){

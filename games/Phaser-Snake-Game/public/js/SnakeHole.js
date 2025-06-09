@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-4'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -11486,8 +11486,8 @@ class GameScene extends Phaser.Scene {
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
 
-                if (STAGE_OVERRIDES.has(this.stage) && "onTick" in STAGE_OVERRIDES.get(this.stage)) {
-                    STAGE_OVERRIDES.get(this.stage).onTick(this);
+                if (STAGE_OVERRIDES.has(this.stage) && "afterTick" in STAGE_OVERRIDES.get(this.stage)) {
+                    STAGE_OVERRIDES.get(this.stage).afterTick(this);
                 }
             }
 
