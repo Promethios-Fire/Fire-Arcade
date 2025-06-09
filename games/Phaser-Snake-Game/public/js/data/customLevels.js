@@ -67,10 +67,8 @@ export var STAGE_OVERRIDES = new Map([
             piggyTile.index = -1;
 
             if (!INVENTORY.get("piggybank")) {
-                scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'coinPickup01Anim.png')
-                .setOrigin(0, 0).setDepth(100).setTint(0x800080);
-
-                scene.piggy.play('coin01idle');
+                scene.piggy = scene.add.sprite(piggyTile.pixelX + X_OFFSET, piggyTile.pixelY + Y_OFFSET, 'inventoryIcons',3)
+                    .setOrigin(0, 0).setDepth(100);
 
                 scene.tweens.add( {
                     targets: scene.piggy,

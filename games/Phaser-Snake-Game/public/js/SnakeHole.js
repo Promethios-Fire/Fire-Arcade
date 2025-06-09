@@ -2990,6 +2990,7 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('menuIcons', 'assets/sprites/ui_menuButtonSheet.png', { frameWidth: 14, frameHeight: 14 });
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
+        this.load.spritesheet('inventoryIcons', 'assets/sprites/UI_InventorySheet.png', { frameWidth: 18, frameHeight: 18 });
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
