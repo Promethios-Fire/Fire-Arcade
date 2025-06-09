@@ -731,7 +731,6 @@ export var STAGE_OVERRIDES = new Map([
             return false;
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
-        },   
         },
     }],
     ["Bonus_X-12", {
@@ -743,8 +742,10 @@ export var STAGE_OVERRIDES = new Map([
             //scene.speedWalk = SPEED_SPRINT;
             //scene.speedSprint = SPEED_WALK;
             //scene.boostCost = 3;
-            scene.laserWall = -1;
-            scene.tickCount = 0;
+            scene.laserWallX = -1;
+            scene.tickCount = 1;
+            scene.wallMovedCount = 0;
+            scene.wallSpeed = 1;
             scene.deathWalls = [];
         },
         postFix: function (scene) {
@@ -755,10 +756,16 @@ export var STAGE_OVERRIDES = new Map([
         afterTick: function (scene) {
             scene.tickCount++;
 
-            if (scene.tickCount > 10) {
+            if (scene.tickCount > scene.wallSpeed) {
                 scene.moveWall();
 
+                scene.wallMovedCount++;
+                console.log("Wall will move every", scene.wallSpeed,"Wall move count = ",  scene.wallMovedCount);
                 scene.tickCount = 0;
+            }
+
+            if (scene.wallMovedCount > 10) {
+                scene.wallSpeed = Math.min(scene.wallSpeed - 1, 1);
             }
         },
         afterMove: function(scene) {
@@ -778,18 +785,18 @@ export var STAGE_OVERRIDES = new Map([
         },
         moveWall: function () {
 
-            this.laserWall = Phaser.Math.Wrap(this.laserWall + 1, 0, 28);
+            this.laserWallX = Phaser.Math.Wrap(this.laserWallX + 1, 0, 28);
             var y = 0;
             this.deathWalls = [];
 
             while (y < 27) {
 
-                var prevTile = this.wallLayer.getTileAt(Phaser.Math.Wrap(this.laserWall - 1, 0, 28), y, true, this.wallVarient);
+                var prevTile = this.wallLayer.getTileAt(Phaser.Math.Wrap(this.laserWallX - 1, 0, 28), y, true, this.wallVarient);
                 
                 prevTile.index = -1;
                 prevTile.properties.hasCollision = false;
                 
-                var tile = this.wallLayer.getTileAt(this.laserWall, y, true, this.wallVarient);
+                var tile = this.wallLayer.getTileAt(this.laserWallX, y, true, this.wallVarient);
                 
                 tile.index = 577;
                 tile.properties.hasCollision = false;
