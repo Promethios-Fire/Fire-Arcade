@@ -206,7 +206,7 @@ export var STAGE_OVERRIDES = new Map([
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
             //scene.maxScore = 60;
-            scene.boostCost = 0;
+            scene.boostCost = 8;
             //scene.boostCost = 8;
             scene.boostAdd = 0;
             
