@@ -11488,6 +11488,7 @@ class GameScene extends Phaser.Scene {
                 }
 
                 if (STAGE_OVERRIDES.has(this.stage) && "afterTick" in STAGE_OVERRIDES.get(this.stage)) {
+                    debugger
                     STAGE_OVERRIDES.get(this.stage).afterTick(this);
                 }
             }
