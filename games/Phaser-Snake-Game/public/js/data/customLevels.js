@@ -472,7 +472,8 @@ export var STAGE_OVERRIDES = new Map([
             scene.lengthGoal = Infinity;
             scene.attackTimer = 12;
             scene.tickCounter = 0;
-            scene.length = - 12;
+            scene.countDownTicker = scene.attackTimer * 10;
+            scene.length = -12;
         },
         postFix: function (scene) {
 
@@ -501,18 +502,24 @@ export var STAGE_OVERRIDES = new Map([
         afterTick: function (scene) {
             
             scene.tickCounter++;
-            if (scene.tickCounter > scene.attackTimer - (scene.length / 12)){
+            scene.countDownTicker--;
+
+            if (scene.countDownTicker < 1) {
+                scene.attackTimer--;
+                scene.countDownTicker = scene.attackTimer * 10;
+                
+            }
+            if (scene.tickCounter >= scene.attackTimer){
 
                 if (scene.snake.body.length > 1) {
                     scene.snake.tail = scene.snake.body.slice(-1);
-                    Math.random()
 
                     var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
 
                     oldPart[0].destroy();  
                 }
 
-                scene.attackerText.setText(Math.floor(scene.attackTimer - (scene.length / 12 + 1 )));
+                scene.attackerText.setText(scene.attackTimer);
 
                 scene.tickCounter = 0;
             }    
