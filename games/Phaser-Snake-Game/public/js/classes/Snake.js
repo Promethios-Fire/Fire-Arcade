@@ -157,8 +157,7 @@ var Snake = new Phaser.Class({
 
 
         // Look ahead for bonks
-        
-
+    
         let xN;
         let yN;
 
@@ -277,8 +276,6 @@ var Snake = new Phaser.Class({
          * Interface requirement that all objects in the interative layer 
          * need an onOver function to work properly.
          */
-
-        
         
     
         // Actually Move the Snake Head

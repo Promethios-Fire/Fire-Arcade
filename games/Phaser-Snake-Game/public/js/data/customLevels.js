@@ -3,6 +3,7 @@ import { X_OFFSET, Y_OFFSET,
     GState, DIRS, commaInt, PLAYER_STATS, 
     INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR } from "../SnakeHole.js";
 import { Food } from "../classes/Food.js";
+import { Snake } from "../classes/Snake.js";
 import { PORTAL_COLORS, ITEMS } from '../const.js';
 
 
@@ -653,6 +654,78 @@ export var STAGE_OVERRIDES = new Map([
             //scene.snake.grow(scene);
             //scene.snake.grow(scene);
 
+        },
+        checkWinCon: function () {
+            return false;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
+        
+        },   
+    }],
+    ["Bonus_X-11", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            //scene.collideSelf = false;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+            debugger
+
+            scene.evilSnake = new Snake(scene, scene.startCoords.x, scene.startCoords.y - GRID);
+            scene.evilSnake.head.setTint(0x66666);
+            scene.evilSnake.head.alpha = 1;
+            scene.checkWinCon = this.checkWinCon;
+    
+        },
+        afterEat: function (scene) {
+            scene.evilSnake.grow(scene);
+            scene.evilSnake.body[scene.evilSnake.body.length - 1].setTint(0x66666);
+
+        },
+        afterMove: function(scene) {
+            debugger
+
+            let xN;
+            let yN;
+
+            debugger
+            
+            switch (scene.snake.direction) {
+                case DIRS.RIGHT:
+                    yN = scene.evilSnake.head.y;
+                    xN = Phaser.Math.Wrap(scene.evilSnake.head.x  - GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+
+                    break;
+    
+                case DIRS.LEFT:
+                    yN = scene.evilSnake.head.y;
+                    xN = Phaser.Math.Wrap(scene.evilSnake.head.x + GRID, X_OFFSET, X_OFFSET + 29 * GRID);
+
+                    break;
+    
+                case DIRS.DOWN:
+                    xN = scene.evilSnake.head.x;
+                    yN = Phaser.Math.Wrap(scene.evilSnake.head.y - GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+
+                    break;
+    
+                case DIRS.UP:
+                    xN = scene.evilSnake.head.x;
+                    yN = Phaser.Math.Wrap(scene.evilSnake.head.y + GRID, Y_OFFSET, Y_OFFSET + 27 * GRID);
+                    break;
+                    
+                default:
+                    debugger;
+                    break;
+            }
+            //scene.evilSnake.head.x = xN;
+            //scene.evilSnake.head.y = yN;
+
+            Phaser.Actions.ShiftPosition(scene.evilSnake.body, xN, yN, scene.evilSnake.tail);
+            
         },
         checkWinCon: function () {
             return false;
