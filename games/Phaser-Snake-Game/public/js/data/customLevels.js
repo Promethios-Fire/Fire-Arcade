@@ -647,6 +647,13 @@ export var STAGE_OVERRIDES = new Map([
             scene.checkWinCon = this.checkWinCon;
     
         },
+        afterEat: function (scene) {
+            //scene.snake.grow(scene);
+            //scene.snake.grow(scene);
+            //scene.snake.grow(scene);
+            //scene.snake.grow(scene);
+
+        },
         checkWinCon: function () {
             return false;
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
