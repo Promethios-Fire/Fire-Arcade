@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-8'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'Bonus_X-10'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7042,6 +7042,7 @@ class GameScene extends Phaser.Scene {
         // Special flags
         this.ghosting = false;
         this.bonkable = true; // No longer bonks when you hit yourself or a wall
+        this.collideSelf = true;
         this.stepMode = false; // Stops auto moving, only pressing moves.
         this.extractMenuOn = false; // set to true to enable extract menu functionality.
         this.spawnCoins = true;
@@ -13842,7 +13843,7 @@ class InputScene extends Phaser.Scene {
     moveUp(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || // Prevents backtracking to death
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode) || !gameScene.collideSelf) { 
 
             //console.log("I'm Moving Up");
             
@@ -13878,7 +13879,7 @@ class InputScene extends Phaser.Scene {
     moveDown(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.LEFT  || gameScene.snake.direction  === DIRS.RIGHT || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode ) || !gameScene.collideSelf) { 
            
 
             this.setPLAY(gameScene);
@@ -13910,7 +13911,7 @@ class InputScene extends Phaser.Scene {
     moveLeft(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) {
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)  || !gameScene.collideSelf) {
             
             this.setPLAY(gameScene);
 
@@ -13942,7 +13943,7 @@ class InputScene extends Phaser.Scene {
     moveRight(gameScene, key) {
         const ourPinball = this.scene.get("PinballDisplayScene");
         if (gameScene.snake.direction  === DIRS.UP   || gameScene.snake.direction  === DIRS.DOWN || 
-            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode)) { 
+            gameScene.snake.direction  === DIRS.STOP || (gameScene.snake.body.length < 1 || gameScene.stepMode) || !gameScene.collideSelf) { 
             
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);

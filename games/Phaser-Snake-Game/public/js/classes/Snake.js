@@ -238,7 +238,7 @@ var Snake = new Phaser.Class({
         }
 
         // #region Intersect Self
-        if (GState.PLAY === scene.gState) { //GState.PLAY
+        if (GState.PLAY === scene.gState && scene.collideSelf) { //GState.PLAY
             /***
              * Don't check the Tail because the Tail will always move out of the way
              * when the head moves forward.

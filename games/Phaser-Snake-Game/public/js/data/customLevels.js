@@ -340,9 +340,7 @@ export var STAGE_OVERRIDES = new Map([
         checkWinCon: function () {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
-        },
-        
-        
+        },   
     }],
     ["Bonus_X-6", {
         preFix: function (scene) {
@@ -634,6 +632,26 @@ export var STAGE_OVERRIDES = new Map([
         
 
         
+    }],
+    ["Bonus_X-10", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            scene.collideSelf = false;
+            //scene.stopOnBonk = true;
+            //scene.maxScore = 60;
+            //scene.speedWalk = SPEED_SPRINT;
+            //scene.speedSprint = SPEED_WALK;
+            //scene.boostCost = 3;
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
+    
+        },
+        checkWinCon: function () {
+            return false;
+            //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
+        
+        },   
     }],
     // #endregion Bonus
     ["Tutorial_T-1", {
