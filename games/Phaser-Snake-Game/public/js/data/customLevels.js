@@ -808,6 +808,32 @@ export var STAGE_OVERRIDES = new Map([
 
         }      
     }],
+    ["Bonus_X-13", {
+        preFix: function (scene) {
+            scene.lengthGoal = Infinity;
+            scene.stopOnBonk = true;
+        },
+        postFix: function (scene) {
+            scene.checkWinCon = this.checkWinCon;
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+            scene.snake.grow(scene);
+        },
+        afterMove: function (scene) {
+            if (scene.comboCounter === 0) {
+                        if (scene.snake.body.length > 3) {
+                    scene.snake.tail = scene.snake.body.slice(-1);
+                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+
+                    oldPart[0].destroy();  
+                }
+            }
+        },
+        checkWinCon: function () {
+            return false;
+        }, 
+    }],
     // #endregion Bonus
     ["Tutorial_T-1", {
         // #region T-1
