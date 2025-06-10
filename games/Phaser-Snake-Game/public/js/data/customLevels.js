@@ -328,17 +328,46 @@ export var STAGE_OVERRIDES = new Map([
     ["Bonus_X-5", {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
+            scene.highScore = INVENTORY.get("comboTrainerXHS");
+            scene.firstFood = false;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
+
     
         },
+        afterMove: function (scene) {
+            if (scene.comboCounter > scene.highScore) {
+                scene.highScore = scene.comboCounter;
+                scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.highScore);
+
+                INVENTORY.set("comboTrainerXHS", scene.comboCounter);
+                localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+            }
+
+            if (scene.comboCounter === 0 && scene.firstFood) {
+                scene.snake.bonk(scene);
+                scene.firstFood = false;
+            }
+        },
+        afterBonk: function (scene) {
+            var toRemove = scene.snake.body.splice(1, scene.snake.body.length -1);
+            toRemove.forEach( bodyPart => {
+                bodyPart.destroy();
+            });
+
+        },
+        afterEat: function(scene) {
+            if (scene.comboCounter > 0) {
+                // Something is off with the combo counter. It doesn't start after the first combo.
+                // This if statment shouldn't need be.
+                scene.firstFood = true;
+            }
+            
+
+        },
         checkWinCon: function () {
+            return false;
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },   
@@ -829,7 +858,7 @@ export var STAGE_OVERRIDES = new Map([
 
             if (scene.comboCounter > scene.highScore) {
                 scene.highScore = scene.comboCounter;
-                scene.scene.get("SpaceBoyScene").textUI.setText(scene.highScore);
+                scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.highScore);
 
                 INVENTORY.set("comboTrainerHS", scene.comboCounter);
                 localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));

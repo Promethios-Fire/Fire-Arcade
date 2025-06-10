@@ -161,7 +161,7 @@ export const ITEMS = new Map([
 
             var target = item.getBottomRight();
             
-            scene.textUI = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.comboTrainertPB = scene.add.bitmapText(target.x, target.y, 'mainFont',
                 INVENTORY.get("comboTrainerHS") ?? 0,
             8).setOrigin(1,1).setDepth(81)
 
@@ -182,6 +182,46 @@ export const ITEMS = new Map([
             scene.scene.get("MainMenuScene").scene.start('TutorialScene', {
                 cards: [randomHowTo],
                 toStage: "Bonus_X-13",
+            });
+            return
+        }
+    }],
+    ["comboTrainerX", {
+        addToInventory: function (scene) {
+            var item = scene.add.sprite(501 + GRID * 1.5, 330
+            ).setOrigin(0, 0).setDepth(80).setTint(0x808000);
+            item.play('atom05spawn');
+
+            
+
+            item.name = "comboTrainerX";
+
+            scene.invItems.set("comboTrainerX", item);
+
+            var target = item.getBottomRight();
+            
+            scene.comboTrainerX_PB = scene.add.bitmapText(target.x, target.y, 'mainFont',
+                INVENTORY.get("comboTrainerXHS") ?? 0,
+            8).setOrigin(1,1).setDepth(81);
+
+
+            return item;
+
+        },
+        interact: function (scene) {
+
+            var selected = scene.invArray[scene.invIndex];
+                selected.outLine.destroy();
+
+            scene.inInventory = false;
+            //this.scene.resume("MainMenuScene");
+
+            var randomHowTo = Phaser.Math.RND.pick([...TUTORIAL_PANELS.keys()]);
+
+            scene.scene.get("PersistScene").mode = MODES.PRACTICE;
+            scene.scene.get("MainMenuScene").scene.start('TutorialScene', {
+                cards: [randomHowTo],
+                toStage: "Bonus_X-5",
             });
             return
         }

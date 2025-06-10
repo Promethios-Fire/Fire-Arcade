@@ -603,6 +603,10 @@ var Snake = new Phaser.Class({
                     ourGame.scoreTimer.paused = true;
                     //console.log(this.gState, "WAIT FOR INPUT");
 
+                    if (STAGE_OVERRIDES.has(scene.stage) && "afterBonk" in STAGE_OVERRIDES.get(scene.stage)) {
+                        STAGE_OVERRIDES.get(scene.stage).afterBonk(scene);
+                    }
+
                 });
             }
 
@@ -610,7 +614,7 @@ var Snake = new Phaser.Class({
             this.gState = GState.WAIT_FOR_INPUT;
         }
 
-        scene.bonks += 1; 
+        scene.bonks += 1;
         
     }
 });
