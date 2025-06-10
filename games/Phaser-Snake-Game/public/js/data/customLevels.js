@@ -638,21 +638,12 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.collideSelf = false;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
     
         },
         afterEat: function (scene) {
-            //scene.snake.grow(scene);
-            //scene.snake.grow(scene);
-            //scene.snake.grow(scene);
-            //scene.snake.grow(scene);
 
         },
         checkWinCon: function () {
@@ -812,13 +803,18 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
+            scene.highScore = INVENTORY.get("comboTrainerHS");
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
             scene.snake.grow(scene);
             scene.snake.grow(scene);
             scene.snake.grow(scene);
-            scene.snake.grow(scene);
+
+            scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
+                scene.comboCounter, 
+                8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
+
         },
         afterMove: function (scene) {
             if (scene.comboCounter === 0) {
@@ -829,6 +825,23 @@ export var STAGE_OVERRIDES = new Map([
                     oldPart[0].destroy();  
                 }
             }
+
+
+            if (scene.comboCounter > scene.highScore) {
+                scene.highScore = scene.comboCounter;
+                scene.scene.get("SpaceBoyScene").textUI.setText(scene.highScore);
+
+                INVENTORY.set("comboTrainerHS", scene.comboCounter);
+                localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+            }
+            //debugger
+
+            var head = scene.snake.body[1].getCenter();
+
+            scene.comboText.x = head.x;
+            scene.comboText.y = head.y;
+            scene.comboText.setText(scene.comboCounter);
+
         },
         checkWinCon: function () {
             return false;
