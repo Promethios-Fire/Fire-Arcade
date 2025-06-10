@@ -39,7 +39,7 @@ const GHOST_WALLS = true;
 export const DEBUG = false;
 export const DEBUG_AREA_ALPHA = 0;   // Between 0,1 to make portal areas appear
 
-const DEBUG_SKIP_INTRO = true;
+const DEBUG_SKIP_INTRO = false;
 const SCORE_SCENE_DEBUG = false;
 const DEBUG_SHOW_LOCAL_STORAGE = true;
 const DEBUG_SKIP_TO_SCENE = false;
@@ -993,7 +993,8 @@ class SpaceBoyScene extends Phaser.Scene {
                                 this.blankScreenInventory.destroy();
                                 this.blankScreenBoost.destroy();
                                 this.spaceBoyReady = true;
-                                this.scene.get("MainMenuScene").pressToPlayTween.play();
+                                this.scene.get("MainMenuScene").UI_PressStartTween.play();
+                                this.scene.get("MainMenuScene").UI_ControlsTween.play();
                                 this.scene.get("PinballDisplayScene").pinballballPowerOn();
                                 // Tween to remove the dark tint and transition back to default
                                 this.tweens.add({
@@ -3340,25 +3341,6 @@ class StartScene extends Phaser.Scene {
         titlePortal.setTint(intColor).setScale(1.25);
         titlePortal.play('portalIdle');
 
-        this.pressToPlay = this.add.dom(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * 4, 'div', Object.assign({}, STYLE_DEFAULT, {
-            "fontSize": '24px',
-            "fontWeight": 400,
-            "color": "white",
-            "textAlign": 'center'
-
-        }),
-                `Press Space`
-        ).setOrigin(0.5,0.5).setScale(0.5);
-
-        this.pressToPlayTween = this.tweens.add({
-            targets: this.pressToPlay,
-            alpha: 0,
-            duration: 1000,
-            ease: 'Sine.InOut',
-            yoyo: true,
-            repeat: -1,
-        });
-
         // SHORTCUT SCENE START HERE TO GO DIRECTLY
         //this.scene.start("StageCodex");
 
@@ -4599,6 +4581,8 @@ class MainMenuScene extends Phaser.Scene {
     preload(){
         this.load.spritesheet('coinPickup01Anim', 'assets/sprites/coinPickup01Anim.png', { frameWidth: 10, frameHeight:20 });
         this.load.spritesheet('uiExitPanel', 'assets/sprites/UI_exitPanel.png', { frameWidth: 45, frameHeight: 20 });
+        this.load.image('UI_Controls', 'assets/sprites/UI_Controls.png');
+        this.load.image('UI_PressStart', 'assets/sprites/UI_PressStart.png');
     }
     init(props){
         var { startingAnimation = "default" } = props;
@@ -5420,8 +5404,12 @@ class MainMenuScene extends Phaser.Scene {
                         this.scene.get("MusicPlayerScene").startMusic();
                     } 
     
-                    mainMenuScene.pressToPlayTween.stop();
-                    mainMenuScene.pressToPlay.setAlpha(0);
+                    mainMenuScene.UI_PressStartTween.stop();
+                    mainMenuScene.UI_ControlsTween.stop();
+                    mainMenuScene.UI_PressStart.stop();
+                    
+                    mainMenuScene.UI_PressStart.destroy();
+                    mainMenuScene.UI_Controls.destroy();
                     mainMenuScene.pressedSpace = true;
                     if (this.startingAnimation === "default") {
                         titleTween.resume();
@@ -5555,74 +5543,30 @@ class MainMenuScene extends Phaser.Scene {
                     `Press Space`
             ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(0);
 
-            var controlsStyle = {
-                "fontSize": '12px',
-                "fontWeight": 200,
-                "color": "white",
-                "textAlign": 'center',
-                "border": '1px solid white', /* Thickness, style, and color */
-                "border-radius": '4px',
-                "padding": '4px', /* Space between text and border */
-                "display": 'inline-block', /* Ensures the border wraps tightly around the text */
-            }
-
-            var controlsY = 266;
-
-            var controlsPlus1 = this.add.dom(304, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "border": '0px', /* Thickness, style, and color */
-            }),
-                    `+`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsTab = this.add.dom(287, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle),
-                    `Tab`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsSpace = this.add.dom(322, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle),
-                    `Space`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsPlus2 = this.add.dom(344, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "border": '0px', /* Thickness, style, and color */
-            }),
-                    `+`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-
-            var controlsArrowsDown = this.add.dom(366, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡇`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsArrowsLeft = this.add.dom(356, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡄`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsArrowsRight = this.add.dom(376, controlsY, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡆`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-
-            var controlsArrowsUp = this.add.dom(366, 254, 'div', Object.assign({}, STYLE_DEFAULT, controlsStyle, {
-                "fontSize": '9px',
-            }),
-                    `🡅`
-            ).setOrigin(0.5,0.5).setScale(0.5).setAlpha(1);
-              
+            this.UI_Controls = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + GRID * 8,
+                'UI_Controls').setOrigin(0.5,0.5).setAlpha(0);
+            this.UI_PressStart = this.add.sprite(SCREEN_WIDTH/2,SCREEN_HEIGHT/2 + GRID * 5,
+                'UI_PressStart').setOrigin(0.5,0.5).setAlpha(0); 
     
-            this.pressToPlayTween = this.tweens.add({
+            this.UI_PressStartTween = this.tweens.add({
                 targets: [
-                    this.pressToPlay,
+                    this.UI_PressStart,
                 ],
                 alpha: 1,
                 duration: 1000,
                 ease: 'Sine.InOut',
                 yoyo: true,
                 repeat: -1,
+                paused: true
+            });
+            this.UI_ControlsTween = this.tweens.add({
+                targets: [
+                    this.UI_Controls,
+                ],
+                alpha: 1,
+                duration: 1000,
+                ease: 'Sine.InOut',
+                yoyo: false,
                 paused: true
             });
         }
