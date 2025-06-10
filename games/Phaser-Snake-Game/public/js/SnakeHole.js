@@ -1228,10 +1228,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
             var firstItem = this.invArray[selectedIndex];
 
-            firstItem.outLine = this.add.rectangle(firstItem.getBottomLeft().x, firstItem.getBottomLeft().y + 3 , 10, 1
-            ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
-
-            firstItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);
+            //UI INVENTORY SELECTOR HERE
+            firstItem.outLine = this.add.sprite(firstItem.x, firstItem.y + 9 ,
+                'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1);
         }, this);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
@@ -1245,11 +1244,8 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 var nextItem = this.invArray[this.invIndex];
 
-                nextItem.outLine = this.add.rectangle(nextItem.getBottomLeft().x, nextItem.getBottomLeft().y + 3 , 10, 1
-                ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
-    
-                nextItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);
-                
+                nextItem.outLine = this.add.sprite(nextItem.x, nextItem.y + 9 ,
+                    'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1); 
             }
 
         }, this);
@@ -1265,10 +1261,8 @@ class SpaceBoyScene extends Phaser.Scene {
 
                 var nextItem = this.invArray[this.invIndex];
 
-                nextItem.outLine = this.add.rectangle(nextItem.getBottomLeft().x, nextItem.getBottomLeft().y + 3 , 10, 1
-                ).setOrigin(0,0.5).setDepth(100).setAlpha(1);
-    
-                nextItem.outLine.setStrokeStyle(1,0xFFFFFF, 1);  
+                 nextItem.outLine = this.add.sprite(nextItem.x, nextItem.y + 9 ,
+                    'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1); 
             }
         }, this);
 
@@ -3001,6 +2995,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
         this.load.image('UI_PowerSwitch', 'assets/sprites/UI_PowerSwitch.png');
         this.load.image('UI_InventoryBG', 'assets/sprites/UI_InventoryBG.png');
+        this.load.image('UI_InventorySelector', 'assets/sprites/UI_InventorySelector.png');
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
