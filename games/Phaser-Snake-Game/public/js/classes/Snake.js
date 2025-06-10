@@ -81,28 +81,19 @@ var Snake = new Phaser.Class({
     // #region Grow
     grow: function (scene)
     {
+        if (scene === undefined) {
+            throw new Error("Error: No scene passed into Snake.grow()");
+        }
+        
         const ourSpaceBoy = scene.scene.get("SpaceBoyScene");
         scene.length += 1;
         scene.globalFruitCount += 1; // Run Wide Counter
 
         var length = `${scene.length}`;
         
-        // Exception for Bonus Levels when the Length Goal = 0
-        if (LENGTH_GOAL != 0) {
-            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
-            ourSpaceBoy.lengthGoalUI.setText(
-                `${length.padStart(2, "0")}\n${LENGTH_GOAL.toString().padStart(2, "0")}`
-            )
-            
-        }
-        else {
-            //ourSpaceBoy.lengthGoalUI.setAlpha(1);
-            ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
-        }
 
-        //scene.scale.gameSize.height += 24;
-        //scene.scale.refresh()
-        //debugger
+        ourSpaceBoy.lengthGoalUI.setText(`${length.padStart(2, "0")}`);
+
         if (scene.boostOutlinesBody.length > 1) {
             //newPart.setTint(0xFF00FF);
             // Make the new one
@@ -170,8 +161,7 @@ var Snake = new Phaser.Class({
 
 
         // Look ahead for bonks
-        
-
+    
         let xN;
         let yN;
 
@@ -251,7 +241,7 @@ var Snake = new Phaser.Class({
         }
 
         // #region Intersect Self
-        if (GState.PLAY === scene.gState) { //GState.PLAY
+        if (GState.PLAY === scene.gState && scene.collideSelf) { //GState.PLAY
             /***
              * Don't check the Tail because the Tail will always move out of the way
              * when the head moves forward.
@@ -290,8 +280,6 @@ var Snake = new Phaser.Class({
          * Interface requirement that all objects in the interative layer 
          * need an onOver function to work properly.
          */
-
-        
         
     
         // Actually Move the Snake Head
@@ -541,8 +529,8 @@ var Snake = new Phaser.Class({
         //        
         //});
 
-        if (STAGE_OVERRIDES.has(scene.stage) && "onMove" in STAGE_OVERRIDES.get(scene.stage)) {
-            STAGE_OVERRIDES.get(scene.stage).onMove(scene);
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage)) {
+            STAGE_OVERRIDES.get(scene.stage).afterMove(scene);
         }
     },
 
