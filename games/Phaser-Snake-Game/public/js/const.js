@@ -79,9 +79,9 @@ export const PORTAL_TILE_RULES = { // TODO Move out of here
     424:3
 };
 
-const INVENTORY_X = 500;
-const INVENTORY_Y = 138;
-const INVENTORY_GRID = 20;
+const INVENTORY_X = 499;
+const INVENTORY_Y = 136;
+const INVENTORY_GRID = 19;
 
 
 export const ITEMS = new Map([

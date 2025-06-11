@@ -14137,7 +14137,7 @@ function loadSpriteSheetsAndAnims(scene) {
     });
     scene.anims.create({
         key: 'inventorySelectorIdle',
-        frames: scene.anims.generateFrameNumbers('UI_InventorySelector',{ frames: [ 0,1,2,3,4,5,6,7,8,9,10,11]}),
+        frames: scene.anims.generateFrameNumbers('UI_InventorySelector',{ frames: [ 0,1,2,3,4,5]}),
         frameRate: 8,
         repeat: -1
     });
