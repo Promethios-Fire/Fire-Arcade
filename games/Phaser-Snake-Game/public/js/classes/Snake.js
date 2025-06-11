@@ -51,6 +51,8 @@ var Snake = new Phaser.Class({
         //    
         //}
 
+        this.comboCounter = 0;
+
         this.lastPlayedCombo = 0;
         this.lastPortal = undefined; // Set
         this.closestPortal = undefined; // TYPE Portal.

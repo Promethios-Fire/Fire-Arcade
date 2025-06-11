@@ -67,9 +67,10 @@ var Food = new Phaser.Class({
         }
 
         if(timeSinceFruit > COMBO_ADD_FLOOR){
+            debugger
             if (scene.snake.lastPlayedCombo > 0) {
-                scene.comboCounter += 1;
-                scene.comboBounce();
+                scene.snake.comboCounter += 1;
+                scene.scene.get("PinballDisplayScene").comboBounce();
                 };
             scene.pointSounds[scene.snake.lastPlayedCombo].play();       
             if (scene.snake.lastPlayedCombo < 7) {
@@ -78,7 +79,7 @@ var Food = new Phaser.Class({
         }
         else {
             scene.snake.lastPlayedCombo = 0;
-            scene.comboCounter = 0;
+            scene.snake.comboCounter = 0;
         }
 
         scene.events.emit('addScore', this); 

@@ -821,10 +821,12 @@ export var STAGE_OVERRIDES = new Map([
             scene.snake.grow(scene);
         },
         afterMove: function (scene) {
-            if (scene.comboCounter === 0) {
-                        if (scene.snake.body.length > 3) {
-                    scene.snake.tail = scene.snake.body.slice(-1);
-                    var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+
+            let _snake = scene.snake;
+            if (_snake.comboCounter === 0) {
+                        if (_snake.body.length > 3) {
+                            _snake.tail = _snake.body.slice(-1);
+                    var oldPart = _snake.body.splice(_snake.body.length - 2,1);
 
                     oldPart[0].destroy();  
                 }
