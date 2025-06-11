@@ -328,17 +328,46 @@ export var STAGE_OVERRIDES = new Map([
     ["Bonus_X-5", {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
+            scene.highScore = INVENTORY.get("comboTrainerXHS");
+            scene.firstFood = false;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
+
     
         },
+        afterMove: function (scene) {
+            if (scene.comboCounter > scene.highScore) {
+                scene.highScore = scene.comboCounter;
+                scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.highScore);
+
+                INVENTORY.set("comboTrainerXHS", scene.comboCounter);
+                localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+            }
+
+            if (scene.comboCounter === 0 && scene.firstFood) {
+                scene.snake.bonk(scene);
+                scene.firstFood = false;
+            }
+        },
+        afterBonk: function (scene) {
+            var toRemove = scene.snake.body.splice(1, scene.snake.body.length -1);
+            toRemove.forEach( bodyPart => {
+                bodyPart.destroy();
+            });
+
+        },
+        afterEat: function(scene) {
+            if (scene.comboCounter > 0) {
+                // Something is off with the combo counter. It doesn't start after the first combo.
+                // This if statment shouldn't need be.
+                scene.firstFood = true;
+            }
+            
+
+        },
         checkWinCon: function () {
+            return false;
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },   
@@ -638,21 +667,12 @@ export var STAGE_OVERRIDES = new Map([
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.collideSelf = false;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
     
         },
         afterEat: function (scene) {
-            //scene.snake.grow(scene);
-            //scene.snake.grow(scene);
-            //scene.snake.grow(scene);
-            //scene.snake.grow(scene);
 
         },
         checkWinCon: function () {
@@ -807,34 +827,6 @@ export var STAGE_OVERRIDES = new Map([
             }
 
         }      
-    }],
-    ["Bonus_X-13", {
-        preFix: function (scene) {
-            scene.lengthGoal = Infinity;
-            scene.stopOnBonk = true;
-        },
-        postFix: function (scene) {
-            scene.checkWinCon = this.checkWinCon;
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-            scene.snake.grow(scene);
-        },
-        afterMove: function (scene) {
-
-            let _snake = scene.snake;
-            if (_snake.comboCounter === 0) {
-                        if (_snake.body.length > 3) {
-                            _snake.tail = _snake.body.slice(-1);
-                    var oldPart = _snake.body.splice(_snake.body.length - 2,1);
-
-                    oldPart[0].destroy();  
-                }
-            }
-        },
-        checkWinCon: function () {
-            return false;
-        }, 
     }],
     // #endregion Bonus
     ["Tutorial_T-1", {
@@ -1113,3 +1105,53 @@ export var STAGE_OVERRIDES = new Map([
         
     }],
 ]);
+
+STAGE_OVERRIDES.add("Bonus_X-13", {
+    X_13: null,
+    preFix: function (scene) {
+        scene.lengthGoal = Infinity;
+        scene.stopOnBonk = true;
+        scene.highScore = INVENTORY.get("comboTrainerHS");
+    },
+    postFix: function (scene) {
+        scene.checkWinCon = this.checkWinCon;
+        scene.snake.grow(scene);
+        scene.snake.grow(scene);
+        scene.snake.grow(scene);
+
+        scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
+            scene.comboCounter, 
+            8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
+
+    },
+    afterMove: function (scene) {
+        if (scene.comboCounter === 0) {
+                    if (scene.snake.body.length > 3) {
+                scene.snake.tail = scene.snake.body.slice(-1);
+                var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+
+                oldPart[0].destroy();  
+            }
+        }
+
+
+        if (scene.comboCounter > scene.highScore) {
+            scene.highScore = scene.comboCounter;
+            scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.highScore);
+
+            INVENTORY.set("comboTrainerHS", scene.comboCounter);
+            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+        }
+        //debugger
+
+        var head = scene.snake.body[1].getCenter();
+
+        scene.comboText.x = head.x;
+        scene.comboText.y = head.y;
+        scene.comboText.setText(scene.comboCounter);
+
+    },
+    checkWinCon: function () {
+        return false;
+    }, 
+});

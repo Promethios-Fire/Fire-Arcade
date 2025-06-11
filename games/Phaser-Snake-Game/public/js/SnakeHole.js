@@ -476,6 +476,10 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["piggybank", INVENTORY.get("piggybank") ?? false],
         ["gearbox", INVENTORY.get("gearbox") ?? false],
         ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
+        ["comboTrainer", INVENTORY.get("comboTrainer") ?? true],
+        ["comboTrainerHS", INVENTORY.get("comboTrainerHS") ?? 0],
+        ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
+        ["comboTrainerXHS", INVENTORY.get("comboTrainerXHS") ?? 0],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -808,7 +812,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-4'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -1292,6 +1296,7 @@ class SpaceBoyScene extends Phaser.Scene {
             }
 
         }, this);
+        
 
 
 
@@ -1306,6 +1311,16 @@ class SpaceBoyScene extends Phaser.Scene {
             
             this.invSettings.set("gearbox", "fast");
         }
+
+        if (INVENTORY.get("comboTrainer")) {
+            this.comboTrainer = ITEMS.get("comboTrainer").addToInventory(this);
+        }
+
+        if (INVENTORY.get("comboTrainerX")) {
+            this.comboTrainerX = ITEMS.get("comboTrainerX").addToInventory(this);
+        }
+
+
     }
 
     loseCoin(){
