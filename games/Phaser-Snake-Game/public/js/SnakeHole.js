@@ -2258,7 +2258,7 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboActive = false;
         //this.scene.get("GameScene").snake.comboCounter = 0;
     }
-    interupt(tween) {
+    interrupt(tween) {
         if (tween) {
             tween.destroy();
             // Hides the combo counter on bonk.
@@ -11015,7 +11015,7 @@ class GameScene extends Phaser.Scene {
             onStart: () => {
                 const ourPinball = this.scene.get('PinballDisplayScene');
                 if (ourPinball.comboFadeTween) {
-                    ourPinball.interupt(ourPinball.comboFadeTween);
+                    ourPinball.interrupt(ourPinball.comboFadeTween);
                 }
                 
             }
