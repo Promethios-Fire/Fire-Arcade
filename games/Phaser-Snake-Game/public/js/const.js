@@ -88,7 +88,7 @@ export const ITEMS = new Map([
     ["piggybank", {
         addToInventory: function (scene) {
             var piggy = scene.add.sprite(INVENTORY_X -2,
-                 INVENTORY_Y + INVENTORY_GRID * 9.75,'inventoryIcons',2)
+                 INVENTORY_Y + INVENTORY_GRID * 10.25,'inventoryIcons',2)
             .setOrigin(0, 0).setDepth(80);
 
             piggy.name = "piggybank";
