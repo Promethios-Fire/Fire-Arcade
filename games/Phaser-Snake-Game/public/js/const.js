@@ -155,9 +155,8 @@ export const ITEMS = new Map([
     }],
     ["comboTrainer", {
         addToInventory: function (scene) {
-            var item = scene.add.sprite(INVENTORY_X, INVENTORY_Y + INVENTORY_GRID * 6
-            ).setOrigin(0, 0).setDepth(80).setTint(0x800080);
-            item.play('atom05spawn');
+            var item = scene.add.sprite(INVENTORY_X, INVENTORY_Y + INVENTORY_GRID * 6,
+            'inventoryIcons',42).setOrigin(0, 0).setDepth(80);
             
 
             item.name = "comboTrainer";
@@ -166,7 +165,7 @@ export const ITEMS = new Map([
 
             var target = item.getBottomRight();
             
-            scene.comboTrainertPB = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.comboTrainertPB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
                 INVENTORY.get("comboTrainerHS") ?? 0,
             8).setOrigin(1,1).setDepth(81)
 
@@ -193,9 +192,8 @@ export const ITEMS = new Map([
     }],
     ["comboTrainerX", {
         addToInventory: function (scene) {
-            var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 6
-            ).setOrigin(0, 0).setDepth(80).setTint(0x808000);
-            item.play('atom05spawn');
+            var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 6,
+            'inventoryIcons',43).setOrigin(0, 0).setDepth(80);
 
             
 
@@ -205,7 +203,7 @@ export const ITEMS = new Map([
 
             var target = item.getBottomRight();
             
-            scene.comboTrainerX_PB = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.comboTrainerX_PB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
                 INVENTORY.get("comboTrainerXHS") ?? 0,
             8).setOrigin(1,1).setDepth(81);
 
