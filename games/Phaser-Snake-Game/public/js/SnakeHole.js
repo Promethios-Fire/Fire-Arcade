@@ -476,6 +476,10 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["piggybank", INVENTORY.get("piggybank") ?? false],
         ["gearbox", INVENTORY.get("gearbox") ?? false],
         ["savedCoins", INVENTORY.get("savedCoins") ?? 0],
+        ["comboTrainer", INVENTORY.get("comboTrainer") ?? true],
+        ["comboTrainerHS", INVENTORY.get("comboTrainerHS") ?? 0],
+        ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
+        ["comboTrainerXHS", INVENTORY.get("comboTrainerXHS") ?? 0],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -1291,6 +1295,7 @@ class SpaceBoyScene extends Phaser.Scene {
             }
 
         }, this);
+        
 
 
 
@@ -1305,6 +1310,16 @@ class SpaceBoyScene extends Phaser.Scene {
             
             this.invSettings.set("gearbox", "fast");
         }
+
+        if (INVENTORY.get("comboTrainer")) {
+            this.comboTrainer = ITEMS.get("comboTrainer").addToInventory(this);
+        }
+
+        if (INVENTORY.get("comboTrainerX")) {
+            this.comboTrainerX = ITEMS.get("comboTrainerX").addToInventory(this);
+        }
+
+
     }
 
     loseCoin(){
