@@ -1,7 +1,7 @@
 
 
 
-import {GRID, INVENTORY, SCREEN_WIDTH, X_OFFSET, Y_OFFSET} from "./SnakeHole.js";
+import {GRID, INVENTORY, SCREEN_HEIGHT, SCREEN_WIDTH, X_OFFSET, Y_OFFSET} from "./SnakeHole.js";
 
 export const PORTAL_COLORS = [
     // This color order will be respected. TODO add Slice
@@ -83,8 +83,8 @@ export const PORTAL_TILE_RULES = { // TODO Move out of here
 export const ITEMS = new Map([
     ["piggybank", {
         addToInventory: function (scene) {
-            var piggy = scene.add.sprite(SCREEN_WIDTH - X_OFFSET + 4, Y_OFFSET + GRID * 8.5,
-                'inventoryIcons',2)
+            var piggy = scene.add.sprite(SCREEN_WIDTH - X_OFFSET + 4,
+                 SCREEN_HEIGHT - GRID * 2.5,'inventoryIcons',2)
             .setOrigin(0, 0).setDepth(80);
 
             piggy.name = "piggybank";
@@ -93,9 +93,9 @@ export const ITEMS = new Map([
 
             var target = piggy.getBottomRight();
             
-            /*scene.savedCoinsUI = scene.add.bitmapText(target.x, target.y, 'mainFont',
+            scene.savedCoinsUI = scene.add.bitmapText(target.x + GRID * 3.25, target.y - 6, 'mainFont',
                 INVENTORY.get("savedCoins") ?? 0,
-            8).setOrigin(1,1).setDepth(81)*/
+            8).setOrigin(1,1).setDepth(81)
 
             return piggy;
 

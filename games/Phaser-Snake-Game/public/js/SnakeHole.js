@@ -808,7 +808,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'Bonus_X-13'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -1232,6 +1232,7 @@ class SpaceBoyScene extends Phaser.Scene {
             //UI INVENTORY SELECTOR HERE
             firstItem.outLine = this.add.sprite(firstItem.x, firstItem.y + 9 ,
                 'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1);
+            firstItem.outLine.play('inventorySelectorIdle');
         }, this);
 
         this.input.keyboard.on('keydown-RIGHT', e => {
@@ -1246,7 +1247,8 @@ class SpaceBoyScene extends Phaser.Scene {
                 var nextItem = this.invArray[this.invIndex];
 
                 nextItem.outLine = this.add.sprite(nextItem.x, nextItem.y + 9 ,
-                    'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1); 
+                    'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1);
+                nextItem.outLine.play('inventorySelectorIdle');
             }
 
         }, this);
@@ -1264,6 +1266,7 @@ class SpaceBoyScene extends Phaser.Scene {
 
                  nextItem.outLine = this.add.sprite(nextItem.x, nextItem.y + 9 ,
                     'UI_InventorySelector').setOrigin(0,0.5).setDepth(100).setAlpha(1); 
+                nextItem.outLine.play('inventorySelectorIdle');
             }
         }, this);
 
@@ -2996,7 +2999,7 @@ class StartScene extends Phaser.Scene {
         this.load.image('UI_SpaceBoi', ['assets/sprites/UI_SpaceBoi.png','assets/sprites/UI_SpaceBoi_n.png']);
         this.load.image('UI_PowerSwitch', 'assets/sprites/UI_PowerSwitch.png');
         this.load.image('UI_InventoryBG', 'assets/sprites/UI_InventoryBG.png');
-        this.load.image('UI_InventorySelector', 'assets/sprites/UI_InventorySelector.png');
+        this.load.spritesheet('UI_InventorySelector', 'assets/sprites/UI_InventorySelector.png', { frameWidth: 20, frameHeight: 20});
 
         this.load.image('electronParticle','assets/sprites/electronParticle.png');
         this.load.image('spaceBoyBase','assets/sprites/spaceBoyBase.png');
@@ -14111,6 +14114,12 @@ function loadSpriteSheetsAndAnims(scene) {
         frames: scene.anims.generateFrameNumbers('portals',{ frames: [ 9,8,7,6]}),
         frameRate: 8,
         repeat: 0
+    });
+    scene.anims.create({
+        key: 'inventorySelectorIdle',
+        frames: scene.anims.generateFrameNumbers('UI_InventorySelector',{ frames: [ 0,1,2,3,4,5,6,7,8,9,10,11]}),
+        frameRate: 8,
+        repeat: -1
     });
     scene.anims.create({
         key: 'starIdle',
