@@ -89,7 +89,7 @@ export const ITEMS = new Map([
 
             piggy.name = "piggybank";
 
-            scene.invItems.set("piggybank", piggy);
+            //scene.invItems.set("piggybank", piggy);
 
             var target = piggy.getBottomRight();
             
