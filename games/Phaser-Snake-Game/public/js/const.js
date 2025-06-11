@@ -1,7 +1,7 @@
 
 
 
-import {GRID, INVENTORY, MODES} from "./SnakeHole.js";
+import {GRID, INVENTORY, MODES,} from "./SnakeHole.js";
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 
 export const PORTAL_COLORS = [
@@ -79,13 +79,16 @@ export const PORTAL_TILE_RULES = { // TODO Move out of here
     424:3
 };
 
+const INVENTORY_X = 500;
+const INVENTORY_Y = 138;
+const INVENTORY_GRID = 20;
 
 
 export const ITEMS = new Map([
     ["piggybank", {
         addToInventory: function (scene) {
-            var piggy = scene.add.sprite(SCREEN_WIDTH - X_OFFSET + 4,
-                 SCREEN_HEIGHT - GRID * 2.5,'inventoryIcons',2)
+            var piggy = scene.add.sprite(INVENTORY_X -2,
+                 INVENTORY_Y + INVENTORY_GRID * 9.75,'inventoryIcons',2)
             .setOrigin(0, 0).setDepth(80);
 
             piggy.name = "piggybank";
@@ -107,10 +110,9 @@ export const ITEMS = new Map([
     }],
     ["gearbox", {
         addToInventory: function (scene) {
-            var gearbox = scene.add.sprite(SCREEN_WIDTH - X_OFFSET + 22, Y_OFFSET + GRID * 8.5,
+            var gearbox = scene.add.sprite(INVENTORY_X, INVENTORY_Y,
                 'inventoryIcons',26)
             .setOrigin(0, 0).setDepth(80).setTint(0xFfc0cb);
-            //gearbox.play('coin01idle');
 
             gearbox.name = "gearbox";
 
@@ -153,7 +155,7 @@ export const ITEMS = new Map([
     }],
     ["comboTrainer", {
         addToInventory: function (scene) {
-            var item = scene.add.sprite(501, 330
+            var item = scene.add.sprite(INVENTORY_X, INVENTORY_Y + INVENTORY_GRID * 6
             ).setOrigin(0, 0).setDepth(80).setTint(0x800080);
             item.play('atom05spawn');
             
@@ -191,7 +193,7 @@ export const ITEMS = new Map([
     }],
     ["comboTrainerX", {
         addToInventory: function (scene) {
-            var item = scene.add.sprite(501 + GRID * 1.5, 330
+            var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 6
             ).setOrigin(0, 0).setDepth(80).setTint(0x808000);
             item.play('atom05spawn');
 
