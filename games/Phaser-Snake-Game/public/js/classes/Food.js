@@ -66,19 +66,20 @@ var Food = new Phaser.Class({
             })
         }
 
-        if(timeSinceFruit > COMBO_ADD_FLOOR){
+        if(timeSinceFruit > COMBO_ADD_FLOOR && scene.scoreHistory.length > 1){
+
+            scene.snake.comboCounter++;
+            scene.scene.get("PinballDisplayScene").comboCountText.setText(scene.snake.comboCounter);
+            
             if (scene.snake.lastPlayedCombo > 0) {
-                scene.comboCounter += 1;
-                scene.comboBounce();
-                };
-            scene.pointSounds[scene.snake.lastPlayedCombo].play();       
+                scene.scene.get("PinballDisplayScene").comboBounce();
+            };
+
+            scene.pointSounds[scene.snake.lastPlayedCombo].play();
+            
             if (scene.snake.lastPlayedCombo < 7) {
                 scene.snake.lastPlayedCombo += 1;
-            }
-        }
-        else {
-            scene.snake.lastPlayedCombo = 0;
-            scene.comboCounter = 0;
+            }  
         }
 
         scene.events.emit('addScore', this); 

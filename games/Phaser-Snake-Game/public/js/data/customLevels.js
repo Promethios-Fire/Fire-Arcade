@@ -335,15 +335,15 @@ export var STAGE_OVERRIDES = new Map([
     
         },
         afterMove: function (scene) {
-            if (scene.comboCounter > scene.highScore) {
-                scene.highScore = scene.comboCounter;
+            if (scene.snake.comboCounter > scene.highScore) {
+                scene.highScore = scene.snake.comboCounter;
                 scene.scene.get("SpaceBoyScene").comboTrainerX_PB.setText(scene.highScore);
 
-                INVENTORY.set("comboTrainerXHS", scene.comboCounter);
+                INVENTORY.set("comboTrainerXHS", scene.snake.comboCounter);
                 localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
             }
 
-            if (scene.comboCounter === 0 && scene.firstFood) {
+            if (scene.snake.comboCounter === 0 && scene.firstFood) {
                 scene.snake.bonk(scene);
                 scene.firstFood = false;
             }
@@ -356,7 +356,7 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         afterEat: function(scene) {
-            if (scene.comboCounter > 0) {
+            if (scene.snake.comboCounter > 0) {
                 // Something is off with the combo counter. It doesn't start after the first combo.
                 // This if statment shouldn't need be.
                 scene.firstFood = true;
@@ -1118,26 +1118,28 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
         scene.snake.grow(scene);
 
         scene.comboText = scene.add.bitmapText(0, 0, 'mainFont', 
-            scene.comboCounter, 
+            scene.snake.comboCounter, 
             8).setOrigin(0.5,0.5).setDepth(100).setAlpha(1).setTintFill(0xFFFFFF);
 
     },
     afterMove: function (scene) {
-        if (scene.comboCounter === 0) {
-                    if (scene.snake.body.length > 3) {
+        if (scene.snake.comboCounter === 0) {
+            if (scene.snake.body.length > 3) {
                 scene.snake.tail = scene.snake.body.slice(-1);
-                var oldPart = scene.snake.body.splice(scene.snake.body.length - 2,1);
+                var oldPart = scene.snake.body.splice(scene.snake.body.length - 1,1);
 
                 oldPart[0].destroy();  
+
+                scene.snake.body[scene.snake.body.length - 1].setFrame(8);
             }
         }
 
 
-        if (scene.comboCounter > scene.highScore) {
-            scene.highScore = scene.comboCounter;
+        if (scene.snake.comboCounter > scene.highScore) {
+            scene.highScore = scene.snake.comboCounter;
             scene.scene.get("SpaceBoyScene").comboTrainertPB.setText(scene.highScore);
 
-            INVENTORY.set("comboTrainerHS", scene.comboCounter);
+            INVENTORY.set("comboTrainerHS", scene.snake.comboCounter);
             localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
         }
         //debugger
@@ -1146,7 +1148,7 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
 
         scene.comboText.x = head.x;
         scene.comboText.y = head.y;
-        scene.comboText.setText(scene.comboCounter);
+        scene.comboText.setText(scene.snake.comboCounter);
 
     },
     checkWinCon: function () {

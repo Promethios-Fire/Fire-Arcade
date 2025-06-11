@@ -2181,7 +2181,13 @@ class PinballDisplayScene extends Phaser.Scene {
             alpha: 0,
         });
 
-        
+        this.comboCountText = this.bestScoreLabel = this.add.bitmapText(
+            206, GRID * 1.25,
+            'mainFontLarge',``, 18
+        ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0).setAlpha(0);
+
+        this.comboCountText.name = 'ComboCountText';
+        this.comboCountText.setText("00");
         
         // 'BONK!!!' text sprite
         this.comboCoverBONK = this.add.sprite(GRID * 17.5, 2, 'UI_comboBONK', 0
@@ -2191,7 +2197,7 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
             this.letterO2,this.letterExplanationPoint,this.comboCoverSnake,
-             this.comboCoverBONK,this.comboCoverReady)
+             this.comboCoverBONK,this.comboCoverReady, this.comboCountText);
 
         this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
         this.comboMasksContainer.add(this.comboMasks);
@@ -2202,6 +2208,67 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboCoverFG.mask = new Phaser.Display.Masks.BitmapMask(this, this.comboMasksContainer);
 
         this.comboCoverFG.mask.invertAlpha = true;
+    }
+    comboBounce(){
+        this.tweens.add({
+            targets: [this.letterC,this.letterO,
+                this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+            y: { from: GRID * 1.25, to: GRID * 0 },
+            ease: 'Sine.InOut',
+            duration: 200,
+            repeat: 0,
+            delay: this.tweens.stagger(60),
+            yoyo: true
+            });
+    }
+
+    comboAppear(){
+        console.log('appearing')
+        this.tweens.add({
+            targets: [this.letterC,this.letterO,
+                this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+            alpha: { from: 0, to: 1 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            repeat: 0,
+            onStart: (tween) => {
+                this.comboActive = true;
+            }
+        });
+        
+    }
+
+    comboFade(){
+        this.comboFadeTween = this.tweens.add({
+            targets: [this.letterC,this.letterO,
+                this.letterM, this.letterB, 
+                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+            alpha: { from: 1, to: 0 },
+            ease: 'Sine.InOut',
+            duration: 300,
+            delay: 750,
+            repeat: 0,
+            onComplete: (tween) => {
+                this.comboActive = false;
+            }
+        });
+    }
+    interrupt(tween) {
+        if (tween) {
+            tween.destroy();
+            // Hides the combo counter on bonk.
+            this.letterC.setAlpha(0);
+            this.letterO.setAlpha(0);
+            this.letterM.setAlpha(0);
+            this.letterB.setAlpha(0);
+            this.letterO2.setAlpha(0);
+            this.letterExplanationPoint.setAlpha(0);
+            this.comboCountText.setAlpha(0);
+
+            this.comboActive = false;           
+        } 
     }
 
     pinballballFGOn(){
@@ -7040,7 +7107,6 @@ class GameScene extends Phaser.Scene {
 
         // BOOST METER
         this.boostEnergy = 600; // Value from 0-1000 which directly dictates ability to boost and the boost mask target.
-        this.comboCounter = 0;
 
         this.goFadeOut = false;
 
@@ -10824,6 +10890,7 @@ class GameScene extends Phaser.Scene {
         /**
          * Number between MAX_SCORE and MIN_SCORE.
          * Always an Integer
+         * INTERVAL IS 1/10th OF A SECOND
          */
         return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
     }
@@ -10892,9 +10959,9 @@ class GameScene extends Phaser.Scene {
                 ourPinball.comboCoverBONK.setAlpha(0);
             },
             onStart: () => {
-                if (ourGame.comboFadeTween) {
-                    ourGame.comboFadeTween.destroy();
-                    ourGame.comboHide();
+                const ourPinball = this.scene.get('PinballDisplayScene');
+                if (ourPinball.comboFadeTween) {
+                    ourPinball.interrupt(ourPinball.comboFadeTween);
                 }
                 
             }
@@ -10935,66 +11002,6 @@ class GameScene extends Phaser.Scene {
             camDirection: this.camDirection,
             mode: this.mode,
         });
-    }
-
-
-    comboBounce(){
-        const ourPinball = this.scene.get('PinballDisplayScene');
-        this.tweens.add({
-            targets: [ourPinball.letterC,ourPinball.letterO,
-                ourPinball.letterM, ourPinball.letterB, 
-                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
-            y: { from: GRID * 1.25, to: GRID * 0 },
-            ease: 'Sine.InOut',
-            duration: 200,
-            repeat: 0,
-            delay: this.tweens.stagger(60),
-            yoyo: true
-            });
-    }
-
-    comboAppear(){
-        const ourPinball = this.scene.get('PinballDisplayScene');
-        console.log('appearing')
-        this.tweens.add({
-            targets: [ourPinball.letterC,ourPinball.letterO,
-                ourPinball.letterM, ourPinball.letterB, 
-                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
-            alpha: { from: 0, to: 1 },
-            ease: 'Sine.InOut',
-            duration: 300,
-            repeat: 0,
-        });
-        this.comboActive = true;
-    }
-
-    comboFade(){
-        const ourPinball = this.scene.get('PinballDisplayScene');
-        this.comboFadeTween = this.tweens.add({
-            targets: [ourPinball.letterC,ourPinball.letterO,
-                ourPinball.letterM, ourPinball.letterB, 
-                ourPinball.letterO2, ourPinball.letterExplanationPoint], 
-            alpha: { from: 1, to: 0 },
-            ease: 'Sine.InOut',
-            duration: 500,
-            repeat: 0,
-        });
-        this.comboActive = false;
-        this.comboCounter = 0;
-    }
-    
-    // Used when another element needs to take precedence such as bonking
-    comboHide(){
-        const ourPinball = this.scene.get('PinballDisplayScene');
-        ourPinball.letterC.setAlpha(0);
-        ourPinball.letterO.setAlpha(0);
-        ourPinball.letterM.setAlpha(0);
-        ourPinball.letterB.setAlpha(0);
-        ourPinball.letterO2.setAlpha(0);
-        ourPinball.letterExplanationPoint.setAlpha(0);
-
-        this.comboActive = false;
-        this.comboCounter = 0;
     }
 
     getStaggerTween (i, group)
@@ -11402,7 +11409,7 @@ class GameScene extends Phaser.Scene {
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly during portaling. After the timer pauses at the Score Floor
              *  the countdown timer will go to 0.  
-             *  -Note: I could fix this with a Math.max() and put it back together again. It would be more efficient. 
+             *  -Note: Could this be fixed with a Math.max() and put it back together again? 
              */
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
     
@@ -11414,6 +11421,7 @@ class GameScene extends Phaser.Scene {
         }
 
         if (timeTick != this.lastTimeTick) {
+            // #region TimerTick
             this.lastTimeTick = timeTick;
 
             if(!this.scoreTimer.paused) {
@@ -11503,6 +11511,22 @@ class GameScene extends Phaser.Scene {
                 }
                 
             }
+
+            const PINBALL = this.scene.get("PinballDisplayScene");
+
+            if (this.snake.comboCounter > 0 && !PINBALL.comboActive) {
+                PINBALL.comboAppear();
+            }
+
+            // Check Combo Counter
+            if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR) {
+                this.snake.comboCounter = 0;
+
+                if (PINBALL.comboActive) {
+                    PINBALL.comboFade();
+                }
+            }
+            
             
         }
         
@@ -11539,18 +11563,6 @@ a
             this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
             this.boostBarTween.updateTo("duration", 30000, true);
         }
-
-
-        if (this.comboCounter > 0 && !this.comboActive) {
-            this.comboAppear();
-        }
-        else if (this.comboCounter == 0 && this.comboActive){
-            this.comboFade();
-        }
-        if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR && this.comboActive) {
-            this.comboFade();
-        }
-
     }
     
 }
