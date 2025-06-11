@@ -2184,8 +2184,8 @@ class PinballDisplayScene extends Phaser.Scene {
 
         this.comboCountText = this.bestScoreLabel = this.add.bitmapText(
             206, GRID * 1.25,
-            'mainFontLarge',``, 14
-        ).setOrigin(1,0.3).setDepth(100).setScrollFactor(0).setAlpha(1);
+            'mainFontLarge',``, 18
+        ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0).setAlpha(0);
 
         this.comboCountText.name = 'ComboCountText';
         this.comboCountText.setText("00");
@@ -2234,8 +2234,11 @@ class PinballDisplayScene extends Phaser.Scene {
             ease: 'Sine.InOut',
             duration: 300,
             repeat: 0,
+            onStart: (tween) => {
+                this.comboActive = true;
+            }
         });
-        this.comboActive = true;
+        
     }
 
     comboFade(){
@@ -2245,12 +2248,30 @@ class PinballDisplayScene extends Phaser.Scene {
                 this.letterO2, this.letterExplanationPoint, this.comboCountText], 
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
-            duration: 500,
-            wait: 100,
+            duration: 300,
+            delay: 750,
             repeat: 0,
+            onComplete: (tween) => {
+                this.comboActive = false;
+            }
         });
         this.comboActive = false;
         //this.scene.get("GameScene").snake.comboCounter = 0;
+    }
+    interupt(tween) {
+        if (tween) {
+            tween.destroy();
+            // Hides the combo counter on bonk.
+            this.letterC.setAlpha(0);
+            this.letterO.setAlpha(0);
+            this.letterM.setAlpha(0);
+            this.letterB.setAlpha(0);
+            this.letterO2.setAlpha(0);
+            this.letterExplanationPoint.setAlpha(0);
+            this.comboCountText.setAlpha(0);
+
+            this.comboActive = false;           
+        } 
     }
 
     pinballballFGOn(){
@@ -10992,20 +11013,9 @@ class GameScene extends Phaser.Scene {
                 ourPinball.comboCoverBONK.setAlpha(0);
             },
             onStart: () => {
-                if (ourGame.comboFadeTween) {
-                    ourGame.comboFadeTween.destroy();
-
-                    // Hides the combo counter on bonk.
-                    const ourPinball = this.scene.get('PinballDisplayScene');
-                    ourPinball.letterC.setAlpha(0);
-                    ourPinball.letterO.setAlpha(0);
-                    ourPinball.letterM.setAlpha(0);
-                    ourPinball.letterB.setAlpha(0);
-                    ourPinball.letterO2.setAlpha(0);
-                    ourPinball.letterExplanationPoint.setAlpha(0);
-
-                    ourPinball.comboActive = false;
-                    //this.snake.comboCounter = 0;
+                const ourPinball = this.scene.get('PinballDisplayScene');
+                if (ourPinball.comboFadeTween) {
+                    ourPinball.interupt(ourPinball.comboFadeTween);
                 }
                 
             }
