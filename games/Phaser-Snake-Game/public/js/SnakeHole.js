@@ -1283,6 +1283,7 @@ class SpaceBoyScene extends Phaser.Scene {
             if (this.inInventory) {
 
                 var selected = this.invArray[this.invIndex];
+                this.scene.get("MainMenuScene").overlayDimmer.setAlpha(0.0);
                 selected.outLine.destroy();
 
                 this.inInventory = false;
@@ -5176,9 +5177,13 @@ class MainMenuScene extends Phaser.Scene {
 
         var mapEngaged = false;
 
+        this.overlayDimmer = this.add.rectangle(0, 0, this.scale.width, this.scale.height, 0x000000)
+            .setOrigin(0, 0).setAlpha(0).setDepth(100); 
+
         // used to back out of sub menus
         this.input.keyboard.on('keydown-Q', e => {
             if (this.menuState === 0) {
+                this.overlayDimmer.setAlpha(0.5);
                 this.scene.pause();
                 this.scene.get("SpaceBoyScene").events.emit("navInventory", 0);
             }
