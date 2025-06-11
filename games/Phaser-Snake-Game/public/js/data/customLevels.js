@@ -1126,7 +1126,7 @@ STAGE_OVERRIDES.set("Bonus_X-13", {
     },
     afterMove: function (scene) {
         if (scene.snake.comboCounter === 0) {
-                    if (scene.snake.body.length > 3) {
+            if (scene.snake.body.length > 3) {
                 scene.snake.tail = scene.snake.body.slice(-1);
                 var oldPart = scene.snake.body.splice(scene.snake.body.length - 1,1);
 
