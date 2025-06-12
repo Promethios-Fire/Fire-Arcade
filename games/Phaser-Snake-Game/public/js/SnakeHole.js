@@ -2185,9 +2185,11 @@ class PinballDisplayScene extends Phaser.Scene {
         });
 
         this.comboCountText = this.bestScoreLabel = this.add.bitmapText(
-            206, GRID * 1.25,
+            205, GRID * 1 + 2,
             'mainFontLarge',``, 13
-        ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0).setAlpha(0);
+        ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0)
+        .setAlpha(0).setTint(0x8e9e40);
+
 
         this.comboCountText.name = 'ComboCountText';
         this.comboCountText.setText("00");
@@ -2200,7 +2202,7 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboMasks = []
         this.comboMasks.push(this.letterC,this.letterO,this.letterM,this.letterB,
             this.letterO2,this.letterExplanationPoint,this.comboCoverSnake,
-             this.comboCoverBONK,this.comboCoverReady, this.comboCountText);
+             this.comboCoverBONK,this.comboCoverReady);//, this.comboCountText);
 
         this.comboMasksContainer = this.make.container(GRID * 6.75, GRID * 0);
         this.comboMasksContainer.add(this.comboMasks);
@@ -2237,13 +2239,15 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboAppearTween = this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+                this.letterO2, this.letterExplanationPoint, 
+                this.comboCountText], 
             alpha: { from: 0, to: 1 },
             ease: 'Sine.InOut',
             duration: 300,
             repeat: 0,
             onStart: (tween) => {
                 this.comboActive = true;
+                this.comboCoverSnake.setFrame(7);
             }
         });
         
@@ -2255,14 +2259,14 @@ class PinballDisplayScene extends Phaser.Scene {
         this.comboFadeTween = this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+                this.letterO2, this.letterExplanationPoint,
+                this.comboCountText], 
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 300,
             delay: 750,
             repeat: 0,
         });
-
     }
     interrupt(tween) {
         if (tween) {
@@ -13843,7 +13847,10 @@ class InputScene extends Phaser.Scene {
                 // At anytime you can update the direction of the snake.
             gameScene.snake.head.setTexture('snakeDefault', 6);
             gameScene.snake.direction = DIRS.UP;
-            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 4)
+            if (!ourPinball.comboActive) {
+                ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 4)
+            }
+            
             
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
             this.turns += 1;
@@ -13876,7 +13883,9 @@ class InputScene extends Phaser.Scene {
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 7);
             gameScene.snake.direction = DIRS.DOWN;
-            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 3)
+            if (!ourPinball.comboActive) {
+                ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 3)
+            }
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -13908,7 +13917,9 @@ class InputScene extends Phaser.Scene {
 
             gameScene.snake.head.setTexture('snakeDefault', 4);
             gameScene.snake.direction = DIRS.LEFT;
-            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 2)
+            if (!ourPinball.comboActive) {
+                ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 2)
+            }
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
@@ -13939,7 +13950,9 @@ class InputScene extends Phaser.Scene {
             this.setPLAY(gameScene);
             gameScene.snake.head.setTexture('snakeDefault', 5);
             gameScene.snake.direction = DIRS.RIGHT;
-            ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
+            if (!ourPinball.comboActive) {
+                ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 1)
+            }
 
             this.turns += 1;
             this.inputSet.push([gameScene.snake.direction, gameScene.time.now]);
