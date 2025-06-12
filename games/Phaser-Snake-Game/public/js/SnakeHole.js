@@ -2115,7 +2115,10 @@ class PinballDisplayScene extends Phaser.Scene {
         //this.scene.bringToTop('PinballDisplayScene');
 
         //const ourGame = this.scene.get("GameScene");
-
+        
+        //check for if combo is ready to display
+        this.comboReady = true;
+        
         // pinball display/combo cover comboCover comboBG
         this.comboCover = this.add.sprite(GRID * 6.75, GRID * 0 + 2,'comboBG')
         .setOrigin(0.0,0.0).setDepth(52).setScrollFactor(0).setAlpha(1).setTint(0x555555);
@@ -2183,7 +2186,7 @@ class PinballDisplayScene extends Phaser.Scene {
 
         this.comboCountText = this.bestScoreLabel = this.add.bitmapText(
             206, GRID * 1.25,
-            'mainFontLarge',``, 18
+            'mainFontLarge',``, 13
         ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0).setAlpha(0);
 
         this.comboCountText.name = 'ComboCountText';
@@ -2213,7 +2216,7 @@ class PinballDisplayScene extends Phaser.Scene {
         this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
-                this.letterO2, this.letterExplanationPoint, this.comboCountText], 
+                this.letterO2, this.letterExplanationPoint,], //this.comboCountText], 
             y: { from: GRID * 1.25, to: GRID * 0 },
             ease: 'Sine.InOut',
             duration: 200,
@@ -2225,7 +2228,13 @@ class PinballDisplayScene extends Phaser.Scene {
 
     comboAppear(){
         console.log('appearing')
-        this.tweens.add({
+        // any remnants of fade happening need to be halted right away
+        if (this.comboFadeTween) {
+                console.log('interrupting fade')
+                this.interrupt(this.comboFadeTween);
+                this.comboFadeTween.destroy();
+            }
+        this.comboAppearTween = this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
                 this.letterO2, this.letterExplanationPoint, this.comboCountText], 
@@ -2241,6 +2250,8 @@ class PinballDisplayScene extends Phaser.Scene {
     }
 
     comboFade(){
+        console.log('fading')
+        this.comboActive = false
         this.comboFadeTween = this.tweens.add({
             targets: [this.letterC,this.letterO,
                 this.letterM, this.letterB, 
@@ -2250,10 +2261,8 @@ class PinballDisplayScene extends Phaser.Scene {
             duration: 300,
             delay: 750,
             repeat: 0,
-            onComplete: (tween) => {
-                this.comboActive = false;
-            }
         });
+
     }
     interrupt(tween) {
         if (tween) {
@@ -2268,7 +2277,7 @@ class PinballDisplayScene extends Phaser.Scene {
             this.comboCountText.setAlpha(0);
 
             this.comboActive = false;           
-        } 
+        }
     }
 
     pinballballFGOn(){
@@ -9113,7 +9122,7 @@ class GameScene extends Phaser.Scene {
 
        // Combo Sprites
 
-       this.comboActive = false; //used to communicate when to activate combo tweens
+       //this.comboActive = false; //used to communicate when to activate combo tweens
 
        /*this.letterC = this.add.sprite(X_OFFSET + GRID * 0 - GRID * 4,GRID * 1.25,"comboLetters", 0).setDepth(51)//.setAlpha(0);
        this.letterO = this.add.sprite(X_OFFSET + GRID * 1.25 - GRID * 4,GRID * 1.25,"comboLetters", 1).setDepth(51)//.setAlpha(0);
@@ -10942,6 +10951,9 @@ class GameScene extends Phaser.Scene {
         this.coinUIText.setHTML(
             `${commaInt(ourPersist.coins).padStart(2, '0')}`
         );
+
+        ourPinball.comboReady = false;
+        this.time.delayedCall(3000, () => ourPinball.comboReady = true);
         
         ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 5)
         
@@ -10961,11 +10973,17 @@ class GameScene extends Phaser.Scene {
             onStart: () => {
                 const ourPinball = this.scene.get('PinballDisplayScene');
                 if (ourPinball.comboFadeTween) {
+                    console.log('interrupting fade')
                     ourPinball.interrupt(ourPinball.comboFadeTween);
+                    ourPinball.comboFadeTween.destroy();
                 }
-                
+                if (ourPinball.comboAppearTween) {
+                    console.log('interrupting appear')
+                    ourPinball.interrupt(ourPinball.comboAppearTween);
+                    ourPinball.comboAppearTween.destroy();
+                }
             }
-        }); 
+        });
 
         //if (this.UI_bonkTween.isPlaying()) {
         //    this.UI_bonkTween.restart();
@@ -11514,20 +11532,18 @@ class GameScene extends Phaser.Scene {
 
             const PINBALL = this.scene.get("PinballDisplayScene");
 
-            if (this.snake.comboCounter > 0 && !PINBALL.comboActive) {
-                PINBALL.comboAppear();
+            if (this.snake.comboCounter > 0 && !PINBALL.comboActive && PINBALL.comboReady) {
+                PINBALL.comboAppear(); 
             }
 
             // Check Combo Counter
             if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR) {
                 this.snake.comboCounter = 0;
-
+                //console.log(PINBALL.comboActive)
                 if (PINBALL.comboActive) {
                     PINBALL.comboFade();
                 }
             }
-            
-            
         }
         
      
