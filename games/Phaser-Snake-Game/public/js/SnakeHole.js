@@ -1155,6 +1155,10 @@ class SpaceBoyScene extends Phaser.Scene {
         setOrigin(0,0).setDepth(102).setAlpha(0);
 
 
+        this.compassBase = this.add.sprite(528 , 304,'compassBase');
+        this.compassBase.name = 'compassBase';
+        this.compassNeedle = this.add.sprite(528 , 308,'compassNeedle');
+        this.compassNeedle.name = 'compassNeedle';
         switch (persist.mode) {
             case MODES.CLASSIC:
                 this.mapProgressPanelText.setText("ADVENTURE");
@@ -3085,6 +3089,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('titleLogo','assets/sprites/UI_TitleLogo.png')
         this.load.spritesheet('arrowMenu','assets/sprites/UI_ArrowMenu.png',{ frameWidth: 17, frameHeight: 15 });
         this.load.spritesheet('inventoryIcons', 'assets/sprites/UI_InventorySheet.png', { frameWidth: 18, frameHeight: 18 });
+        this.load.image('compassBase', 'assets/sprites/UI_InventoryCompassBase.png');
+        this.load.image('compassNeedle', 'assets/sprites/UI_InventoryCompassNeedle.png');
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
