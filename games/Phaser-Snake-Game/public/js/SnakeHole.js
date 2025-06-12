@@ -2140,7 +2140,7 @@ class PinballDisplayScene extends Phaser.Scene {
         ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0).setAlpha(0);
         
         this.comboCoverSnakeEmpty = this.add.sprite(GRID * 15.125, 1, 'UI_comboSnakeEmpty', 0
-        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0).setAlpha(1);
+        ).setOrigin(0.0,0.0).setDepth(101).setScrollFactor(0).setAlpha(0);
         
 
         // combo letters
@@ -2194,7 +2194,7 @@ class PinballDisplayScene extends Phaser.Scene {
         });
 
         this.comboCountText = this.bestScoreLabel = this.add.bitmapText(
-            205, GRID * 1 + 2,
+            206, GRID * 1 + 2,
             'mainFontLarge',``, 13
         ).setOrigin(1,0.42).setDepth(100).setScrollFactor(0)
         .setAlpha(0).setTint(0x8e9e40);
@@ -2264,7 +2264,7 @@ class PinballDisplayScene extends Phaser.Scene {
             alpha: { from: 1, to: 0 },
             ease: 'Sine.InOut',
             duration: 300,
-            delay: 750,
+            delay: 0,
             repeat: 0,
         });
         
@@ -10987,9 +10987,13 @@ class GameScene extends Phaser.Scene {
         ourPinball.comboReady = false;
         this.time.delayedCall(3000, () => ourPinball.comboReady = true);
         
+        ourPinball.comboCoverSnakeEmpty.setAlpha(0);
+        ourPinball.comboCoverSnake.setAlpha(1);
         ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 5)
         
         ourPinball.comboCoverBONK.setAlpha(1);
+
+        
         
         this.UI_bonkTween = this.tweens.add({
             targets: ourPinball.comboCoverBONK, 
