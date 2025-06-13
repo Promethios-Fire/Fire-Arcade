@@ -11087,16 +11087,20 @@ class GameScene extends Phaser.Scene {
 
                 let pos = Phaser.Utils.Array.RemoveRandomElement(locations);
                 var _coin = new Coin(this, this.coinsArray, pos.x , pos.y );
-                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
-                    this.interactLayer[(pos.x - X_OFFSET) / GRID][(pos.y - Y_OFFSET)/ GRID] = _coin;
+                _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+                this.interactLayer[(pos.x - X_OFFSET) / GRID][(pos.y - Y_OFFSET)/ GRID] = _coin;
 
-                    PERSISTS.coins--;
-                    this.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
+                PERSISTS.coins--;
+                this.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
+
+                this.tweens.add({
+                    targets: _coin,
+                    x: { from: this.snake.head.x, to: _coin.x },
+                    y: { from: this.snake.head.x, to: _coin.y },
+                    ease: 'Sine.InOut',
+                    duration: 500,
+                });
             }
-
-            this.tweens.add({
-                targets: this.coinsArray,
-            });
         }
     }
     checkWinCon() { // Returns Bool
