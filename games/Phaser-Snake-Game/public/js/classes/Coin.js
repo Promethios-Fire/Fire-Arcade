@@ -16,6 +16,10 @@ var Coin = new Phaser.Class({
         this.setTexture('coinPickup01Anim.png');
         this.play('coin01idle');
 
+        if (scene.scene.get("SpaceBoyScene").invSettings.get("skullMult") === 5) {
+            this.setTint(0xBB0808);
+        }
+
 
         scene.tweens.add( {
             targets: this,
@@ -47,8 +51,10 @@ var Coin = new Phaser.Class({
             });
         }
 
-        ourPersistScene.coins += 1;
-        PLAYER_STATS.totalCoinsCollected += 1;
+        var skullMult = scene.scene.get("SpaceBoyScene").invSettings.get("skullMult");
+
+        ourPersistScene.coins += 1 * skullMult;
+        PLAYER_STATS.totalCoinsCollected += 1 * skullMult;
         if (ourPersistScene.coins > 0) {
             scene.coinsUIIcon.setVisible(true);
         }

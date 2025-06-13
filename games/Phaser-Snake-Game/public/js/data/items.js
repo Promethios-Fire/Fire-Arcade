@@ -165,15 +165,15 @@ ITEMS.set("skull", {
     skull: null,
     addToInventory: function (scene) {
         var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 4,
-        'inventoryIcons',43).setOrigin(0, 0).setDepth(80);
-        item.setTint(0x880808);
+        'inventoryIcons',17).setOrigin(0, 0).setDepth(80);
+        //item.setTint(0x880808);
 
         
 
         item.name = "skull";
 
         scene.invItems.set("skull", item);
-        scene.invSettings.set("skull", false);
+        scene.invSettings.set("skullMult", 1);
 
         var target = item.getBottomRight();
         
@@ -186,16 +186,16 @@ ITEMS.set("skull", {
     interact: function (scene) {
         var sprite = scene.invItems.get("skull");
 
-        if (scene.invSettings.get("skull") === false) {
-            scene.invSettings.set("skull", true);
-            sprite.setFrame(27);
+        if (scene.invSettings.get("skullMult") === 1) {
+            scene.invSettings.set("skullMult", 5);
+            sprite.setFrame(16);
             
-        } else if (scene.invSettings.get("skull") === true) {
-            sprite.setFrame(26);
-            scene.invSettings.set("skull", false);
+        } else if (scene.invSettings.get("skullMult") === 5) {
+            sprite.setFrame(17);
+            scene.invSettings.set("skullMult", 1);
         }
 
-        console.log("Skull On", scene.invSettings.get("skull"));
+        console.log("Skull On", scene.invSettings.get("skullMult"));
     }
 })
 

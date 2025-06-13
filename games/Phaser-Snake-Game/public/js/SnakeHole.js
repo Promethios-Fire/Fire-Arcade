@@ -115,6 +115,7 @@ const NO_BONK_BASE = 2400;
 const STAGE_TOTAL = STAGES.size;
 
 let SPACE_BOY; // Defined at runtime
+let PERSISTS;
 
 
 
@@ -3224,6 +3225,7 @@ class StartScene extends Phaser.Scene {
 
 
         SPACE_BOY = this.scene.get("SpaceBoyScene");
+        PERSISTS = this.scene.get("PersistScene");
         
         // Loads All Stage Properties
         STAGES.forEach( stageName => {
@@ -11030,9 +11032,13 @@ class GameScene extends Phaser.Scene {
         const ourPinball = this.scene.get("PinballDisplayScene");
         ourSpaceboy.loseCoin();
         this.coinsUIIcon.setVisible(false);
-        ourPersist.coins += -1;
+        if (SPACE_BOY.invSettings.get("skullMult") === 5 ) {
+            PERSISTS.coins = 0;
+        } else {
+            PERSISTS.coins += -1;
+        }
         this.coinUIText.setHTML(
-            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+            `${commaInt(PERSISTS.coins).padStart(2, '0')}`
         );
 
         // we set a timer here because upon respawning, comboAppear() function wants to run immediately
@@ -11067,13 +11073,7 @@ class GameScene extends Phaser.Scene {
                     ourPinball.comboAppearTween.destroy();
                 }
             }
-        });
-
-        //if (this.UI_bonkTween.isPlaying()) {
-        //    this.UI_bonkTween.restart();
-        //}
-        
-
+        });    
     }
     checkWinCon() { // Returns Bool
         return this.length >= this.lengthGoal

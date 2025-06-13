@@ -554,7 +554,6 @@ var Snake = new Phaser.Class({
     
             scene.wallPortals.forEach ( portalWallSegment => {
                 portalWallSegment.snakePortalingSprite.visible = false;
-    
             });
     
             if (ourPersistScene.coins > -1) {
