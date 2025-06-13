@@ -268,6 +268,34 @@ ITEMS.set("sonicCoins", {
     }
 })
 
+ITEMS.set("slowPortals", {
+    slowPortals: null,
+    addToInventory: function (scene) {
+        var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID * 0, INVENTORY_Y + INVENTORY_GRID * 3,
+        'inventoryIcons',1).setOrigin(0, 0).setDepth(80);
+        //item.setTint(0x880808);
+
+        item.name = "slowPortals";
+
+        scene.invItems.set("slowPortals", item);
+        scene.invSettings.set("slowPortals", false)
+    },
+    interact: function (scene) {
+        var sprite = scene.invItems.get("slowPortals");
+
+        if (scene.invSettings.get("slowPortals") === false) {
+            scene.invSettings.set("slowPortals", true);
+            sprite.setFrame(0);
+            
+        } else if (scene.invSettings.get("slowPortals") === true) {
+            scene.invSettings.set("slowPortals", false);
+            sprite.setFrame(1);
+        }
+
+        console.log("SlowPortals", scene.invSettings.get("slowPortals"));
+    }
+})
+
 
 ITEMS.set("template", {
     template: null,

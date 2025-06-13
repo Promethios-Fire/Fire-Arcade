@@ -488,6 +488,7 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["classicCard", INVENTORY.get("classicCard") ?? false],
         ["classicCardBank", INVENTORY.get("classicCardBank") ?? 0],
         ["sonicCoins", INVENTORY.get("sonicCoins") ?? false],
+        ["slowPortals", INVENTORY.get("slowPortals") ?? false],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -1332,8 +1333,9 @@ class SpaceBoyScene extends Phaser.Scene {
             this.comboTrainerX = ITEMS.get("comboTrainerX").addToInventory(this);
         }
 
-        // Default In for testing
+        // Default In for testing. Needs logic to find them.
 
+        ITEMS.get("slowPortals").addToInventory(this);
         ITEMS.get("skull").addToInventory(this);
         ITEMS.get("classicCard").addToInventory(this);
         ITEMS.get("sonicCoins").addToInventory(this);

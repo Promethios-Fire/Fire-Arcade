@@ -1,4 +1,4 @@
-import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG, PLAYER_STATS, X_OFFSET, Y_OFFSET } from "../SnakeHole.js";
+import {GRID, SPEED_WALK, PORTAL_PAUSE, GState, DEBUG, PLAYER_STATS, X_OFFSET, Y_OFFSET, SPACE_BOY } from "../SnakeHole.js";
 
 
 var Portal = new Phaser.Class({
@@ -81,8 +81,18 @@ var Portal = new Phaser.Class({
         if (scene.canPortal === true) {
             scene.gState = GState.PORTAL;
             scene.snake.lastPortal = this;
-            scene.scoreTimer.paused = true;
 
+            let portalTime;
+
+            if (SPACE_BOY.invSettings.get("slowPortals")) {
+                scene.scoreTimer.paused = false;
+                portalTime = 600;
+                
+            } else {
+                scene.scoreTimer.paused = true;
+                portalTime = SPEED_WALK * PORTAL_PAUSE;
+            }
+            
             // Start other portal spinning
             this.targetObject.anims.msPerFrame = 16;
     
@@ -132,7 +142,7 @@ var Portal = new Phaser.Class({
                 x: _x,
                 y: _y,
                 yoyo: false,
-                duration: SPEED_WALK * PORTAL_PAUSE,
+                duration: portalTime,
                 ease: 'Linear',
                 repeat: 0,
                 //delay: 500
