@@ -114,6 +114,8 @@ const NO_BONK_BASE = 2400;
 
 const STAGE_TOTAL = STAGES.size;
 
+let SPACE_BOY; // Defined at runtime
+
 
 
 //debug stuff
@@ -3216,6 +3218,8 @@ class StartScene extends Phaser.Scene {
         this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
 
 
+        SPACE_BOY = this.scene.get("SpaceBoyScene");
+        
         // Loads All Stage Properties
         STAGES.forEach( stageName => {
             /***
@@ -7157,7 +7161,6 @@ class GameScene extends Phaser.Scene {
         const ourStartScene = this.scene.get('StartScene');
         const ourPersist = this.scene.get('PersistScene');
         const ourSpaceBoyScene = this.scene.get("SpaceBoyScene");
-        const SPACE_BOY = this.scene.get("SpaceBoyScene");
         const ourPinball = this.scene.get("PinballDisplayScene");
 
         this.scene.moveBelow("SpaceBoyScene", "GameScene");
@@ -14824,4 +14827,7 @@ if (SCREEN_HEIGHT % GRID != 0) {
 
 
 export const game = new Phaser.Game(config);
+
+// I'd love to put this here as a const, but I don't know how
+// const SPACE_BOY = game.scene.getScene("SpaceBoyScene");
 
