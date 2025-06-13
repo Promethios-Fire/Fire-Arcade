@@ -238,6 +238,34 @@ ITEMS.set("classicCard", {
             scene.savedCoinsUI.setText(INVENTORY.get("savedCoins"));
         }
     }
+});
+
+ITEMS.set("sonicCoins", {
+    sonicCoins: null,
+    addToInventory: function (scene) {
+        var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID * 2, INVENTORY_Y + INVENTORY_GRID * 4,
+        'inventoryIcons',37).setOrigin(0, 0).setDepth(80);
+        //item.setTint(0x880808);
+
+        item.name = "sonicCoins";
+
+        scene.invItems.set("sonicCoins", item);
+        scene.invSettings.set("sonicCoins", false)
+    },
+    interact: function (scene) {
+        var sprite = scene.invItems.get("sonicCoins");
+
+        if (scene.invSettings.get("sonicCoins") === false) {
+            scene.invSettings.set("sonicCoins", true);
+            sprite.setFrame(36);
+            
+        } else if (scene.invSettings.get("sonicCoins") === true) {
+            scene.invSettings.set("sonicCoins", false);
+            sprite.setFrame(37);
+        }
+
+        console.log("Sonic On", scene.invSettings.get("sonicCoins"));
+    }
 })
 
 

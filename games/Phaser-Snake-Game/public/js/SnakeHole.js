@@ -487,6 +487,7 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["skull", INVENTORY.get("skull") ?? false],
         ["classicCard", INVENTORY.get("classicCard") ?? false],
         ["classicCardBank", INVENTORY.get("classicCardBank") ?? 0],
+        ["sonicCoins", INVENTORY.get("sonicCoins") ?? false],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -1333,8 +1334,9 @@ class SpaceBoyScene extends Phaser.Scene {
 
         // Default In for testing
 
-        this.skull = ITEMS.get("skull").addToInventory(this);
-        this.skull = ITEMS.get("classicCard").addToInventory(this);
+        ITEMS.get("skull").addToInventory(this);
+        ITEMS.get("classicCard").addToInventory(this);
+        ITEMS.get("sonicCoins").addToInventory(this);
 
 
     }
@@ -11040,6 +11042,7 @@ class GameScene extends Phaser.Scene {
         } else {
             PERSISTS.coins += -1;
         }
+
         this.coinUIText.setHTML(
             `${commaInt(PERSISTS.coins).padStart(2, '0')}`
         );
@@ -11076,7 +11079,25 @@ class GameScene extends Phaser.Scene {
                     ourPinball.comboAppearTween.destroy();
                 }
             }
-        });    
+        }); 
+
+        if (SPACE_BOY.invSettings.get("sonicCoins")) {
+            var locations = this.validSpawnLocations();
+            while (PERSISTS.coins > 0) {
+
+                let pos = Phaser.Utils.Array.RemoveRandomElement(locations);
+                var _coin = new Coin(this, this.coinsArray, pos.x , pos.y );
+                    _coin.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1.5);
+                    this.interactLayer[(pos.x - X_OFFSET) / GRID][(pos.y - Y_OFFSET)/ GRID] = _coin;
+
+                    PERSISTS.coins--;
+                    this.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
+            }
+
+            this.tweens.add({
+                targets: this.coinsArray,
+            });
+        }
     }
     checkWinCon() { // Returns Bool
         return this.length >= this.lengthGoal
