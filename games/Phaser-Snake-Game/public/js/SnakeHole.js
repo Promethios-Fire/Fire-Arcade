@@ -5,9 +5,10 @@ import { SpawnArea } from './classes/SpawnArea.js';
 import { Snake } from './classes/Snake.js';
 
 
-import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS, ITEMS } from './const.js';
+import { PORTAL_COLORS, PORTAL_TILE_RULES, TRACKS } from './const.js';
 import { STAGE_UNLOCKS, COMPASS_ORDER, STAGES, EXTRACT_CODES, checkRank, checkRankGlobal, checkCanExtract, GAUNTLET_CODES} from './data/UnlockCriteria.js';
 import { STAGE_OVERRIDES } from './data/customLevels.js';
+import { ITEMS } from './data/items.js';
 import { TUTORIAL_PANELS } from './data/tutorialScreens.js';
 import { QUICK_MENUS } from './data/quickMenus.js';
 

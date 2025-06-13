@@ -4,7 +4,9 @@ import { X_OFFSET, Y_OFFSET,
     INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR } from "../SnakeHole.js";
 import { Food } from "../classes/Food.js";
 import { Snake } from "../classes/Snake.js";
-import { PORTAL_COLORS, ITEMS } from '../const.js';
+import { PORTAL_COLORS} from '../const.js';
+
+import { ITEMS } from "./items.js";
 
 
 
