@@ -66,7 +66,7 @@ var Food = new Phaser.Class({
             })
         }
 
-        if(timeSinceFruit > COMBO_ADD_FLOOR && scene.scoreHistory.length > 1){
+        if(timeSinceFruit > COMBO_ADD_FLOOR && scene.scoreHistory.length > 0){
 
             scene.snake.comboCounter++;
             scene.scene.get("PinballDisplayScene").comboCountText.setText(scene.snake.comboCounter);

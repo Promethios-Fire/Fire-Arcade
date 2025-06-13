@@ -2243,6 +2243,7 @@ class PinballDisplayScene extends Phaser.Scene {
         if (this.comboFadeTween) {
                 console.log('interrupting fade')
                 this.interrupt(this.comboFadeTween);
+                this.interrupt(this.comboCountTween);
                 this.comboFadeTween.destroy();
             }
         this.comboAppearTween = this.tweens.add({
@@ -10563,7 +10564,7 @@ class GameScene extends Phaser.Scene {
         // scene blur removal
         const ourSpaceBoy = this.scene.get('SpaceBoyScene');
         const ourGameScene = this.scene.get('GameScene');
-
+        const ourPinball = this.scene.get('PinballDisplayScene');
 
         ourSpaceBoy.deltaScoreUI.alpha = 0;
         // Clear for reseting game
@@ -10573,6 +10574,19 @@ class GameScene extends Phaser.Scene {
         ourGameScene.scene.get("InputScene").scene.restart();
 
         this.gameSceneExternalCleanup();
+
+        // hard reset pinball display elements
+        if (ourPinball.comboFadeTween) {
+            ourPinball.interrupt(ourPinball.comboFadeTween);
+            ourPinball.comboFadeTween.destroy();
+        }
+        if (ourPinball.comboAppearTween) {
+            ourPinball.interrupt(ourPinball.comboAppearTween);
+            ourPinball.comboAppearTween.destroy();
+        }
+        ourPinball.comboCoverSnakeEmpty.setAlpha(0);
+        ourPinball.comboCoverSnake.setAlpha(1);
+        ourPinball.comboCoverSnake.setTexture('UI_comboSnake', 5)
 
         while (ourSpaceBoy.navLog.length > 0) {
             var log = ourSpaceBoy.navLog.pop();
@@ -11574,6 +11588,7 @@ class GameScene extends Phaser.Scene {
             // Check Combo Counter
             if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR) {
                 this.snake.comboCounter = 0;
+                this.snake.lastPlayedCombo = 0;
                 //console.log(PINBALL.comboActive)
                 if (PINBALL.comboActive) {
                     PINBALL.comboFade();
