@@ -1,4 +1,4 @@
-import { PLAYER_STATS, RANKS, START_STAGE, START_UUID, MODES} from "../SnakeHole.js";
+import { PLAYER_STATS, RANKS, START_STAGE, START_UUID, MODES, INVENTORY} from "../SnakeHole.js";
 import { TUTORIAL_PANELS } from "./tutorialScreens.js";
 import { GAUNTLET_CODES, STAGES } from "./UnlockCriteria.js";
 
@@ -45,6 +45,16 @@ export const QUICK_MENUS = new Map([
                     cards: ["move", "atoms", "portals" , "boost"],
                     toStage: START_STAGE, 
                 });
+            }
+
+            var classicCardCoins = function (coins) {
+                if (coins < 1) {
+                    this.time.delayedCall(120, () => {
+                        
+                    }, this);
+                } else {
+                    return
+                }
             }
 
             mainMenuScene.scene.bringToTop('SpaceBoyScene');//if not called, TutorialScene renders above

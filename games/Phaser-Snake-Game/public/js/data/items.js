@@ -164,7 +164,7 @@ ITEMS.set("comboTrainerX", {
 ITEMS.set("skull", {
     skull: null,
     addToInventory: function (scene) {
-        var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 4,
+        var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID * 0, INVENTORY_Y + INVENTORY_GRID * 4,
         'inventoryIcons',17).setOrigin(0, 0).setDepth(80);
         //item.setTint(0x880808);
 
@@ -199,6 +199,46 @@ ITEMS.set("skull", {
     }
 })
 
+ITEMS.set("classicCard", {
+    template: null,
+    addToInventory: function (scene) {
+        var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID * 1, INVENTORY_Y + INVENTORY_GRID * 4,
+        'inventoryIcons',14).setOrigin(0, 0).setDepth(80);
+        //item.setTint(0x880808);
+
+        item.name = "classicCard";
+
+        scene.invItems.set("classicCard", item);
+
+        var target = item.getBottomRight();
+        
+        item.invText = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
+            "",
+        8).setOrigin(1,1).setDepth(81);
+
+        if (INVENTORY.get("classicCardBank") > 0) {
+            item.invText.setText(INVENTORY.get("classicCardBank"));
+        }
+
+        return item;
+    },
+    interact: function (scene) {
+
+        if (INVENTORY.get("savedCoins") > 4) {
+
+            let _invS = scene.invSettings;
+
+            INVENTORY.set("classicCardBank", INVENTORY.get("classicCardBank") + 2);
+            INVENTORY.set("savedCoins", INVENTORY.get("savedCoins") - 5);
+
+            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+
+            scene.invItems.get("classicCard").invText.setText(INVENTORY.get("classicCardBank"));
+
+            scene.savedCoinsUI.setText(INVENTORY.get("savedCoins"));
+        }
+    }
+})
 
 
 ITEMS.set("template", {

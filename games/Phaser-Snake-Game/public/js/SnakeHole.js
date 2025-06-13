@@ -114,8 +114,8 @@ const NO_BONK_BASE = 2400;
 
 const STAGE_TOTAL = STAGES.size;
 
-let SPACE_BOY; // Defined at runtime
-let PERSISTS;
+export let SPACE_BOY; // Defined at runtime
+export let PERSISTS;
 
 
 
@@ -485,6 +485,8 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
         ["comboTrainerXHS", INVENTORY.get("comboTrainerXHS") ?? 0],
         ["skull", INVENTORY.get("skull") ?? false],
+        ["classicCard", INVENTORY.get("classicCard") ?? false],
+        ["classicCardBank", INVENTORY.get("classicCardBank") ?? 0],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -1332,6 +1334,7 @@ class SpaceBoyScene extends Phaser.Scene {
         // Default In for testing
 
         this.skull = ITEMS.get("skull").addToInventory(this);
+        this.skull = ITEMS.get("classicCard").addToInventory(this);
 
 
     }
@@ -11033,7 +11036,7 @@ class GameScene extends Phaser.Scene {
         ourSpaceboy.loseCoin();
         this.coinsUIIcon.setVisible(false);
         if (SPACE_BOY.invSettings.get("skullMult") === 5 ) {
-            PERSISTS.coins = 0;
+            PERSISTS.coins = -1;
         } else {
             PERSISTS.coins += -1;
         }

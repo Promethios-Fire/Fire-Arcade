@@ -1,7 +1,8 @@
 import { X_OFFSET, Y_OFFSET, 
     GRID, SPEED_WALK, SPEED_SPRINT, MODES, 
     GState, DIRS, commaInt, PLAYER_STATS, 
-    INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR } from "../SnakeHole.js";
+    INVENTORY, BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, SPACE_BOY, 
+    PERSISTS} from "../SnakeHole.js";
 import { Food } from "../classes/Food.js";
 import { Snake } from "../classes/Snake.js";
 import { PORTAL_COLORS} from '../const.js';
@@ -1049,9 +1050,33 @@ export var STAGE_OVERRIDES = new Map([
             //scene.speedSprint = 147;
         },
         postFix: function (scene) {
-    
+
+            if (scene.mode === MODES.CLASSIC && INVENTORY.get("classicCardBank") > 0) {
+                var coinTime = 250;
+
+                scene.time.delayedCall(1250, () => {
+                    for (let index = 1; index <= INVENTORY.get("classicCardBank"); index++) {
+                        scene.time.delayedCall(coinTime * index, () => {
+                            PERSISTS.coins += 1;
+                            console.log('adding classicCardCoin +1')
+                            scene.coinSound.play();
+                            scene.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
+
+                            INVENTORY.set("classicCardBank", INVENTORY.get("classicCardBank") - 1);
+                            localStorage.setItem("inventory", JSON.stringify(Object.fromEntries(INVENTORY)));
+
+                            SPACE_BOY.invItems.get("classicCard").invText.setText(INVENTORY.get("classicCardBank"));
+
+                            if (INVENTORY.get("classicCardBank") === 0) {
+                                SPACE_BOY.invItems.get("classicCard").invText.setText("");
+                            }
+
+
+                        }, scene);
+                    }
+                }, scene);  
+            } 
         },
-        
     }],
     ["World_4-1", {
         preFix: function (scene) {
