@@ -160,3 +160,51 @@ ITEMS.set("comboTrainerX", {
         return
     }
 });
+
+ITEMS.set("skull", {
+    skull: null,
+    addToInventory: function (scene) {
+        var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID, INVENTORY_Y + INVENTORY_GRID * 4,
+        'inventoryIcons',43).setOrigin(0, 0).setDepth(80);
+        item.setTint(0x880808);
+
+        
+
+        item.name = "skull";
+
+        scene.invItems.set("skull", item);
+        scene.invSettings.set("skull", false);
+
+        var target = item.getBottomRight();
+        
+        //scene.comboTrainerX_PB = scene.add.bitmapText(target.x + 1, target.y - 6, 'mainFont',
+        //    INVENTORY.get("skull") ?? 0,
+        //8).setOrigin(1,1).setDepth(81);
+
+        return item;
+    },
+    interact: function (scene) {
+        var sprite = scene.invItems.get("skull");
+
+        if (scene.invSettings.get("skull") === false) {
+            scene.invSettings.set("skull", true);
+            sprite.setFrame(27);
+            
+        } else if (scene.invSettings.get("skull") === true) {
+            sprite.setFrame(26);
+            scene.invSettings.set("skull", false);
+        }
+
+        console.log("Skull On", scene.invSettings.get("skull"));
+    }
+})
+
+
+
+ITEMS.set("template", {
+    template: null,
+    addToInventory: function (scene) {
+    },
+    interact: function (scene) {
+    }
+})

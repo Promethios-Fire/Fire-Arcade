@@ -483,6 +483,7 @@ export var INVENTORY = new Map(Object.entries(JSON.parse(localStorage.getItem("i
         ["comboTrainerHS", INVENTORY.get("comboTrainerHS") ?? 0],
         ["comboTrainerX", INVENTORY.get("comboTrainerX") ?? true],
         ["comboTrainerXHS", INVENTORY.get("comboTrainerXHS") ?? 0],
+        ["skull", INVENTORY.get("skull") ?? false],
     ])
     INVENTORY = inventoryDefaults;
 
@@ -1326,6 +1327,10 @@ class SpaceBoyScene extends Phaser.Scene {
         if (INVENTORY.get("comboTrainerX")) {
             this.comboTrainerX = ITEMS.get("comboTrainerX").addToInventory(this);
         }
+
+        // Default In for testing
+
+        this.skull = ITEMS.get("skull").addToInventory(this);
 
 
     }
