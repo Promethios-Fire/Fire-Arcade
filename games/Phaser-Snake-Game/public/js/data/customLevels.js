@@ -1131,6 +1131,19 @@ export var STAGE_OVERRIDES = new Map([
     }],
 ]);
 
+STAGE_OVERRIDES.set("World_1-3", {
+    1_3: null,
+    methods: {
+        preFix: function (scene) {
+        },
+        postFix: function (scene) {
+        },
+        afterScore: function (scene) {
+            debugger
+        }
+    }
+});
+
 STAGE_OVERRIDES.set("Bonus_X-13", {
     X_13: null,
     preFix: function (scene) {

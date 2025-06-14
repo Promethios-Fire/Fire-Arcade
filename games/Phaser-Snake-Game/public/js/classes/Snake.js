@@ -208,7 +208,7 @@ var Snake = new Phaser.Class({
                 break;
                 
             default:
-                debugger;
+                //debugger; // UNCOMMENT THIS OUT BEFORE PUSH
                 break;
         }
 

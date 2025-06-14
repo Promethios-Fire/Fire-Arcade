@@ -30,7 +30,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 24; //28..................... Win Condition
+export const LENGTH_GOAL = 3; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -477,7 +477,7 @@ var tempSumOfBest = function(scene, stageData) {
 export var INVENTORY_ITEMS = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory-items") ?? "{}"))); {
     
     var inventoryDefaults = new Map([
-        ["boostCapacitor", INVENTORY_ITEMS.get("boostCapacitor") ?? false],
+        ["boostItem", INVENTORY_ITEMS.get("boostItem") ?? false],
         ["piggybank", INVENTORY_ITEMS.get("piggybank") ?? false],
         ["gearbox", INVENTORY_ITEMS.get("gearbox") ?? false],
         ["comboTrainer", INVENTORY_ITEMS.get("comboTrainer") ?? true],
@@ -831,7 +831,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_1-2'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -7253,7 +7253,7 @@ class GameScene extends Phaser.Scene {
     create () {
         if (STAGE_OVERRIDES.has(this.stage)) {
             console.log("Running preFix Override on", this.stage);
-            STAGE_OVERRIDES.get(this.stage).preFix(this);
+            STAGE_OVERRIDES.get(this.stage).methods.preFix(this);
         }
 
 
@@ -9179,16 +9179,16 @@ class GameScene extends Phaser.Scene {
         }
        
 
-       this.boostMask = this.make.image({ // name is unclear.
-           x: SCREEN_WIDTH/2,
-           y: GRID * 1.5,
-           key: 'megaAtlas',
-           frame: 'boostMask.png',
-           add: false
-       }).setOrigin(0.5,0.5);
-       this.boostMask.setScrollFactor(0);
+        this.boostMask = this.make.image({ // name is unclear.
+            x: SCREEN_WIDTH/2,
+            y: GRID * 1.5,
+            key: 'megaAtlas',
+            frame: 'boostMask.png',
+            add: false
+        }).setOrigin(0.5,0.5);
+        this.boostMask.setScrollFactor(0);
 
-       const keys = ['increasing'];
+        const keys = ['increasing'];
 
        
         this.boostBar = this.add.sprite(SCREEN_WIDTH/2 + 11 - GRID, GRID * 1.5)
@@ -9203,20 +9203,26 @@ class GameScene extends Phaser.Scene {
         this.boostBar.play('increasing');
 
 
-       const ourGame = this.scene.get("GameScene");
+        const ourGame = this.scene.get("GameScene");
 
-       this.boostBarTween = this.tweens.add( {
-        targets: this.boostMask,
-        scaleX: this.boostEnergy/1000,
-        ease: 'linear',
-        duration: 2250, // Mariocart countdown timer is 750 milliseconds between beats.
-        yoyo: false,
-        repeat: -1,
-        persist: true,
-        onRepeat: function () {
-            this.updateTo("scaleX", this.parent.scene.boostEnergy/1000, true);
-        },
-       })
+        if (INVENTORY_ITEMS.get("boostItem")) {
+            this.boostBarTween = this.tweens.add( {
+                targets: this.boostMask,
+                scaleX: this.boostEnergy/1000,
+                ease: 'linear',
+                duration: 2250, // Mariocart countdown timer is 750 milliseconds between beats.
+                yoyo: false,
+                repeat: -1,
+                persist: true,
+                onRepeat: function (tween, targets) {
+                    tween.updateTo("scaleX", tween.parent.scene.boostEnergy/1000, true);
+                },
+            });
+        } else {
+            this.boostBarTween = undefined;
+        }
+
+       
 
        
        //const fx1 = boostBar.postFX.addGlow(0xF5FB0F, 0, 0, false, 0.1, 32);
@@ -9684,7 +9690,7 @@ class GameScene extends Phaser.Scene {
 
         if (STAGE_OVERRIDES.has(this.stage)) {
             console.log("Running postFix Override on", this.stage);
-            STAGE_OVERRIDES.get(this.stage).postFix(this);
+            STAGE_OVERRIDES.get(this.stage).methods.postFix(this);
         }
 
         if (DEBUG_SKIP_TO_SCENE && DEBUG_SCENE === "ScoreScene") {
@@ -11812,7 +11818,7 @@ class GameScene extends Phaser.Scene {
         
      
         
-        if (GState.PLAY === this.gState) {
+        if (GState.PLAY === this.gState && this.boostBarTween) {
             if (ourInputScene.spaceBar.isDown) {
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
@@ -11840,8 +11846,10 @@ a
                 
                 this.boostEnergy = Math.min(this.boostEnergy + this.boostAdd, 1000); // Recharge Boost Slowly
             }
+           
             this.boostBarTween.updateTo("scaleX", this.boostEnergy/1000, true);
             this.boostBarTween.updateTo("duration", 30000, true);
+            
         }
     }
     
@@ -13171,8 +13179,6 @@ class ScoreScene extends Phaser.Scene {
 
         this.lights.enable();
         this.lights.setAmbientColor(0x3B3B3B);
-
-        debugger
         
         let rank = this.stageData.stageRank(); // FileNames start at 01.png
         
@@ -13651,8 +13657,6 @@ class ScoreScene extends Phaser.Scene {
                 break;
         }
 
-
-
         
         // #region TOTAL SCORE
         var totalScore = 0;
@@ -13755,8 +13759,17 @@ class ScoreScene extends Phaser.Scene {
             }
 
             //score screen starting arrows
-            ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
-            ourGame.events.emit("spawnArrows", ourGame.snake.head);
+            if (STAGE_OVERRIDES.has(ourGame.stage) && 
+                STAGE_OVERRIDES.get(ourGame.stage).methods.hasOwnProperty("afterScore")) {
+
+                console.log("Running afterScore Override on", ourGame.stage);
+                STAGE_OVERRIDES.get(ourGame.stage).methods.afterScore(ourGame);
+
+            } else {
+                ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
+                ourGame.events.emit("spawnArrows", ourGame.snake.head);
+            }
+            
             
 
             
