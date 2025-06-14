@@ -477,6 +477,7 @@ var tempSumOfBest = function(scene, stageData) {
 export var INVENTORY_ITEMS = new Map(Object.entries(JSON.parse(localStorage.getItem("inventory-items") ?? "{}"))); {
     
     var inventoryDefaults = new Map([
+        ["boostCapacitor", INVENTORY_ITEMS.get("boostCapacitor") ?? false],
         ["piggybank", INVENTORY_ITEMS.get("piggybank") ?? false],
         ["gearbox", INVENTORY_ITEMS.get("gearbox") ?? false],
         ["comboTrainer", INVENTORY_ITEMS.get("comboTrainer") ?? true],
