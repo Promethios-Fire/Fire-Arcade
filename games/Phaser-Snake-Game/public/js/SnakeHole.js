@@ -9729,6 +9729,7 @@ class GameScene extends Phaser.Scene {
     }
 
     compassUpdate(_angle){
+        // Move to SpaceBoyScene @holden.
         const SPACE_BOY = this.scene.get("SpaceBoyScene");
         let compassCheck = undefined;
         //let compassCode = undefined;

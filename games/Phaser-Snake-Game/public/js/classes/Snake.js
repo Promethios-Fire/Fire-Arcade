@@ -489,17 +489,6 @@ var Snake = new Phaser.Class({
                 }
             }
 
-        // #region Coin Collision
-        //for (let index = 0; index < scene.coins.length; index++) {
-        //    
-        //}
-
-        // #region Food Collision
-        //scene.atoms.forEach(_atom => {  
-        //    if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
-        //        
-        //});
-
         if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage)) {
             STAGE_OVERRIDES.get(scene.stage).afterMove(scene);
         }
