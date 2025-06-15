@@ -812,7 +812,7 @@ var SOUND_POINT_COLLECT = [
 var SOUND_PORTAL = [
     ['PortalEntry', [ 'PortalEntry.ogg', 'PortalEntry.mp3' ]]
 ]
-var SOUND_RANK = [
+export const SOUND_RANK = [
     ['rankD', [ 'rankD.ogg', 'rankD.mp3' ]],
     ['rankC', [ 'rankD.ogg', 'rankD.mp3' ]],
     ['rankB', [ 'rankB.ogg', 'rankB.mp3' ]],

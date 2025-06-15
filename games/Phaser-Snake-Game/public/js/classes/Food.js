@@ -1,6 +1,7 @@
 import {DEBUG, END_X, END_Y, SCREEN_WIDTH, GRID, SCREEN_HEIGHT, X_OFFSET, Y_OFFSET, 
     COMBO_ADD_FLOOR, SPEED_WALK, SPEED_SPRINT, GState, PLAYER_STATS, MODES,
-    PERSISTS, SPACE_BOY, INPUT} from "../SnakeHole.js";
+    PERSISTS, SPACE_BOY, INPUT,
+    SOUND_RANK} from "../SnakeHole.js";
 import { STAGE_OVERRIDES } from '../data/customLevels.js';
 
 var Food = new Phaser.Class({
@@ -64,6 +65,15 @@ var Food = new Phaser.Class({
         if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup
 
             scene.winned = true;
+
+            var tempSounds = [];
+
+            // Placeholder winning sounds. Should be its own sound. and music?
+
+            SOUND_RANK.forEach(soundID => {
+            tempSounds.push(scene.sound.add(soundID[0]));
+            });
+            tempSounds[4].play();
 
             scene.gState = GState.TRANSITION;
             
