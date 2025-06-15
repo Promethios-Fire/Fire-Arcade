@@ -38,7 +38,7 @@ ITEMS.set("gearbox", {
     gearbox: null,
     addToInventory: function (scene) {
         var gearbox = scene.add.sprite(INVENTORY_X, INVENTORY_Y,
-            'inventoryIcons',26)
+            'inventoryIcons',24)
         .setOrigin(0, 0).setDepth(80).setTint(0xFfc0cb);
 
         gearbox.name = "gearbox";
@@ -68,7 +68,7 @@ ITEMS.set("gearbox", {
             
         } else if (scene.invSettings.get("gearbox") === "slow") {
             //sprite.setTint(0xFfc0cb);
-            sprite.setFrame(26);
+            sprite.setFrame(24);
             scene.invSettings.set("gearbox", "fast");
             //sprite.text.setText("FAST");
             scene.scene.get("PersistScene").speedSprint = 33
@@ -244,7 +244,7 @@ ITEMS.set("sonicCoins", {
     sonicCoins: null,
     addToInventory: function (scene) {
         var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID * 2, INVENTORY_Y + INVENTORY_GRID * 4,
-        'inventoryIcons',37).setOrigin(0, 0).setDepth(80);
+        'inventoryIcons',47).setOrigin(0, 0).setDepth(80);
         //item.setTint(0x880808);
 
         item.name = "sonicCoins";
@@ -257,11 +257,11 @@ ITEMS.set("sonicCoins", {
 
         if (scene.invSettings.get("sonicCoins") === false) {
             scene.invSettings.set("sonicCoins", true);
-            sprite.setFrame(36);
+            sprite.setFrame(46);
             
         } else if (scene.invSettings.get("sonicCoins") === true) {
             scene.invSettings.set("sonicCoins", false);
-            sprite.setFrame(37);
+            sprite.setFrame(47);
         }
 
         console.log("Sonic On", scene.invSettings.get("sonicCoins"));
@@ -272,7 +272,7 @@ ITEMS.set("slowPortals", {
     slowPortals: null,
     addToInventory: function (scene) {
         var item = scene.add.sprite(INVENTORY_X + INVENTORY_GRID * 0, INVENTORY_Y + INVENTORY_GRID * 3,
-        'inventoryIcons',1).setOrigin(0, 0).setDepth(80);
+        'inventoryIcons',45).setOrigin(0, 0).setDepth(80);
         //item.setTint(0x880808);
 
         item.name = "slowPortals";
@@ -285,11 +285,11 @@ ITEMS.set("slowPortals", {
 
         if (scene.invSettings.get("slowPortals") === false) {
             scene.invSettings.set("slowPortals", true);
-            sprite.setFrame(0);
+            sprite.setFrame(44);
             
         } else if (scene.invSettings.get("slowPortals") === true) {
             scene.invSettings.set("slowPortals", false);
-            sprite.setFrame(1);
+            sprite.setFrame(45);
         }
 
         console.log("SlowPortals", scene.invSettings.get("slowPortals"));

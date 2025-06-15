@@ -3144,6 +3144,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('compassBase', 'assets/sprites/UI_InventoryCompassBase.png');
         this.load.image('compassNeedle', 'assets/sprites/UI_InventoryCompassNeedle.png');
         this.load.image('compassNeedleShadow', 'assets/sprites/UI_InventoryCompassNeedleShadow.png');
+        this.load.image('gridAlign', 'assets/sprites/UI_GridAlign.png');
+        this.load.image('gridCenter', 'assets/sprites/UI_GridCenter.png');
         //this.load.spritesheet('mediaButtons','assets/sprites/UI_MediaButtons.png',{ frameWidth: 18, frameHeight: 16 });
         //this.load.spritesheet('UI_comboSnake','assets/sprites/UI_ComboSnake.png',{ frameWidth: 28, frameHeight: 28 });
         //this.load.image('UI_comboBONK','assets/sprites/UI_comboCoverBONK.png');
@@ -3236,8 +3238,8 @@ class StartScene extends Phaser.Scene {
         this.load.image('tutSnakeSPACE', 'assets/HowToCards/tutorial_snake_SPACE.png');
         this.load.image('tutSnakePortal1', 'assets/HowToCards/tutorial_snake_portal1.png');
         this.load.image('tutSnakePortal2', 'assets/HowToCards/tutorial_snake_portal2.png');
-        this.load.spritesheet('ranksSpriteSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
-        //this.load.spritesheet('ranksSpriteSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 48, frameHeight: 72 });
+        //this.load.spritesheet('ranksSpriteSheet', 'assets/sprites/ranksSpriteSheet.png', { frameWidth: 48, frameHeight: 72 });
+        this.load.spritesheet('ranksSpriteSheet', ['assets/sprites/ranksSpriteSheet.png','assets/sprites/ranksSpriteSheet_n.png'], { frameWidth: 24, frameHeight: 36 });
         //this.load.spritesheet('downArrowAnim', 'assets/sprites/UI_ArrowDownAnim.png',{ frameWidth: 32, frameHeight: 32 });
         //this.load.spritesheet('twinkle01Anim', 'assets/sprites/twinkle01Anim.png', { frameWidth: 16, frameHeight: 16 });
         //this.load.spritesheet('twinkle02Anim', 'assets/sprites/twinkle02Anim.png', { frameWidth: 16, frameHeight: 16 });
@@ -4418,9 +4420,9 @@ class StageCodex extends Phaser.Scene {
                     ).setDepth(80).setOrigin(0,0).setScale(1);
                     
                 } else {
-                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 4
+                    var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 5
                     ).setDepth(80).setOrigin(0,0).setScale(1);
-                    rankIcon.setTintFill(COLOR_BONUS_HEX);
+                    //rankIcon.setTintFill(COLOR_BONUS_HEX);
                 }
 
 
@@ -7395,6 +7397,12 @@ class GameScene extends Phaser.Scene {
                 break;
         }
 
+        // GRID
+
+        this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
+        .setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
+        //this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
+        //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
 
         // SOUND
 
@@ -13189,9 +13197,9 @@ class ScoreScene extends Phaser.Scene {
 
         } else {
             // Extra stuff for GrandMaster
-            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 4
+            var letterRank = this.add.sprite(X_OFFSET + GRID * 3.5, rankY , "ranksSpriteSheet", 5
             ).setDepth(20).setOrigin(0,0).setPipeline('Light2D');
-            letterRank.setTintFill(COLOR_BONUS_HEX);
+            //letterRank.setTintFill(COLOR_BONUS_HEX);
         }
         
     
