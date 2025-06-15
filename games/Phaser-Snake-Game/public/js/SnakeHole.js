@@ -30,7 +30,7 @@ const TUTORIAL_ON = false;
 const GAME_VERSION = 'v0.8.11.07.002';
 export const GRID = 12;        //....................... Size of Sprites and GRID
 //var FRUIT = 5;               //....................... Number of fruit to spawn
-export const LENGTH_GOAL = 3; //28..................... Win Condition
+export const LENGTH_GOAL = 4; //28..................... Win Condition
 const GAME_LENGTH = 4; //............................... 4 Worlds for the Demo
 
 const DARK_MODE = false;
@@ -116,6 +116,7 @@ const STAGE_TOTAL = STAGES.size;
 
 export let SPACE_BOY; // Defined at runtime
 export let PERSISTS;
+export let INPUT;
 
 
 
@@ -3276,6 +3277,7 @@ class StartScene extends Phaser.Scene {
 
         SPACE_BOY = this.scene.get("SpaceBoyScene");
         PERSISTS = this.scene.get("PersistScene");
+        INPUT = this.scene.get("InputScene");
         
         // Loads All Stage Properties
         STAGES.forEach( stageName => {
@@ -7397,10 +7399,10 @@ class GameScene extends Phaser.Scene {
                 break;
         }
 
-        // GRID
+        // #region GRID
 
-        this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
-        .setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
+        //this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
+        //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
         //this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
         //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
 
@@ -9373,7 +9375,7 @@ class GameScene extends Phaser.Scene {
         this.electronGroup = this.add.group();
         
         //  #region @E: addScore
-        this.events.on('addScore', function (fruit) {
+        this.events.on('addScore', function (fruit, timeLeft) {
 
             const ourGameScene = this.scene.get('GameScene');
             const ourScoreScene = this.scene.get('ScoreScene');
@@ -9404,7 +9406,7 @@ class GameScene extends Phaser.Scene {
             });
             
             
-            var timeLeft = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
+            var timeLeft = timeLeft;
 
             PLAYER_STATS.globalScore += timeLeft;
             
@@ -9538,13 +9540,13 @@ class GameScene extends Phaser.Scene {
             }
 
             switch (this.length) {
-                case this.lengthGoal - 3:
+                case this.lengthGoal - 4:
                     ourSpaceBoy.shiftLight1.setAlpha(1);
                     ourSpaceBoy.shiftLight1.setFrame(0);
                     ourSpaceBoy.shiftLight5.setAlpha(1);
                     ourSpaceBoy.shiftLight5.setFrame(0);
                     break;
-                case this.lengthGoal - 2:
+                case this.lengthGoal - 3:
                     ourSpaceBoy.shiftLight2.setAlpha(1);
                     ourSpaceBoy.shiftLight1.setFrame(1);
                     ourSpaceBoy.shiftLight2.setFrame(1);
@@ -9552,7 +9554,7 @@ class GameScene extends Phaser.Scene {
                     ourSpaceBoy.shiftLight4.setFrame(1);
                     ourSpaceBoy.shiftLight5.setFrame(1);
                     break;
-                case this.lengthGoal - 1:
+                case this.lengthGoal - 2:
                     ourSpaceBoy.shiftLight3.setAlpha(2);
                     ourSpaceBoy.shiftLight1.setFrame(2);
                     ourSpaceBoy.shiftLight2.setFrame(2);
@@ -9613,6 +9615,90 @@ class GameScene extends Phaser.Scene {
                 });
 
         }, this);
+
+        this.events.once('win', function (){
+            console.log("YOU WIN" , this.stage);
+            this.winned = true;
+            this.canPortal = false;
+
+
+            var coinsToRemove = Math.floor(this.coinsArray.size / 2);
+            const iterator = this.coinsArray.values(); // Get an iterator for the Set
+        
+            // Remove half of remaining coins.
+            while (coinsToRemove > 0) {
+                const coin = iterator.next().value; // Get the first value
+                this.coinsArray.delete(coin);
+                coin.destroy();  
+                
+                coinsToRemove--;
+            }
+
+
+
+            this.atoms.forEach(atom => {
+                // So you can't see them during free play.
+                atom.electrons.visible = false;
+            })
+
+            var checkList = [...this.portals, ...this.wallPortals];
+            checkList.forEach(portal => {
+                portal.snakePortalingSprite.visible = false;
+            })
+
+
+            //this.scoreLabel.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
+            this.gState = GState.TRANSITION;
+            this.snake.direction = DIRS.STOP;
+            //slowmo comment
+            //this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+
+            this.events.off('addScore');
+
+            const ourInputScene = this.scene.get("InputScene");
+            const ourPersist = this.scene.get("PersistScene");
+
+            var stageDataJSON = {
+                bonks: this.bonks,
+                boostFrames: ourInputScene.boostTime,
+                cornerTime: Math.floor(ourInputScene.cornerTime),
+                diffBonus: this.stageDiffBonus,
+                foodHistory: this.foodHistory,
+                foodLog: this.scoreHistory,
+                medals: this.medals,
+                moveCount: ourInputScene.moveCount,
+                moveHistory: ourInputScene.moveHistory,
+                turnInputs: ourInputScene.turnInputs,
+                turns: ourInputScene.turns,
+                stage:this.stage,
+                mode:this.mode,
+                uuid:this.stageUUID,
+                zedLevel: calcZedObj(ourPersist.zeds).level,
+                zeds: ourPersist.zeds,
+                sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
+            }
+
+            //this.backgroundBlur(true);
+            this.collapsePortals();
+
+            this.scene.launch('ScoreScene', stageDataJSON);
+            
+
+            const ourQuickMenu = this.scene.get('QuickMenuScene');
+            console.log(ourQuickMenu);
+
+
+            // for handling if quick menu is active or not
+            if (this.scene.isActive(ourQuickMenu)) {
+                console.log('its open!!!!')
+                ourQuickMenu.scene.stop();
+            }
+            else{
+                this.backgroundBlur(true);
+            }
+            this.setWallsPermeable();
+        }, this)
 
         this.lastTimeTick = 0;
         // 9-Slice Panels
@@ -9705,6 +9791,18 @@ class GameScene extends Phaser.Scene {
             this.scene.start(DEBUG_SCENE, DEBUG_ARGS.get(DEBUG_SCENE))
         }
         
+    }
+    playAtomSound() {
+        if (this.moveInterval = SPEED_WALK) {
+            // Play atom sound
+            var _index = Phaser.Math.Between(0, this.atomSounds.length - 1);
+            this.atomSounds[_index].play();//Use "index" here instead of "i" if we want randomness back
+            } else if (this.moveInterval = SPEED_SPRINT) {
+                
+                // Play sniper sound here.
+                // There are some moveInterval shenanigans happening here. 
+                // Need to debug when exactly the move call happens compared to setting the movesInterval.
+        }
     }
 
     // #region .setWallsPermeable(
@@ -9928,307 +10026,6 @@ class GameScene extends Phaser.Scene {
 
     // #region .Fanfare(
     victoryFanfare(){
-        const ourInputScene = this.scene.get('InputScene');
-        const ourGame = this.scene.get('GameScene');
-        const ourStartScene = this.scene.get('StartScene');
-        const ourPersist = this.scene.get('PersistScene');
-        const ourSpaceBoy= this.scene.get("SpaceBoyScene");
-
-        
-        // Store speed values
-        let _walkSpeed = this.speedWalk;
-        let _sprintSpeed = this.speedSprint;
-
-        // Store initial camera position
-        let initialCameraX = this.cameras.main.scrollX;
-        let initialCameraY = this.cameras.main.scrollY
-
-        // Start slowMoValCopy at 1 (default time scale). It's copied to preserve its value outside the tween
-        var slowMoValCopy = 1;
-
-        var finalFanfare = false;
-
-        switch (true) {
-            case this.mode === MODES.CLASSIC || this.mode === MODES.EXPERT || this.mode === MODES.TUTORIAL:
-                if (this.nextStagePortalLayer.findByIndex(616)){
-                    finalFanfare = true;
-                }
-                break;
-            case this.mode === MODES.GAUNTLET:
-                if (ourPersist.gauntlet.length === 0) {
-                    finalFanfare = true;
-                }
-                break;
-            case this.mode === MODES.PRACTICE:
-                finalFanfare = false;
-                break;
-        
-            default:
-                debugger // Saftey Break. Don't remove.
-                break;
-        }
-
-
-        if (!finalFanfare){
-            //normal ending
-            // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
-            this.slowMoTween = this.tweens.add({
-                targets: { value: 1 },
-                value: 0.2,
-                duration: 500,
-                yoyo: true,
-                ease: 'Sine.easeInOut',
-                repeat: 0,
-                    onUpdate: (tween) => {
-                        let slowMoValue = tween.getValue();
-                        slowMoValCopy = slowMoValue;
-
-                        // Apply the interpolated slowMoValue to all the timeScales
-                        this.tweens.timeScale = slowMoValue;
-                        this.anims.globalTimeScale = slowMoValue;
-                        this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.speedSprint = _sprintSpeed / slowMoValue;
-                        if (this.starEmitterFinal) {
-                            this.starEmitterFinal.timeScale = slowMoValue;
-                        }
-                    },
-                    onComplete: () => {
-                        console.log('Slow motion effect completed');
-                        this.tweens.timeScale = 1;
-                        this.anims.globalTimeScale = 1;
-                        this.speedWalk = _walkSpeed;
-                        this.speedSprint = _sprintSpeed;
-                        if (this.starEmitterFinal) {
-                            this.starEmitterFinal.timeScale = 1;
-                        }
-                    }
-                    
-                });
-                //this.gState = GState.PLAY;
-
-            }
-        else{
-            //fanfare ending
-            // Slow Motion Tween -- slows down all tweens and anim timeScales withing scene
-            this.snake.criticalStateTween.pause(); // stop flashing red if it exists
-            console.log('should rainbow right now fr')
-            this.slowMoTween = this.tweens.add({
-                targets: { value: 1 },
-                value: 0.2,
-                duration: 500,
-                yoyo: true,
-                ease: 'Sine.easeInOut',
-                repeat: 0,
-                    onUpdate: (tween) => {
-                        // Camera Restraints/Bounds -- isn't needed if not zooming
-                        //this.cameras.main.setBounds(0, 0, 240, 320);
-                        //ourSpaceBoy.cameras.main.setBounds(0, 0, 240, 320);
-                        //ourPersist.cameras.main.setBounds(0, 0, 240, 320);
-
-                        let slowMoValue = tween.getValue();
-                        slowMoValCopy = slowMoValue;
-
-                        // Apply the interpolated slowMoValue to all the timeScales
-                        this.tweens.timeScale = slowMoValue;
-                        this.anims.globalTimeScale = slowMoValue;
-                        this.speedWalk = _walkSpeed  / slowMoValue;
-                        this.speedSprint = _sprintSpeed / slowMoValue;
-                        if (this.starEmitterFinal) {
-                            this.starEmitterFinal.timeScale = slowMoValue;
-                        }
-                        // Camera Zoom
-                        //this.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
-                        //ourSpaceBoy.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
-                        //ourPersist.cameras.main.zoom = 1 + (1 / slowMoValue - 1) * 0.05
-                        
-                        // Continuously interpolate the camera's position to the snake's head -- not needed
-                        //let targetX = this.snake.head.x - this.cameras.main.width / 2;
-                        //let targetY = this.snake.head.y - this.cameras.main.height / 2;
-
-                        /*if (slowMoValue <= 0.5) {
-                            this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
-                            this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
-
-                            ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
-                            ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
-
-                            ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, this.electronFanfare.x - this.cameras.main.width / 2, 1);
-                            ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, this.electronFanfare.y - this.cameras.main.height / 2, 1);
-                        } 
-                        else {
-                            this.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
-                            this.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
-
-                            ourSpaceBoy.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
-                            ourSpaceBoy.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
-                            
-                            ourPersist.cameras.main.scrollX = Phaser.Math.Linear(this.cameras.main.scrollX, 0, 0.01);
-                            ourPersist.cameras.main.scrollY = Phaser.Math.Linear(this.cameras.main.scrollY, 0, 0.01);
-                        }*/
-                    // Set scrollFactor to 1 for all game objects if using zoom-in
-                        // Get all game objects in the scene
-                        /*this.children.list.forEach((child) => {
-                            // Check if the child object has a scroll factor property set to 0
-                            if (child.scrollFactorX === 0 && child.scrollFactorY === 0) {
-                                child.setScrollFactor(1);
-                                this.UIScoreContainer.setScrollFactor(1);
-                                }
-                            });
-                            // Iterate over each child in the container and set the scroll factor to 1
-                            this.UIScoreContainer.each((child) => {
-                                child.setScrollFactor(1);
-                        });*/
-                    },
-                    onComplete: () => {
-                        console.log('Slow motion effect completed');
-                        
-                        this.tweens.timeScale = 1;
-                        this.anims.globalTimeScale = 1;
-                        this.speedWalk = _walkSpeed;
-                        this.speedSprint = _sprintSpeed;
-                        if (this.starEmitterFinal) {
-                            this.starEmitterFinal.timeScale = 1;
-                        }
-                        
-                        this.hsv = Phaser.Display.Color.HSVColorWheel();
-                        const spectrum = Phaser.Display.Color.ColorSpectrum(360);
-                        var colorIndex = 0;
-                        var color = spectrum[colorIndex];
-
-                        this.fxBoost = this.boostBar.preFX.addColorMatrix();
-
-                        this.tweens.addCounter({
-                            from: 0,
-                            to: 360,
-                            duration: 3000,
-                            loop: -1,
-                            onUpdate: (tween) => {
-                                let hueValue = tween.getValue();
-                                this.fxBoost.hue(hueValue);
-                        
-                                // Update each segment's tint with an offset and apply pastel effect
-                                this.snake.body.forEach((part, index) => {
-                                    // Add an offset to the hue for each segment
-                                    let partHueValue = (hueValue + index * 12.41) % 360;
-                        
-                                    // Reduce saturation and increase lightness
-                                    let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
-                        
-                                    if (color) {// only update color when it's not null
-                                        part.setTint(color.color);
-                                    }
-                                });
-                            }
-                        });
-                        
-                        /*this.electronFanfare = ourSpaceBoy.add.sprite(ourSpaceBoy.scoreFrame.getCenter().x -3,ourSpaceBoy.scoreFrame.getCenter().y)
-                            .setDepth(100);
-                        this.electronFanfare.play('electronFanfareIdle');*/
-
-                        /*this.cameras.main.scrollX = 0;
-                        this.cameras.main.scrollY = 0;
-
-                        ourSpaceBoy.cameras.main.scrollX = 0;
-                        ourSpaceBoy.cameras.main.scrollY = 0;
-
-                        ourPersist.cameras.main.scrollX = 0;
-                        ourPersist.cameras.main.scrollY = 0;*/
-                        ourSpaceBoy.CapSparkFinale = ourSpaceBoy.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
-                        .setDepth(100);
-                        
-                        this.gState = GState.PLAY;
-                }
-            });
-
-            // check for extractHole so it doesn't fanfare in gauntlet and other modes
-            if (this.extractHole) {
-                // atomic comet
-                ourSpaceBoy.atomComet = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-                .setDepth(100);
-                ourSpaceBoy.atomComet.play('atomCometSpawn');
-                ourSpaceBoy.atomComet.chain(['atomCometIdle']);
-
-
-                // rainbow electronFanfare
-                ourSpaceBoy.electronFanfare = ourSpaceBoy.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-                .setDepth(100);
-                ourSpaceBoy.electronFanfare.play('electronFanfareForm');
-                
-
-                // emit stars from electronFanfare
-                this.starEmitterFinal = this.add.particles(6,6,"twinkle01", { 
-                    speed: { min: -20, max: 20 },
-                    angle: { min: 0, max: 360 },
-                    alpha: { start: 1, end: 0 },
-                    anim: 'starIdle',
-                    lifespan: 1000,
-                    follow: ourSpaceBoy.electronFanfare,
-                }).setFrequency(150,[1]).setDepth(1);
-
-                ourGame.countDown.setAlpha(0);
-            }
-
-        this.tweens.add({ //slower one-off snakeEating tween
-            targets: this.snake.body, 
-            scale: [1.25,1],
-            yoyo: false,
-            duration: 128,
-            ease: 'Linear',
-            repeat: 0,
-            timeScale: slowMoValCopy,
-            delay: this.tweens.stagger(this.speedSprint),
-            onUpdate: (tween) => {
-                this.timeScale = slowMoValCopy /2;
-            }
-        });
-
-        // Atomic Comet and Electron Fanfare Tween
-        if (ourSpaceBoy.electronFanfare) {
-            ourSpaceBoy.electronFanfare.on('animationcomplete', (animation, frame) => {
-                if (animation.key === 'electronFanfareForm') {
-                    this.tweens.add({
-                        targets: [ourSpaceBoy.electronFanfare,ourSpaceBoy.atomComet],
-                        x: ourSpaceBoy.scoreFrame.getCenter().x -6,
-                        y: ourSpaceBoy.scoreFrame.getCenter().y,
-                        ease: 'Sine.easeIn',
-                        duration: 1250,
-                        onComplete: () => {
-                            ourGame.countDown.setAlpha(1);
-                            ourGame.countDown.x = X_OFFSET + GRID * 4 - 6;
-                            ourGame.countDown.y = 3;
-                            ourSpaceBoy.atomComet.destroy();
-                        }
-                    });
-                            ourGame.countDown.setHTML('W1N');
-                            ourGame.countDown.x += 3
-                    }
-                    
-            });
-
-            ourSpaceBoy.electronFanfare.chain(['electronFanfareIdle']);
-            }
-        }
-
-        /*this.starEmitter = this.add.particles(X_OFFSET, Y_OFFSET, "starIdle", { 
-            x:{min: 0, max: SCREEN_WIDTH},
-            y:{min: 0, max: SCREEN_HEIGHT},
-            alpha: { start: 1, end: 0 },
-            gravityX: -50,
-            gravityY: 50,
-            anim: 'starIdle',
-            lifespan: 3000,
-        }).setFrequency(300,[1]).setDepth(1);
-
-        // check if stage next is empty -- means it's the final extraction point
-
-        this.starEmitterFinal = this.add.particles(6,6,"starIdle", { 
-            speed: { min: -20, max: 20 },
-            angle: { min: 0, max: 360 },
-            alpha: { start: 1, end: 0 },
-            anim: 'starIdle',
-            lifespan: 1000,
-            follow:this.snake.head,
-        }).setFrequency(150,[1]).setDepth(1);*/
     }
 
 
@@ -10755,6 +10552,7 @@ class GameScene extends Phaser.Scene {
         ourGameScene.events.off('addScore');
         ourGameScene.events.off('spawnBlackholes');
         ourGameScene.events.off('spawnArrows');
+        ourGameScene.events.off('win');
         ourGameScene.scene.get("InputScene").scene.restart();
 
         //reset compass needle
@@ -11271,7 +11069,9 @@ class GameScene extends Phaser.Scene {
         }
     }
     checkWinCon() { // Returns Bool
-        return this.length >= this.lengthGoal
+        // Use Atom for default game.
+        // this.length >= this.lengthGoal
+        return false
     }
 
     checkLoseCon() {
@@ -11433,92 +11233,8 @@ class GameScene extends Phaser.Scene {
 
         
         // #region Win State
-        if (this.checkWinCon() && !this.winned) {
-
-            console.log("YOU WIN" , this.stage);
-            this.winned = true;
-            this.canPortal = false;
-
-
-            var coinsToRemove = Math.floor(this.coinsArray.size / 2);
-            const iterator = this.coinsArray.values(); // Get an iterator for the Set
-        
-            // Remove half of remaining coins.
-            while (coinsToRemove > 0) {
-                const coin = iterator.next().value; // Get the first value
-                this.coinsArray.delete(coin);
-                coin.destroy();  
-                
-                coinsToRemove--;
-            }
-
-
-            
-
-            this.atoms.forEach(atom => {
-                // So you can't see them during free play.
-                atom.electrons.visible = false;
-            })
-
-            var checkList = [...this.portals, ...this.wallPortals];
-            checkList.forEach(portal => {
-                portal.snakePortalingSprite.visible = false;
-            })
-
-
-            //this.scoreLabel.setText(`Stage: ${this.scoreHistory.reduce((a,b) => a + b, 0)}`); //commented out as it double prints
-            this.gState = GState.TRANSITION;
-            this.snake.direction = DIRS.STOP;
-            //slowmo comment
-            //this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
-
-
-            this.events.off('addScore');
-
-            const ourInputScene = this.scene.get("InputScene");
-            const ourPersist = this.scene.get("PersistScene");
-
-            var stageDataJSON = {
-                bonks: this.bonks,
-                boostFrames: ourInputScene.boostTime,
-                cornerTime: Math.floor(ourInputScene.cornerTime),
-                diffBonus: this.stageDiffBonus,
-                foodHistory: this.foodHistory,
-                foodLog: this.scoreHistory,
-                medals: this.medals,
-                moveCount: ourInputScene.moveCount,
-                moveHistory: ourInputScene.moveHistory,
-                turnInputs: ourInputScene.turnInputs,
-                turns: ourInputScene.turns,
-                stage:this.stage,
-                mode:this.mode,
-                uuid:this.stageUUID,
-                zedLevel: calcZedObj(ourPersist.zeds).level,
-                zeds: ourPersist.zeds,
-                sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
-            }
-
-            //this.backgroundBlur(true);
-            this.collapsePortals();
-
-            this.scene.launch('ScoreScene', stageDataJSON);
-            
-            
-            
-
-            const ourQuickMenu = this.scene.get('QuickMenuScene');
-            console.log(ourQuickMenu);
-
-
-            // for handling if quick menu is active or not
-            if (this.scene.isActive(ourQuickMenu)) {
-                console.log('its open!!!!')
-                ourQuickMenu.scene.stop();
-            }
-            else{
-                this.backgroundBlur(true);
-            }
-            this.setWallsPermeable();
+        if (this.checkWinCon()) {
+            this.events.emit('win');
         }
 
         // #region Lose State
