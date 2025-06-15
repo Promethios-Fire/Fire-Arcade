@@ -4416,7 +4416,7 @@ class StageCodex extends Phaser.Scene {
 
                 if (_rank != 5) {
                     var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
-                    ).setDepth(80).setOrigin(0,0).setScale(1);
+                    ).setDepth(80).setOrigin(0,0).setScale(1);//add light
                     
                 } else {
                     var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 5
@@ -4491,21 +4491,21 @@ class StageCodex extends Phaser.Scene {
             })
 
 
-            var selected = this.yMap.get(stageDisplay);
+            this.selected = this.yMap.get(stageDisplay);
 
             
-            if (selected === undefined) { // Haven't beaten level yet
-                var selected = this.yMap.get(ourPersist.prevStage);
+            if (this.selected === undefined) { // Haven't beaten level yet
+                this.selected = this.yMap.get(ourPersist.prevStage);
             }
 
-            if (selected === undefined) { // Storage Level was not unlocked yet on a mode.
-                var selected = this.yMap.get(START_STAGE);
+            if (this.selected === undefined) { // Storage Level was not unlocked yet on a mode.
+                this.selected = this.yMap.get(START_STAGE);
             }
 
-            selected.title.setTintFill(COLOR_FOCUS_HEX);
+            this.selected.title.setTintFill(COLOR_FOCUS_HEX);
 
-            this.containerToY = selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
-            
+            //this.containerToY = this.selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+            this.containerToY = 56;
             this.maskContainerMenu = this.make.container(0, 0);
             
             // mask for top of codexContainer
@@ -4536,37 +4536,27 @@ class StageCodex extends Phaser.Scene {
             this.codexContainer.mask = new Phaser.Display.Masks.BitmapMask(this, this.maskContainerMenu);
             this.codexContainer.mask.invertAlpha = true;
             
-
+            this.menuLengthInPixels = this.yMap.size * 56;   
 
             this.input.keyboard.on('keydown-UP', e => {
 
-                selected.title.clearTint()
+                this.selected.title.clearTint()
 
                 if (practiceMode) {
-                    var safeIndex = Math.max(selected.index - 1, -1);
+                    var safeIndex = Math.max(this.selected.index - 1, -1);
                 } else {
-                    var safeIndex = Math.max(selected.index - 1, 0);
+                    var safeIndex = Math.max(this.selected.index - 1, 0);
                 }
                 
                 if (safeIndex != -1) {
                     var nextSelect = ([...this.yMap.keys()][safeIndex]);
-                    selected = this.yMap.get(nextSelect);
+                    this.selected = this.yMap.get(nextSelect);
                     ourPersist.prevCodexStageMemory = nextSelect;
                     
-                    this.containerToY = selected.conY * -1 + nextRow;
+                    this.containerToY = this.selected.conY * -1 + nextRow;
 
-                    selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    /*this.tweens.add({
-                        targets: this.codexContainer,
-                        y: this.containerToY,
-                        ease: 'Sine.InOut',
-                        duration: 0,
-                        onComplete: () => {
-                            if (exitButton.frame.name === 0) {
-                                selected.title.setTintFill(COLOR_FOCUS_HEX);
-                            }
-                        }
-                    }, this);*/
+
+                    this.selected.title.setTintFill(COLOR_FOCUS_HEX);
                     
                 } else {
                     exitButton.setFrame(1);
@@ -4578,38 +4568,28 @@ class StageCodex extends Phaser.Scene {
             }, this);
 
             this.input.keyboard.on('keydown-DOWN', e => {
-
-                var dur = 500;
                 if (exitButton && exitButton.frame.name === 1) {
                     exitButton.setFrame(0);
                     exitText.node.style.color = "white"
                     var safeIndex = 0;
-                    dur = 0;
-                    
                 }
                 else {
-                    var safeIndex = Math.min(selected.index + 1, this.yMap.size - 1);
+                    var safeIndex = Math.min(this.selected.index + 1, this.yMap.size - 1);
                 }
                 
-                
+                this.selected.title.clearTint()
 
-                selected.title.clearTint()
-     
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
-                selected = this.yMap.get(nextSelect);
+                this.selected = this.yMap.get(nextSelect);
                 ourPersist.prevCodexStageMemory = nextSelect;
                 
-                this.containerToY = selected.conY * -1 + nextRow;
-                selected.title.setTintFill(COLOR_FOCUS_HEX);
-                /*this.tweens.add({
-                    targets: this.codexContainer,
-                    y: this.containerToY,
-                    ease: 'Sine.InOut',
-                    duration: 0,
-                    onComplete: () => {
-                        selected.title.setTintFill(COLOR_FOCUS_HEX);
-                    }
-                }, this);*/
+                //console.log(this.selected.index)
+
+                this.containerToY = this.selected.conY * -1 + nextRow;
+
+                
+                this.selected.title.setTintFill(COLOR_FOCUS_HEX);
+
             }, this);  
         }
 
@@ -4622,10 +4602,10 @@ class StageCodex extends Phaser.Scene {
                    this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
 
                 } else {
-                    console.log("Launch Practice!", selected.stageTitle);
+                    console.log("Launch Practice!", this.selected.stageTitle);
                     
                     this.scene.start("GameScene", {
-                        stage: selected.stageTitle,
+                        stage: this.selected.stageTitle,
                         score: 0,
                         startupAnim: true,
                         mode: MODES.PRACTICE
@@ -4724,15 +4704,33 @@ class StageCodex extends Phaser.Scene {
             }                               
         }
     }
-    update() { 
+    update() {
+
+        // check for if menu scroll is beyond bounds.
+        // this could be checked on keydown, but there's...
+        // not much else going on in this scene so seems fine
+        this.containerYOffset = 56 + this.containerToY;
+        if (-this.containerToY >= this.menuLengthInPixels - 56 * 4) {
+            this.containerYOffset = 56 + this.containerToY;
+        }
+        else if (-this.containerToY <= 56) {
+            this.containerYOffset = this.containerToY;
+        }
+
         this.tweens.add({ // CLEAN UP: THis is adding a tween every frame.
             targets: this.codexContainer,
-            y: this.containerToY,
+            y: this.containerYOffset,
             ease: 'Linear',
             duration: 100,
             repeat: 0,
             yoyo: true,
-        });  
+            onUpdate: ()=>{
+                if (-this.containerToY >= this.menuLengthInPixels - 56 * 4) {
+                    this.codexContainer.y = Phaser.Math.Clamp(this.codexContainer.y,
+                    -(this.menuLengthInPixels - 56 * 5),56);
+                } 
+            }
+        }); 
     }
 }
 
