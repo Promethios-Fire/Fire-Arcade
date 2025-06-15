@@ -4265,7 +4265,7 @@ class StageCodex extends Phaser.Scene {
         var sumOfBestDisplay;
         var stagesCompleteDisplay;
         var categoryText;
-        
+
 
         updateSumOfBest(ourPersist);
         
@@ -4538,7 +4538,6 @@ class StageCodex extends Phaser.Scene {
             this.menuLengthInPixels = this.yMap.size * 56;   
 
             this.input.keyboard.on('keydown-UP', e => {
-
                 this.selected.title.clearTint()
 
                 if (practiceMode) {
@@ -4549,6 +4548,13 @@ class StageCodex extends Phaser.Scene {
                 
                 if (safeIndex != -1) {
                     var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                    
+                    // check if the menu can scroll more
+                    console.log('selected',this.selected.stageTitle, 'nextSelect', nextSelect)
+                    if (this.selected.stageTitle !== nextSelect) {
+                        SPACE_BOY.sound.play('buttonHover01');
+                    }
+
                     this.selected = this.yMap.get(nextSelect);
                     ourPersist.prevCodexStageMemory = nextSelect;
                     
@@ -4557,7 +4563,10 @@ class StageCodex extends Phaser.Scene {
 
                     this.selected.title.setTintFill(COLOR_FOCUS_HEX);
                     
-                } else {
+                } else { //checks for exit button logic
+                    if (exitButton.frame.name !== 1) {
+                        SPACE_BOY.sound.play('buttonHover01');
+                    }
                     exitButton.setFrame(1);
                     exitText.node.style.color = "red";
                     var firstElement = this.yMap.get([...this.yMap.keys()][0]);
@@ -4571,6 +4580,7 @@ class StageCodex extends Phaser.Scene {
                     exitButton.setFrame(0);
                     exitText.node.style.color = "white"
                     var safeIndex = 0;
+                    SPACE_BOY.sound.play('buttonHover01');
                 }
                 else {
                     var safeIndex = Math.min(this.selected.index + 1, this.yMap.size - 1);
@@ -4579,16 +4589,18 @@ class StageCodex extends Phaser.Scene {
                 this.selected.title.clearTint()
 
                 var nextSelect = ([...this.yMap.keys()][safeIndex]);
+                
+                // check if the menu can scroll more
+                if (this.selected.stageTitle !== nextSelect) {
+                    SPACE_BOY.sound.play('buttonHover01');
+                }
                 this.selected = this.yMap.get(nextSelect);
                 ourPersist.prevCodexStageMemory = nextSelect;
-                
-                //console.log(this.selected.index)
 
                 this.containerToY = this.selected.conY * -1 + nextRow;
 
                 
                 this.selected.title.setTintFill(COLOR_FOCUS_HEX);
-
             }, this);  
         }
 
