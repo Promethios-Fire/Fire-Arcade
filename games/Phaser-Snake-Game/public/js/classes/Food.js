@@ -98,7 +98,7 @@ var Food = new Phaser.Class({
                         targets: finalAtom,
                         x: SPACE_BOY.scoreFrame.getCenter().x -6,
                         y: SPACE_BOY.scoreFrame.getCenter().y,
-                        duration: 300,
+                        duration: 500,
                         delay: 0,
                         ease: 'Sine.in',
                         onComplete: () => {
