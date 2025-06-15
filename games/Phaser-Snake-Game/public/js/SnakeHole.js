@@ -4265,6 +4265,7 @@ class StageCodex extends Phaser.Scene {
         var sumOfBestDisplay;
         var stagesCompleteDisplay;
         var categoryText;
+        
 
         updateSumOfBest(ourPersist);
         
@@ -4416,12 +4417,10 @@ class StageCodex extends Phaser.Scene {
 
                 if (_rank != 5) {
                     var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", bestOf.stageRank()
-                    ).setDepth(80).setOrigin(0,0).setScale(1);//add light
-                    
+                    ).setDepth(80).setOrigin(0,0).setScale(1); //.setPipeline('Light2D');
                 } else {
                     var rankIcon = this.add.sprite(topLeft + GRID * 24 - 4 , topY - 4, "ranksSpriteSheet", 5
-                    ).setDepth(80).setOrigin(0,0).setScale(1);
-                    //rankIcon.setTintFill(COLOR_BONUS_HEX);
+                    ).setDepth(80).setOrigin(0,0).setScale(1); //.setPipeline('Light2D');
                 }
 
 
@@ -4504,8 +4503,8 @@ class StageCodex extends Phaser.Scene {
 
             this.selected.title.setTintFill(COLOR_FOCUS_HEX);
 
-            //this.containerToY = this.selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
-            this.containerToY = 56;
+            this.containerToY = this.selected.conY * -1 + nextRow ?? 0; // A bit cheeky. maybe too cheeky.
+
             this.maskContainerMenu = this.make.container(0, 0);
             
             // mask for top of codexContainer
@@ -7398,8 +7397,8 @@ class GameScene extends Phaser.Scene {
 
         //this.gridAlign = this.add.sprite(X_OFFSET, Y_OFFSET,'gridAlign')
         //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
-        this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
-        .setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
+        //this.gridCenter = this.add.sprite(X_OFFSET, Y_OFFSET,'gridCenter')
+        //.setDepth(0).setOrigin(0,0).setAlpha(0.333).setScrollFactor(0);
 
         // SOUND
 
