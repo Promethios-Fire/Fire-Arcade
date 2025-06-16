@@ -102,15 +102,16 @@ var Food = new Phaser.Class({
 
                     var finalAtom = SPACE_BOY.add.sprite(this.x, this.y).setOrigin(0,0);
                     finalAtom.play("atom02idle", this.frame.name)
+                    finalAtom.setDepth(100);                    
                     debugger
 
                     var finalAtomTween = SPACE_BOY.tweens.add( {
                         targets: finalAtom,
-                        x: SPACE_BOY.scoreFrame.getCenter().x -6,
+                        x: SPACE_BOY.scoreFrame.getCenter().x,
                         y: SPACE_BOY.scoreFrame.getCenter().y,
-                        duration: 500,
+                        duration: 750,
                         delay: 0,
-                        ease: 'Sine.in',
+                        ease: 'Expo.easeIn',
                         onComplete: () => {
                             scene.events.emit('win');
 
