@@ -4550,7 +4550,7 @@ class StageCodex extends Phaser.Scene {
                     var nextSelect = ([...this.yMap.keys()][safeIndex]);
                     
                     // check if the menu can scroll more
-                    console.log('selected',this.selected.stageTitle, 'nextSelect', nextSelect)
+                    //console.log('selected',this.selected.stageTitle, 'nextSelect', nextSelect)
                     if (this.selected.stageTitle !== nextSelect) {
                         SPACE_BOY.sound.play('buttonHover01');
                     }
@@ -4629,8 +4629,11 @@ class StageCodex extends Phaser.Scene {
                 this.input.keyboard.on('keydown-Q', e => {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
+                    this.scene.get("MainMenuScene").expandMenu(0);
+                    this.scene.get("MainMenuScene").expandLogo()
                     this.scene.stop('StageCodex');
                     this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
+                    
                 });
         } 
         else {
@@ -4858,18 +4861,7 @@ class MainMenuScene extends Phaser.Scene {
 
             titleContainer.y = -GRID * 6;
 
-            var titleTween = this.tweens.add({
-                targets: this.titleLogo,
-                alpha: 1,
-                duration: 300,
-                ease: 'Sine.InOut',
-            });
-            this.tweens.add({
-                targets: this.titlePortal,
-                scale: 1.25,
-                duration: 300,
-                ease: 'Sine.InOut',
-            });
+            this.expandLogo();
 
             var fadeInDuration = 0;
         }
@@ -4905,16 +4897,9 @@ class MainMenuScene extends Phaser.Scene {
         // main menu selectable options with their corresponding functions
         var menuOptions = new Map([
             ['practice', function () {
+                this.collapseMenu(0);
                 console.log("Practice");
-                this.scene.launch("StageCodex", {
-                    originScene: this,
-                    fromQuickMenu: false,
-                    disableArrows: true,
-                    practiceMode: true, 
-                });
-                mainMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
-                mainMenuScene.scene.get("PersistScene").coins = 12;
-                mainMenuScene.scene.sleep('MainMenuScene');
+                
                 return true;
             }],
             ['adventure', function () {
@@ -5066,19 +5051,7 @@ class MainMenuScene extends Phaser.Scene {
                     this.subSelected = selectedElement; // Highlight the selected menu element
                     this.subMenuElements[0].node.style.color = "white";
                     
-                    // Add tweens for logo hide
-                    this.tweens.add({
-                        targets: this.titleLogo,
-                        alpha: 0,
-                        duration: 300,
-                        ease: 'Sine.InOut',
-                    });
-                    this.tweens.add({
-                        targets: this.titlePortal,
-                        scale: 0.01, // Prevent visual/camera bugs
-                        duration: 300,
-                        ease: 'Sine.InOut',
-                    });
+
         
                     // Manually update tweens for buttons and pointer
                     this.tweens.add({
@@ -5233,18 +5206,7 @@ class MainMenuScene extends Phaser.Scene {
                     ease: 'Sine.Out',
                 });
 
-                this.tweens.add({
-                    targets: this.titleLogo,
-                    alpha: 1,
-                    duration: 300,
-                    ease: 'Sine.InOut',
-                });
-                this.tweens.add({
-                    targets: this.titlePortal,
-                    scale: 1.25,
-                    duration: 300,
-                    ease: 'Sine.InOut',
-                });
+                this.expandLogo();
 
                 this.tweens.add({
                     targets: this.extrasButton, //back button is swapped to extras button here
@@ -5383,18 +5345,7 @@ class MainMenuScene extends Phaser.Scene {
                 this.changeMenuSprite(6);
                 this.extrasIcon.setFrame(14);
 
-                this.tweens.add({
-                    targets: this.titleLogo,
-                    alpha: 1,
-                    duration: 300,
-                    ease: 'Sine.InOut',
-                });
-                this.tweens.add({
-                    targets: this.titlePortal,
-                    scale: 1.25,
-                    duration: 300,
-                    ease: 'Sine.InOut',
-                });
+                this.expandLogo();
 
                 this.tweens.add({
                     targets: [...this.subMenuElements,this.shopButton,this.customizeButton,
@@ -5898,18 +5849,89 @@ class MainMenuScene extends Phaser.Scene {
     // collapse main menu, and bring extras tab to focus
     // could be made more dynamic by passing arguments for other menus in the future
     collapseMenu(menuOption) {
-        this.menuState = 1;
+        //this.menuState = 1;
         this.sideMenuPrompts('hide');
         const ourMenuScene = this.scene.get('MainMenuScene');
         this.inMotion = true;
 
         switch (menuOption) {
-            case 0:
-            console.log('placeholder menu state');
+            case 0: // PRACTICE
+                this.inMotion = true;
+
+                var selectedElements = [
+                    this.menuElements[0],
+                    this.menuElements[1],
+                    this.menuElements[2],
+                    this.menuElements[3],
+                    this.menuElements[4],
+                    this.menuElements[5],
+                    this.menuElements[6],
+                    this.menuElements[7]
+                ];
+
+                this.tweens.add({
+                    targets: this.cameras.main,
+                    scrollY: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                    onComplete: () => {
+                        this.inMotion = false;
+
+                        this.scene.launch("StageCodex", {
+                        originScene: this,
+                        fromQuickMenu: false,
+                        disableArrows: true,
+                        practiceMode: true, 
+                        });
+                        ourMenuScene.scene.get("SpaceBoyScene").mapProgressPanelText.setText("PRACTICE");
+                        ourMenuScene.scene.get("PersistScene").coins = 12;
+                        ourMenuScene.scene.sleep('MainMenuScene');
+                    }
+                });
+        
+                this.tweens.add({
+                    targets: this.descriptionPanel,
+                    alpha: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+                this.tweens.add({
+                    targets: this.descriptionText,
+                    alpha: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
+
+                this.tweens.add({
+                    targets: [this.practiceButton,this.practiceIcon,
+                        this.adventureButton,this.adventureIcon,
+                        this.gauntletButton,this.gauntletIcon,this.gauntletKey,
+                        this.extrasButton,this.extrasIcon,
+                        this.optionsButton,this.optionsIcon,
+                        this.endlessButton,this.endlessIcon,
+                        this.championshipButton,this.championshipIcon,
+                        this.extractionButton,this.extractionIcon,
+                        ...selectedElements],
+                    alpha: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
             break;
 
             case 1: // EXTRAS
+                this.menuState = 1;
                 this.inMotion = true;
+
+                var selectedElements = [
+                    this.menuElements[0],
+                    this.menuElements[1],
+                    this.menuElements[2],
+                    this.menuElements[3],
+                    this.menuElements[4],
+                    //this.menuElements[5],
+                    //this.menuElements[6],
+                    //this.menuElements[7]
+                ];
 
                 this.tweens.add({
                     targets: this.cameras.main,
@@ -5937,6 +5959,18 @@ class MainMenuScene extends Phaser.Scene {
                     duration: 300,
                     ease: 'Sine.InOut',
                 });
+
+                 this.tweens.add({
+                    targets: [this.gauntletButton,this.gauntletIcon,this.gauntletKey,
+                        this.optionsButton,this.optionsIcon,
+                        this.endlessButton,this.endlessIcon,
+                        this.championshipButton,this.championshipIcon,
+                        this.extractionButton,this.extractionIcon,
+                        ...selectedElements],
+                    alpha: 0,
+                    duration: 300,
+                    ease: 'Sine.InOut',
+                });
                 break;
 
             case 2:
@@ -5955,31 +5989,42 @@ class MainMenuScene extends Phaser.Scene {
         }
 
         this.hideExitButton('smooth');
-        
-        // fade out main menu options to display sub menu
-        const selectedElements = [
-            this.menuElements[0],
-            this.menuElements[1],
-            this.menuElements[2],
-            this.menuElements[3],
-            this.menuElements[4],
-            //this.menuElements[5],
-            //this.menuElements[6],
-            //this.menuElements[7]
-        ];
+        this.collapseLogo();
+        // Add tweens for logo hide
 
+        // fade out main menu options to display sub menu
+        
+       
+        console.log("collapsing...");
+    }
+
+    collapseLogo(){
         this.tweens.add({
-            targets: [this.gauntletButton,this.gauntletIcon,this.gauntletKey,
-                this.optionsButton,this.optionsIcon,
-                this.endlessButton,this.endlessIcon,
-                this.championshipButton,this.championshipIcon,
-                this.extractionButton,this.extractionIcon,
-                ...selectedElements],
+            targets: this.titleLogo,
             alpha: 0,
             duration: 300,
             ease: 'Sine.InOut',
         });
-        console.log("collapsing...");
+        this.tweens.add({
+            targets: this.titlePortal,
+            scale: 0.01, // Prevent visual/camera bugs
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+    }
+    expandLogo(){
+        this.tweens.add({
+            targets: this.titleLogo,
+            alpha: 1,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
+        this.tweens.add({
+            targets: this.titlePortal,
+            scale: 1.25,
+            duration: 300,
+            ease: 'Sine.InOut',
+        });
     }
 
     // brings back main menu and collapses previous menu
@@ -5988,30 +6033,70 @@ class MainMenuScene extends Phaser.Scene {
         this.sideMenuPrompts('show');
         this.inMotion = true;
 
-        this.tweens.add({
-            targets: this.cameras.main,
-            scrollY: 0,
-            duration: 300,
-            ease: 'Sine.InOut',
-            onComplete: () => {
+        
+        if (cursorIndex === 0) { // PRACTICE
+            this.time.delayedCall(300, () => {
                 this.inMotion = false;
                 this.menuElements[5].setAlpha(1);
-                console.log('Camera expand tween complete');
-            }
-        });
+            });
+            this.tweens.add({
+                targets: [this.descriptionPanel,this.descriptionText],
+                alpha: 1,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+                        this.tweens.add({
+                targets: [
+                    ...this.menuElements,
+                    this.adventureButton,this.adventureIcon,
+                    this.practiceButton,this.practiceIcon,
+                    this.extrasButton,this.extrasIcon
+                ],
+                alpha: 1,
+                duration: 300,
+                delay: 60,
+                ease: 'linear',
+            });
+        }
+        if (cursorIndex === 3) { //EXTRAS
+            this.tweens.add({
+                targets: this.cameras.main,
+                scrollY: 0,
+                duration: 300,
+                ease: 'Sine.InOut',
+                onComplete: () => {
+                this.inMotion = false;
+                this.menuElements[5].setAlpha(1);
+                }
+            });
+            this.tweens.add({
+                targets: this.descriptionPanel,
+                y: this.descriptionPanel.y - 90,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            this.tweens.add({
+                targets: this.descriptionText,
+                y: this.descriptionText.y - 90,
+                duration: 300,
+                ease: 'Sine.InOut',
+            });
+            // Fade in all main menu elements except extras
+            this.tweens.add({
+                targets: [
+                    ...this.menuElements,
+                    this.adventureButton,this.adventureIcon,
+                    this.practiceButton,this.practiceIcon
+                ],
+                alpha: 1,
+                duration: 300,
+                delay: 60,
+                ease: 'linear',
+            });
+        }
+        
 
-        this.tweens.add({
-            targets: this.descriptionPanel,
-            y: this.descriptionPanel.y - 90,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
-        this.tweens.add({
-            targets: this.descriptionText,
-            y: this.descriptionText.y - 90,
-            duration: 300,
-            ease: 'Sine.InOut',
-        });
+        
 
         this.showExitButton('smooth');
         
@@ -6038,18 +6123,7 @@ class MainMenuScene extends Phaser.Scene {
             ease: 'Sine.InOut',
         });
 
-        // Fade in all main menu elements except extras
-        this.tweens.add({
-            targets: [
-                ...this.menuElements,
-                this.adventureButton,this.adventureIcon,
-                this.practiceButton,this.practiceIcon
-            ],
-            alpha: 1,
-            duration: 300,
-            delay: 60,
-            ease: 'linear',
-        });
+        
         console.log("expanding");
     }
 
