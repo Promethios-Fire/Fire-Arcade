@@ -921,7 +921,12 @@ class SpaceBoyScene extends Phaser.Scene {
         const persist = this.scene.get("PersistScene");
         const ourGame = this.scene.get("GameScene");
 
-        
+
+        // Temporary until boost item is placed
+
+        INVENTORY_ITEMS.set("boostItem", true);
+        localStorage.setItem("inventory-item", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
+
         // Create the sprites and apply initial dark tint
         // Initial Setup
         this.UI_ScorePanel = this.add.sprite(X_OFFSET + GRID * 23.5, 0, 'UI_ScorePanel')
@@ -9697,7 +9702,7 @@ class GameScene extends Phaser.Scene {
                 alpha: 1,
                 duration: 500,
                 ease: 'linear',
-                });
+            });
 
         }, this);
 
@@ -9705,7 +9710,6 @@ class GameScene extends Phaser.Scene {
             console.log("YOU WIN" , this.stage);
             this.winned = true;
             this.canPortal = false;
-
 
             var coinsToRemove = Math.floor(this.coinsArray.size / 2);
             const iterator = this.coinsArray.values(); // Get an iterator for the Set
@@ -9718,8 +9722,6 @@ class GameScene extends Phaser.Scene {
                 
                 coinsToRemove--;
             }
-
-
 
             this.atoms.forEach(atom => {
                 // So you can't see them during free play.

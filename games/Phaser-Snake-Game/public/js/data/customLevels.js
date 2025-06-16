@@ -1036,48 +1036,6 @@ export var STAGE_OVERRIDES = new Map([
             scene.scene.start('MainMenuScene');
         }
     }],
-
-    ["World_0-1", {
-        preFix: function (scene) {
-            //scene.lengthGoal = 0;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            
-            //scene.boostCost = 3;
-
-
-            // Slow Boost Number
-            //scene.speedSprint = 147;
-        },
-        postFix: function (scene) {
-
-            if (scene.mode === MODES.CLASSIC && INVENTORY_DATA.get("classicCardBank") > 0) {
-                var coinTime = 250;
-
-                scene.time.delayedCall(1250, () => {
-                    for (let index = 1; index <= INVENTORY_DATA.get("classicCardBank"); index++) {
-                        scene.time.delayedCall(coinTime * index, () => {
-                            PERSISTS.coins += 1;
-                            console.log('adding classicCardCoin +1');
-                            scene.coinSound.play();
-                            scene.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
-
-                            INVENTORY_DATA.set("classicCardBank", INVENTORY_DATA.get("classicCardBank") - 1);
-                            localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
-
-                            SPACE_BOY.invItems.get("classicCard").invText.setText(INVENTORY_DATA.get("classicCardBank"));
-
-                            if (INVENTORY_DATA.get("classicCardBank") === 0) {
-                                SPACE_BOY.invItems.get("classicCard").invText.setText("");
-                            }
-
-                        }, scene);
-                    }
-                }, scene);  
-            } 
-        },
-    }],
     ["World_4-1", {
         preFix: function (scene) {
             scene.startEWraps = PLAYER_STATS.eWraps;
@@ -1130,6 +1088,53 @@ export var STAGE_OVERRIDES = new Map([
         
     }],
 ]);
+/*
+STAGE_OVERRIDES.set("tmp", {
+    tmp: null,
+    methods: {
+        preFix: function (scene) {
+        },
+        postFix: function (scene) {
+        },
+    }
+});
+*/
+
+STAGE_OVERRIDES.set("World_0-1", {
+    zero_1: null,
+    methods: {
+        preFix: function (scene) {
+            //scene.lengthGoal = 0;
+            //scene.stopOnBonk = true;
+        },
+        postFix: function (scene) {
+            if (scene.mode === MODES.CLASSIC && INVENTORY_DATA.get("classicCardBank") > 0) {
+                var coinTime = 250;
+
+                scene.time.delayedCall(1250, () => {
+                    for (let index = 1; index <= INVENTORY_DATA.get("classicCardBank"); index++) {
+                        scene.time.delayedCall(coinTime * index, () => {
+                            PERSISTS.coins += 1;
+                            console.log('adding classicCardCoin +1');
+                            scene.coinSound.play();
+                            scene.coinUIText.setHTML(`${commaInt(PERSISTS.coins).padStart(2, '0')}`);
+
+                            INVENTORY_DATA.set("classicCardBank", INVENTORY_DATA.get("classicCardBank") - 1);
+                            localStorage.setItem("inventory-data", JSON.stringify(Object.fromEntries(INVENTORY_DATA)));
+
+                            SPACE_BOY.invItems.get("classicCard").invText.setText(INVENTORY_DATA.get("classicCardBank"));
+
+                            if (INVENTORY_DATA.get("classicCardBank") === 0) {
+                                SPACE_BOY.invItems.get("classicCard").invText.setText("");
+                            }
+
+                        }, scene);
+                    }
+                }, scene);  
+            } 
+        },
+    }
+});
 
 STAGE_OVERRIDES.set("World_1-3", {
     1_3: null,
