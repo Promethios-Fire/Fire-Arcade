@@ -4609,8 +4609,10 @@ class StageCodex extends Phaser.Scene {
                 if (exitButton.frame.name === 1) {
                     console.log("Exiting!");
                     this.scene.wake('MainMenuScene');
-                   this.scene.sleep('StageCodex');
-                   this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
+                    this.scene.get("MainMenuScene").expandMenu(0);
+                    this.scene.get("MainMenuScene").expandLogo()
+                    this.scene.stop('StageCodex');
+                    this.scene.get("SpaceBoyScene").mapProgressPanelText.setText("SHIP LOG");
 
                 } else {
                     console.log("Launch Practice!", this.selected.stageTitle);
@@ -4727,7 +4729,7 @@ class StageCodex extends Phaser.Scene {
         if (-this.containerToY >= this.menuLengthInPixels - 56 * 4) {
             this.containerYOffset = 56 + this.containerToY;
         }
-        else if (-this.containerToY <= 56) {
+        else if (-this.containerToY <= -56) {
             this.containerYOffset = this.containerToY;
         }
 
