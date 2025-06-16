@@ -1,5 +1,5 @@
 import { X_OFFSET, Y_OFFSET, 
-    GRID, SPEED_WALK, SPEED_SPRINT, MODES, 
+    GRID, MODES, 
     GState, DIRS, commaInt, PLAYER_STATS, 
     INVENTORY_ITEMS,INVENTORY_DATA,
     BOOST_ADD_FLOOR, COMBO_ADD_FLOOR, 
@@ -10,14 +10,24 @@ import { PORTAL_COLORS} from '../const.js';
 
 import { ITEMS } from "./items.js";
 
+export const STAGE_OVERRIDES = new Map();
 
-
-
-export var STAGE_OVERRIDES = new Map([
-    ["World_4-4", { 
-        // #region 4-4
+/*
+STAGE_OVERRIDES.set("tmp", {
+    tmp: null,
+    methods: {
         preFix: function (scene) {
+        },
+        postFix: function (scene) {
+        },
+    }
+});
+*/
 
+STAGE_OVERRIDES.set("World_4-4", {
+    4_4: null,
+    methods: {
+        preFix: function (scene) {
         },
         postFix: function (scene) {
 
@@ -64,11 +74,12 @@ export var STAGE_OVERRIDES = new Map([
             ITEMS.get("gearbox").addToInventory(spaceboy);
 
         }
+    }
+});
 
-    
-    }],
-    ["World_2-4", {
-        // #region 2-4
+STAGE_OVERRIDES.set("World_2-4", {
+    2_4: null,
+    methods: {
         preFix: function (scene) {
 
         },
@@ -115,44 +126,22 @@ export var STAGE_OVERRIDES = new Map([
                 }
             }
         }
+    }
+});
 
-    }],
-    
-    ["Bonus_X-1", {
-        // #region Bonus
+STAGE_OVERRIDES.set("Bonus_X-1", {
+    X_1: null,
+    methods: {
         preFix: function (scene) {
-            debugger
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
             scene.tickCounter = 0;
         },
         postFix: function (scene) {
-
             // Override
             scene.onBonk = this.onBonk;
             scene.checkWinCon = this.checkWinCon;
 
-
-        },
-        onBonk: function () { // .this = GameScene
-            var ourPersist = this.scene.get("PersistScene");
-            this.coinsUIIcon.setVisible(false);
-            ourPersist.coins = Math.max(ourPersist.coins -1, 1);
-
-            if (ourPersist.coins != 1) {
-                ourPersist.loseCoin();
-            }
-            this.coinUIText.setHTML(
-            `${commaInt(ourPersist.coins).padStart(2, '0')}`
-            );
-
-            this.maxScore = Math.max(this.maxScore - 10, 1);
-
-            debugger;
-
-            this.snake.head;
-
-            // Add check for stuck on self.  
         },
         afterEat: function (scene, food) {
 
@@ -177,14 +166,26 @@ export var STAGE_OVERRIDES = new Map([
                     times--;
                     
                 }
-                
-                
+        },
+        onBonk: function () { // .this = GameScene
+            var ourPersist = this.scene.get("PersistScene");
+            this.coinsUIIcon.setVisible(false);
+            ourPersist.coins = Math.max(ourPersist.coins -1, 1);
 
+            if (ourPersist.coins != 1) {
+                ourPersist.loseCoin();
+            }
+            this.coinUIText.setHTML(
+            `${commaInt(ourPersist.coins).padStart(2, '0')}`
+            );
 
-                //scene.tickCounter = 0
-                
-            //}
-            //scene.tickCounter++;
+            this.maxScore = Math.max(this.maxScore - 10, 1);
+
+            debugger;
+
+            this.snake.head;
+
+            // Add check for stuck on self.  
         },
         checkWinCon: function () {
 
@@ -203,8 +204,12 @@ export var STAGE_OVERRIDES = new Map([
              
 
         }
-    }],
-    ["Bonus_X-2", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-2", {
+    X_2: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.stopOnBonk = true;
@@ -225,7 +230,6 @@ export var STAGE_OVERRIDES = new Map([
                 atom.move(scene);
 
             });
-    
         },
         afterEat: function(scene, food) {
             // Grow 3 more times.
@@ -276,13 +280,14 @@ export var STAGE_OVERRIDES = new Map([
 
 
         */
-        
-    }],
-    ["Bonus_X-3", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-3", {
+    X_3: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = 221;
-            //scene.maxScore = 60;
-            //scene.boostCost = 0;
         },
         postFix: function (scene) {
             scene.atoms.forEach( atom => {
@@ -295,9 +300,12 @@ export var STAGE_OVERRIDES = new Map([
             food.electrons.destroy();
             food.destroy();
         }
-        
-    }],
-    ["Bonus_X-4", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-4", {
+    X_4: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             //scene.stopOnBonk = true;
@@ -312,11 +320,8 @@ export var STAGE_OVERRIDES = new Map([
             scene.atoms.forEach( atom => {
                 atom.setTint(0xFFD700);
             })
-    
         },
         afterEat: function (scene, food) {
-            debugger
-            // dounble grow
             scene.snake.grow(scene);
             scene.events.emit('addScore', food); 
         },
@@ -324,10 +329,12 @@ export var STAGE_OVERRIDES = new Map([
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR;
         
         },
-        
-        
-    }],
-    ["Bonus_X-5", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-5", {
+    X_5: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.highScore = INVENTORY_DATA.get("comboTrainerXPB");
@@ -335,8 +342,6 @@ export var STAGE_OVERRIDES = new Map([
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
-
-    
         },
         afterMove: function (scene) {
             if (scene.snake.comboCounter > scene.highScore) {
@@ -357,7 +362,6 @@ export var STAGE_OVERRIDES = new Map([
             toRemove.forEach( bodyPart => {
                 bodyPart.destroy();
             });
-
         },
         afterEat: function(scene) {
             if (scene.snake.comboCounter > 0) {
@@ -365,16 +369,18 @@ export var STAGE_OVERRIDES = new Map([
                 // This if statment shouldn't need be.
                 scene.firstFood = true;
             }
-            
-
         },
         checkWinCon: function () {
             return false;
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },   
-    }],
-    ["Bonus_X-6", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-6", {
+    X_6: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.bombTime = 40;
@@ -404,7 +410,6 @@ export var STAGE_OVERRIDES = new Map([
 
             scene.bombAtom.timerText.x = pos.x;
             scene.bombAtom.timerText.y = pos.y;
-
         },
         afterTick: function (scene) {
             var diff = scene.maxScore - scene.bombTime;
@@ -414,21 +419,18 @@ export var STAGE_OVERRIDES = new Map([
                 Math.max(Math.trunc((time - diff - 1) / 10) + 1
                 , 0)
             );
-
         },
         checkWinCon: function () {
             return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < this.maxScore - this.bombTime;
-        
         }, 
-    }],
-    ["Bonus_X-7", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-7", {
+    X_7: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
         },
         postFix: function (scene) {
 
@@ -495,9 +497,12 @@ export var STAGE_OVERRIDES = new Map([
     
     
         },
-        
-    }],
-    ["Bonus_X-8", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-8", {
+    X_8: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.attackTimer = 12;
@@ -568,11 +573,12 @@ export var STAGE_OVERRIDES = new Map([
             scene.attackerText.y = tail.y;
 
         },
-        
+    }
+});
 
-        
-    }],
-    ["Bonus_X-9", {
+STAGE_OVERRIDES.set("Bonus_X-9", {
+    X_9: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.deathTimer = 10;
@@ -661,40 +667,35 @@ export var STAGE_OVERRIDES = new Map([
         
             scene.applyMask()
         },
-        
+    }
+});
 
-        
-    }],
-    ["Bonus_X-10", {
+STAGE_OVERRIDES.set("Bonus_X-10", {
+    X_10: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
             scene.collideSelf = false;
+            return true
         },
         postFix: function (scene) {
             scene.checkWinCon = this.checkWinCon;
-    
-        },
-        afterEat: function (scene) {
-
         },
         checkWinCon: function () {
             return false;
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
-        },   
-    }],
-    ["Bonus_X-11", {
+        }, 
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-11", {
+    X_11: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            //scene.collideSelf = false;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
         },
         postFix: function (scene) {
-            debugger
 
             scene.evilSnake = new Snake(scene, scene.startCoords.x, scene.startCoords.y - GRID);
             scene.evilSnake.head.setTint(0x66666);
@@ -708,12 +709,10 @@ export var STAGE_OVERRIDES = new Map([
 
         },
         afterMove: function(scene) {
-            debugger
 
             let xN;
             let yN;
 
-            debugger
             
             switch (scene.snake.direction) {
                 case DIRS.RIGHT:
@@ -754,16 +753,14 @@ export var STAGE_OVERRIDES = new Map([
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },
-    }],
-    ["Bonus_X-12", {
+    }
+});
+
+STAGE_OVERRIDES.set("Bonus_X-12", {
+    X_12: null,
+    methods: {
         preFix: function (scene) {
             scene.lengthGoal = Infinity;
-            //scene.collideSelf = false;
-            //scene.stopOnBonk = true;
-            //scene.maxScore = 60;
-            //scene.speedWalk = SPEED_SPRINT;
-            //scene.speedSprint = SPEED_WALK;
-            //scene.boostCost = 3;
             scene.laserWallX = -1;
             scene.tickCount = 1;
             scene.wallMovedCount = 0;
@@ -828,11 +825,13 @@ export var STAGE_OVERRIDES = new Map([
                 y++ ;
             }
 
-        }      
-    }],
-    // #endregion Bonus
-    ["Tutorial_T-1", {
-        // #region T-1
+        } 
+    }
+});
+
+STAGE_OVERRIDES.set("Tutorial_T-1", {
+    T_1: null,
+    methods: {
         preFix: function (scene) {
             
             scene.mode = MODES.TUTORIAL;
@@ -880,15 +879,17 @@ export var STAGE_OVERRIDES = new Map([
                 }
             }
         }
+    }
+});
 
-    }],
-    ["Tutorial_T-2", {
+STAGE_OVERRIDES.set("Tutorial_T-2", {
+    T_2: null,
+    methods: {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
             scene.spawnCoins = false;
             scene.scene.get('PersistScene').coins = 99;
-
 
         },
         postFix: function (scene) {
@@ -916,8 +917,12 @@ export var STAGE_OVERRIDES = new Map([
             }
 
         }
-    }],
-    ["Tutorial_T-3", {
+    }
+});
+
+STAGE_OVERRIDES.set("Tutorial_T-3", {
+    T_3: null,
+    methods: {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -949,13 +954,15 @@ export var STAGE_OVERRIDES = new Map([
             }
 
         }
-    }],
-    ["Tutorial_T-4", {
-        preFix: function (scene) {
+    }
+});
 
+STAGE_OVERRIDES.set("Tutorial_T-4", {
+    T_4: null,
+    methods: {
+        preFix: function (scene) {
             scene.mode = MODES.TUTORIAL;
             scene.scene.get('PersistScene').coins = 20
-
         },
         postFix: function (scene) {
 
@@ -983,16 +990,15 @@ export var STAGE_OVERRIDES = new Map([
                     return false;
                 }
             }
+        },
+    }
+});
 
-        }
-    }],
-    ["Tutorial_T-5", {
+STAGE_OVERRIDES.set("Tutorial_T-5", {
+    T_5: null,
+    methods: {
         preFix: function (scene) {
-
             scene.mode = MODES.TUTORIAL;
-            //scene.scene.get('PersistScene').coins = 20
-            //scene.skipScoreScreen = true;
-
         },
         postFix: function (scene) {
 
@@ -1016,9 +1022,12 @@ export var STAGE_OVERRIDES = new Map([
                 
             }
         }
-    }],
+    }
+});
 
-    ["Tutorial_T-6", {
+STAGE_OVERRIDES.set("Tutorial_T-6", {
+    T_6: null,
+    methods: {
         preFix: function (scene) {
 
             scene.mode = MODES.TUTORIAL;
@@ -1035,8 +1044,12 @@ export var STAGE_OVERRIDES = new Map([
             scene.gameSceneFullCleanup();
             scene.scene.start('MainMenuScene');
         }
-    }],
-    ["World_4-1", {
+    }
+});
+
+STAGE_OVERRIDES.set("World_4-1", {
+    4_1: null,
+    methods: {
         preFix: function (scene) {
             scene.startEWraps = PLAYER_STATS.eWraps;
             scene.startWWraps = PLAYER_STATS.wWraps;
@@ -1052,7 +1065,6 @@ export var STAGE_OVERRIDES = new Map([
             //scene.boostCost = 3;
         },
         postFix: function (scene) {
-
         },
         afterMove: function (scene) {
             var currentEWraps = PLAYER_STATS.eWraps - scene.startEWraps;
@@ -1085,20 +1097,8 @@ export var STAGE_OVERRIDES = new Map([
 
             
         }
-        
-    }],
-]);
-/*
-STAGE_OVERRIDES.set("tmp", {
-    tmp: null,
-    methods: {
-        preFix: function (scene) {
-        },
-        postFix: function (scene) {
-        },
     }
 });
-*/
 
 STAGE_OVERRIDES.set("World_0-1", {
     zero_1: null,

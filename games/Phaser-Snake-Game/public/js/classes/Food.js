@@ -453,8 +453,8 @@ var Food = new Phaser.Class({
             
         }
         
-        if (STAGE_OVERRIDES.has(scene.stage) && "afterEat" in STAGE_OVERRIDES.get(scene.stage)) {
-                    STAGE_OVERRIDES.get(scene.stage).afterEat(scene, this);
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterEat" in STAGE_OVERRIDES.get(scene.stage).methods) {
+                    STAGE_OVERRIDES.get(scene.stage).methods.afterEat(scene, this);
         }
         
         return 'valid';
@@ -484,8 +484,8 @@ var Food = new Phaser.Class({
             this.fruitTimerText.setPosition(this.x + GRID + 3 , this.y - 1); // Little Padding to like nice
         }
 
-        if (STAGE_OVERRIDES.has(scene.stage) && "afterMoveFood" in STAGE_OVERRIDES.get(scene.stage)) {
-            STAGE_OVERRIDES.get(scene.stage).afterMoveFood(scene, this);
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterMoveFood" in STAGE_OVERRIDES.get(scene.stage).methods) {
+            STAGE_OVERRIDES.get(scene.stage).methods.afterMoveFood(scene, this);
 }
     },
 });

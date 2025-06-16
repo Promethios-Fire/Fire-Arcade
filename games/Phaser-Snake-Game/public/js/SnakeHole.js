@@ -11557,8 +11557,8 @@ class GameScene extends Phaser.Scene {
                     this.coinSpawnCounter = Phaser.Math.RND.integerInRange(80,140);
                 }
 
-                if (STAGE_OVERRIDES.has(this.stage) && "afterTick" in STAGE_OVERRIDES.get(this.stage)) {
-                    STAGE_OVERRIDES.get(this.stage).afterTick(this);
+                if (STAGE_OVERRIDES.has(this.stage) && "afterTick" in STAGE_OVERRIDES.get(this.stage).methods) {
+                    STAGE_OVERRIDES.get(this.stage).methods.afterTick(this);
                 }
             }
 

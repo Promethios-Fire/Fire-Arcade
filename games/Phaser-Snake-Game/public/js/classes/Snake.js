@@ -489,8 +489,8 @@ var Snake = new Phaser.Class({
                 }
             }
 
-        if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage)) {
-            STAGE_OVERRIDES.get(scene.stage).afterMove(scene);
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage).methods) {
+            STAGE_OVERRIDES.get(scene.stage).methods.afterMove(scene);
         }
     },
 
@@ -563,8 +563,8 @@ var Snake = new Phaser.Class({
                     ourGame.scoreTimer.paused = true;
                     //console.log(this.gState, "WAIT FOR INPUT");
 
-                    if (STAGE_OVERRIDES.has(scene.stage) && "afterBonk" in STAGE_OVERRIDES.get(scene.stage)) {
-                        STAGE_OVERRIDES.get(scene.stage).afterBonk(scene);
+                    if (STAGE_OVERRIDES.has(scene.stage) && "afterBonk" in STAGE_OVERRIDES.get(scene.stage).methods) {
+                        STAGE_OVERRIDES.get(scene.stage).methods.afterBonk(scene);
                     }
 
                 });
