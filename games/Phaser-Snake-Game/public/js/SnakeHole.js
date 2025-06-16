@@ -2793,8 +2793,6 @@ class TutorialScene extends Phaser.Scene {
                 ..._map.get("images"), 
                 ..._map.get("panels") 
             );
-            
-
         }
 
         this.panelsContainer.add(panelContents);
@@ -2816,15 +2814,15 @@ class TutorialScene extends Phaser.Scene {
                 duration: 300,
                 ease: 'sine.inout',
                 yoyo: false,
-                delay:200,
+                delay:0,
                 repeat: 0,
             });
         })
 
         // Defaults everything to invisible so you don't need to remember to set in TUTORIAL_PANELS .
-        panelContents.forEach( item => {
+        /*panelContents.forEach( item => {
             item.alpha = 0;
-        })
+        })*/
 
 
         //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
@@ -2836,64 +2834,66 @@ class TutorialScene extends Phaser.Scene {
         ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
         this.continueText.setVisible(false).setAlpha(0);
 
-        if (tutorialPanels.length === 1) {
-            // Change this to a tween. That works a bit like a loading bar.
-            //this.continueText.setVisible(true);
-            //if (!this.continueText.visible) {
-                this.tweens.add({
-                    targets: this.continueText,
-                    alpha: { from: 0, to: 1 },
-                    ease: 'Sine.InOut',
-                    duration: 1000,
-                    delay: 700,
-                    repeat: -1,
-                    yoyo: true,
-                    onStart: () =>  {
-                        this.continueText.setVisible(true);
-                    }
-                });   
-            //}
-        } else {
-            this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-            this.panelArrowR.play('startArrowIdle');
-            this.panelArrowR.angle = 90;
-            this.panelArrowR.setAlpha(0);
-            
-            this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2).setDepth(103).setOrigin(0.5,0.5);
-            this.panelArrowL.play('startArrowIdle');
-            this.panelArrowL.angle = 270;
-            this.panelArrowL.setVisible(false).setAlpha(0);
+        
 
+        if (tutorialPanels.length === 1) {
+            this.containorToX = this.panelsContainer.x;
+            panelContents.forEach( item => {
+                item.alpha = 1;
+            })
+            this.tweens.add({
+                targets: this.continueText,
+                alpha: { from: 0, to: 1 },
+                ease: 'Sine.InOut',
+                duration: 1000,
+                delay: 700,
+                repeat: -1,
+                yoyo: true,
+                onStart: () =>  {
+                    this.continueText.setVisible(true);
+                }
+            });   
+        } else {
             this.containorToX = 0;
+            this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0).setDepth(103).setOrigin(0.5,0.5);
+            this.panelArrowR.play('arrowMenuIdle');
+
+            this.panelArrowR.setAlpha(1);
+            
+            this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0).setDepth(103).setOrigin(0.5,0.5);
+            this.panelArrowL.play('arrowMenuIdle');
+            this.panelArrowL.setFlipX(true);
+            this.panelArrowL.setVisible(false).setAlpha(1);
+
+            
             
             this.input.keyboard.on('keydown-RIGHT', e => {
                 const ourPersist = this.scene.get('PersistScene');
                 if (this.selectedPanel < tutorialPanels.length - 1) { // @holden this needs to be changed
-                    
-                    // Fade Out Old Text
-                    this.tweens.add({
-                        targets: panelsArray[this.selectedPanel].get("text"),
-                        alpha: { from: 1, to: 0 },
-                        ease: 'Sine.InOut',
-                        //delay: 500,
-                        duration: fadeOut,
-                        
-                    });
-                    
-                    this.pop02.play();
-                    this.selectedPanel += 1;
 
+                    // set all text to 0 opacity
                     panelsArray[this.selectedPanel].get("text").forEach( text => {
                         text.alpha = 0;
                     })
-                    // Fade In New Text
-                    this.tweens.add({
-                        targets: panelsArray[this.selectedPanel].get("text"),
-                        alpha: { from: 0, to: 1 },
-                        ease: 'Sine.InOut',
-                        delay: fadeInDelay,
-                        duration: fadeIn,
+
+                    this.pop02.play();
+                    this.selectedPanel += 1;
+
+                    // set current text element to 1 opacity
+                    const panel = panelsArray[this.selectedPanel];
+                    const textObj = panel.get("text")[0];
+
+                    var selectedPanellOld = this.selectedPanel
+                    this.time.delayedCall(200, () => {
+                        if (selectedPanellOld === this.selectedPanel) {
+                            console.log(this.selectedPanel)
+                            textObj.alpha = 1;
+                        }
+                        else{
+                            textObj.alpha = 0;
+                        }
                     });
+                    
                 }
 
                 var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
@@ -2928,44 +2928,34 @@ class TutorialScene extends Phaser.Scene {
                         ourPersist.bgCoords.x += 20;
                         break
                 }
-                
-                this.tweens.add({
-                    targets: this.panelsContainer,
-                    x: this.containorToX,
-                    ease: 'Sine.InOut',
-                    duration: 500,
-                });   
             }, this);
 
             this.input.keyboard.on('keydown-LEFT', e => {
                 const ourPersist = this.scene.get('PersistScene');
                 if (this.selectedPanel > 0) {
 
-                    // Fade Out Current Text
-                    this.tweens.add({
-                        targets: panelsArray[this.selectedPanel].get("text"),
-                        alpha: { from: 1, to: 0 },
-                        ease: 'Sine.InOut',
-                        //delay: 500,
-                        duration: fadeOut,
-                        
-                    });
-
-                    this.selectedPanel -= 1
-                    this.pop02.play();
-
-                    // Fade In Current Text
+                    // set all text to 0 opacity
                     panelsArray[this.selectedPanel].get("text").forEach( text => {
                         text.alpha = 0;
                     })
-                    // Fade In New Text
-                    this.tweens.add({
-                        targets: panelsArray[this.selectedPanel].get("text"),
-                        alpha: { from: 0, to: 1 },
-                        ease: 'Sine.InOut',
-                        delay: fadeInDelay,
-                        duration: fadeIn,
+                    this.selectedPanel -= 1
+                    this.pop02.play();
+
+                    // set current text element to 1 opacity
+                    const panel = panelsArray[this.selectedPanel];
+                    const textObj = panel.get("text")[0];
+
+                    var selectedPanellOld = this.selectedPanel
+                    this.time.delayedCall(200, () => {
+                        if (selectedPanellOld === this.selectedPanel) {
+                            console.log(this.selectedPanel)
+                            textObj.alpha = 1;
+                        }
+                        else{
+                            textObj.alpha = 0;
+                        }
                     });
+                    
                 }
 
                 this.containorToX = Math.min(this.containorToX + hOffSet, 0);
@@ -2978,43 +2968,21 @@ class TutorialScene extends Phaser.Scene {
                     this.panelArrowL.setVisible(true);
                     this.panelArrowR.setVisible(true);
                     ourPersist.bgCoords.x -= 20; 
-
                 }
-    
-                
-                this.tweens.add({
-                    targets: this.panelsContainer,
-                    x: this.containorToX,
-                    ease: 'Sine.InOut',
-                    duration: 500,
-                    onComplete: function () {
-                        
-                        //if (ourTutorialScene.selectedPanel < 4) {
-                            //debugger //@holden why are these debuggers here?
-                            //ourTutorialScene.panelArrowR.setVisible(true);
-                        //}
-                        //else{
-                            //debugger
-                            //ourTutorialScene.panelArrowR.setVisible(false);
-                        //}
-                        
-                    }
-                }, this);   
             }, this)
 
         }
 
         // Fade Everything In
-
-        this.tweens.add({
+        // wanted to preserve this tween, but it's proving too much work so setting delay to 0 for now
+        /*this.tweens.add({
             targets: [...panelContents, this.panelArrowR, this.panelArrowL],
             alpha: {from: 0, to: 1},
-            duration: 500,
+            duration: 0,
             ease: 'sine.inout',
             yoyo: false,
-            delay: 300,
-            repeat: 0,
-        });
+        });*/
+
 
         const onInput = function (scene) {
             const spaceBoy = scene.scene.get("SpaceBoyScene");
@@ -3050,12 +3018,13 @@ class TutorialScene extends Phaser.Scene {
                     startupAnim: true,
                     mode: ourPersist.mode
 
-                });   
-            }
+                    });   
+                }
 
-            else {
-                                                
+                else {
+                                                    
 
+                }
             }
             /* //@holden we need here or can move to reference?
             ourPersist.closingTween();
@@ -3087,7 +3056,6 @@ class TutorialScene extends Phaser.Scene {
                 }
             });
             */
-        }
     
         
         this.continueText.on('pointerdown', e => {
@@ -3102,6 +3070,16 @@ class TutorialScene extends Phaser.Scene {
             onInput(this);
 
         });
+    }
+    update(){
+        this.tweens.add({ // CLEAN UP: THis is adding a tween every frame.
+                targets: this.panelsContainer,
+                x: this.containorToX,
+                ease: 'Linear',
+                duration: 60,
+                repeat: 0,
+                yoyo: true,
+            });     
     }
 }
 
