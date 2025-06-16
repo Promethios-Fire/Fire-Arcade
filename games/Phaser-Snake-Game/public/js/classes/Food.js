@@ -103,7 +103,6 @@ var Food = new Phaser.Class({
                     var finalAtom = SPACE_BOY.add.sprite(this.x, this.y).setOrigin(0,0);
                     finalAtom.play("atom02idle", this.frame.name)
                     finalAtom.setDepth(100);                    
-                    debugger
 
                     var finalAtomTween = SPACE_BOY.tweens.add( {
                         targets: finalAtom,
@@ -114,6 +113,7 @@ var Food = new Phaser.Class({
                         ease: 'Expo.easeIn',
                         onComplete: () => {
                             scene.events.emit('win');
+                            finalAtom.destroy();
 
                             // Store speed values
                             let _walkSpeed = scene.speedWalk;
