@@ -95,7 +95,7 @@ var Food = new Phaser.Class({
                 onComplete: () =>{
                     
                     const ourStartScene = scene.scene.get('StartScene');
-                    scene.snake.grow(scene);
+                    
                     scene.events.emit('addScore', this, timeSinceFruit);
                     scene.playAtomSound();
                     this.electrons.visible = false;
@@ -112,9 +112,10 @@ var Food = new Phaser.Class({
                         delay: 0,
                         ease: 'Expo.easeIn',
                         onComplete: () => {
-                            scene.events.emit('win');
+                            scene.snake.grow(scene);
                             finalAtom.destroy();
-
+                            scene.events.emit('win');
+                        
                             // Store speed values
                             let _walkSpeed = scene.speedWalk;
                             let _sprintSpeed = scene.speedSprint;
