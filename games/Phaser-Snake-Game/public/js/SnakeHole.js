@@ -2868,7 +2868,7 @@ class TutorialScene extends Phaser.Scene {
                     text.alpha = 0;
                 })
 
-                this.pop02.play();
+                SPACE_BOY.sound.play('buttonHover01');
                 this.selectedPanel += 1;
 
                 var selectedPanellOld = this.selectedPanel
@@ -2928,7 +2928,7 @@ class TutorialScene extends Phaser.Scene {
                     text.alpha = 0;
                 })
                 this.selectedPanel -= 1
-                this.pop02.play();
+                SPACE_BOY.sound.play('buttonHover01');
 
                 // set current text element to 1 opacity w/ previously described logic
                 var selectedPanellOld = this.selectedPanel
