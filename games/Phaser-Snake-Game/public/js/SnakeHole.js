@@ -7244,7 +7244,7 @@ class GameScene extends Phaser.Scene {
         this.wallPortals = [];
         this.dreamWalls = [];
         this.nextStagePortals = [];
-        this.extractHole = [];
+        this.extractHole = undefined;
 
         this.snakeLights = [];
 
@@ -7269,7 +7269,6 @@ class GameScene extends Phaser.Scene {
 
         this.stageOver = false; // deprecated to be removed
 
-        this.canPortal = true;
         this.winned = false; // marked as true any time this.winCondition is met.
         this.canContinue = true; // used to check for a true game over
 
@@ -8460,7 +8459,7 @@ class GameScene extends Phaser.Scene {
                                 this.r3.postFX.addShine(1, .5, 5)
                                 this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
         
-                                this.extractHole.push(extractImage);
+                                this.extractHole = extractImage;
                                 this.extractLables.push(this.extractText,this.r3);
         
                                 this.tweens.add({
@@ -8496,7 +8495,7 @@ class GameScene extends Phaser.Scene {
                                     this.r3.postFX.addShine(1, .5, 5)
                                     this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
             
-                                    this.extractHole.push(extractImage);
+                                    this.extractHole = extractImage;
                                     this.extractLables.push(this.extractText,this.r3);
             
                                     this.tweens.add({
@@ -8755,7 +8754,7 @@ class GameScene extends Phaser.Scene {
                         ).setDepth(10).setOrigin(0.4125,0.4125)
                         if (ourPersist.gauntlet.length === 0) {
                             extractImage.play('extractHoleIdle');
-                            this.extractHole.push(extractImage);
+                            this.extractHole = extractImage;
                             
                         } else {
                             extractImage.play('blackholeForm');
@@ -9387,8 +9386,6 @@ class GameScene extends Phaser.Scene {
          }, this);
 
         var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
-        
-
 
          // Countdown Text
         this.countDown = this.add.dom(X_OFFSET + GRID * 8 + 1, GRID * 1.5, 'div', Object.assign({}, STYLE_DEFAULT, {
@@ -9593,9 +9590,6 @@ class GameScene extends Phaser.Scene {
             //this.runningScoreLabelUI.setText(
             //    `${commaInt(this.runningScore.toString())}`
             //);
-            
-            
-
 
             // Update UI
             //var tempScore = `${this.scoreHistory.reduce((a,b) => a + b, 0)}`
@@ -9709,7 +9703,6 @@ class GameScene extends Phaser.Scene {
         this.events.once('win', function (){
             console.log("YOU WIN" , this.stage);
             this.winned = true;
-            this.canPortal = false;
 
             var coinsToRemove = Math.floor(this.coinsArray.size / 2);
             const iterator = this.coinsArray.values(); // Get an iterator for the Set
@@ -9766,8 +9759,11 @@ class GameScene extends Phaser.Scene {
                 sRank: parseInt(this.tiledProperties.get("sRank")) // NaN if doesn't exist.
             }
 
-            //this.backgroundBlur(true);
-            this.collapsePortals();
+            if (STAGE_OVERRIDES.has(this.stage) &&
+                STAGE_OVERRIDES.get(ourGame.stage).methods.hasOwnProperty("beforeScoreScreen") ) {
+                console.log("Running beforeScoreScreen Override on", this.stage);
+                STAGE_OVERRIDES.get(this.stage).methods.beforeScoreScreen(this);
+             }
 
             this.scene.launch('ScoreScene', stageDataJSON);
             
@@ -10387,7 +10383,7 @@ class GameScene extends Phaser.Scene {
         
 
 
-        this.extractHole[0].play('extractHoleClose');
+        this.extractHole.play('extractHoleClose');
 
         this.tweens.add({
             targets: this.snake.body, 
@@ -10704,6 +10700,9 @@ class GameScene extends Phaser.Scene {
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
         const ourPinball = this.scene.get("PinballDisplayScene");
         this.gState = GState.TRANSITION;
+
+        //this.backgroundBlur(true);
+        this.collapsePortals();
 
         ourSpaceboy.scoreTweenShow();
         this.drainScore();
@@ -11039,20 +11038,6 @@ class GameScene extends Phaser.Scene {
 
         return this.vortexTween
     }
-
-    snakeEating(){
-        this.snakeEatingTween = this.tweens.add({
-            targets: this.snake.body, 
-            scale: [1.25,1],
-            yoyo: false,
-            duration: 64,
-            ease: 'Linear',
-            repeat: 0,
-            delay: this.tweens.stagger(this.speedSprint),
-        });
-
-        return this.snakeEating
-    }
     onBonk() {
         var ourPersist = this.scene.get("PersistScene");
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
@@ -11187,31 +11172,8 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    getStaggerTween (i, group)
-    {
-        const stagger = this.variations[i];
-        
-        this.tweens.add({
-            targets: group.getChildren(),
-            scale: [2,0],
-            alpha: [.5,0],
-            ease: 'power2',
-            duration: 800,
-            delay: this.tweens.stagger(...stagger),
-            completeDelay: 1000,
-            repeat: 0,
-            onComplete: () =>
-            {
-                group.getChildren().forEach(child => {
-
-                    child.destroy();
-
-                });
-            }
-        }); 
-    }
-
     musicPlayerDisplay(show){
+        // move to spaceboy or music player. #TODO
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
         let _offset = 36;
         if (show === true) {
@@ -11250,22 +11212,26 @@ class GameScene extends Phaser.Scene {
                 repeat: 0,
             }); 
         }
-            
-        
         this.lengthGoalUI
         this.lengthGoalUILabel
     }
 
     collapsePortals(){
         this.portals.forEach(portal => {
+
+            this.interactLayer[portal.tileX()][portal.tileY()] = "empty";
+
             portal.play('portalClose');
             portal.on('animationcomplete', (animation) => {
                 if (animation.key === 'portalClose') {
-                    portal.alpha = 0;
+                    portal.destroy();
+                    portal.portalHighlight.destroy();
                 }
             });
-            portal.portalHighlight.alpha = 0;
-        })
+            
+        });
+
+        this.portals = [];
 
         this.portalLights.forEach(portalLight => {
             this.lights.removeLight(portalLight);

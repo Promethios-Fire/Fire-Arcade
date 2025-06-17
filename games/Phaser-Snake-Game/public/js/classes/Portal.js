@@ -77,103 +77,112 @@ var Portal = new Phaser.Class({
         //this.fx.setActive(false);
 
     },
+    
+    tileX: function() {
+        var x = (this.x - X_OFFSET) / GRID;
+        if (!Number.isInteger(x)) {
+            throw new Error("Not on Grid");
+        }
+        return x
+
+    },
+    tileY: function() {
+        return (this.y - Y_OFFSET) / GRID
+    },
     onOver: function(scene) {
-        if (scene.canPortal === true) {
-            scene.gState = GState.PORTAL;
-            scene.snake.lastPortal = this;
+        scene.gState = GState.PORTAL;
+        scene.snake.lastPortal = this;
 
-            let portalTime;
+        let portalTime;
 
-            if (SPACE_BOY.invSettings.get("slowPortals")) {
-                scene.scoreTimer.paused = false;
-                portalTime = 600;
-                
-            } else {
-                scene.scoreTimer.paused = true;
-                portalTime = SPEED_WALK * PORTAL_PAUSE;
-            }
+        if (SPACE_BOY.invSettings.get("slowPortals")) {
+            scene.scoreTimer.paused = false;
+            portalTime = 600;
             
-            // Start other portal spinning
-            this.targetObject.anims.msPerFrame = 16;
-    
+        } else {
+            scene.scoreTimer.paused = true;
+            portalTime = SPEED_WALK * PORTAL_PAUSE;
+        }
+        
+        // Start other portal spinning
+        this.targetObject.anims.msPerFrame = 16;
 
-            this.portalTimerRunning = true;
-            //this.target.portalTimerRunning = true;
-            
-            //this.anims.msPerFrame = 128;
-            //this.portalHighlight.anims.msPerFrame =  128;
-            //this.portalHighlight.alpha = 0;
 
-            scene.time.delayedCall(750, () => { 
-                this.portalTimerRunning = false;
-                //this.target.portalTimerRunning = false;    
-            });
+        this.portalTimerRunning = true;
+        //this.target.portalTimerRunning = true;
+        
+        //this.anims.msPerFrame = 128;
+        //this.portalHighlight.anims.msPerFrame =  128;
+        //this.portalHighlight.alpha = 0;
 
-            /*scene.tweens.add({
-                    targets: this,
-                    alpha: {from: this.targetObject.portalHighlight.anims.msPerFrame,
-                         to: 8},
-                    duration: 98,
-                    ease: 'Sine.Out',
-                    onUpdate:() => {
-                        this.portalHighlight.anims.msPerFrame = 8;
-                        this.anims.msPerFrame = 8;
-                    },
-            });*/
+        scene.time.delayedCall(750, () => { 
+            this.portalTimerRunning = false;
+            //this.target.portalTimerRunning = false;    
+        });
 
-            if (DEBUG) { console.log("PORTAL"); }
-    
-            // Show portal snake body after head arrives.
-            if (scene.snake.body.length > 2) {
-                this.snakePortalingSprite.visible = true;   
-            }
-    
-    
-            var _x = this.target.x;
-            var _y = this.target.y;
-    
-            
-    
-            var portalSound = scene.portalSounds[0];
-            portalSound.play();
-    
-            var _tween = scene.tweens.add({
-                targets: scene.snake.body[0], 
-                x: _x,
-                y: _y,
-                yoyo: false,
-                duration: portalTime,
-                ease: 'Linear',
-                repeat: 0,
-                //delay: 500
-                onStart: function () {       
-                }
-            });
-            
-            _tween.on('complete',()=>{
-                scene.gState = GState.PLAY;
-                scene.scoreTimer.paused = false;
-    
-                // Show portal snake body after head arrives.
-                if (scene.snake.body.length > 2) {
-                    this.targetObject.snakePortalingSprite.visible = true;   
-                }
-    
-    
-                scene.scene.get("InputScene").moveHistory.push([
-                    [(this.x - X_OFFSET)/GRID, (this.y - Y_OFFSET)/GRID], 
-                    [(_x - X_OFFSET)/GRID, (_y - Y_OFFSET)/GRID], 
-                    scene.snake.direction
-                ]);
-    
-    
-                // Set last move to now. Fixes Corner Time.
-                scene.lastMoveTime = scene.time.now;
-    
-                PLAYER_STATS.portals += 1;
-            });
+        /*scene.tweens.add({
+                targets: this,
+                alpha: {from: this.targetObject.portalHighlight.anims.msPerFrame,
+                        to: 8},
+                duration: 98,
+                ease: 'Sine.Out',
+                onUpdate:() => {
+                    this.portalHighlight.anims.msPerFrame = 8;
+                    this.anims.msPerFrame = 8;
+                },
+        });*/
+
+        if (DEBUG) { console.log("PORTAL"); }
+
+        // Show portal snake body after head arrives.
+        if (scene.snake.body.length > 2) {
+            this.snakePortalingSprite.visible = true;   
         }
 
+
+        var _x = this.target.x;
+        var _y = this.target.y;
+
+        
+
+        var portalSound = scene.portalSounds[0];
+        portalSound.play();
+
+        var _tween = scene.tweens.add({
+            targets: scene.snake.body[0], 
+            x: _x,
+            y: _y,
+            yoyo: false,
+            duration: portalTime,
+            ease: 'Linear',
+            repeat: 0,
+            //delay: 500
+            onStart: function () {       
+            }
+        });
+        
+        _tween.on('complete',()=>{
+            scene.gState = GState.PLAY;
+            scene.scoreTimer.paused = false;
+
+            // Show portal snake body after head arrives.
+            if (scene.snake.body.length > 2) {
+                this.targetObject.snakePortalingSprite.visible = true;   
+            }
+
+
+            scene.scene.get("InputScene").moveHistory.push([
+                [(this.x - X_OFFSET)/GRID, (this.y - Y_OFFSET)/GRID], 
+                [(_x - X_OFFSET)/GRID, (_y - Y_OFFSET)/GRID], 
+                scene.snake.direction
+            ]);
+
+
+            // Set last move to now. Fixes Corner Time.
+            scene.lastMoveTime = scene.time.now;
+
+            PLAYER_STATS.portals += 1;
+        });
                         
     },
     

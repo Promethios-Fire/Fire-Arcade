@@ -345,8 +345,8 @@ var Snake = new Phaser.Class({
 
                 
             }
-            if (scene.extractHole[0]) { //check that there is an extract hole
-                if (scene.extractHole[0].x === this.head.x && scene.extractHole[0].y === this.head.y) {
+            if (scene.extractHole) { //check that there is an extract hole
+                if (scene.extractHole.x === this.head.x && scene.extractHole.y === this.head.y) {
                     console.log('WOO')
                     //scene.finalScore();
                     scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
@@ -363,7 +363,7 @@ var Snake = new Phaser.Class({
         
         
        
-        if (checkPortals.length > 1 && scene.canPortal && scene.gState === GState.PLAY) {
+        if (checkPortals.length > 1 && scene.gState === GState.PLAY) {
             var testPortal = Phaser.Math.RND.pick(checkPortals);
             var dist = Phaser.Math.Distance.Between(this.snakeLight.x, this.snakeLight.y, 
                 testPortal.x, testPortal.y);
@@ -396,59 +396,58 @@ var Snake = new Phaser.Class({
 
             });
 
-            if (scene.canPortal) {
-                scene.portals.forEach(portal => {
+            scene.portals.forEach(portal => {
 
-                    let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
-                        portal.x, portal.y);
-                        // normalized code to be used at a later point
-                        /*const distNormalized = Phaser.Math.Clamp(
-                        (_dist - 0) / (600 - 0), 
-                        0, 1
-                        );*/
-                    if (scene.gState != GState.PORTAL) {
-                        switch (true) {
-                            case _dist > GRID * 5:
-                                
-                                portal.anims.msPerFrame = 125; // 125
-                                break;
-                            case _dist > GRID * 3:
-                                portal.anims.msPerFrame = 32;
-                                break;
-                            case _dist > GRID * 0:
-                                portal.anims.msPerFrame = 16;
-                                break;
-                        
-                            default:
-                                break;
-                        }   
-                    }
+                let _dist = Phaser.Math.Distance.Between(this.newHead.x, this.newHead.y,
+                    portal.x, portal.y);
+                    // normalized code to be used at a later point
+                    /*const distNormalized = Phaser.Math.Clamp(
+                    (_dist - 0) / (600 - 0), 
+                    0, 1
+                    );*/
+                if (scene.gState != GState.PORTAL) {
+                    switch (true) {
+                        case _dist > GRID * 5:
+                            
+                            portal.anims.msPerFrame = 125; // 125
+                            break;
+                        case _dist > GRID * 3:
+                            portal.anims.msPerFrame = 32;
+                            break;
+                        case _dist > GRID * 0:
+                            portal.anims.msPerFrame = 16;
+                            break;
                     
+                        default:
+                            break;
+                    }   
+                }
+                
 
-                    if (portal.targetObject.portalTimerRunning === false) { // && portal.canHighlight === true) {
+                if (portal.targetObject.portalTimerRunning === false) { // && portal.canHighlight === true) {
 
-                        var minFrameRate = 32; 
-                        var maxFrameRate = 64;
-                        
-                        //removing portal speed up until it's bug-free
-                        /*portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
-                            _dist, minFrameRate, maxFrameRate);
-                        portal.targetObject.portalHighlight.anims.msPerFrame = 
-                            portal.targetObject.anims.msPerFrame;*/
-                        
-                        portal.targetObject.portalHighlight.alpha = 
-                            1 - Phaser.Math.Clamp(_dist / maxFrameRate / 2 , -0.5, 1.5);
-                        
-                        //console.log(portal.targetObject.portalHighlight.alpha);
-                    }  
-                    else {
-                        //portal.anims.msPerFrame = 128;
-                        //portal.portalHighlight.anims.msPerFrame =  128;
+                    var minFrameRate = 32; 
+                    var maxFrameRate = 64;
+                    
+                    //removing portal speed up until it's bug-free
+                    /*portal.targetObject.anims.msPerFrame = Phaser.Math.Clamp(
+                        _dist, minFrameRate, maxFrameRate);
+                    portal.targetObject.portalHighlight.anims.msPerFrame = 
+                        portal.targetObject.anims.msPerFrame;*/
+                    
+                    portal.targetObject.portalHighlight.alpha = 
+                        1 - Phaser.Math.Clamp(_dist / maxFrameRate / 2 , -0.5, 1.5);
+                    
+                    //console.log(portal.targetObject.portalHighlight.alpha);
+                }  
+                else {
+                    //portal.anims.msPerFrame = 128;
+                    //portal.portalHighlight.anims.msPerFrame =  128;
 
-                        //portal.portalHighlight.alpha = 0;
-                    }
-                });
-            }
+                    //portal.portalHighlight.alpha = 0;
+                }
+            });
+            
 
             /*scene.tweens.add({
                 targets: testPortal.targetObject.portalHighlight,
