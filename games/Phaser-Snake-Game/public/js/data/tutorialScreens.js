@@ -126,7 +126,7 @@ export var TUTORIAL_PANELS = new Map([
         
 
         _map.get("text").push(tutText);
-        _map.get("images").push(tutMove);
+        _map.get("images").push();
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
 
