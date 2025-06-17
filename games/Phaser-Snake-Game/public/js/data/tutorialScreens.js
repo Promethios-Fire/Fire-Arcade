@@ -74,8 +74,12 @@ export var TUTORIAL_PANELS = new Map([
             }), 
             'Collect atoms to grow longer.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
+
+        var tutMove = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2 - GRID  * .5,).setDepth(103).setOrigin(0.5,0.5);
+        tutMove.play('tutMove');
         
-        var tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 3,
+        /*var tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 3,
         SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         tutAtomSmall.play('atom04idle');
         
@@ -93,10 +97,10 @@ export var TUTORIAL_PANELS = new Map([
         
         var tutAtomElectrons = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomElectrons.play('electronIdle');
+        tutAtomElectrons.play('electronIdle');*/
 
         _map.get("text").push(tutText);
-        _map.get("images").push(tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);
+        _map.get("images").push(tutMove);//tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);
         _map.get("panels").push(panel2);
         _map.set("growPanelTo", {w:240, h:160});
 
@@ -122,7 +126,7 @@ export var TUTORIAL_PANELS = new Map([
         
 
         _map.get("text").push(tutText);
-        _map.get("images").push();
+        _map.get("images").push(tutMove);
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
 

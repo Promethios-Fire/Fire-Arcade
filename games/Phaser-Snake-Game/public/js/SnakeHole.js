@@ -3189,7 +3189,7 @@ class StartScene extends Phaser.Scene {
         //this.load.spritesheet('snakeOutlineBoostingSmall', 'assets/sprites/snakeOutlineSmallAnim.png', { frameWidth: 28, frameHeight: 28 });
         this.load.spritesheet('tutWASD', 'assets/HowToCards/tutorial_WASD.png', { frameWidth: 43, frameHeight: 29 });
         this.load.spritesheet('tutSPACE', 'assets/HowToCards/tutorial_SPACE.png', { frameWidth: 67, frameHeight: 31 });
-
+        this.load.spritesheet('tutMove', 'assets/HowToCards/tutorial_snake_move.png', { frameWidth: 240, frameHeight: 18 });
 
         SPACE_BOY = this.scene.get("SpaceBoyScene");
         PERSISTS = this.scene.get("PersistScene");
@@ -14118,12 +14118,21 @@ function loadSpriteSheetsAndAnims(scene) {
         frameRate: 1,
         repeat: 0
       });
+
     scene.anims.create({
     key: 'tutAll',
     frames: scene.anims.generateFrameNumbers('tutWASD',{ frames: [ 1,2,1,3,4,3,5,6,5,7,8,7]}),
     frameRate: 12,
     repeat: -1
     });
+
+    scene.anims.create({
+    key: 'tutMove',
+    frames: scene.anims.generateFrameNumbers('tutMove',{ frames: [ 0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25,26,27,28]}),
+    frameRate: 12,
+    repeat: -1
+    });
+
     scene.anims.create({
         key: 'tutSpace',
         frames: scene.anims.generateFrameNumbers('tutSPACE',{ frames: [ 0,0,0,0,1,2,2,2,2,1]}),
