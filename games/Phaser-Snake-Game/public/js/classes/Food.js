@@ -143,6 +143,27 @@ var Food = new Phaser.Class({
 
                 if (!finalFanfare) {
                     // Normal Final Atom Case
+
+                    /* Brightness Tween *shrug* not great
+                    const brightness = scene.snake.head.preFX.addColorMatrix().brightness(2);
+                    brightness.active = true;
+
+                    scene.add.tween({
+                        targets: brightness,
+                        alpha: { from: 0, to: 1 },
+                        yoyo: true, 
+                        duration: 350, 
+                        ease: 'Linear', 
+                        repeat: -1,
+                        onStart: () => {
+                        //brightness.active = true;
+                        },
+                        onComplete: () => {
+                        //brightness.active = false;
+                        }
+                    });
+                    */
+
                     scene.tweens.add({
                         targets: scene.snake.head,
                         x: {from: scene.snake.previous[0], to:_x },
@@ -150,6 +171,7 @@ var Food = new Phaser.Class({
                         duration: 1,
                         ease:'Expo.easeIn',
                         onComplete: () =>{
+
                             
                             const ourStartScene = scene.scene.get('StartScene');
                             
@@ -157,10 +179,11 @@ var Food = new Phaser.Class({
                             
                             this.electrons.visible = false;
 
-                            var vortexTween = scene.vortexIn(scene.snake.body, _x, _y);
+                            var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Expo.easeInOut');
 
                             vortexTween.on('complete', () => {
                                 scene.time.delayedCall(200, () => {
+
 
 
                                     scene.playAtomSound();
@@ -302,7 +325,10 @@ var Food = new Phaser.Class({
                                                 var color = spectrum[colorIndex];
                         
                                                 scene.fxBoost = scene.boostBar.preFX.addColorMatrix();
+
+                                                // #region Rainbow
                         
+                                                /*
                                                 scene.tweens.addCounter({
                                                     from: 0,
                                                     to: 360,

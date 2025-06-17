@@ -10218,7 +10218,7 @@ class GameScene extends Phaser.Scene {
 
         this.gState = GState.TRANSITION;
         this.snake.head.setTexture('snakeDefault', 0);
-        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+        this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
 
         // hide the level labels
         this.levelLabelHide = this.tweens.add({
@@ -11026,15 +11026,19 @@ class GameScene extends Phaser.Scene {
         }
     }
 
-    vortexIn(target, x, y){
+    vortexIn(target, x, y, time, ease){
+
+        if (!ease) {
+            ease = 'Sine.easeOutIn';
+        }
 
         this.vortexTween = this.tweens.add({
             targets: target, 
             x: x, //this.pathRegroup.vec.x,
             y: y, //this.pathRegroup.vec.y,
             yoyo: false,
-            duration: 500,
-            ease: 'Sine.easeOutIn',
+            ease: ease, //'Sine.easeOutIn'
+            duration: time,
             repeat: 0,
             delay: this.tweens.stagger(30)
         });
@@ -11298,7 +11302,7 @@ class GameScene extends Phaser.Scene {
             this.canContinue = false;
             this.gState = GState.TRANSITION;
             this.snake.direction = DIRS.STOP;
-            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+            this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y, 500);
             this.gameSceneCleanup();
             this.gameOver();
 

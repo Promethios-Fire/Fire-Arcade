@@ -545,7 +545,7 @@ var Snake = new Phaser.Class({
             });
     
             if (ourPersistScene.coins > -1) {
-                scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y);
+                scene.tweenRespawn = scene.vortexIn(this.body, scene.startCoords.x, scene.startCoords.y, 500);
             
                 scene.tweenRespawn.on("complete", () => {
 

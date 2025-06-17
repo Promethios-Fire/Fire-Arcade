@@ -849,7 +849,7 @@ STAGE_OVERRIDES.set("Tutorial_T-1", {
                     scene.gState = GState.TRANSITION;
                     scene.snake.direction = DIRS.STOP;
 
-                    var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
+                    var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y, 500);
 
                     var timeDelay = vTween.totalDuration;
 
