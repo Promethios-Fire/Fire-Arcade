@@ -44,8 +44,8 @@ export var TUTORIAL_PANELS = new Map([
 
         var tutSnake = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
             SCREEN_HEIGHT/2 - GRID * 1,
-           'tutSnakeWASD'
         ).setDepth(103).setOrigin(0.5,0.5).setScale(1);
+        tutSnake.play('tutWASDMove')
 
 
         let panel1 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
@@ -78,29 +78,9 @@ export var TUTORIAL_PANELS = new Map([
         var tutMove = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
         SCREEN_HEIGHT/2 - GRID  * .5,).setDepth(103).setOrigin(0.5,0.5);
         tutMove.play('tutMove');
-        
-        /*var tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 3,
-        SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomSmall.play('atom04idle');
-        
-        var tutAtomMedium = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomMedium.play('atom03idle');
-        
-        var tutAtomLarge = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 1,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomLarge.play('atom02idle');
-        
-        var tutAtomCharged = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomCharged.play('atom01idle');
-        
-        var tutAtomElectrons = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
-            SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomElectrons.play('electronIdle');*/
 
         _map.get("text").push(tutText);
-        _map.get("images").push(tutMove);//tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);
+        _map.get("images").push(tutMove);
         _map.get("panels").push(panel2);
         _map.set("growPanelTo", {w:240, h:160});
 
@@ -131,7 +111,6 @@ export var TUTORIAL_PANELS = new Map([
         _map.set("growPanelTo", {w:200, h:120});
 
         return _map
-
     }],
     ["screenwrap", function (panelNumber) {
         var _map = structuredClone(defaultMap);
@@ -157,7 +136,6 @@ export var TUTORIAL_PANELS = new Map([
         _map.set("growPanelTo", {w:200, h:120});
 
         return _map
-
     }],
     ["coins", function (panelNumber) {
         var _map = structuredClone(defaultMap);
