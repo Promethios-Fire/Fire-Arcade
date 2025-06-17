@@ -24,19 +24,10 @@ var hOffSet = 570;
  */
 
 export var TUTORIAL_PANELS = new Map([
-    /*
-    ["", function () {
-
-    }],
-    */
     ["move", function (panelNumber) {
-
-        // 640
-        
         var _map = structuredClone(defaultMap);
-        
 
-        var Text1 = this.add.dom(
+        var tutText = this.add.dom(
             (SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 2.5, 
             GRID * 19, 'div',  
             Object.assign({}, STYLE_DEFAULT, tutStyle), 
@@ -60,24 +51,13 @@ export var TUTORIAL_PANELS = new Map([
         let panel1 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
         panel1.setDepth(10);
         panel1.setScale(0);
-        this.time.delayedCall(500, event => {
-            
-        });
 
-        _map.get("text").push(Text1);
+        _map.get("text").push(tutText);
         _map.get("images").push(tutWASD, tutSnake);
         _map.get("panels").push(panel1);
         _map.set("growPanelTo", {w:240, h:160});
 
-        // General delay call scale panels
-        
-
-        // general tween for fading in objs after scale.
-
-        // Panels centered on the same point x and y. Can be different
-
         return _map
-
     }],
     ["atoms", function (panelNumber) {
         var _map = structuredClone(defaultMap);
@@ -103,7 +83,7 @@ export var TUTORIAL_PANELS = new Map([
         */
 
         
-        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 10.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
                 //width: '50px'
@@ -131,10 +111,10 @@ export var TUTORIAL_PANELS = new Map([
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
         tutAtomElectrons.play('electronIdle');
 
-        _map.get("text").push(tutText2);
+        _map.get("text").push(tutText);
         _map.get("images").push(tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);
         _map.get("panels").push(panel2);
-        _map.set("growPanelTo", {w:200, h:120});
+        _map.set("growPanelTo", {w:240, h:160});
 
         return _map
 
@@ -148,7 +128,7 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 13.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 13.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
                 width: '200px'
@@ -157,7 +137,7 @@ export var TUTORIAL_PANELS = new Map([
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
-        _map.get("text").push(tutText2);
+        _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
@@ -174,7 +154,7 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
                 width: '200px'
@@ -183,7 +163,7 @@ export var TUTORIAL_PANELS = new Map([
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
-        _map.get("text").push(tutText2);
+        _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
@@ -200,7 +180,7 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
                 width: '200px'
@@ -209,7 +189,7 @@ export var TUTORIAL_PANELS = new Map([
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
-        _map.get("text").push(tutText2);
+        _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
@@ -226,7 +206,7 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText2 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
                 width: '200px'
@@ -235,7 +215,7 @@ export var TUTORIAL_PANELS = new Map([
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
-        _map.get("text").push(tutText2);
+        _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:200, h:120});
@@ -250,7 +230,7 @@ export var TUTORIAL_PANELS = new Map([
         panel3.setDepth(80);
         panel3.setScale(0);
         
-        var tutText3 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
             'Use portals to bend spacetime.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
 
@@ -267,7 +247,7 @@ export var TUTORIAL_PANELS = new Map([
         var tutSnake3 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 1.5,
         SCREEN_HEIGHT/2 + GRID  * 1,'tutSnakePortal1').setDepth(103).setOrigin(0,0.5).setScale(1);
 
-        _map.get("text").push(tutText3);
+        _map.get("text").push(tutText);
         _map.get("images").push(tutPortal1, tutPortal2, tutSnake2, tutSnake3);
         _map.get("panels").push(panel3);
         _map.set("growPanelTo", {w:240, h:160});
@@ -282,7 +262,7 @@ export var TUTORIAL_PANELS = new Map([
         panel4.setDepth(80);
         panel4.setScale(0);
 
-        var tutText4 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
                 'Hold space to sprint.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
 
@@ -293,7 +273,7 @@ export var TUTORIAL_PANELS = new Map([
         var tutSnake4 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
         SCREEN_HEIGHT/2 - GRID * 1,'tutSnakeSPACE').setDepth(103).setOrigin(0.5,0.5).setScale(1);
 
-        _map.get("text").push(tutText4);
+        _map.get("text").push(tutText);
         _map.get("images").push(tutSPACE,tutSnake4);
         _map.get("panels").push(panel4);
         _map.set("growPanelTo", {w:240, h:160});
