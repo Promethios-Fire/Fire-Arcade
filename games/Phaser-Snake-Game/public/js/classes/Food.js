@@ -69,8 +69,38 @@ var Food = new Phaser.Class({
             }  
         }
         
-        if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup
+        if (scene.length != scene.lengthGoal -1) { 
+            // Normal Case
+            if (!scene.winned) {
+                scene.events.emit('addScore', this, timeSinceFruit); 
+            }
+        
+            scene.snake.grow(scene);
+            // Avoid double _atom getting while in transition
+            this.visible = false;
 
+            this.move(scene);
+            // Moves the eaten atom after a delay including the electron.
+            this.delayTimer = scene.time.delayedCall(200, function () { // Amount of time in ms to delay next atom appearing
+                if (scene.gState != GState.TRANSITION) {
+                    
+                    scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
+                    this.anims.play("atom05spawn");  // Start the spawn animation
+                    this.chain(['atom01idle']);
+                    this.visible = true; //set newly spawned atom to visible once it's moved into position
+                }
+
+            }, [], this);
+
+            if (scene.snake.body.length > 28) {
+                PLAYER_STATS.atomsOverEaten += 1;
+                if (scene.snake.body.length - 1 > PLAYER_STATS.longestBody) {
+                    PLAYER_STATS.longestBody = scene.snake.body.length - 1;
+                }
+            }
+            scene.playAtomSound();
+        } else {
+            // Last Atom!
             scene.winned = true;
 
             var tempSounds = [];
@@ -108,9 +138,10 @@ var Food = new Phaser.Class({
                     break;
             }
 
-            // Default is shown first.
+            
 
             if (!finalFanfare) {
+                // Normal Final Atom Case
                 scene.tweens.add({
                     targets: scene.snake.head,
                     x: {from: scene.snake.previous[0], to:_x },
@@ -417,44 +448,17 @@ var Food = new Phaser.Class({
                 })
                 
             } else {
+                // Finale Fanfare!
+                scene.tweens.add({
+                    targets: scene.snake.head,
+                    x: {from: scene.snake.previous[0], to:_x },
+                    y: { from: scene.snake.previous[1], to:_y },
+                    duration: 800,
+                    onComplete: () => {
 
-                debugger
-
+                    }
+                });
             }
-            
-            
-            
-        } else {
-            // Not the last Atom. > or < LENGTH GOAL
-            if (!scene.winned) {
-                scene.events.emit('addScore', this, timeSinceFruit); 
-            }
-        
-            scene.snake.grow(scene);
-            // Avoid double _atom getting while in transition
-            this.visible = false;
-
-            this.move(scene);
-            // Moves the eaten atom after a delay including the electron.
-            this.delayTimer = scene.time.delayedCall(200, function () { // Amount of time in ms to delay next atom appearing
-                if (scene.gState != GState.TRANSITION) {
-                    
-                    scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
-                    this.anims.play("atom05spawn");  // Start the spawn animation
-                    this.chain(['atom01idle']);
-                    this.visible = true; //set newly spawned atom to visible once it's moved into position
-                }
-
-            }, [], this);
-
-            if (scene.snake.body.length > 28) {
-                PLAYER_STATS.atomsOverEaten += 1;
-                if (scene.snake.body.length - 1 > PLAYER_STATS.longestBody) {
-                    PLAYER_STATS.longestBody = scene.snake.body.length - 1;
-                }
-            }
-            scene.playAtomSound();
-
             
         }
         
