@@ -7237,6 +7237,7 @@ class GameScene extends Phaser.Scene {
 
         // Arrays for collision detection
         this.atoms = new Set();
+        this.atomRespawnPool = new Set();
         this.activeArrows = new Set();
         this.foodHistory = [];
         this.walls = [];
@@ -11493,6 +11494,21 @@ class GameScene extends Phaser.Scene {
                 if (!this.winned) {
                     this.coinSpawnCounter -= 1;
                 }
+
+                if (this.atomRespawnPool.size > 0) {
+                    debugger
+                    this.atomRespawnPool.forEach(atom => {
+                        atom.respawnTimer-- ;
+
+                        if (atom.respawnTimer < 0) {
+                            atom.visible = true; // visiblw
+                            atom.anims.play("atom05spawn");  // Start the spawn animation
+                            atom.chain(['atom01idle']);
+                            this.atomRespawnPool.delete(atom);
+                        }
+                    });
+                }
+                
 
                 if (this.coinSpawnCounter < 1) {
                     if (this.spawnCoins) {

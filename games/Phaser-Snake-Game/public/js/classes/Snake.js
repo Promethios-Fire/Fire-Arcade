@@ -276,7 +276,7 @@ var Snake = new Phaser.Class({
          */ 
     
         // Actually Move the Snake Head
-        if (scene.gState != GState.BONK && this.direction != DIRS.STOP) {
+        if (scene.gState != GState.BONK && this.direction != DIRS.STOP && scene.gState != GState.TRANSITION) {
                  Phaser.Actions.ShiftPosition(this.body, xN, yN, this.tail);      
         }
 
