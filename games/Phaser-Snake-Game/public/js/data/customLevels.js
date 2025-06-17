@@ -196,11 +196,15 @@ STAGE_OVERRIDES.set("Bonus_X-1", {
             var left = {x:head.x - GRID , y: head.y};
             var right = {x:head.x + GRID , y: head.y};
 
-            return [above, down, left, right].every( pos => {
+            var check = [above, down, left, right].every( pos => {
                 return this.snake.body.some( part => {
                     return pos.x === part.x && pos.y === part.y
                 })
             });
+
+            if (check) {
+                this.events.emit('win');
+            }
              
 
         }
@@ -326,7 +330,9 @@ STAGE_OVERRIDES.set("Bonus_X-4", {
             scene.events.emit('addScore', food); 
         },
         checkWinCon: function () {
-            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR;
+            if (this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < BOOST_ADD_FLOOR) {
+                this.events.emit('win');
+            }
         
         },
     }
@@ -421,7 +427,10 @@ STAGE_OVERRIDES.set("Bonus_X-6", {
             );
         },
         checkWinCon: function () {
-            return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < this.maxScore - this.bombTime;
+            if (this.currentScoreTimer() < this.maxScore - this.bombTime) {
+                this.events.emit('win');  
+            }
+            return ;
         }, 
     }
 });
@@ -445,7 +454,10 @@ STAGE_OVERRIDES.set("Bonus_X-7", {
     
         },
         checkWinCon: function () {
-            return this.length < 1;
+            if (this.length < 1) {
+                this.events.emit('win');
+            }
+            return ;
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
         
         },
@@ -530,7 +542,10 @@ STAGE_OVERRIDES.set("Bonus_X-8", {
             scene.checkWinCon = this.checkWinCon;
         },
         checkWinCon: function () {
-            return this.snake.body.length < 2;
+            if (this.snake.body.length < 2) {
+                this.events.emit('win');
+            }
+            return
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
         
         },
@@ -608,7 +623,10 @@ STAGE_OVERRIDES.set("Bonus_X-9", {
             scene.snake.grow = this.grow;
         },
         checkWinCon: function () {
-            return this.snake.body.length < 2;
+            if (this.snake.body.length < 2) {
+                this.events.emit('win');
+            }
+            return 
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < 1;
         
         },
@@ -798,7 +816,10 @@ STAGE_OVERRIDES.set("Bonus_X-12", {
             
         },
         checkWinCon: function () {
-            return scene.snake.body.length < 2;
+            if (scene.snake.body.length < 2) {
+                this.events.emit("win");
+            }
+            return
             //return this.scoreTimer.getRemainingSeconds().toFixed(1) * 10 < COMBO_ADD_FLOOR;
         
         },
@@ -842,43 +863,32 @@ STAGE_OVERRIDES.set("Tutorial_T-1", {
         postFix: function (scene) {
             
             // Override checkWinCon()
-            scene.checkWinCon = function(){
-                if (scene.length >= 7 && !scene.winned) {
+            scene.checkWinCon = this.checkWinCon;        
+        },
+        checkWinCon: function () {
+            if (this.length >= 7) {
                     
-                    scene.winned = true;
-                    scene.gState = GState.TRANSITION;
-                    scene.snake.direction = DIRS.STOP;
+                this.winned = true;
+                this.gState = GState.TRANSITION;
+                this.snake.direction = DIRS.STOP;
 
-                    var vTween = scene.vortexIn(scene.snake.body, scene.snake.head.x, scene.snake.head.y);
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
 
-                    var timeDelay = vTween.totalDuration;
+                vTween.on("complete", () => {
+                    this.time.delayedCall(200, () => {
+                        debugger
 
-                    scene.time.delayedCall(timeDelay + 75, () => {
+                        this.gameSceneFullCleanup();
 
-                        scene.gameSceneFullCleanup();
-
-                        scene.scene.start('TutorialScene', {
+                        this.scene.start('TutorialScene', {
                             cards: ["walls","screenwrap"],
                             toStage: "Tutorial_T-2",
                         });
                     });
 
-                    /* This also works
-                    vTween.on("complete", () => {
-                        scene.scene.start('TutorialScene', {
-                            cards: ["move","atoms"],
-                            toStage: "Tutorial_2",
-                        });
-                    });
-                    */
-                    
-                    // Scene Clean Up needed?
-    
-                } else {
-                    return false;
-                }
+                });
             }
-        }
+        }  
     }
 });
 
@@ -893,30 +903,38 @@ STAGE_OVERRIDES.set("Tutorial_T-2", {
 
         },
         postFix: function (scene) {
-
-
+            
             let counter = 7;
             while (counter > 0) {
                 scene.snake.grow(scene);
                 counter--;
             }
 
-
-            scene.checkWinCon = function(){
-                if (scene.length >= 14) {
-                    scene.gameSceneFullCleanup();
+            scene.checkWinCon = this.checkWinCon;        
+        },
+        checkWinCon: function () {
+            if (this.length >= 14) {
                     
-                    scene.scene.start('TutorialScene', {
-                        cards: ["portals"],
-                        toStage: "Tutorial_T-3",
-                    });
-    
-                } else {
-                    return false;
-                }
-            }
+                this.winned = true;
+                this.gState = GState.TRANSITION;
+                this.snake.direction = DIRS.STOP;
 
-        }
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+                vTween.on("complete", () => {
+                    this.time.delayedCall(200, () => {
+
+                        this.gameSceneFullCleanup();
+
+                        this.scene.start('TutorialScene', {
+                            cards: ["portals"],
+                            toStage: "Tutorial_T-3",
+                        });
+                    });
+
+                });
+            }
+        } 
     }
 });
 
@@ -937,23 +955,32 @@ STAGE_OVERRIDES.set("Tutorial_T-3", {
                 scene.snake.grow(scene);
                 counter--;
             }
-
-            scene.checkWinCon = function(){
-                if (scene.length >= 21) {
-
-                    scene.gameSceneFullCleanup();
+        
+            scene.checkWinCon = this.checkWinCon;        
+        },
+        checkWinCon: function () {
+            if (this.length >= 21) {
                     
-                    scene.scene.start('TutorialScene', {
-                        cards: ["coins"],
-                        toStage: "Tutorial_T-4",
-                    });
-    
-                } else {
-                    return false;
-                }
-            }
+                this.winned = true;
+                this.gState = GState.TRANSITION;
+                this.snake.direction = DIRS.STOP;
 
-        }
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+                vTween.on("complete", () => {
+                    this.time.delayedCall(200, () => {
+
+                        this.gameSceneFullCleanup();
+
+                        this.scene.start('TutorialScene', {
+                            cards: ["coins"],
+                            toStage: "Tutorial_T-4",
+                        });
+                    });
+
+                });
+            }
+        } 
     }
 });
 
@@ -971,26 +998,34 @@ STAGE_OVERRIDES.set("Tutorial_T-4", {
                 scene.snake.grow(scene);
                 counter--;
             }
-
-            scene.checkWinCon = function(){
-                if (scene.length >= 28) { //28
-
-                    scene.winned = true;
-                    scene.gState = GState.TRANSITION;
-                    scene.snake.direction = DIRS.STOP;
-
-                    scene.gameSceneFullCleanup();
-                    
-                    scene.scene.start('TutorialScene', {
-                        cards: ["blackholes"],
-                        toStage: "Tutorial_T-5",
-                    });
-    
-                } else {
-                    return false;
-                }
-            }
+            
+            // Override checkWinCon()
+            scene.checkWinCon = this.checkWinCon;        
         },
+        checkWinCon: function () {
+            if (this.length >= 28) {
+                    
+                this.winned = true;
+                this.gState = GState.TRANSITION;
+                this.snake.direction = DIRS.STOP;
+
+                var vTween = this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
+
+                vTween.on("complete", () => {
+                    this.time.delayedCall(200, () => {
+
+                        debugger
+                        this.gameSceneFullCleanup();
+
+                        this.scene.start('TutorialScene', {
+                            cards: ["blackholes"],
+                            toStage: "Tutorial_T-5",
+                        });
+                    }, this);
+
+                });
+            }
+        } 
     }
 });
 
@@ -1002,26 +1037,16 @@ STAGE_OVERRIDES.set("Tutorial_T-5", {
         },
         postFix: function (scene) {
 
+            scene.winned = true;
+            scene.events.emit('spawnBlackholes', scene.snake.direction);
+
             let counter = 28; //28
             while (counter > 0) {
                 scene.snake.grow(scene);
                 counter--;
             }
-
-            scene.winned = true;
-
-
-            scene.events.emit('spawnBlackholes', scene.snake.direction);
-
-            //this.events.emit('spawnBlackholes', ourGame.snake.direction);
-
-            scene.checkWinCon = function() { // Returns Bool
-                if (scene.lengthGoal > 0) { // Placeholder check for bonus level.
-                    return scene.length >= scene.lengthGoal + 1; // Should never reach here.
-                }
-                
-            }
-        }
+ 
+        },
     }
 });
 
@@ -1037,7 +1062,7 @@ STAGE_OVERRIDES.set("Tutorial_T-6", {
             //window.location.reload();
 
             //temporary solution for resetting the game -- doesn't preserve object permanence
-            window.location.reload();
+            //window.location.reload();
 
         },
         postFix: function (scene) {

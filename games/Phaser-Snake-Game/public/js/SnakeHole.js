@@ -925,7 +925,7 @@ class SpaceBoyScene extends Phaser.Scene {
         // Temporary until boost item is placed
 
         INVENTORY_ITEMS.set("boostItem", true);
-        localStorage.setItem("inventory-item", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
+        localStorage.setItem("inventory-items", JSON.stringify(Object.fromEntries(INVENTORY_ITEMS)));
 
         // Create the sprites and apply initial dark tint
         // Initial Setup
@@ -7239,6 +7239,15 @@ class GameScene extends Phaser.Scene {
 
 
         this.coinSpawnCounter = 100;
+
+        // This is here so it correctly is reloaded on every game scene start/restart.
+        // Bonus levels reasign this function after this point. 
+        // The standard game returns nothing and uses the length goal
+
+        this.checkWinCon = function () {
+            // remember to emit "win" when overriding directly.
+            return
+        }
     }
     
     
@@ -11066,11 +11075,6 @@ class GameScene extends Phaser.Scene {
             }, this);
         }
     }
-    checkWinCon() { // Returns Bool
-        // Use Atom for default game.
-        // this.length >= this.lengthGoal
-        return false
-    }
 
     checkLoseCon() {
         /*
@@ -11229,17 +11233,12 @@ class GameScene extends Phaser.Scene {
                 console.log("SPACE LONG ENOUGH BRO");
         }
 
-        
-        // #region Win State
-        if (this.checkWinCon()) {
-            this.events.emit('win');
-        }
-
         // #region Lose State
         if (this.checkLoseCon() && this.canContinue) {
             this.canContinue = false;
             this.gState = GState.TRANSITION;
             this.snake.direction = DIRS.STOP;
+            debugger
             this.vortexIn(this.snake.body, this.snake.head.x, this.snake.head.y);
             this.gameSceneCleanup();
             this.gameOver();
@@ -11409,18 +11408,19 @@ class GameScene extends Phaser.Scene {
  
         }
 
-        var timeTick = this.currentScoreTimer()
+        var timeTick = this.currentScoreTimer();
       
     
         // #endregion
 
+        /*
         if (!this.checkWinCon() && !this.scoreTimer.paused) {
             /***
              * This is out of the Time Tick Loop because otherwise it won't pause 
              * correctly during portaling. After the timer pauses at the Score Floor
              *  the countdown timer will go to 0.  
              *  -Note: Could this be fixed with a Math.max() and put it back together again? 
-             */
+             *//*
             var countDown = this.scoreTimer.getRemainingSeconds().toFixed(1) * 10;
     
             if (countDown === SCORE_FLOOR || countDown < SCORE_FLOOR) {
@@ -11429,10 +11429,14 @@ class GameScene extends Phaser.Scene {
 
             this.countDown.setText(countDown.toString().padStart(3,"0"));
         }
+        */ // can I get this working without?
 
         if (timeTick != this.lastTimeTick) {
             // #region TimerTick
             this.lastTimeTick = timeTick;
+            
+            // #region Win State
+            this.checkWinCon();
 
             if(!this.scoreTimer.paused) {
                 if (!this.winned) {

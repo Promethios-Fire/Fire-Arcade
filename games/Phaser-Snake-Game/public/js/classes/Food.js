@@ -62,7 +62,7 @@ var Food = new Phaser.Class({
             }  
         }
         
-        if (scene.length === scene.lengthGoal -1) { //Check for final atom pickup
+        if (scene.length === scene.lengthGoal -1 && scene.mode != MODES.TUTORIAL) { //Check for final atom pickup
 
             scene.winned = true;
 
@@ -413,6 +413,7 @@ var Food = new Phaser.Class({
                             }).setFrequency(150,[1]).setDepth(1);*/
                             
                             console.log('tween finished, start electrons');
+                            debugger
                             scene.vortexIn(scene.snake.body, _x, _y);
                         }
                     });
@@ -456,6 +457,8 @@ var Food = new Phaser.Class({
         if (STAGE_OVERRIDES.has(scene.stage) && "afterEat" in STAGE_OVERRIDES.get(scene.stage).methods) {
                     STAGE_OVERRIDES.get(scene.stage).methods.afterEat(scene, this);
         }
+
+        scene.checkWinCon();
         
         return 'valid';
     },

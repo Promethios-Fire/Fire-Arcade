@@ -321,6 +321,7 @@ var Snake = new Phaser.Class({
         
         // Check for Blackholes
         if (scene.winned) {
+            debugger
             
             /**
              * Okay to not be part of the interact layer because there is only ever 8?
