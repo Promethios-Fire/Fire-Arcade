@@ -66,22 +66,6 @@ export var TUTORIAL_PANELS = new Map([
         const panel2 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
         panel2.setDepth(80);
         panel2.setScale(0);
-
-        /*
-        this.time.delayedCall(500, event => {
-            this.tweens.add({
-                targets: panel2,
-                scale: 1,
-                width: 200,
-                height: 140,
-                duration: 300,
-                ease: 'sine.inout',
-                yoyo: false,
-                repeat: 0,
-            }, this);
-        }, this);
-        */
-
         
         var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
