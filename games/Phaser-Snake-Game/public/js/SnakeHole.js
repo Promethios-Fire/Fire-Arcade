@@ -9186,6 +9186,33 @@ class GameScene extends Phaser.Scene {
             var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
         }
 
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+        this.snake.grow(this);
+
 
         // #endregion
 
