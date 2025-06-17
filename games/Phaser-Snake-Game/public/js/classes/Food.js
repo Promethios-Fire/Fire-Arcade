@@ -154,15 +154,16 @@ var Food = new Phaser.Class({
                             const ourStartScene = scene.scene.get('StartScene');
                             
                             scene.events.emit('addScore', this, timeSinceFruit);
-                            scene.playAtomSound();
+                            
                             this.electrons.visible = false;
 
                             var vortexTween = scene.vortexIn(scene.snake.body, _x, _y);
 
                             vortexTween.on('complete', () => {
-                                scene.time.delayedCall(300, () => {
+                                scene.time.delayedCall(200, () => {
 
 
+                                    scene.playAtomSound();
                                     scene.snake.grow(scene);
                                     finalAtom.destroy();
                                     scene.events.emit('win');
