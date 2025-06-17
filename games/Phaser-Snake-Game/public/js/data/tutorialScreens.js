@@ -96,19 +96,20 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 13.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 18.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
-                width: '200px'
+                width: '300px'
             }),  
-            'Collide with walls (or body) and lose lives.',
+            //'Collide with walls (or body) and lose lives.',
+            'Running into walls or yourself will cost a life.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
-        _map.set("growPanelTo", {w:200, h:120});
+        _map.set("growPanelTo", {w:240, h:160});
 
         return _map
     }],
@@ -121,19 +122,19 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 18.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
-                width: '200px'
+                width: '400px'
             }),  
-            'Screen wrap in all 4 directions to access areas blocked by walls.',
+            'Travel beyond the edge of a level to screenwrap to the opposite side.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
-        _map.set("growPanelTo", {w:200, h:120});
+        _map.set("growPanelTo", {w:240, h:160});
 
         return _map
     }],
@@ -146,19 +147,19 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
-                width: '200px'
+                width: '300px'
             }),  
-            'Collect coins to gain lives',
+            'Collect coins to gain lives.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
-        _map.set("growPanelTo", {w:200, h:120});
+        _map.set("growPanelTo", {w:240, h:160});
 
         return _map
 
@@ -172,10 +173,10 @@ export var TUTORIAL_PANELS = new Map([
         _panel.setScale(0);
 
         
-        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 12.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
+        var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 18.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
-                width: '200px'
+                width: '400px'
             }),  
             'Enter the center of a black hole to progress to the next stage.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
@@ -184,7 +185,7 @@ export var TUTORIAL_PANELS = new Map([
         _map.get("text").push(tutText);
         _map.get("images").push();
         _map.get("panels").push(_panel);
-        _map.set("growPanelTo", {w:200, h:120});
+        _map.set("growPanelTo", {w:240, h:160});
 
         return _map
 
@@ -229,7 +230,7 @@ export var TUTORIAL_PANELS = new Map([
         panel4.setScale(0);
 
         var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
-                'Hold space to sprint.',
+                'Hold space to boost.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
 
         var tutSPACE = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 5.25,
