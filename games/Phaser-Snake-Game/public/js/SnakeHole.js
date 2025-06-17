@@ -8226,7 +8226,9 @@ class GameScene extends Phaser.Scene {
                          * have the input be more responsive.  - James
                          */
                         this.atoms.forEach( atom => {
-                            atom.electrons.visible = true;
+                            if (atom.visible) {
+                                atom.electrons.visible = true;
+                            }
                         });
                     }
                 }
@@ -11500,7 +11502,8 @@ class GameScene extends Phaser.Scene {
                         atom.respawnTimer-- ;
 
                         if (atom.respawnTimer < 0) {
-                            atom.visible = true; // visiblw
+                            atom.visible = true; // visible
+                            atom.electrons.visible = true;
                             atom.anims.play("atom05spawn");  // Start the spawn animation
                             atom.chain(['atom01idle']);
                             this.atomRespawnPool.delete(atom);

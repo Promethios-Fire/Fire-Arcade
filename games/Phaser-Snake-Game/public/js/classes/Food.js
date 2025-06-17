@@ -474,6 +474,7 @@ var Food = new Phaser.Class({
     },
     
     
+    // #region move
     move: function (scene) {
 
         this.prevX = this.x;
@@ -490,10 +491,11 @@ var Food = new Phaser.Class({
         scene.foodHistory.push([(pos.x - X_OFFSET) / GRID, (pos.y - Y_OFFSET) / GRID, INPUT.moveCount]);
         //console.log(this.x,this.y)
         this.electrons.setPosition(pos.x, pos.y);
+        this.electrons.visible = false;
         //console.log(this.electrons.x,this.electrons.y)
 
 
-        this.respawnTimer = 3; // DecaSeconds
+        this.respawnTimer = 20; // DecaSeconds
         scene.atomRespawnPool.add(this);
 
         scene.interactLayer[(this.x - X_OFFSET) / GRID][(this.y - Y_OFFSET) / GRID] = this;
