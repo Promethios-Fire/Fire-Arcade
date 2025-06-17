@@ -208,7 +208,7 @@ var Snake = new Phaser.Class({
                 break;
                 
             default:
-                debugger;
+                //debugger; // UNCOMMENT THIS OUT BEFORE PUSH
                 break;
         }
 
@@ -489,19 +489,8 @@ var Snake = new Phaser.Class({
                 }
             }
 
-        // #region Coin Collision
-        //for (let index = 0; index < scene.coins.length; index++) {
-        //    
-        //}
-
-        // #region Food Collision
-        //scene.atoms.forEach(_atom => {  
-        //    if(this.head.x === _atom.x && this.head.y === _atom.y && GState.PLAY === scene.gState && _atom.visible === true){
-        //        
-        //});
-
-        if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage)) {
-            STAGE_OVERRIDES.get(scene.stage).afterMove(scene);
+        if (STAGE_OVERRIDES.has(scene.stage) && "afterMove" in STAGE_OVERRIDES.get(scene.stage).methods) {
+            STAGE_OVERRIDES.get(scene.stage).methods.afterMove(scene);
         }
     },
 
@@ -574,8 +563,8 @@ var Snake = new Phaser.Class({
                     ourGame.scoreTimer.paused = true;
                     //console.log(this.gState, "WAIT FOR INPUT");
 
-                    if (STAGE_OVERRIDES.has(scene.stage) && "afterBonk" in STAGE_OVERRIDES.get(scene.stage)) {
-                        STAGE_OVERRIDES.get(scene.stage).afterBonk(scene);
+                    if (STAGE_OVERRIDES.has(scene.stage) && "afterBonk" in STAGE_OVERRIDES.get(scene.stage).methods) {
+                        STAGE_OVERRIDES.get(scene.stage).methods.afterBonk(scene);
                     }
 
                 });
