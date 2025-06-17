@@ -41,7 +41,7 @@ export var TUTORIAL_PANELS = new Map([
             GRID * 19, 'div',  
             Object.assign({}, STYLE_DEFAULT, tutStyle), 
                 'Press arrow keys to move.'
-        ).setOrigin(0.5,0).setScale(.5).setAlpha(1);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
 
         // return all items 
         // maybe even a map of items.
@@ -49,12 +49,12 @@ export var TUTORIAL_PANELS = new Map([
         var tutWASD = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 6.5,
             SCREEN_HEIGHT/2 + GRID  * 4.25
         ).setDepth(105).setOrigin(0.5,0.5);
-        tutWASD.play('tutAll').setAlpha(1)
+        tutWASD.play('tutAll');
 
         var tutSnake = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
             SCREEN_HEIGHT/2 - GRID * 1,
            'tutSnakeWASD'
-        ).setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(1);
+        ).setDepth(103).setOrigin(0.5,0.5).setScale(1);
 
 
         let panel1 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
@@ -113,23 +113,23 @@ export var TUTORIAL_PANELS = new Map([
         
         var tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 3,
         SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomSmall.play('atom04idle').setAlpha(1);
+        tutAtomSmall.play('atom04idle');
         
         var tutAtomMedium = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 1,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomMedium.play('atom03idle').setAlpha(1);
+        tutAtomMedium.play('atom03idle');
         
         var tutAtomLarge = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 1,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomLarge.play('atom02idle').setAlpha(1);
+        tutAtomLarge.play('atom02idle');
         
         var tutAtomCharged = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomCharged.play('atom01idle').setAlpha(1);
+        tutAtomCharged.play('atom01idle');
         
         var tutAtomElectrons = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomElectrons.play('electronIdle').setAlpha(1);
+        tutAtomElectrons.play('electronIdle');
 
         _map.get("text").push(tutText2);
         _map.get("images").push(tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);

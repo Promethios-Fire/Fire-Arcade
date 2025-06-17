@@ -2765,11 +2765,6 @@ class TutorialScene extends Phaser.Scene {
         // AUDIO
         this.pop02 = this.sound.add('pop02');
 
-        // delete this
-        var tutStyle = {
-            "fontSize":'24px',
-        }
-
         var panelsArray = [];
         this.selectedPanel = 0;
 
@@ -2797,7 +2792,6 @@ class TutorialScene extends Phaser.Scene {
 
         this.panelsContainer.add(panelContents);
 
-        
         this.panelsContainer.iterate( child=> {
             if (child.type === "NineSlice") {
                 this.panelsContainer.sendToBack(child)
@@ -2818,13 +2812,6 @@ class TutorialScene extends Phaser.Scene {
                 repeat: 0,
             });
         })
-
-        // Defaults everything to invisible so you don't need to remember to set in TUTORIAL_PANELS .
-        /*panelContents.forEach( item => {
-            item.alpha = 0;
-        })*/
-
-
         //this.continueText = this.add.text(SCREEN_WIDTH/2, GRID*24.5, '[PRESS SPACE TO CONTINUE]',{ font: '32px Oxanium'}).setOrigin(0.5,0).setInteractive().setScale(.5);
         
         this.continueText = this.add.dom(SCREEN_WIDTH/2, GRID*24.5, 'div',  Object.assign({}, STYLE_DEFAULT,{
@@ -2832,15 +2819,27 @@ class TutorialScene extends Phaser.Scene {
             }), 
                 '[PRESS SPACE TO CONTINUE]',
         ).setOrigin(0.5,0).setScale(.5).setInteractive(); // Sets the origin to the middle top.
+        
         this.continueText.setVisible(false).setAlpha(0);
 
-        
+        panelsArray[0].get("text")[0].setAlpha(1);
+        this.containorToX = this.panelsContainer.x;
+
+        this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5,
+            SCREEN_HEIGHT/2 + GRID * 0).setDepth(103).setOrigin(0.5,0.5).setAlpha(0);
+        this.panelArrowR.play('arrowMenuIdle');
+
+        this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0).setDepth(103).setOrigin(0.5,0.5);
+        this.panelArrowL.play('arrowMenuIdle');
+        this.panelArrowL.setFlipX(true);
+        this.panelArrowL.setVisible(false).setAlpha(1);
 
         if (tutorialPanels.length === 1) {
-            this.containorToX = this.panelsContainer.x;
+
             panelContents.forEach( item => {
                 item.alpha = 1;
             })
+
             this.tweens.add({
                 targets: this.continueText,
                 alpha: { from: 0, to: 1 },
@@ -2854,134 +2853,108 @@ class TutorialScene extends Phaser.Scene {
                 }
             });   
         } else {
-            this.containorToX = 0;
-            this.panelArrowR = this.add.sprite(SCREEN_WIDTH/2 + GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0).setDepth(103).setOrigin(0.5,0.5);
-            this.panelArrowR.play('arrowMenuIdle');
-
+            //this.containorToX = 0;
             this.panelArrowR.setAlpha(1);
-            
-            this.panelArrowL = this.add.sprite(SCREEN_WIDTH/2 - GRID * 11.5, SCREEN_HEIGHT/2 + GRID * 0).setDepth(103).setOrigin(0.5,0.5);
-            this.panelArrowL.play('arrowMenuIdle');
-            this.panelArrowL.setFlipX(true);
-            this.panelArrowL.setVisible(false).setAlpha(1);
-
-            
-            
-            this.input.keyboard.on('keydown-RIGHT', e => {
-                const ourPersist = this.scene.get('PersistScene');
-                if (this.selectedPanel < tutorialPanels.length - 1) { // @holden this needs to be changed
-
-                    // set all text to 0 opacity
-                    panelsArray[this.selectedPanel].get("text").forEach( text => {
-                        text.alpha = 0;
-                    })
-
-                    this.pop02.play();
-                    this.selectedPanel += 1;
-
-                    // set current text element to 1 opacity
-                    const panel = panelsArray[this.selectedPanel];
-                    const textObj = panel.get("text")[0];
-
-                    var selectedPanellOld = this.selectedPanel
-                    this.time.delayedCall(200, () => {
-                        if (selectedPanellOld === this.selectedPanel) {
-                            console.log(this.selectedPanel)
-                            textObj.alpha = 1;
-                        }
-                        else{
-                            textObj.alpha = 0;
-                        }
-                    });
-                    
-                }
-
-                var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
-
-                this.containorToX = Math.max(this.containorToX - hOffSet, endX);
-                
-                switch (this.containorToX) {
-                    //case 0: // Start Panel
-                    //    this.panelArrowL.setVisible(false);
-                    //    ourPersist.bgCoords.x += 20;
-                    //    break
-                    case endX: // End Panel
-                        this.panelArrowR.setVisible(false);
-                        
-                        if (!this.continueText.visible) {
-                            this.tweens.add({
-                                targets: this.continueText,
-                                alpha: { from: 0, to: 1 },
-                                ease: 'Sine.InOut',
-                                duration: 1000,
-                                repeat: -1,
-                                yoyo: true
-                            });   
-                        }
-
-                        this.continueText.setVisible(true);
-                        
-                        break
-                    default: // Middle Panel
-                        this.panelArrowL.setVisible(true);
-                        this.panelArrowR.setVisible(true);
-                        ourPersist.bgCoords.x += 20;
-                        break
-                }
-            }, this);
-
-            this.input.keyboard.on('keydown-LEFT', e => {
-                const ourPersist = this.scene.get('PersistScene');
-                if (this.selectedPanel > 0) {
-
-                    // set all text to 0 opacity
-                    panelsArray[this.selectedPanel].get("text").forEach( text => {
-                        text.alpha = 0;
-                    })
-                    this.selectedPanel -= 1
-                    this.pop02.play();
-
-                    // set current text element to 1 opacity
-                    const panel = panelsArray[this.selectedPanel];
-                    const textObj = panel.get("text")[0];
-
-                    var selectedPanellOld = this.selectedPanel
-                    this.time.delayedCall(200, () => {
-                        if (selectedPanellOld === this.selectedPanel) {
-                            console.log(this.selectedPanel)
-                            textObj.alpha = 1;
-                        }
-                        else{
-                            textObj.alpha = 0;
-                        }
-                    });
-                    
-                }
-
-                this.containorToX = Math.min(this.containorToX + hOffSet, 0);
-
-                // All the way left
-                if (this.containorToX === 0) {
-                    this.panelArrowL.setVisible(false); 
-
-                } else { // Middle Pannel
-                    this.panelArrowL.setVisible(true);
-                    this.panelArrowR.setVisible(true);
-                    ourPersist.bgCoords.x -= 20; 
-                }
-            }, this)
-
         }
+            
+            
+        this.input.keyboard.on('keydown-RIGHT', e => {
+            const ourPersist = this.scene.get('PersistScene');
+            // is the selected panel not the last one? then proceed
+            if (this.selectedPanel < tutorialPanels.length - 1) {
+                ourPersist.bgCoords.x += 20;
+                // set all text to 0 opacity
+                panelsArray[this.selectedPanel].get("text").forEach( text => {
+                    text.alpha = 0;
+                })
 
-        // Fade Everything In
-        // wanted to preserve this tween, but it's proving too much work so setting delay to 0 for now
-        /*this.tweens.add({
-            targets: [...panelContents, this.panelArrowR, this.panelArrowL],
-            alpha: {from: 0, to: 1},
-            duration: 0,
-            ease: 'sine.inout',
-            yoyo: false,
-        });*/
+                this.pop02.play();
+                this.selectedPanel += 1;
+
+                var selectedPanellOld = this.selectedPanel
+                // this delayed check is to ensure the alpha turns 1 only when the...
+                // selected panel is correct (text elements never display over spaceboi)
+                this.time.delayedCall(200, () => {
+                    if (selectedPanellOld === this.selectedPanel) {
+                        panelsArray[this.selectedPanel].get("text")[0].setAlpha(1);
+                    }
+                    else{
+                        panelsArray[this.selectedPanel].get("text")[0].setAlpha(0);
+                    }
+                });
+                
+            }
+
+            var endX = - 1 * hOffSet * (tutorialPanels.length - 1);
+
+            this.containorToX = Math.max(this.containorToX - hOffSet, endX);
+            
+            // at end of list
+            if (this.selectedPanel === tutorialPanels.length - 1) {
+                this.panelArrowR.setVisible(false);
+                
+                if (tutorialPanels.length !== 1) {
+                    this.panelArrowL.setVisible(true);
+                }
+                
+                if (!this.continueText.visible) {
+                    this.tweens.add({
+                        targets: this.continueText,
+                        alpha: { from: 0, to: 1 },
+                        ease: 'Sine.InOut',
+                        duration: 1000,
+                        repeat: -1,
+                        yoyo: true,
+                        onStart: () =>  {
+                            this.continueText.setVisible(true);
+                        }
+                    });   
+                }
+            }
+            // not at end of list
+            else {
+                this.panelArrowL.setVisible(true);
+                this.panelArrowR.setVisible(true);
+            }
+        }, this);
+
+        this.input.keyboard.on('keydown-LEFT', e => {
+            const ourPersist = this.scene.get('PersistScene');
+            // is the selected panel not the first one? then proceed
+            if (this.selectedPanel > 0) {
+                ourPersist.bgCoords.x -= 20; 
+                // set all text to 0 opacity
+                panelsArray[this.selectedPanel].get("text").forEach( text => {
+                    text.alpha = 0;
+                })
+                this.selectedPanel -= 1
+                this.pop02.play();
+
+                // set current text element to 1 opacity w/ previously described logic
+                var selectedPanellOld = this.selectedPanel
+                this.time.delayedCall(200, () => {
+                    if (selectedPanellOld === this.selectedPanel) {
+                        panelsArray[this.selectedPanel].get("text")[0].setAlpha(1);
+                    }
+                    else{
+                        panelsArray[this.selectedPanel].get("text")[0].setAlpha(0);
+                    }
+                });
+                
+            }
+
+            this.containorToX = Math.min(this.containorToX + hOffSet, 0);
+
+            // All the way left
+            if (this.selectedPanel === 0) {
+                this.panelArrowL.setVisible(false); 
+                this.panelArrowR.setVisible(true);
+
+            } else {
+                this.panelArrowL.setVisible(true);
+                this.panelArrowR.setVisible(true);
+            }
+        }, this)
 
 
         const onInput = function (scene) {
@@ -3017,69 +2990,29 @@ class TutorialScene extends Phaser.Scene {
                     score: 0,
                     startupAnim: true,
                     mode: ourPersist.mode
-
                     });   
                 }
-
                 else {
-                                                    
-
                 }
             }
-            /* //@holden we need here or can move to reference?
-            ourPersist.closingTween();
-            scene.tweens.addCounter({
-                from: 600,
-                to: 0,
-                ease: 'Sine.InOut',
-                duration: 1000,
-                onUpdate: tween =>
-                    {   
-                        graphics.clear();
-                        var value = (tween.getValue());
-                        scene.tweenValue = value
-                        scene.shape1 = scene.make.graphics().fillCircle(SCREEN_WIDTH/2, SCREEN_HEIGHT/2 + GRID * .5, value);
-                        var geomask1 = scene.shape1.createGeometryMask();
-                        
-                        scene.cameras.main.setMask(geomask1,true)
-                    },
-                onComplete: () => {
-                    scene.scene.setVisible(false);
-                    //this.scene.get("UIScene").setVisible(false);
-
-                    ourPersist.starterTween.stop();
-                    ourPersist.openingTween(scene.tweenValue);
-                    scene.openingTweenStart.stop();
-                    scene.scene.stop();
-                    
-                    //var ourGameScene = this.scene.get("GameScene");
-                }
-            });
-            */
-    
         
-        this.continueText.on('pointerdown', e => {
+        /*this.continueText.on('pointerdown', e => {
             //console.log("I CLICK");
             if (this.continueText.visible === true) {
                 //console.log("I click and continue");
                 onInput(this);
             }
-        });
+        });*/
 
         this.input.keyboard.on('keydown-SPACE', e => {
             onInput(this);
-
         });
     }
-    update(){
-        this.tweens.add({ // CLEAN UP: THis is adding a tween every frame.
-                targets: this.panelsContainer,
-                x: this.containorToX,
-                ease: 'Linear',
-                duration: 60,
-                repeat: 0,
-                yoyo: true,
-            });     
+    update(time, delta){
+        const move = 100 * (delta/1000);
+        const diff = (this.containorToX - this.panelsContainer.x) * move;
+
+        this.panelsContainer.x += diff * 0.25;
     }
 }
 
@@ -15031,6 +14964,9 @@ var config = {
         zoom: Phaser.Scale.MAX_ZOOM,
         mode: Phaser.Scale.FIT,
     },
+    /*fps:{ // we can use this to check if anything is framerate dependent
+        limit: 60
+    },*/
     //parent: 'phaser-example',
     physics: 
         { default: 'matter',
