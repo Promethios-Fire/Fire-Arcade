@@ -49,12 +49,12 @@ export var TUTORIAL_PANELS = new Map([
         var tutWASD = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 6.5,
             SCREEN_HEIGHT/2 + GRID  * 4.25
         ).setDepth(105).setOrigin(0.5,0.5);
-        tutWASD.play('tutAll').setAlpha(0)
+        tutWASD.play('tutAll');
 
         var tutSnake = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
             SCREEN_HEIGHT/2 - GRID * 1,
            'tutSnakeWASD'
-        ).setDepth(103).setOrigin(0.5,0.5).setScale(1).setAlpha(0);
+        ).setDepth(103).setOrigin(0.5,0.5).setScale(1);
 
 
         let panel1 = this.add.nineslice((SCREEN_WIDTH/2 + hOffSet * panelNumber), SCREEN_HEIGHT/2, 'uiPanelL', 'Glass', 0, 0, 36,36,36,36);
@@ -109,27 +109,27 @@ export var TUTORIAL_PANELS = new Map([
                 //width: '50px'
             }), 
             'Collect atoms to grow longer.',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
         var tutAtomSmall = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 3,
         SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomSmall.play('atom04idle').setAlpha(0);
+        tutAtomSmall.play('atom04idle');
         
         var tutAtomMedium = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 1,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomMedium.play('atom03idle').setAlpha(0);
+        tutAtomMedium.play('atom03idle');
         
         var tutAtomLarge = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 1,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomLarge.play('atom02idle').setAlpha(0);
+        tutAtomLarge.play('atom02idle');
         
         var tutAtomCharged = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomCharged.play('atom01idle').setAlpha(0);
+        tutAtomCharged.play('atom01idle');
         
         var tutAtomElectrons = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3,
             SCREEN_HEIGHT/2 + GRID  * .5).setDepth(103).setOrigin(0.5,0.5);
-        tutAtomElectrons.play('electronIdle').setAlpha(0);
+        tutAtomElectrons.play('electronIdle');
 
         _map.get("text").push(tutText2);
         _map.get("images").push(tutAtomSmall, tutAtomMedium, tutAtomLarge, tutAtomCharged, tutAtomElectrons);
@@ -154,7 +154,7 @@ export var TUTORIAL_PANELS = new Map([
                 width: '200px'
             }),  
             'Collide with walls (or body) and lose lives.',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText2);
@@ -180,7 +180,7 @@ export var TUTORIAL_PANELS = new Map([
                 width: '200px'
             }),  
             'Screen wrap in all 4 directions to access areas blocked by walls.',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText2);
@@ -206,7 +206,7 @@ export var TUTORIAL_PANELS = new Map([
                 width: '200px'
             }),  
             'Collect coins to gain lives',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText2);
@@ -232,7 +232,7 @@ export var TUTORIAL_PANELS = new Map([
                 width: '200px'
             }),  
             'Enter the center of a black hole to progress to the next stage.',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
         _map.get("text").push(tutText2);
@@ -252,7 +252,7 @@ export var TUTORIAL_PANELS = new Map([
         
         var tutText3 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
             'Use portals to bend spacetime.',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
 
         var tutPortal1 = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 2,
         SCREEN_HEIGHT/2 - GRID  * 1).setDepth(103).setOrigin(0.5,0.5);
@@ -284,7 +284,7 @@ export var TUTORIAL_PANELS = new Map([
 
         var tutText4 = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber) + GRID * 3.5, GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, tutStyle), 
                 'Hold space to sprint.',
-        ).setOrigin(0.5,0).setScale(.5);
+        ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
 
         var tutSPACE = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber) - GRID * 5.25,
         GRID  * 19.25).setDepth(103).setOrigin(0.5,0.5);

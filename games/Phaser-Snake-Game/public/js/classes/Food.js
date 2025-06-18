@@ -219,8 +219,8 @@ var Food = new Phaser.Class({
                                             // Apply the interpolated slowMoValue to all the timeScales
                                             scene.tweens.timeScale = slowMoValue;
                                             scene.anims.globalTimeScale = slowMoValue;
-                                            scene.speedWalk = _walkSpeed  / slowMoValue;
-                                            scene.speedSprint = _sprintSpeed / slowMoValue;
+                                            scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
+                                            scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = slowMoValue;
                                             }
@@ -229,8 +229,8 @@ var Food = new Phaser.Class({
                                             console.log('Slow motion effect completed');
                                             scene.tweens.timeScale = 1;
                                             scene.anims.globalTimeScale = 1;
-                                            scene.speedWalk = _walkSpeed;
-                                            scene.speedSprint = _sprintSpeed;
+                                            scene.gameSettings.speedWalk = _walkSpeed;
+                                            scene.gameSettings.speedSprint = _sprintSpeed;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = 1;
                                             }
