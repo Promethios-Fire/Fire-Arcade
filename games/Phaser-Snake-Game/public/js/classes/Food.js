@@ -85,7 +85,7 @@ var Food = new Phaser.Class({
 
 
             // #region Last Atom
-            if (scene.length != scene.lengthGoal -1) { 
+            if (scene.length != scene.gameSettings.lengthGoal -1) { 
                 // Normal Case 
                 if (!scene.winned) {
                     scene.events.emit('addScore', this, timeSinceFruit); 
@@ -97,6 +97,7 @@ var Food = new Phaser.Class({
             } else {
                 // Last Atom!
                 scene.winned = true;
+                debugger
 
                 var _x = this.prevX;
                 var _y = this.prevY;
@@ -394,14 +395,14 @@ var Food = new Phaser.Class({
                                                     ease: 'Sine.easeIn',
                                                     duration: 1250,
                                                     onComplete: () => {
-                                                        scene.countDown.setAlpha(1);
-                                                        scene.countDown.x = X_OFFSET + GRID * 4 - 6;
-                                                        scene.countDown.y = 3;
+                                                        scene.countDownTimer.setAlpha(1);
+                                                        scene.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
+                                                        scene.countDownTimer.y = 3;
                                                         SPACE_BOY.atomComet.destroy();
                                                     }
                                                 });
-                                                        scene.countDown.setHTML('W1N');
-                                                        scene.countDown.x += 3
+                                                        scene.countDownTimer.setHTML('W1N');
+                                                        scene.countDownTimer.x += 3
                                                 }
                                                 
                                         });
@@ -442,7 +443,7 @@ var Food = new Phaser.Class({
                                             follow: SPACE_BOY.electronFanfare,
                                         }).setFrequency(150,[1]).setDepth(1);
                         
-                                        scene.countDown.setAlpha(0);
+                                        scene.countDownTimer.setAlpha(0);
                             
                                     debugger
                                     /*

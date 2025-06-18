@@ -9106,6 +9106,7 @@ class GameScene extends Phaser.Scene {
         for (let index = 1; index <= this.atomToSpawn; index++) {
             var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
         }
+        
 
         this.snake.grow(this);
         this.snake.grow(this);
@@ -9133,6 +9134,7 @@ class GameScene extends Phaser.Scene {
         this.snake.grow(this);
         this.snake.grow(this);
         this.snake.grow(this);
+        
 
 
         // #endregion
