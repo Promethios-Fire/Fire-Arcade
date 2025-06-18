@@ -8317,7 +8317,7 @@ class GameScene extends Phaser.Scene {
 
             // #region is unlocked?
 
-            if (this.winned) {
+            if (this.winned) { // DO WE NEED THIS CHECK? -ME
                 updateSumOfBest(ourPersist);
 
 
