@@ -221,7 +221,7 @@ var Snake = new Phaser.Class({
         if (nextTile != null && nextTile.properties.hasCollision && !scene.winned) {
             
             this.direction = DIRS.STOP;
-            if (scene.bonkable) {
+            if (scene.gameSettings.bonkable) {
                 this.bonk(scene);  
             }
         }
@@ -234,14 +234,14 @@ var Snake = new Phaser.Class({
             
         
                 this.direction = DIRS.STOP;
-                if (scene.bonkable) {
+                if (scene.gameSettings.bonkable) {
                     this.bonk(scene);   
                 }
             }
         }
 
         // #region Intersect Self
-        if (GState.PLAY === scene.gState && scene.collideSelf) { //GState.PLAY
+        if (GState.PLAY === scene.gState && scene.gameSettings.collideSelf) { //GState.PLAY
             /***
              * Don't check the Tail because the Tail will always move out of the way
              * when the head moves forward.
@@ -258,7 +258,7 @@ var Snake = new Phaser.Class({
                     if(scene.interactLayer[nextHeadGridX][nextHeadGridY] instanceof Portal){
                         portalSafe = true; // Mark on portal
                     }
-                    if (!portalSafe && scene.bonkable) {
+                    if (!portalSafe && scene.gameSettings.bonkable) {
                         this.bonk(scene);    
                     }
                     

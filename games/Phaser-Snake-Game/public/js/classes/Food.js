@@ -62,7 +62,7 @@ var Food = new Phaser.Class({
             }  
         }
         
-        if (scene.length === scene.lengthGoal -1 && scene.mode != MODES.TUTORIAL) { //Check for final atom pickup
+        if (scene.length === scene.gameSettings.lengthGoal -1 && scene.mode != MODES.TUTORIAL) { //Check for final atom pickup
 
             scene.winned = true;
 
@@ -117,8 +117,8 @@ var Food = new Phaser.Class({
                             scene.events.emit('win');
                         
                             // Store speed values
-                            let _walkSpeed = scene.speedWalk;
-                            let _sprintSpeed = scene.speedSprint;
+                            let _walkSpeed = scene.gameSettings.speedWalk;
+                            let _sprintSpeed = scene.gameSettings.speedSprint;
                     
                             // Store initial camera position
                             let initialCameraX = scene.cameras.main.scrollX;
@@ -168,8 +168,8 @@ var Food = new Phaser.Class({
                                             // Apply the interpolated slowMoValue to all the timeScales
                                             scene.tweens.timeScale = slowMoValue;
                                             scene.anims.globalTimeScale = slowMoValue;
-                                            scene.speedWalk = _walkSpeed  / slowMoValue;
-                                            scene.speedSprint = _sprintSpeed / slowMoValue;
+                                            scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
+                                            scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = slowMoValue;
                                             }
@@ -178,8 +178,8 @@ var Food = new Phaser.Class({
                                             console.log('Slow motion effect completed');
                                             scene.tweens.timeScale = 1;
                                             scene.anims.globalTimeScale = 1;
-                                            scene.speedWalk = _walkSpeed;
-                                            scene.speedSprint = _sprintSpeed;
+                                            scene.gameSettings.speedWalk = _walkSpeed;
+                                            scene.gameSettings.speedSprint = _sprintSpeed;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = 1;
                                             }
@@ -213,8 +213,8 @@ var Food = new Phaser.Class({
                                             // Apply the interpolated slowMoValue to all the timeScales
                                             scene.tweens.timeScale = slowMoValue;
                                             scene.anims.globalTimeScale = slowMoValue;
-                                            scene.speedWalk = _walkSpeed  / slowMoValue;
-                                            scene.speedSprint = _sprintSpeed / slowMoValue;
+                                            scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
+                                            scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = slowMoValue;
                                             }
@@ -266,8 +266,8 @@ var Food = new Phaser.Class({
                                             
                                             scene.tweens.timeScale = 1;
                                             scene.anims.globalTimeScale = 1;
-                                            scene.speedWalk = _walkSpeed;
-                                            scene.speedSprint = _sprintSpeed;
+                                            scene.gameSettings.speedWalk = _walkSpeed;
+                                            scene.gameSettings.speedSprint = _sprintSpeed;
                                             if (scene.starEmitterFinal) {
                                                 scene.starEmitterFinal.timeScale = 1;
                                             }
@@ -347,7 +347,7 @@ var Food = new Phaser.Class({
                                         follow: SPACE_BOY.electronFanfare,
                                     }).setFrequency(150,[1]).setDepth(1);
                     
-                                    scene.countDown.setAlpha(0);
+                                    scene.countDownTimer.setAlpha(0);
                                 }
                     
                             scene.tweens.add({ //slower one-off snakeEating tween
@@ -358,7 +358,7 @@ var Food = new Phaser.Class({
                                 ease: 'Linear',
                                 repeat: 0,
                                 timeScale: slowMoValCopy,
-                                delay: scene.tweens.stagger(scene.speedSprint),
+                                delay: scene.tweens.stagger(scene.gameSettings.speedSprint),
                                 onUpdate: (tween) => {
                                     scene.timeScale = slowMoValCopy /2;
                                 }
@@ -375,14 +375,14 @@ var Food = new Phaser.Class({
                                             ease: 'Sine.easeIn',
                                             duration: 1250,
                                             onComplete: () => {
-                                                scene.countDown.setAlpha(1);
-                                                scene.countDown.x = X_OFFSET + GRID * 4 - 6;
-                                                scene.countDown.y = 3;
+                                                scene.countDownTimer.setAlpha(1);
+                                                scene.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
+                                                scene.countDownTimer.y = 3;
                                                 SPACE_BOY.atomComet.destroy();
                                             }
                                         });
-                                                scene.countDown.setHTML('W1N');
-                                                scene.countDown.x += 3
+                                                scene.countDownTimer.setHTML('W1N');
+                                                scene.countDownTimer.x += 3
                                         }
                                         
                                 });
