@@ -104,10 +104,19 @@ export var TUTORIAL_PANELS = new Map([
             //'Collide with walls (or body) and lose lives.',
             'Running into walls or yourself will cost a life.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
+
+        //animated snake sprite that runs into wall
+        var tutWall = this.add.sprite((SCREEN_WIDTH/2 - GRID * 2 + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2 - GRID  * 1,).setDepth(103).setOrigin(0.5,0.5);
+        tutWall.play('tutWalls');
+
+        //static wall sprite
+        var tutWallSprite = this.add.sprite((SCREEN_WIDTH/2 + 6 + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2 - GRID  * .5,'tutWallSprite').setDepth(103).setOrigin(0.5,0.5);
         
 
         _map.get("text").push(tutText);
-        _map.get("images").push();
+        _map.get("images").push(tutWall,tutWallSprite);
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:240, h:160});
 
@@ -125,14 +134,23 @@ export var TUTORIAL_PANELS = new Map([
         var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 18.5, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
-                width: '400px'
+                width: '440px'
             }),  
             'Travel beyond the edge of a level to screenwrap to the opposite side.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
 
+        var tutWrap = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2 - GRID  * 1,).setDepth(103).setOrigin(0.5,0.5);
+        tutWrap.play('tutWrap');
+
+        //static wall sprite
+        var tutWallSprite2 = this.add.sprite((SCREEN_WIDTH/2 - 6 + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2 - GRID  * .5,'tutWallSprite2').setDepth(104).setOrigin(0.5,0.5);
+        
+        
         _map.get("text").push(tutText);
-        _map.get("images").push();
+        _map.get("images").push(tutWrap,tutWallSprite2);
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:240, h:160});
 
@@ -150,14 +168,22 @@ export var TUTORIAL_PANELS = new Map([
         var tutText = this.add.dom((SCREEN_WIDTH/2 + hOffSet * panelNumber), GRID * 19, 'div',  Object.assign({}, STYLE_DEFAULT, 
             {
                 "fontSize":'24px',
-                width: '300px'
+                width: '400px'
             }),  
             'Collect coins to gain lives.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
+        var coin = this.add.sprite((SCREEN_WIDTH/2 - 2* GRID + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2,).setDepth(104).setOrigin(0.5,0.5);
+        coin.play('coin01idle')
 
-        _map.get("text").push(tutText);
-        _map.get("images").push();
+
+        var coinText = this.add.bitmapText((SCREEN_WIDTH/2 - GRID + hOffSet * panelNumber),SCREEN_HEIGHT/2 - 5, 'mainFont', 
+                "= 1 LIFE", 
+                8).setDepth(100)
+
+        _map.get("text").push(tutText,coinText);
+        _map.get("images").push(coin);
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:240, h:160});
 
@@ -181,9 +207,12 @@ export var TUTORIAL_PANELS = new Map([
             'Enter the center of a black hole to progress to the next stage.',
         ).setOrigin(0.5,0).setScale(.5).setAlpha(0);
         
+        var blackHole = this.add.sprite((SCREEN_WIDTH/2 + hOffSet * panelNumber),
+        SCREEN_HEIGHT/2,).setDepth(104).setOrigin(0.5,0.5);
+        blackHole.play('tutBlackHole');
 
         _map.get("text").push(tutText);
-        _map.get("images").push();
+        _map.get("images").push(blackHole);
         _map.get("panels").push(_panel);
         _map.set("growPanelTo", {w:240, h:160});
 
