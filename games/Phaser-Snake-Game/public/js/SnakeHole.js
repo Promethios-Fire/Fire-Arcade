@@ -11568,7 +11568,6 @@ GState.PLAY
                 // Has Boost Logic, Then Boost
                 //console.log(this.boostEnergy);
                 if(this.boostEnergy > 0){
-                    debugger
                     this.moveInterval = this.gameSettings.speedSprint;
 a                    
                     if (!this.winned) {
@@ -11582,13 +11581,11 @@ a
                     // DISSIPATE LIVE ELECTRICITY
                     //console.log("walking now", this.boostMask.scaleX);
                     this.boostMask.scaleX = 0; // Counters fractional Mask scale values when you run out of boost. Gets rid of the phantom middle piece.
-                    debugger
                     this.moveInterval = this.gameSettings.speedWalk;
                 }
         
             } else {
                 //console.log("spacebar not down");
-                debugger
                 this.moveInterval = this.gameSettings.speedWalk; // Less is Faster
                 //this.boostMask.setScale(this.boostEnergy/1000,1);
                 
@@ -13051,7 +13048,6 @@ class ScoreScene extends Phaser.Scene {
                 delay:0,
                 onComplete: () =>
                     {
-                        debugger
                         this.rankSounds[rank].play();
                         nextRankLetter.setAlpha(1);
                     },
@@ -13494,7 +13490,6 @@ class ScoreScene extends Phaser.Scene {
             ourGame.backgroundBlur(false);
 
             console.log('pressing space inside score scene');
-            debugger
 
             var gameOver = false;
 
@@ -13575,7 +13570,6 @@ class ScoreScene extends Phaser.Scene {
 
                 
             if (!gameOver) {
-                debugger
                 // Go Back Playing To Select New Stage
                 ourScoreScene.scene.stop();
                 ourGame.gState = GState.START_WAIT;

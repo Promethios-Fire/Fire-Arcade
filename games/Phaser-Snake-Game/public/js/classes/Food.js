@@ -98,7 +98,6 @@ var Food = new Phaser.Class({
                 // Last Atom!
                 scene.winned = true;
                 scene.gState = GState.TRANSITION;
-                debugger
 
                 var _x = this.prevX;
                 var _y = this.prevY;
@@ -114,9 +113,6 @@ var Food = new Phaser.Class({
                     tempSounds.push(scene.sound.add(soundID[0]));
                 });
                 tempSounds[4].play();
-
-                debugger
-
                 
 
                 var finalFare = false;
@@ -192,8 +188,6 @@ var Food = new Phaser.Class({
                                     scene.snake.grow(scene);
                                     finalAtom.destroy();
                                     scene.events.emit('win');
-
-                                    debugger
                                 
                                     // Store speed values
                                     let _walkSpeed = scene.gameSettings.speedWalk;
@@ -446,7 +440,6 @@ var Food = new Phaser.Class({
                         
                                         scene.countDownTimer.setAlpha(0);
                             
-                                    debugger
                                     /*
                                         scene.tweens.add({ //slower one-off snakeEating tween
                                         targets: scene.snake.body, 

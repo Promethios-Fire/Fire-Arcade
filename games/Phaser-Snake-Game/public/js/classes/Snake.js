@@ -324,7 +324,6 @@ var Snake = new Phaser.Class({
         
         // Check for Blackholes
         if (scene.winned) {
-            debugger
             
             /**
              * Okay to not be part of the interact layer because there is only ever 8?
@@ -517,7 +516,6 @@ var Snake = new Phaser.Class({
             scene.scene.get("InputScene").moveHistory.push(["BONK"]);
 
             //reset portal visuals on bonk
-            debugger
             scene.portals.forEach(portal => {
                 portal.portalHighlight.alpha = 0;
                 console.log(portal.portalHighlight.alpha);
