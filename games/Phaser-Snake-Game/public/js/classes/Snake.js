@@ -282,7 +282,10 @@ var Snake = new Phaser.Class({
 
     
 
-        if (GState.PLAY === scene.gState && this.body.length > 2) { 
+        if (GState.PLAY === scene.gState && this.body.length > 2 && 
+            !Number.isNaN(this.body[this.body.length -2].x) && 
+            !Number.isNaN(this.body[this.body.length -2].y)) 
+            { 
             
             var lastBodyNotTailGridX = (this.body[this.body.length -2].x - X_OFFSET) / GRID;
             var lastBodyNotTailGridY = (this.body[this.body.length -2].y - Y_OFFSET) / GRID;

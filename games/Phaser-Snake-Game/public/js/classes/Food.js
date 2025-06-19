@@ -97,6 +97,7 @@ var Food = new Phaser.Class({
             } else {
                 // Last Atom!
                 scene.winned = true;
+                scene.gState = GState.TRANSITION;
                 debugger
 
                 var _x = this.prevX;
@@ -116,23 +117,23 @@ var Food = new Phaser.Class({
 
                 debugger
 
-                scene.gState = GState.TRANSITION;
+                
 
-                var finalFanfare = false;
+                var finalFare = false;
                         
                 switch (true) {
                     case scene.mode === MODES.CLASSIC || scene.mode === MODES.EXPERT:
                         if (scene.nextStagePortalLayer.findByIndex(616)){
-                            finalFanfare = true;
+                            finalFare = true;
                         }
                         break;
                     case scene.mode === MODES.GAUNTLET:
                         if (PERSISTS.gauntlet.length === 0) {
-                            finalFanfare = true;
+                            finalFare = true;
                         }
                         break;
                     case scene.mode === MODES.PRACTICE:
-                        finalFanfare = false;
+                        finalFare = false;
                         break;
                 
                     default:
@@ -142,8 +143,8 @@ var Food = new Phaser.Class({
 
                 
 
-                if (!finalFanfare) {
-                    // Normal Final Atom Case
+                if (!finalFare) {
+                    // Normal Fan
 
                     /* Brightness Tween *shrug* not great
                     const brightness = scene.snake.head.preFX.addColorMatrix().brightness(2);
@@ -191,10 +192,12 @@ var Food = new Phaser.Class({
                                     scene.snake.grow(scene);
                                     finalAtom.destroy();
                                     scene.events.emit('win');
+
+                                    debugger
                                 
                                     // Store speed values
-                                    let _walkSpeed = scene.speedWalk;
-                                    let _sprintSpeed = scene.speedSprint;
+                                    let _walkSpeed = scene.gameSettings.speedWalk;
+                                    let _sprintSpeed = scene.gameSettings.speedSprint;
                             
                                     // Store initial camera position
                                     let initialCameraX = scene.cameras.main.scrollX;
@@ -261,8 +264,8 @@ var Food = new Phaser.Class({
                                                 // Apply the interpolated slowMoValue to all the timeScales
                                                 scene.tweens.timeScale = slowMoValue;
                                                 scene.anims.globalTimeScale = slowMoValue;
-                                                scene.speedWalk = _walkSpeed  / slowMoValue;
-                                                scene.speedSprint = _sprintSpeed / slowMoValue;
+                                                scene.gameSettings.speedWalk = _walkSpeed  / slowMoValue;
+                                                scene.gameSettings.speedSprint = _sprintSpeed / slowMoValue;
                                                 if (scene.starEmitterFinal) {
                                                     scene.starEmitterFinal.timeScale = slowMoValue;
                                                 }
@@ -314,8 +317,8 @@ var Food = new Phaser.Class({
                                                 
                                                 scene.tweens.timeScale = 1;
                                                 scene.anims.globalTimeScale = 1;
-                                                scene.speedWalk = _walkSpeed;
-                                                scene.speedSprint = _sprintSpeed;
+                                                scene.gameSettings.speedWalk = _walkSpeed;
+                                                scene.gameSettings.speedSprint = _sprintSpeed;
                                                 if (scene.starEmitterFinal) {
                                                     scene.starEmitterFinal.timeScale = 1;
                                                 }
@@ -365,8 +368,6 @@ var Food = new Phaser.Class({
                                                 PERSISTS.cameras.main.scrollY = 0;*/
                                                 SPACE_BOY.CapSparkFinale = SPACE_BOY.add.sprite(X_OFFSET + GRID * 9 -3, GRID * 1.5).play(`CapSparkFinale`).setOrigin(.5,.5)
                                                 .setDepth(100);
-                                                
-                                                scene.gState = GState.PLAY;
                                         }
                                     });
                         
