@@ -8320,7 +8320,6 @@ class GameScene extends Phaser.Scene {
 
             this.compassUpdate();
 
-            // #region is unlocked?
 
             
             updateSumOfBest(ourPersist);
@@ -8421,7 +8420,7 @@ class GameScene extends Phaser.Scene {
                                 this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 11 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 22, 0x1a1a1a  
                                 ).setDepth(49).setAlpha(0);
                                 //debugger
-                                this.r3.postFX.addShine(1, .5, 5)
+                                this.r3.postFX.addShine(1, .5, 5);
                                 this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
         
                                 this.extractHole = extractImage;
@@ -8474,6 +8473,7 @@ class GameScene extends Phaser.Scene {
                                                 }
             
         
+                                                debugger
                                                 if ((STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) || this.mode === MODES.HARDCORE) {
                                                     
                                                     // Now we know the Stage is unlocked, so make the black hole tile.
@@ -11187,7 +11187,7 @@ class GameScene extends Phaser.Scene {
 
     hidePortals(step) {
 
-        var delay = 240;
+        var delay = 300;
 
         var sortedPortals = this.portals.toSorted(
                 (a, b) => {
@@ -11233,7 +11233,15 @@ class GameScene extends Phaser.Scene {
     
             sortedPortals.forEach (portal => {
                 portal.visible = true;
-                portal.playAfterDelay('portalIdle', delay);
+                if (!this.winned) {
+                        // No idea why this one works only on start.
+                        portal.playAfterDelay('portalForm', delay);
+                    } else {
+                        // and this one works only the second time. *shrug*
+                        // but it works. and .chain() doesn't work.
+                        portal.play('portalIdle');
+                        //portal.playAfterDelay('portalIdle', delay);
+                    }
                 portal.portalHighlight.play("portalHighlights");
                 portal.portalHighlight.alpha = 0;
                 delay += step;
@@ -11244,14 +11252,7 @@ class GameScene extends Phaser.Scene {
                     
                     portal.visible = true;
                     
-                    if (!this.winned) {
-                        // No idea why this one works only on start.
-                        portal.play('portalForm')
-                    } else {
-                        // and this one works only the second time. *shrug*
-                        // but it works. and .chain() doesn't work.
-                        portal.chain(['portalIdle']);
-                    }
+                    
                     portal.portalHighlight.play("portalHighlights");
                     portal.portalHighlight.alpha = 0;
                 }, [], this);*/
