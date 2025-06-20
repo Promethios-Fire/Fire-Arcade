@@ -172,6 +172,7 @@ var Food = new Phaser.Class({
 
                             
                             const ourStartScene = scene.scene.get('StartScene');
+                            scene.hidePortals();
                             
                             scene.events.emit('addScore', this, timeSinceFruit);
                             
@@ -180,6 +181,8 @@ var Food = new Phaser.Class({
                             var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Expo.easeInOut');
 
                             vortexTween.on('complete', () => {
+                                
+
                                 scene.time.delayedCall(200, () => {
 
 

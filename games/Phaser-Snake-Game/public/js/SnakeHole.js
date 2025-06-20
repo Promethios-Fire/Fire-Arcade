@@ -9070,23 +9070,7 @@ class GameScene extends Phaser.Scene {
         
 
         // #region Portals Play
-        if (this.portals.length > 0) {
-            var sortedPortals = this.portals.toSorted(
-                (a, b) => {
-                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) 
-                    - Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y)
-                }); 
-    
-            sortedPortals.forEach (portal => {
-                portal.play(portal.anim);
-                portal.portalHighlight.play("portalHighlights");
-                portal.portalHighlight.alpha = 0;
-            });
-            
-        }
-        
-
-
+        this.showPortals();
 
         //stagger portal spawns
         //this.time.delayedCall(600, event => {
@@ -11131,7 +11115,7 @@ class GameScene extends Phaser.Scene {
         });
     }
 
-    musicPlayerDisplay(show){
+    musicPlayerDisplay(show) {
         // move to spaceboy or music player. #TODO
         const ourSpaceboy = this.scene.get('SpaceBoyScene');
         let _offset = 36;
@@ -11175,7 +11159,7 @@ class GameScene extends Phaser.Scene {
         this.lengthGoalUILabel
     }
 
-    collapsePortals(){
+    collapsePortals() {
         this.portals.forEach(portal => {
 
             this.interactLayer[portal.tileX()][portal.tileY()] = "empty";
@@ -11199,6 +11183,44 @@ class GameScene extends Phaser.Scene {
         this.portalParticles.forEach(portalParticles => { 
             portalParticles.stop();
         });
+    }
+
+    hidePortals() {
+        this.portals.forEach(portal => {
+
+            portal.play('portalClose');
+            portal.on('animationcomplete', (animation) => {
+                if (animation.key === 'portalClose') {
+                    
+                    portal.visible = false;
+                }
+            });
+        });
+    }
+    
+    showPortals() {
+        if (this.portals.length > 0) {
+            var sortedPortals = this.portals.toSorted(
+                (a, b) => {
+                     
+                    return Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) - 
+                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y)
+                    
+                }
+            );
+            
+            var delay = 240;
+            var step = 60;
+    
+            sortedPortals.forEach (portal => {
+                portal.visible = true;
+                portal.playAfterDelay(portal.anim, delay);
+                portal.portalHighlight.play("portalHighlights");
+                portal.portalHighlight.alpha = 0;
+                delay += step;
+            });
+            
+        }
     }
 
     // #region Game Update
@@ -11270,27 +11292,24 @@ class GameScene extends Phaser.Scene {
 
        }
 
-
-
-        //console.log(this.gState, " 2 is good. new move time", time, ">", this.lastMoveTime + this.moveInterval, this.lastMoveTime, this.moveInterval );
         if(time >= this.lastMoveTime + this.moveInterval && this.gState === GState.PLAY) {
             this.lastMoveTime = time;
 
             // could we move this into snake.move()
-            this.snakeMask.x = this.snake.head.x
-            this.snakeMask.y = this.snake.head.y
+            this.snakeMask.x = this.snake.head.x;
+            this.snakeMask.y = this.snake.head.y;
 
             this.snakeMaskN.x = this.snake.head.x
             this.snakeMaskN.y = this.snake.head.y + SCREEN_HEIGHT
-GState.PLAY
+
             this.snakeMaskE.x = this.snake.head.x + SCREEN_WIDTH
             this.snakeMaskE.y = this.snake.head.y
 
-            this.snakeMaskS.x = this.snake.head.x
-            this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT
+            this.snakeMaskS.x = this.snake.head.x;
+            this.snakeMaskS.y = this.snake.head.y - SCREEN_HEIGHT;
 
-            this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH
-            this.snakeMaskW.y = this.snake.head.y
+            this.snakeMaskW.x = this.snake.head.x - SCREEN_WIDTH;
+            this.snakeMaskW.y = this.snake.head.y;
 
             /*if (this.starEmitterFinal) {
                 this.starEmitterFinal.x = this.snake.head.x

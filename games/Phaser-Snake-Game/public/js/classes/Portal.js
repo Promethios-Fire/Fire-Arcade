@@ -31,9 +31,6 @@ var Portal = new Phaser.Class({
             this.portalHighlight = scene.add.sprite(from[0], from[1]).setDepth(46).setOrigin(.3125,.3125);
             // this.portalHighlight.setTint(color.color);
             // this.portalHighlight.chain(['portalHighlights']);
-            
-
-
         } else {
             this.setOrigin(0,0);
             scene.wallPortals.push(this);
