@@ -832,7 +832,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-2'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -8473,7 +8473,7 @@ class GameScene extends Phaser.Scene {
                                                 }
             
         
-                                                debugger
+                                                
                                                 if ((STAGE_UNLOCKS.get(propObj.value).call(ourPersist) && spawnOn) || this.mode === MODES.HARDCORE) {
                                                     
                                                     // Now we know the Stage is unlocked, so make the black hole tile.
@@ -8499,18 +8499,14 @@ class GameScene extends Phaser.Scene {
                                                     
                                                     
                                                     var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
-                                                    ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
+                                                    ).setDepth(10).setOrigin(0.4125,0.4125);
+                                                    blackholeImage.alpha = 0;
+                                                    
+                                                    
             
             
                                                     //extractImage.playAfterRepeat('extractHoleClose');
                                                     
-                                                    
-                                                    //this.barrel = this.cameras.main.postFX.addBarrel([barrelAmount])
-                                                    //this.cameras.main.postFX.addBarrel(this,-0.5);
-                                                    //blackholeImage.postFX.addBarrel(this.cameras.main,[.5])
-                                                    /*this.blackholes.forEach(blackholeImage =>{
-                                                        this.cameras.main.postFX.addBarrel([.125]) 
-                                                    })*/
                                                     
                                                     this.blackholes.push(blackholeImage);
                                                     
@@ -8519,10 +8515,8 @@ class GameScene extends Phaser.Scene {
                                                 
             
                                                     this.blackholeLabels.push(stageText,r1);
-                                                    if (blackholeImage.anims.getName() === 'blackholeForm')
-                                                        {
-                                                            blackholeImage.playAfterRepeat('blackholeIdle');
-                                                        }
+
+                                                    
             
                                                     //line code doesn't work yet
                                                     //this.graphics = this.add.graphics({ lineStyle: { width: 4, color: 0xaa00aa } });
@@ -8624,13 +8618,6 @@ class GameScene extends Phaser.Scene {
                                                     this.nextStagePortals.push(undefined);
                                                 }
                                                 
-                                                this.tweens.add({
-                                                    targets: this.blackholeLabels,
-                                                    alpha: {from: 0, to: 1},
-                                                    ease: 'Sine.easeOutIn',
-                                                    duration: 50,
-                                                    delay: this.tweens.stagger(150)
-                                                });
             
                                                 
                                             }
@@ -8720,6 +8707,56 @@ class GameScene extends Phaser.Scene {
                     debugger // Leave this in as a safety break
                     break;
             }
+
+            // #region BlackHole Anim
+
+            var _delay = 400;
+            var _index = 0;
+            this.nextStagePortals.forEach((bH) => {
+
+
+                if (bH) {
+                    _index++;
+                    
+                    var spaceBall = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y, 'inventoryIcons', 42
+                    ).setOrigin(0.2,0.2).setDepth(20);
+                    spaceBall.setTintFill(0xf0f0f0);
+                    spaceBall.name = "spaceBall";
+                    //spaceBall.play('atom01idle');
+
+                    spaceBall.electrons = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y).setOrigin(.22,.175).setDepth(48);
+                    spaceBall.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
+                    spaceBall.electrons.anims.msPerFrame = 66;
+                    spaceBall.electrons.setTintFill(0xf0f0f0);
+
+                    this.tweens.add( {
+                        targets: [spaceBall,spaceBall.electrons ],
+                        x: {from: this.snake.body[0].x, to: bH.x },
+                        y: {from: this.snake.body[0].y, to: bH.y },
+                        duration: 500,
+                        ease: 'Sine.Out',
+                        delay: _delay * _index,
+                        onComplete: (tween) => {
+                            spaceBall.destroy();
+                            spaceBall.electrons.destroy();
+                            bH.play('blackholeForm');
+                            bH.alpha = 1;
+                            if (bH.anims.getName() === 'blackholeForm')
+                                {
+                                    bH.playAfterRepeat('blackholeIdle');
+                                }
+                        }
+                    });
+                }
+            });
+
+            this.tweens.add({
+                targets: this.blackholeLabels,
+                alpha: {from: 0, to: 1},
+                ease: 'Sine.easeOutIn',
+                duration: 50,
+                delay: 2000 //this.tweens.stagger(150)
+            });
 
             // #region Layer: Next
                  

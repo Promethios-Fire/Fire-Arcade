@@ -22,7 +22,6 @@ var Food = new Phaser.Class({
 
         this.respawnTimer = 0; // Tenths of seconds
         
-
         this.electrons = scene.add.sprite().setOrigin(.22,.175).setDepth(48);
         this.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
         this.electrons.anims.msPerFrame = 66;
@@ -172,7 +171,7 @@ var Food = new Phaser.Class({
 
                             
                             const ourStartScene = scene.scene.get('StartScene');
-                            scene.hidePortals(120);
+
                             
                             scene.events.emit('addScore', this, timeSinceFruit);
                             
@@ -181,6 +180,8 @@ var Food = new Phaser.Class({
                             var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Expo.easeInOut');
 
                             vortexTween.on('complete', () => {
+
+                                scene.hidePortals(120);
                                 
 
                                 scene.time.delayedCall(200, () => {
