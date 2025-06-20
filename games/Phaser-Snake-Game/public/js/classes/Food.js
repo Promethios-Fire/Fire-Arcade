@@ -184,11 +184,11 @@ var Food = new Phaser.Class({
                                 scene.hidePortals(120);
                                 
 
-                                scene.time.delayedCall(200, () => {
+                                scene.time.delayedCall(1, () => {
 
 
 
-                                    scene.playAtomSound();
+                                    //scene.playAtomSound();
                                     scene.snake.grow(scene);
                                     finalAtom.destroy();
                                     scene.events.emit('win');
