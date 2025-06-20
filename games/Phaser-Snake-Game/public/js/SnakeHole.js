@@ -7183,7 +7183,6 @@ class GameScene extends Phaser.Scene {
         // You need Slice to make a copy. Otherwise it updates the pointer only and errors on scene.restart()
         this.portalColors = PORTAL_COLORS.slice();
         this.portalParticles = [];
-        this.snakePortalingSprites = [];
 
 
         this.winned = false; // marked as true any time this.winCondition is met.
@@ -8998,11 +8997,10 @@ class GameScene extends Phaser.Scene {
                     break;
             }
             
-            this.portalLight = this.lights.addLight(portal.x +8, portal.y + 8, 128,
+            portal.portalLight = this.lights.addLight(portal.x +8, portal.y + 8, 128,
                   portalLightColor).setIntensity(1.5);
-            this.portalLights.push(this.portalLight);
 
-            var portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
+            portal.portalParticles = this.add.particles(portal.x, portal.y, 'megaAtlas', {
                 frame: ['portalParticle01.png'],
                 color: [ portal.tintTopLeft,0x000000, 0x000000],
                 colorEase: 'quad.out',
@@ -9015,7 +9013,6 @@ class GameScene extends Phaser.Scene {
                 alpha:{start: 1, end: 0 },
             }).setFrequency(332,[1]).setDepth(20);
 
-            this.portalParticles.push(portalParticles)
             
             if (!this.hasGhostTiles) {
                 this.portalMask = this.make.image({
@@ -10749,16 +10746,13 @@ class GameScene extends Phaser.Scene {
             ...sortedWallSprites,
         ];
 
-        //turn off portal particles and any portal sprites
-        if (this.portalParticles != undefined) {
-            this.portalParticles.forEach(portalParticles => { 
-                portalParticles.stop();
-            });
-            this.snakePortalingSprites.forEach(snakePortalingSprite => { 
-                snakePortalingSprite.visible = false;
-            });
+        
+        
+        this.portals.forEach(portal => { 
+            portal.portalParticles.stop();
+            portal.snakePortalingSprite.visible = false;
+        });
             
-        }
         
         var snakeholeTween = this.tweens.add({
             targets: this.snake.body, 
@@ -11164,11 +11158,17 @@ class GameScene extends Phaser.Scene {
 
             this.interactLayer[portal.tileX()][portal.tileY()] = "empty";
 
+            portal.portalHighlight.destroy();
+            portal.snakePortalingSprite.destroy();
+
             portal.play('portalClose');
             portal.on('animationcomplete', (animation) => {
                 if (animation.key === 'portalClose') {
+                    this.lights.removeLight(portal.portalLights);
+                    portal.portalParticles.stop();
+                    
+                    
                     portal.destroy();
-                    portal.portalHighlight.destroy();
                 }
             });
             
@@ -11176,25 +11176,43 @@ class GameScene extends Phaser.Scene {
 
         this.portals = [];
 
-        this.portalLights.forEach(portalLight => {
-            this.lights.removeLight(portalLight);
-        });
+        //this.portalLights.forEach(portalLight => {
+        //    this.lights.removeLight(portalLight);
+        //});
 
-        this.portalParticles.forEach(portalParticles => { 
-            portalParticles.stop();
-        });
+        //this.portalParticles.forEach(portalParticles => { 
+        //    portalParticles.stop();
+        //});
     }
 
-    hidePortals() {
-        this.portals.forEach(portal => {
+    hidePortals(step) {
 
-            portal.play('portalClose');
+        var delay = 240;
+
+        var sortedPortals = this.portals.toSorted(
+                (a, b) => {
+                     
+                    return Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) - 
+                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y)
+                    
+                }
+            );
+
+        sortedPortals.forEach(portal => {
+
+            portal.portalHighlight.alpha = 0;
+            portal.snakePortalingSprite.visible = false;
+
+            portal.playAfterDelay('portalClose', delay);
             portal.on('animationcomplete', (animation) => {
                 if (animation.key === 'portalClose') {
                     
+                    portal.portalParticles.stop();
                     portal.visible = false;
+                    
                 }
             });
+            delay += step;
         });
     }
     
@@ -11203,8 +11221,9 @@ class GameScene extends Phaser.Scene {
             var sortedPortals = this.portals.toSorted(
                 (a, b) => {
                      
-                    return Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) - 
-                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y)
+                    var diff = Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, a.x, a.y) - 
+                    Phaser.Math.Distance.Between(this.snake.head.x, this.snake.head.y, b.x, b.y);
+                    return diff
                     
                 }
             );
@@ -11214,11 +11233,28 @@ class GameScene extends Phaser.Scene {
     
             sortedPortals.forEach (portal => {
                 portal.visible = true;
-                portal.playAfterDelay(portal.anim, delay);
+                portal.playAfterDelay('portalIdle', delay);
                 portal.portalHighlight.play("portalHighlights");
                 portal.portalHighlight.alpha = 0;
                 delay += step;
             });
+
+            /*    
+            this.time.delayedCall(delay, function () {
+                    
+                    portal.visible = true;
+                    
+                    if (!this.winned) {
+                        // No idea why this one works only on start.
+                        portal.play('portalForm')
+                    } else {
+                        // and this one works only the second time. *shrug*
+                        // but it works. and .chain() doesn't work.
+                        portal.chain(['portalIdle']);
+                    }
+                    portal.portalHighlight.play("portalHighlights");
+                    portal.portalHighlight.alpha = 0;
+                }, [], this);*/
             
         }
     }
@@ -13507,6 +13543,7 @@ class ScoreScene extends Phaser.Scene {
         const onContinue = function (scene) {
             
             ourGame.backgroundBlur(false);
+            ourGame.showPortals();
 
             console.log('pressing space inside score scene');
 
