@@ -8710,7 +8710,7 @@ class GameScene extends Phaser.Scene {
 
             // #region BlackHole Anim
 
-            var _delay = 400;
+            var _delay = 360;
             var _index = 0;
             this.nextStagePortals.forEach((bH) => {
 
@@ -8733,8 +8733,8 @@ class GameScene extends Phaser.Scene {
                         targets: [spaceBall,spaceBall.electrons ],
                         x: {from: this.snake.body[0].x, to: bH.x },
                         y: {from: this.snake.body[0].y, to: bH.y },
-                        duration: 500,
-                        ease: 'Sine.Out',
+                        duration: 600,
+                        ease: 'Back.easeIn', // best ones: 'Sine.easeInOut' 'Back.easeIn' 'Expo.easeIn' https://phaser.io/examples/v3.85.0/tweens/eases/view/ease-equations
                         delay: _delay * _index,
                         onComplete: (tween) => {
                             spaceBall.destroy();
@@ -8754,8 +8754,8 @@ class GameScene extends Phaser.Scene {
                 targets: this.blackholeLabels,
                 alpha: {from: 0, to: 1},
                 ease: 'Sine.easeOutIn',
-                duration: 50,
-                delay: 2000 //this.tweens.stagger(150)
+                duration: 100,
+                delay: _delay * _index //this.tweens.stagger(150)
             });
 
             // #region Layer: Next
