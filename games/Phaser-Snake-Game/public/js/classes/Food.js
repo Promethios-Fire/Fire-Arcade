@@ -177,7 +177,7 @@ var Food = new Phaser.Class({
                             
                             this.electrons.visible = false;
 
-                            var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Expo.easeInOut');
+                            var vortexTween = scene.vortexIn(scene.snake.body, _x, _y, 750, 'Back.easeIn'); // 'Back.easeIn' 'Expo.easeInOut'
 
                             vortexTween.on('complete', () => {
 

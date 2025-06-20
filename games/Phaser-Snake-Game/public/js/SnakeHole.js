@@ -11001,7 +11001,7 @@ class GameScene extends Phaser.Scene {
     vortexIn(target, x, y, time, ease){
 
         if (!ease) {
-            ease = 'Sine.easeOutIn';
+            ease = 'Sine.easeOutIn'; // 'Back.easeIn' 'Sine.easeOutIn'
         }
 
         this.vortexTween = this.tweens.add({
