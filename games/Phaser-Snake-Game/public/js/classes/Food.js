@@ -166,7 +166,7 @@ var Food = new Phaser.Class({
                         x: {from: scene.snake.previous[0], to:_x },
                         y: { from: scene.snake.previous[1], to:_y },
                         duration: 240,
-                        ease:'Expo.easeIn',
+                        ease:'Expo.easeIn', // 'Expo.easeIn' 'Back.easeIn'
                         onComplete: () =>{
 
                             

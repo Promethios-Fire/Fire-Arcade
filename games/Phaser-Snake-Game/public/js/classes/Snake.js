@@ -325,38 +325,6 @@ var Snake = new Phaser.Class({
         // Check for Blackholes
         if (scene.winned) {
             
-            /**
-             * Okay to not be part of the interact layer because there is only ever 8?
-             */
-            
-            for (let index = 0; index < scene.nextStagePortals.length; index++) {
-
-                
-                if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === this.head.x && scene.nextStagePortals[index].y === this.head.y)) {
-                    
-                    console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
-                    scene.portals.forEach(portal => {
-                        portal.portalHighlight.visible = false;
-                    });
-
-                    //portal.snakePortalingSprite.visible = false;
-                    //portal.targetObject.snakePortalingSprite.visible = false;
-                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                    updatePlayerStats()
-                    scene.warpToNext(index);
-                }
-
-                
-            }
-            if (scene.extractHole) { //check that there is an extract hole
-                if (scene.extractHole.x === this.head.x && scene.extractHole.y === this.head.y) {
-                    console.log('WOO')
-                    //scene.finalScore();
-                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                    debugger // TODO Extract Prompt needs to handle Gauntlet Mode.
-                    scene.extractPrompt(); // Maybe higher function that determines which to call.
-                }
-            }
 
         }
 

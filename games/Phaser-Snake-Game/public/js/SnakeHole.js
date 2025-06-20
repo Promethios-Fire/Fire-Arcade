@@ -8440,6 +8440,8 @@ class GameScene extends Phaser.Scene {
                                     var tile = blackHoleTiles.shift(); // Will error if not enough Black Hole Tiles.
                                     var stageName = STAGES.get(stageID);
 
+                                    var blackholeImage = undefined;
+
                                     if (stageName != undefined) { // Catches levels that are not in STAGES.
                                         //stageName = stageRaw;
                                         var dataName = `${stageName}.properties`;
@@ -8498,7 +8500,7 @@ class GameScene extends Phaser.Scene {
             
                                                     
                                                     
-                                                    var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                                    blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
                                                     ).setDepth(10).setOrigin(0.4125,0.4125);
                                                     blackholeImage.alpha = 0;
                                                     
@@ -8623,7 +8625,7 @@ class GameScene extends Phaser.Scene {
                                             }
                                         });
                                     } else {
-                                        var blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
+                                        blackholeImage = this.add.sprite(tile.pixelX + X_OFFSET, tile.pixelY + Y_OFFSET, 'blackHoleAnim.png' 
                                         ).setDepth(10).setOrigin(0.4125,0.4125).play('blackholeForm');
 
 
@@ -8639,6 +8641,45 @@ class GameScene extends Phaser.Scene {
                                         
                                         this.blackholes.push(blackholeImage);
                                     }
+
+                                    if (blackholeImage != undefined) {
+                                        blackholeImage.onOver = function (scene) {
+                                            /**
+                                             * Make it compatible with Interactlayer.
+                                             */
+
+                                            var _head = scene.snake.head;
+                                            
+                                            for (let index = 0; index < scene.nextStagePortals.length; index++) {
+
+                                                
+                                                if (scene.nextStagePortals[index] != undefined && (scene.nextStagePortals[index].x === _head.x && scene.nextStagePortals[index].y === _head.y)) {
+                                                    
+                                                    console.log("ITS WARPING TIME to WORLD", "Index", index, scene.nextStagePortals[index]);
+                                                    scene.portals.forEach(portal => {
+                                                        portal.portalHighlight.visible = false;
+                                                    });
+
+                                                    //portal.snakePortalingSprite.visible = false;
+                                                    //portal.targetObject.snakePortalingSprite.visible = false;
+                                                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                                                    updatePlayerStats()
+                                                    scene.warpToNext(index);
+                                                }
+
+                                                
+                                            }
+                                            if (scene.extractHole) { //check that there is an extract hole
+                                                if (scene.extractHole.x === _head.x && scene.extractHole.y === _head.y) {
+                                                    console.log('WOO')
+                                                    //scene.finalScore();
+                                                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                                                    debugger // TODO Extract Prompt needs to handle Gauntlet Mode.
+                                                    scene.extractPrompt(); // Maybe higher function that determines which to call.
+                                                }
+                                            }
+                                        }  
+                                    }
                                 })  
                             }
 
@@ -8646,8 +8687,6 @@ class GameScene extends Phaser.Scene {
                                 throw new Error(`Too many Black Hole Tiles on ${this.stage}. Need Exactly the right number. /n Next Stages on this stage. ${this.nextStages}`);
                             }
                         }
-
-                        
                     }
                     break;
             
@@ -8741,10 +8780,14 @@ class GameScene extends Phaser.Scene {
                             spaceBall.electrons.destroy();
                             bH.play('blackholeForm');
                             bH.alpha = 1;
-                            if (bH.anims.getName() === 'blackholeForm')
-                                {
+                            if (bH.anims.getName() === 'blackholeForm') {
                                     bH.playAfterRepeat('blackholeIdle');
-                                }
+                            }
+
+                            // Delay this line further to make blackholes uninteractable for a longer period.
+                            // This positition means they are interactable as soon as spawning starts.
+                            this.interactLayer[(bH.x - X_OFFSET) / GRID][(bH.y - Y_OFFSET) / GRID] = bH;
+                
                         }
                     });
                 }
