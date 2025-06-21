@@ -21,6 +21,8 @@ var Snake = new Phaser.Class({
         this.head.setAlpha(0);
         this.head.setOrigin(0,0).setDepth(48);
 
+        this.head.name = "head";
+
         this.newHead = {};
 
         this.previous = [];
@@ -116,6 +118,7 @@ var Snake = new Phaser.Class({
         // The Tail position stays where it is and then every thing moves in series
         var newPart = scene.add.sprite(this.tail.x*GRID, this.tail.y*GRID, 'snakeDefault', 8);
         newPart.setOrigin(0,0).setDepth(47).setPipeline('Light2D');
+        newPart.name = `BodyPart ${scene.length}`;
         //newPart.postFX.addShadow(-2, 6, 0.007, 1.2, 0x111111, 6, 1);
 
         
@@ -322,10 +325,15 @@ var Snake = new Phaser.Class({
 
 
         
-        // Check for Blackholes
-        if (scene.winned) {
-            
-
+        // Check for ExtractHole
+        if (scene.extractHole) { //check that there is an extract hole
+            if (scene.extractHole.x === this.head.x && scene.extractHole.y === this.head.y) {
+                console.log('WOO')
+                //scene.finalScore();
+                scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
+                // TODO Extract Prompt needs to handle Gauntlet Mode.
+                scene.extractPrompt(); // Maybe higher function that determines which to call.
+            }
         }
 
         // Update closest portal. I think it techinally is lagging behind because it follows the lights which are one step behind.

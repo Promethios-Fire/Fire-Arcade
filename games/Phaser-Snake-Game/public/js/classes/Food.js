@@ -467,6 +467,7 @@ var Food = new Phaser.Class({
                     scene.snake.grow(scene);
                     // Avoid double _atom getting while in transition
                     this.visible = false;
+                    scene.pathTweens = new Set();
 
                     scene.playAtomSound();
 
@@ -586,6 +587,8 @@ var Food = new Phaser.Class({
 
                             }
                         });
+
+                        scene.pathTweens.add(pathTween);
 
                         var _radius = Phaser.Math.Between(22,27);
                         scene.tweens.add({

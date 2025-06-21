@@ -8653,15 +8653,6 @@ class GameScene extends Phaser.Scene {
 
                                                 
                                             }
-                                            if (scene.extractHole) { //check that there is an extract hole
-                                                if (scene.extractHole.x === _head.x && scene.extractHole.y === _head.y) {
-                                                    console.log('WOO')
-                                                    //scene.finalScore();
-                                                    scene.scene.get("PersistScene").stageHistory.push(scene.scene.get("ScoreScene").stageData);
-                                                    debugger // TODO Extract Prompt needs to handle Gauntlet Mode.
-                                                    scene.extractPrompt(); // Maybe higher function that determines which to call.
-                                                }
-                                            }
                                         }  
                                     }
                                 })  
@@ -8792,45 +8783,87 @@ class GameScene extends Phaser.Scene {
                 
                 // #region COMET
                 var atomComet = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-                .setDepth(100);
-                atomComet.play('atomCometSpawn');
-                atomComet.chain(['atomCometIdle']);
+                .setDepth(100).setAlpha(0);
                 atomComet.name = "atomComet";
 
 
                 // rainbow electronFanfare
                 var electronFanfare = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
-                .setDepth(100);//.setOrigin(0.25,0.25);
-                electronFanfare.play('electronFanfareForm');
+                .setDepth(100).setAlpha(0);//.setOrigin(0.25,0.25);
                 electronFanfare.name = "electronFanfare";
 
-                // Atomic Comet and Electron Fanfare Tween
-            
-                electronFanfare.on('animationcomplete', (animation, frame) => {
-                    if (animation.key === 'electronFanfareForm') {
-                        this.tweens.add({
-                            targets: [electronFanfare,atomComet],
-                            x: this.extractHole.getCenter().x + 3,
-                            y: this.extractHole.getCenter().y + 3,
-                            ease: 'Back.easeIn',
-                            delay: 500,
-                            duration: 1250,
-                            onComplete: () => {
-                                this.countDownTimer.setAlpha(1);
-                                this.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
-                                this.countDownTimer.y = 3;
-                                this.extractHole.alpha = 1;
-                                this.extractHole.play('extractHoleIdle');
-                                //atomComet.destroy();
-                            }
-                        });
-                                
-                                //this.countDownTimer.x += 3
-                        }
-                        
+
+                this.pathTweens.forEach( twn => {
+                    twn.pause();
                 });
-    
-                electronFanfare.chain(['electronFanfareIdle']);
+
+                
+                
+                this.tweens.add({
+                    targets: this.snake.body,
+                    x: this.snake.head.x,
+                    y: this.snake.head.y,
+                    originX: 0,
+                    originY: 0,
+                    ease: "Back.easeIn",
+                    duration: 1200,
+                    onComplete: (tween) => {
+                        // There is a better way to do this.
+                        this.snake.body.forEach( body => {
+                            body.setOrigin(0,0);
+                        });
+                    }
+                });
+
+                var _delay = 500;
+                
+                this.tweens.add({
+                    targets: [atomComet, electronFanfare],
+                    alpha: 1,
+                    delay: _delay,
+                    duration: 500
+                })
+
+                this.time.delayedCall(_delay, event => {
+                    atomComet.play('atomCometSpawn');
+                    atomComet.chain(['atomCometIdle']);
+                    electronFanfare.play('electronFanfareForm');
+                
+                    electronFanfare.on('animationcomplete', (animation, frame) => {
+                        if (animation.key === 'electronFanfareForm') {
+                            this.tweens.add({
+                                targets: [electronFanfare, atomComet],
+                                x: this.extractHole.getCenter().x + 3,
+                                y: this.extractHole.getCenter().y + 3,
+                                ease: 'Back.easeIn',
+                                delay: 300,
+                                duration: 1250,
+                                onComplete: () => {
+                                    this.countDownTimer.setAlpha(1);
+                                    this.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
+                                    this.countDownTimer.y = 3;
+                                    this.extractHole.alpha = 1;
+                                    this.extractHole.play('extractHoleIdle');
+                                    atomComet.destroy();
+                                    electronFanfare.destroy();
+                                    this.gState = GState.WAIT_FOR_INPUT;
+                                    this.events.emit("spawnArrows", this.snake.head);
+                                }
+                            });
+                                    
+                                    //this.countDownTimer.x += 3
+                            }
+                            
+                    });
+
+                    electronFanfare.chain(['electronFanfareIdle']);
+                }, [], this);
+                    // Atomic Comet and Electron Fanfare Tween
+                    
+
+
+
+                
                 //#endregion
             }
 
