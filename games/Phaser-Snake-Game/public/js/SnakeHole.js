@@ -832,7 +832,7 @@ export const GState = Object.freeze({
 
 
 // #region START STAGE
-export const START_STAGE = 'World_1-3'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
+export const START_STAGE = 'World_0-1'; //'World_0-1'; // World_0-1 Warning: Cap sensitive in the code but not in Tiled. Can lead to strang bugs.
 export const START_UUID = "723426f7-cfc5-452a-94d9-80341db73c7f"; //"723426f7-cfc5-452a-94d9-80341db73c7f"
 const TUTORIAL_UUID = "e80aad2f-f24a-4619-b525-7dc3af65ed33";
 
@@ -8377,10 +8377,7 @@ class GameScene extends Phaser.Scene {
                             extractImage.alpha = 0;
                             extractTile.index = -1;
                             
-    
                             this.extractHole = extractImage;
-                            
-                            
                             
                         } else {           
 
@@ -8396,6 +8393,7 @@ class GameScene extends Phaser.Scene {
                                 ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
                                 extractTile.index = -1;
         
+                                // still need this?
                                 this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
                                     "EXTRACT!", 
                                     16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(1);
@@ -8725,11 +8723,18 @@ class GameScene extends Phaser.Scene {
             // #region BlackHole Anim
             if (!this.extractHole) {
 
-                this.gState = GState.START_WAIT;
-                this.events.emit("spawnArrows", this.snake.head);
+                
 
                 var _delay = 360;
                 var _index = 0;
+
+                // This Timing is independent from the rest of the sequence.
+                this.time.delayedCall(_delay, event => {
+                    this.gState = GState.START_WAIT;
+                    this.events.emit("spawnArrows", this.snake.head);
+                }, [], this);
+
+
                 this.nextStagePortals.forEach((bH) => {
 
                     if (bH) {
@@ -8780,6 +8785,8 @@ class GameScene extends Phaser.Scene {
                 });
                 
             } else {
+
+                
                 
                 // #region COMET
                 var atomComet = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
@@ -9244,7 +9251,7 @@ class GameScene extends Phaser.Scene {
             var _atom = new Food(this, Phaser.Math.RND.pick(this.validSpawnLocations()));  
         }
         
-
+        /* // Grow 26;
         this.snake.grow(this);
         this.snake.grow(this);
         this.snake.grow(this);
@@ -9270,7 +9277,7 @@ class GameScene extends Phaser.Scene {
         this.snake.grow(this);
         this.snake.grow(this);
         this.snake.grow(this);
-        this.snake.grow(this);
+        this.snake.grow(this);*/
         
 
 

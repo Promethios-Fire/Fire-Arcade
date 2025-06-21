@@ -171,7 +171,6 @@ var Food = new Phaser.Class({
 
                             
                             const ourStartScene = scene.scene.get('StartScene');
-
                             
                             scene.events.emit('addScore', this, timeSinceFruit);
                             

@@ -114,7 +114,7 @@ var Portal = new Phaser.Class({
         scene.time.delayedCall(750, () => { 
             this.portalTimerRunning = false;
             //this.target.portalTimerRunning = false;    
-        });
+        }, [], this);
 
         /*scene.tweens.add({
                 targets: this,
