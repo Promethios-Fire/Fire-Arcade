@@ -1164,9 +1164,6 @@ STAGE_OVERRIDES.set("World_1-3", {
         },
         postFix: function (scene) {
         },
-        afterScore: function (scene) {
-            debugger
-        }
     }
 });
 

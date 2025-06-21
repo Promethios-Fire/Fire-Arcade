@@ -515,44 +515,6 @@ var Food = new Phaser.Class({
                             scene.hidePortals(120);
                             scene.events.emit('win');
                             finalAtomCopy.destroy();
-
-                            // #region COMET
-                            scene.atomComet = scene.add.sprite(scene.snake.head.x + 6,scene.snake.head.y + 6)
-                            .setDepth(100);
-                            scene.atomComet.play('atomCometSpawn');
-                            scene.atomComet.chain(['atomCometIdle']);
-            
-            
-                            // rainbow electronFanfare
-                            scene.electronFanfare = scene.add.sprite(scene.snake.head.x + 6,scene.snake.head.y + 6)
-                            .setDepth(100);
-                            scene.electronFanfare.play('electronFanfareForm');
-
-                            // Atomic Comet and Electron Fanfare Tween
-                        
-                            scene.electronFanfare.on('animationcomplete', (animation, frame) => {
-                                if (animation.key === 'electronFanfareForm') {
-                                    scene.tweens.add({
-                                        targets: [scene.electronFanfare,scene.atomComet],
-                                        //x: scene.scoreFrame.getCenter().x -6,
-                                        //y: scene.scoreFrame.getCenter().y,
-                                        ease: 'Sine.easeIn',
-                                        duration: 1250,
-                                        onComplete: () => {
-                                            scene.countDownTimer.setAlpha(1);
-                                            scene.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
-                                            scene.countDownTimer.y = 3;
-                                            //scene.atomComet.destroy();
-                                        }
-                                    });
-                                            scene.countDownTimer.setHTML('W1N');
-                                            scene.countDownTimer.x += 3
-                                    }
-                                    
-                            });
-                
-                            scene.electronFanfare.chain(['electronFanfareIdle']);
-                            //#endregion
                             
                         }
                     });

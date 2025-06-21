@@ -8748,57 +8748,107 @@ class GameScene extends Phaser.Scene {
             }
 
             // #region BlackHole Anim
+            if (!this.extractHole) {
 
-            var _delay = 360;
-            var _index = 0;
-            this.nextStagePortals.forEach((bH) => {
+                this.gState = GState.START_WAIT;
+                this.events.emit("spawnArrows", this.snake.head);
 
-                if (bH) {
-                    _index++;
+                var _delay = 360;
+                var _index = 0;
+                this.nextStagePortals.forEach((bH) => {
+
+                    if (bH) {
+                        _index++;
+                        
+                        var spaceBall = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y, 'inventoryIcons', 42
+                        ).setOrigin(0.2,0.2).setDepth(20);
+                        spaceBall.setTintFill(0xf0f0f0);
+                        spaceBall.name = "spaceBall";
+                        //spaceBall.play('atom01idle');
+
+                        spaceBall.electrons = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y).setOrigin(.22,.175).setDepth(48);
+                        spaceBall.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
+                        spaceBall.electrons.anims.msPerFrame = 66;
+                        spaceBall.electrons.setTintFill(0xf0f0f0);
+
+                        this.tweens.add( {
+                            targets: [spaceBall,spaceBall.electrons ],
+                            x: {from: this.snake.body[0].x, to: bH.x },
+                            y: {from: this.snake.body[0].y, to: bH.y },
+                            duration: 600,
+                            ease: 'Back.easeIn', // best ones: 'Sine.easeInOut' 'Back.easeIn' 'Expo.easeIn' https://phaser.io/examples/v3.85.0/tweens/eases/view/ease-equations
+                            delay: _delay * _index,
+                            onComplete: (tween) => {
+                                spaceBall.destroy();
+                                spaceBall.electrons.destroy();
+                                bH.play('blackholeForm');
+                                bH.alpha = 1;
+                                if (bH.anims.getName() === 'blackholeForm') {
+                                        bH.playAfterRepeat('blackholeIdle');
+                                }
+
+                                // Delay this line further to make blackholes uninteractable for a longer period.
+                                // This positition means they are interactable as soon as spawning starts.
+                                this.interactLayer[(bH.x - X_OFFSET) / GRID][(bH.y - Y_OFFSET) / GRID] = bH;
                     
-                    var spaceBall = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y, 'inventoryIcons', 42
-                    ).setOrigin(0.2,0.2).setDepth(20);
-                    spaceBall.setTintFill(0xf0f0f0);
-                    spaceBall.name = "spaceBall";
-                    //spaceBall.play('atom01idle');
-
-                    spaceBall.electrons = this.add.sprite(this.snake.body[0].x, this.snake.body[0].y).setOrigin(.22,.175).setDepth(48);
-                    spaceBall.electrons.playAfterDelay("electronIdle", Phaser.Math.RND.integerInRange(0,30) * 10);
-                    spaceBall.electrons.anims.msPerFrame = 66;
-                    spaceBall.electrons.setTintFill(0xf0f0f0);
-
-                    this.tweens.add( {
-                        targets: [spaceBall,spaceBall.electrons ],
-                        x: {from: this.snake.body[0].x, to: bH.x },
-                        y: {from: this.snake.body[0].y, to: bH.y },
-                        duration: 600,
-                        ease: 'Back.easeIn', // best ones: 'Sine.easeInOut' 'Back.easeIn' 'Expo.easeIn' https://phaser.io/examples/v3.85.0/tweens/eases/view/ease-equations
-                        delay: _delay * _index,
-                        onComplete: (tween) => {
-                            spaceBall.destroy();
-                            spaceBall.electrons.destroy();
-                            bH.play('blackholeForm');
-                            bH.alpha = 1;
-                            if (bH.anims.getName() === 'blackholeForm') {
-                                    bH.playAfterRepeat('blackholeIdle');
                             }
+                        });
+                    }
+                });
 
-                            // Delay this line further to make blackholes uninteractable for a longer period.
-                            // This positition means they are interactable as soon as spawning starts.
-                            this.interactLayer[(bH.x - X_OFFSET) / GRID][(bH.y - Y_OFFSET) / GRID] = bH;
+                this.tweens.add({
+                    targets: this.blackholeLabels,
+                    alpha: {from: 0, to: 1},
+                    ease: 'Sine.easeOutIn',
+                    duration: 100,
+                    delay: _delay * _index //this.tweens.stagger(150)
+                });
                 
-                        }
-                    });
-                }
-            });
+            } else {
+                
+                // #region COMET
+                var atomComet = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                .setDepth(100);
+                atomComet.play('atomCometSpawn');
+                atomComet.chain(['atomCometIdle']);
+                atomComet.name = "atomComet";
 
-            this.tweens.add({
-                targets: this.blackholeLabels,
-                alpha: {from: 0, to: 1},
-                ease: 'Sine.easeOutIn',
-                duration: 100,
-                delay: _delay * _index //this.tweens.stagger(150)
-            });
+
+                // rainbow electronFanfare
+                var electronFanfare = this.add.sprite(this.snake.head.x + 6,this.snake.head.y + 6)
+                .setDepth(100);//.setOrigin(0.25,0.25);
+                electronFanfare.play('electronFanfareForm');
+                electronFanfare.name = "electronFanfare";
+
+                // Atomic Comet and Electron Fanfare Tween
+            
+                electronFanfare.on('animationcomplete', (animation, frame) => {
+                    if (animation.key === 'electronFanfareForm') {
+                        this.tweens.add({
+                            targets: [electronFanfare,atomComet],
+                            x: this.extractHole.getCenter().x,
+                            y: this.extractHole.getCenter().y,
+                            ease: 'Back.easeIn',
+                            delay: 500,
+                            duration: 1250,
+                            onComplete: () => {
+                                this.countDownTimer.setAlpha(1);
+                                this.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
+                                this.countDownTimer.y = 3;
+                                //atomComet.destroy();
+                            }
+                        });
+                                this.countDownTimer.setHTML('W1N');
+                                this.countDownTimer.x += 3
+                        }
+                        
+                });
+    
+                electronFanfare.chain(['electronFanfareIdle']);
+                //#endregion
+            }
+
+            
 
             // #endregion
 
@@ -13650,7 +13700,7 @@ class ScoreScene extends Phaser.Scene {
 
             } else {
                 ourGame.events.emit('spawnBlackholes', ourGame.snake.direction);
-                ourGame.events.emit("spawnArrows", ourGame.snake.head);
+                //ourGame.events.emit("spawnArrows", ourGame.snake.head);
             }
             
             
@@ -13710,7 +13760,6 @@ class ScoreScene extends Phaser.Scene {
             if (!gameOver) {
                 // Go Back Playing To Select New Stage
                 ourScoreScene.scene.stop();
-                ourGame.gState = GState.START_WAIT;
                 ourGame.bgTween = ourGame.tweens.add({
                     targets: [ourGame.stageBackGround, ourGame.continueBanner],
                     alpha: 0,
