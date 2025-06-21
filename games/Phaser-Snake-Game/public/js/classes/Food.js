@@ -476,16 +476,166 @@ var Food = new Phaser.Class({
                     this.visible = false;
 
                     scene.playAtomSound();
-                    // Finale Fanfare!
+
+                    // #region BAR RAINBOW
+                    /* Boost Bar Rainbow Code.
+                    scene.fxBoost = scene.boostBar.preFX.addColorMatrix();
+                    scene.tweens.addCounter({
+                        from: 0,
+                        to: 360,
+                        duration: 3000,
+                        loop: -1,
+                        onUpdate: (tween) => {
+                            let hueValue = tween.getValue();
+                            scene.fxBoost.hue(hueValue);
+                    
+                            // Update each segment's tint with an offset and apply pastel effect
+                            scene.snake.body.forEach((part, index) => {
+                                // Add an offset to the hue for each segment
+                                let partHueValue = (hueValue + index * 12.41) % 360;
+                    
+                                // Reduce saturation and increase lightness
+                                let color = Phaser.Display.Color.HSVToRGB(partHueValue / 360, 0.5, 1); // Adjusted to pastel
+                    
+                                if (color) {// only update color when it's not null
+                                    part.setTint(color.color);
+                                }
+                            });
+                        }
+                    });*/
+
+                    // #endregion
+                    
+                    // Finalfare!
+
+                    scene.snake.criticalStateTween.pause(); 
                     scene.tweens.add({
                         targets: scene.snake.head,
                         x: {from: scene.snake.previous[0], to:_x },
                         y: { from: scene.snake.previous[1], to:_y },
-                        duration: 800,
+                        duration: 2000,
+                        ease:'Expo.easeIn', // 'Expo.easeIn' 'Back.easeIn'
                         onComplete: () => {
                             this.move(scene);
+
+                            // #region COMET
+                            scene.atomComet = scene.add.sprite(scene.snake.head.x + 6,scene.snake.head.y + 6)
+                            .setDepth(100);
+                            scene.atomComet.play('atomCometSpawn');
+                            scene.atomComet.chain(['atomCometIdle']);
+            
+            
+                            // rainbow electronFanfare
+                            scene.electronFanfare = scene.add.sprite(scene.snake.head.x + 6,scene.snake.head.y + 6)
+                            .setDepth(100);
+                            scene.electronFanfare.play('electronFanfareForm');
+
+                            // Atomic Comet and Electron Fanfare Tween
+                        
+                            scene.electronFanfare.on('animationcomplete', (animation, frame) => {
+                                if (animation.key === 'electronFanfareForm') {
+                                    scene.tweens.add({
+                                        targets: [scene.electronFanfare,scene.atomComet],
+                                        //x: scene.scoreFrame.getCenter().x -6,
+                                        //y: scene.scoreFrame.getCenter().y,
+                                        ease: 'Sine.easeIn',
+                                        duration: 1250,
+                                        onComplete: () => {
+                                            scene.countDownTimer.setAlpha(1);
+                                            scene.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
+                                            scene.countDownTimer.y = 3;
+                                            //scene.atomComet.destroy();
+                                        }
+                                    });
+                                            scene.countDownTimer.setHTML('W1N');
+                                            scene.countDownTimer.x += 3
+                                    }
+                                    
+                            });
+                
+                            scene.electronFanfare.chain(['electronFanfareIdle']);
+                            //#endregion
+                            
                         }
                     });
+
+                    // #region Spiral
+
+                    var body = scene.snake.body.slice(1, scene.snake.body.length);
+
+                    var graphics = scene.add.graphics();
+                    graphics.lineStyle(1, 0xffffff, 1);
+
+                    var flipCounter = 0;
+
+                    body.forEach( segment => {
+                        var path = new Phaser.Curves.Path();
+
+                        segment.setOrigin(0.5,0.5);
+                        segment.x = segment.x + GRID / 2;
+                        segment.y = segment.y + GRID / 2;
+
+                        var r = Phaser.Math.Distance.BetweenPoints(scene.snake.head.getCenter(), segment.getCenter());
+                        var _angle = Phaser.Math.Angle.BetweenPoints(scene.snake.head, segment);
+
+                        var _degrees = Phaser.Math.RadToDeg(_angle);
+
+                        var clockwise;
+                        flipCounter++;
+
+                        if (flipCounter % 2 === 0) {
+                            clockwise = true;
+                        } else {
+                            clockwise = false;
+                        }
+                        
+                        
+                        path.add(new Phaser.Curves.Ellipse(
+                            scene.snake.head.getCenter().x, 
+                            scene.snake.head.getCenter().y, 
+                            r,
+                            r,
+                            0,
+                            360,
+                            clockwise,
+                            _degrees  
+                        ));
+
+                        var follower = { t: 0, vec: new Phaser.Math.Vector2(segment.x, segment.y),  };
+
+                        
+                        // path.draw(graphics); // Draws the circle paths
+
+                        
+
+                        scene.tweens.add({
+                            targets: follower,
+                            t: 1,
+                            ease: 'Linear',
+                            duration: Phaser.Math.Between(2000,3000),
+                            //yoyo: true,
+                            repeat: -1,
+                            onUpdate: (tween, targets) => {
+                                path.getPoint(targets.t, targets.vec);
+                                segment.x = targets.vec.x;
+                                segment.y = targets.vec.y;
+
+                            }
+                        });
+
+                        var _radius = Phaser.Math.Between(22,27);
+                        scene.tweens.add({
+                            targets: path.curves,
+                            ease: 'Back.easeIn',
+                            duration: 2500,
+                            xRadius: _radius,
+                            yRadius: _radius,
+                        })
+                    });
+
+                    
+
+                    // #endregion
                 }
                 
             }
