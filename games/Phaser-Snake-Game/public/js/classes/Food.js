@@ -101,9 +101,9 @@ var Food = new Phaser.Class({
                 var _x = this.prevX;
                 var _y = this.prevY;
 
-                var finalAtom = scene.add.sprite(_x, _y).setOrigin(0,0);
-                finalAtom.play("atom02idle", this.frame.name); // Needs to select the correct frame
-                finalAtom.setDepth(45); 
+                var finalAtomCopy = scene.add.sprite(_x, _y).setOrigin(0,0);
+                finalAtomCopy.play("atom02idle", this.frame.name); // Needs to select the correct frame
+                finalAtomCopy.setDepth(45); 
 
                 var tempSounds = [];
 
@@ -182,15 +182,12 @@ var Food = new Phaser.Class({
                             vortexTween.on('complete', () => {
 
                                 scene.hidePortals(120);
-                                
-
+                            
                                 scene.time.delayedCall(1, () => {
-
-
 
                                     //scene.playAtomSound();
                                     scene.snake.grow(scene);
-                                    finalAtom.destroy();
+                                    finalAtomCopy.destroy();
                                     scene.events.emit('win');
                                 
                                     // Store speed values
@@ -458,10 +455,6 @@ var Food = new Phaser.Class({
                                             scene.timeScale = slowMoValCopy /2;
                                         }
                                     });*/
-                            
-                                    
-
-
                                     
                                     console.log('tween finished, start electrons');
                         
@@ -478,8 +471,8 @@ var Food = new Phaser.Class({
                     scene.playAtomSound();
 
                     // #region BAR RAINBOW
-                    /* Boost Bar Rainbow Code.
-                    scene.fxBoost = scene.boostBar.preFX.addColorMatrix();
+                    // Boost Bar Rainbow Code.
+                    //scene.fxBoost = scene.boostBar.preFX.addColorMatrix();
                     scene.tweens.addCounter({
                         from: 0,
                         to: 360,
@@ -487,7 +480,7 @@ var Food = new Phaser.Class({
                         loop: -1,
                         onUpdate: (tween) => {
                             let hueValue = tween.getValue();
-                            scene.fxBoost.hue(hueValue);
+                            //scene.fxBoost.hue(hueValue);
                     
                             // Update each segment's tint with an offset and apply pastel effect
                             scene.snake.body.forEach((part, index) => {
@@ -502,21 +495,26 @@ var Food = new Phaser.Class({
                                 }
                             });
                         }
-                    });*/
+                    });
 
                     // #endregion
                     
                     // Finalfare!
+
+                    var timeToScoreScreen = 2250;
 
                     scene.snake.criticalStateTween.pause(); 
                     scene.tweens.add({
                         targets: scene.snake.head,
                         x: {from: scene.snake.previous[0], to:_x },
                         y: { from: scene.snake.previous[1], to:_y },
-                        duration: 2000,
+                        duration: timeToScoreScreen,
                         ease:'Expo.easeIn', // 'Expo.easeIn' 'Back.easeIn'
                         onComplete: () => {
                             this.move(scene);
+                            scene.hidePortals(120);
+                            scene.events.emit('win');
+                            finalAtomCopy.destroy();
 
                             // #region COMET
                             scene.atomComet = scene.add.sprite(scene.snake.head.x + 6,scene.snake.head.y + 6)
@@ -627,7 +625,7 @@ var Food = new Phaser.Class({
                         scene.tweens.add({
                             targets: path.curves,
                             ease: 'Back.easeIn',
-                            duration: 2500,
+                            duration: timeToScoreScreen,
                             xRadius: _radius,
                             yRadius: _radius,
                         })
