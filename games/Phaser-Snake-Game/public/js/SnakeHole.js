@@ -7886,7 +7886,7 @@ class GameScene extends Phaser.Scene {
                 ourGameScene.extractPanel.setAlpha(0);
                 // show the level labels again
                 ourGameScene.tweens.add({
-                    targets: [...ourGameScene.blackholeLabels, ourGameScene.r3,ourGameScene.extractText],
+                    targets: [...ourGameScene.blackholeLabels, ourGameScene.r3],
                     yoyo: false,
                     duration: 500,
                     ease: 'Linear',
@@ -8373,30 +8373,14 @@ class GameScene extends Phaser.Scene {
                         if (this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX) && this.mode != MODES.HARDCORE) {
                             var extractTile = this.nextStagePortalLayer.findByIndex(EXTRACT_BLACK_HOLE_INDEX);
                             var extractImage = this.add.sprite(extractTile.pixelX + X_OFFSET, extractTile.pixelY + Y_OFFSET, 'extractHole.png' 
-                            ).setDepth(10).setOrigin(0.4125,0.4125).play('extractHoleIdle');
+                            ).setDepth(10).setOrigin(0.4125,0.4125);
+                            extractImage.alpha = 0;
                             extractTile.index = -1;
-    
-                            this.extractText = this.add.bitmapText(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY + GRID * 2 + Y_OFFSET, 'mainFont', 
-                                "EXTRACT!", 
-                                16).setOrigin(0.5,0.5).setDepth(50).setAlpha(0).setScale(1);
                             
-                            
-                            this.r3 = this.add.rectangle(extractTile.pixelX + X_OFFSET + GRID * 0.5, extractTile.pixelY - 11 + GRID * 3 + Y_OFFSET, this.extractText.width + 8, 22, 0x1a1a1a  
-                            ).setDepth(49).setAlpha(0);
-                            //debugger
-                            this.r3.postFX.addShine(1, .5, 5)
-                            this.r3.setStrokeStyle(2, 0x4d9be6, 0.75);
     
                             this.extractHole = extractImage;
-                            this.extractLables.push(this.extractText,this.r3);
-    
-                            this.tweens.add({
-                                targets: [this.r3,this.extractText],
-                                alpha: {from: 0, to: 1},
-                                ease: 'Sine.easeOutIn',
-                                duration: 50,
-                                delay: this.tweens.stagger(150)
-                            });
+                            
+                            
                             
                         } else {           
 
@@ -8826,8 +8810,8 @@ class GameScene extends Phaser.Scene {
                     if (animation.key === 'electronFanfareForm') {
                         this.tweens.add({
                             targets: [electronFanfare,atomComet],
-                            x: this.extractHole.getCenter().x,
-                            y: this.extractHole.getCenter().y,
+                            x: this.extractHole.getCenter().x + 3,
+                            y: this.extractHole.getCenter().y + 3,
                             ease: 'Back.easeIn',
                             delay: 500,
                             duration: 1250,
@@ -8835,11 +8819,13 @@ class GameScene extends Phaser.Scene {
                                 this.countDownTimer.setAlpha(1);
                                 this.countDownTimer.x = X_OFFSET + GRID * 4 - 6;
                                 this.countDownTimer.y = 3;
+                                this.extractHole.alpha = 1;
+                                this.extractHole.play('extractHoleIdle');
                                 //atomComet.destroy();
                             }
                         });
-                                this.countDownTimer.setHTML('W1N');
-                                this.countDownTimer.x += 3
+                                
+                                //this.countDownTimer.x += 3
                         }
                         
                 });

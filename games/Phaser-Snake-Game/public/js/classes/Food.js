@@ -503,6 +503,8 @@ var Food = new Phaser.Class({
 
                     var timeToScoreScreen = 2250;
 
+                    
+
                     scene.snake.criticalStateTween.pause(); 
                     scene.tweens.add({
                         targets: scene.snake.head,
@@ -513,6 +515,8 @@ var Food = new Phaser.Class({
                         onComplete: () => {
                             this.move(scene);
                             scene.hidePortals(120);
+                            scene.countDownTimer.setHTML('W1N');
+                            //scene.countDownTimer.x += 3;
                             scene.events.emit('win');
                             finalAtomCopy.destroy();
                             
@@ -568,7 +572,7 @@ var Food = new Phaser.Class({
 
                         
 
-                        scene.tweens.add({
+                        var pathTween = scene.tweens.add({
                             targets: follower,
                             t: 1,
                             ease: 'Linear',
